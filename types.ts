@@ -74,3 +74,14 @@ export interface AuthResponse {
   user: User;
   token: string;
 }
+
+export interface Payment {
+  id: number;
+  orderId: number;
+  userId: number;
+  amount: number;
+  status: 'pending' | 'completed' | 'failed' | 'refunded';
+  paymentMethod: string;
+  transactionId?: string;
+  createdAt: string;
+}

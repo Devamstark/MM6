@@ -144,3 +144,34 @@ insert into public.products (name, description, price, image_url, category, bran
 ('Smart Watch', 'Fitness tracking redefined.', 299.99, 'https://images.unsplash.com/photo-1523275335684-37898b6baf30', 'Electronics', 'Apple', 30, true, false),
 ('Running Shoes', 'Ultralight performance.', 89.99, 'https://images.unsplash.com/photo-1542291026-7eec264c27ff', 'Sports', 'Nike', 100, false, true),
 ('Leather Backpack', 'Daily urban carry.', 129.50, 'https://images.unsplash.com/photo-1553062407-98eeb64c6a62', 'Accessories', 'Herschel', 25, false, false);
+
+-- PAYMENTS table
+create table public.payments (
+  id uuid default uuid_generate_v4() primary key,
+  order_id uuid references public.orders(id) not null,
+  user_id uuid references auth.users not null,
+  amount decimal(10,2) not null,
+  currency text default 'USD',
+  status text default 'pending' check (status in ('pending', 'completed', 'failed', 'refunded')),
+  payment_method text,
+  provider text,
+  transaction_id text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- Enable RLS on payments
+alter table public.payments enable row level security;
+
+-- Payments Policies
+create policy "Users can view their own payments."
+  on payments for select
+  using ( auth.uid() = user_id );
+
+create policy "Admins can view all payments."
+  on payments for select
+  using ( exists ( select 1 from profiles where id = auth.uid() and role = 'admin' ) );
+
+create policy "Users can insert their own payments."
+  on payments for insert
+  with check ( auth.uid() = user_id );
+

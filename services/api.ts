@@ -10,7 +10,8 @@ const STORAGE_KEYS = {
   PRODUCTS: 'cm_products',
   TOKEN: 'cm_token',
   USER: 'cm_user_data',
-  ORDERS: 'cm_orders' // New key for orders
+  ORDERS: 'cm_orders',
+  PAYMENTS: 'cm_payments'
 };
 
 const INITIAL_PRODUCTS: Product[] = [
@@ -33,11 +34,11 @@ const INITIAL_USERS: User[] = [
 ];
 
 const INITIAL_ORDERS: Order[] = [
-  { 
+  {
     id: 101, userId: 3, customerName: 'John Doe', totalPrice: 348.00, status: 'delivered', createdAt: '2023-10-01',
     items: [INITIAL_PRODUCTS[0]]
   },
-  { 
+  {
     id: 102, userId: 4, customerName: 'Jane Smith', totalPrice: 89.99, status: 'shipped', createdAt: '2023-10-02',
     items: [INITIAL_PRODUCTS[2]]
   }
@@ -85,6 +86,15 @@ const setStoredOrders = (orders: Order[]) => {
   localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
 };
 
+const getStoredPayments = (): any[] => {
+  const stored = localStorage.getItem(STORAGE_KEYS.PAYMENTS);
+  return stored ? JSON.parse(stored) : [];
+};
+
+const setStoredPayments = (payments: any[]) => {
+  localStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(payments));
+};
+
 // ============================================================================
 // API SERVICE
 // ============================================================================
@@ -94,7 +104,7 @@ export const api = {
   login: async (email: string, password: string): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-    
+
     let user: User | undefined;
     if (email === 'admin@cloudmart.com' && password === 'admin') user = users.find(u => u.email === email);
     else if (email === 'seller@cloudmart.com' && password === 'seller') user = users.find(u => u.email === email);
@@ -102,30 +112,30 @@ export const api = {
 
     if (user) {
       if (user.isActive === false) throw new Error('Account is disabled. Contact admin.');
-      
+
       const token = `mock-jwt-token-${user.role}`;
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       return { user, token };
     }
-    
+
     throw new Error('Invalid credentials.');
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-    const newUser: User = { 
-      id: Date.now(), 
-      name, 
-      email, 
-      role, 
-      isActive: true, 
-      createdAt: new Date().toISOString().split('T')[0] 
+    const newUser: User = {
+      id: Date.now(),
+      name,
+      email,
+      role,
+      isActive: true,
+      createdAt: new Date().toISOString().split('T')[0]
     };
     users.push(newUser);
     setStoredUsers(users);
-    
+
     localStorage.setItem(STORAGE_KEYS.TOKEN, 'mock-jwt-token-new');
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
     return { user: newUser, token: 'mock-jwt-token-new' };
@@ -174,8 +184,8 @@ export const api = {
     const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
     const currentUser = storedUser ? JSON.parse(storedUser) : { id: 1 };
 
-    const newProduct = { 
-      ...product, 
+    const newProduct = {
+      ...product,
       id: Date.now(),
       userId: currentUser.id,
       brand: product.brand || 'Generic',
@@ -233,28 +243,36 @@ export const api = {
     // Format items to look like Product[] so dashboards can display them easily
     // In a real app, this would be a JOIN query
     const newOrder: Order = {
-        id: Date.now(),
-        userId: currentUser.id,
-        customerName: currentUser.name,
-        totalPrice: orderData.totalPrice,
-        status: 'pending',
-        createdAt: new Date().toISOString().split('T')[0],
-        shippingAddress: `${orderData.shippingAddress.address}, ${orderData.shippingAddress.city}`,
-        items: orderData.items // Preserves the full product object including userId for seller filtering
+      id: Date.now(),
+      userId: currentUser.id,
+      customerName: currentUser.name,
+      totalPrice: orderData.totalPrice,
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0],
+      shippingAddress: `${orderData.shippingAddress.address}, ${orderData.shippingAddress.city}`,
+      items: orderData.items // Preserves the full product object including userId for seller filtering
     };
 
     orders.unshift(newOrder); // Add to top of list
     setStoredOrders(orders);
-    
+
     // Decrease stock (mock logic)
     const products = getStoredProducts();
     orderData.items.forEach((item: any) => {
-        const product = products.find(p => p.id === item.id);
-        if(product) {
-            product.stock = Math.max(0, product.stock - (item.quantity || 1));
-        }
+      const product = products.find(p => p.id === item.id);
+      if (product) {
+        product.stock = Math.max(0, product.stock - (item.quantity || 1));
+      }
     });
     setStoredProducts(products);
+
+    // Process Payment automatically for this mock
+    await api.processPayment({
+      orderId: newOrder.id,
+      amount: newOrder.totalPrice,
+      paymentMethod: 'Credit Card',
+      cardDetails: orderData.paymentDetails
+    });
 
     return newOrder;
   },
@@ -274,7 +292,7 @@ export const api = {
     const products = getStoredProducts();
     const users = getStoredUsers();
     const orders = getStoredOrders();
-    
+
     const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
 
     return {
@@ -291,35 +309,62 @@ export const api = {
     const orders = getStoredOrders().filter(order => order.items?.some(item => item.userId === sellerId));
     let revenue = 0;
     let units = 0;
-    
+
     orders.forEach(order => {
-        const sellerItems = order.items?.filter(item => item.userId === sellerId) || [];
-        sellerItems.forEach(item => {
-            // Assume quantity is 1 if not present for mock compat
-            const qty = (item as any).quantity || 1;
-            revenue += item.price * qty;
-            units += qty;
-        });
+      const sellerItems = order.items?.filter(item => item.userId === sellerId) || [];
+      sellerItems.forEach(item => {
+        // Assume quantity is 1 if not present for mock compat
+        const qty = (item as any).quantity || 1;
+        revenue += item.price * qty;
+        units += qty;
+      });
     });
 
     // Fallback if no orders yet for demo purposes
-    if (revenue === 0) revenue = 12450; 
+    if (revenue === 0) revenue = 12450;
     if (units === 0) units = 142;
 
     return {
-        totalRevenue: revenue,
-        revenueGrowth: 12,
-        unitsSold: units,
-        unitsGrowth: 8.5,
-        conversionRate: 3.2,
-        conversionGrowth: 0.4,
-        monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95]
+      totalRevenue: revenue,
+      revenueGrowth: 12,
+      unitsSold: units,
+      unitsGrowth: 8.5,
+      conversionRate: 3.2,
+      conversionGrowth: 0.4,
+      monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95]
     };
   },
 
   getUsers: async (): Promise<User[]> => {
     await delay(400);
     return getStoredUsers();
+  },
+
+  // --- Payments ---
+  processPayment: async (paymentData: { orderId: number, amount: number, paymentMethod: string, cardDetails?: any }): Promise<any> => {
+    await delay(1000);
+
+    // Simulate payment failure for specific amount (e.g., if amount ends in .99) - optional, keeping it simple for now
+
+    const payments = getStoredPayments();
+    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 999 };
+
+    const newPayment = {
+      id: Date.now(),
+      orderId: paymentData.orderId,
+      userId: currentUser.id,
+      amount: paymentData.amount,
+      status: 'completed', // Mock success
+      paymentMethod: paymentData.paymentMethod || 'Credit Card',
+      transactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: new Date().toISOString()
+    };
+
+    payments.push(newPayment);
+    setStoredPayments(payments);
+
+    return newPayment;
   },
 
   updateUserStatus: async (userId: number, isActive: boolean): Promise<void> => {
