@@ -1,0 +1,5 @@
+{
+  "name": "CloudMart E-Commerce",
+  "description": "A full-stack e-commerce solution with React frontend and Node.js/Sequelize backend, designed for AWS deployment.",
+  "requestFramePermissions": []
+}
