@@ -105,21 +105,21 @@ export const AdminDashboard = () => {
   if (loading) return <div className="p-10 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-indigo-600"/></div>;
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-          <p className="text-gray-500">Overview of store performance and management.</p>
+    <div className="bg-[#f0f4f8] min-h-screen pb-12">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="mb-8 animate-fade-up">
+          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
+          <p className="text-gray-500 mt-2">Overview of store performance and management.</p>
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-1 bg-white p-1 rounded-xl shadow-sm mb-8 w-fit border border-gray-200 overflow-x-auto">
+        <div className="flex space-x-2 bg-white p-1.5 rounded-full shadow-sm mb-8 w-fit border border-gray-100 overflow-x-auto animate-fade-up delay-100">
           {['overview', 'products', 'sellers', 'users', 'orders'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors whitespace-nowrap ${
-                activeTab === tab ? 'bg-indigo-100 text-indigo-700' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              className={`px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all whitespace-nowrap ${
+                activeTab === tab ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
               }`}
             >
               {tab}
@@ -128,55 +128,56 @@ export const AdminDashboard = () => {
         </div>
 
         {/* Tab Content */}
+        <div className="animate-fade-up delay-200">
         {activeTab === 'overview' && stats && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon={DollarSign} color="text-green-600" bg="bg-green-100" />
-            <StatCard title="Total Orders" value={stats.totalOrders} icon={ShoppingBag} color="text-blue-600" bg="bg-blue-100" />
-            <StatCard title="Total Products" value={stats.totalProducts} icon={Package} color="text-orange-600" bg="bg-orange-100" />
-            <StatCard title="Total Users" value={stats.totalUsers || 0} icon={Users} color="text-purple-600" bg="bg-purple-100" />
+            <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon={DollarSign} color="text-green-600" bg="bg-green-50" delay={0} />
+            <StatCard title="Total Orders" value={stats.totalOrders} icon={ShoppingBag} color="text-blue-600" bg="bg-blue-50" delay={100} />
+            <StatCard title="Total Products" value={stats.totalProducts} icon={Package} color="text-orange-600" bg="bg-orange-50" delay={200} />
+            <StatCard title="Total Users" value={stats.totalUsers || 0} icon={Users} color="text-purple-600" bg="bg-purple-50" delay={300} />
           </div>
         )}
 
         {activeTab === 'products' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-             <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 className="font-bold text-gray-800">All Products</h3>
-                <button onClick={() => openModal()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+             <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                <h3 className="font-bold text-lg text-gray-800">All Products</h3>
+                <button onClick={() => openModal()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
                    <Plus className="w-4 h-4" /> Add Product
                 </button>
              </div>
-             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+             <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-white">
                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Seller</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Stock</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
                    </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-50">
                    {products.map(p => {
                       const seller = users.find(u => u.id === p.userId);
                       return (
-                      <tr key={p.id}>
+                      <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                          <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                               <img className="h-10 w-10 rounded-lg object-cover" src={p.imageUrl} alt="" />
+                               <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
                                <div className="ml-4">
-                                  <div className="text-sm font-medium text-gray-900">{p.name}</div>
-                                  <div className="text-xs text-gray-500">{p.brand}</div>
+                                  <div className="text-sm font-bold text-gray-900">{p.name}</div>
+                                  <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
                                </div>
                             </div>
                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                            {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${p.price}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${p.price}</td>
                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onClick={() => openModal(p)} className="text-indigo-600 hover:text-indigo-900 mr-3"><Edit2 className="w-4 h-4"/></button>
-                            <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:text-red-900"><Trash2 className="w-4 h-4"/></button>
+                            <button onClick={() => openModal(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4"/></button>
+                            <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4"/></button>
                          </td>
                       </tr>
                    )})}
@@ -187,39 +188,39 @@ export const AdminDashboard = () => {
 
         {/* Sellers Management Tab */}
         {activeTab === 'sellers' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-             <div className="p-4 border-b border-gray-200">
-                <h3 className="font-bold text-gray-800">Seller Management</h3>
-                <p className="text-xs text-gray-500">Enable or disable seller accounts and view their inventory size.</p>
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+             <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+                <h3 className="font-bold text-lg text-gray-800">Seller Management</h3>
+                <p className="text-sm text-gray-500 mt-1">Enable or disable seller accounts and view their inventory size.</p>
              </div>
-             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+             <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-white">
                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Seller Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Products</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller Name</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Products</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
                    </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-50">
                    {sellers.map(s => (
-                      <tr key={s.id} className={s.isActive === false ? 'bg-gray-50 opacity-75' : ''}>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{s.name}</td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{s.email}</td>
+                      <tr key={s.id} className={`hover:bg-gray-50 transition-colors ${s.isActive === false ? 'bg-gray-50/80 opacity-75' : ''}`}>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{s.name}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{s.email}</td>
                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{getSellerProductCount(s.id)}</td>
                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                               ${s.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                               ${s.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                                {s.isActive !== false ? 'Active' : 'Disabled'}
                             </span>
                          </td>
                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                             <button 
                               onClick={() => toggleUserStatus(s.id, s.isActive)}
-                              className={`flex items-center gap-1 ml-auto px-3 py-1 rounded border transition-colors ${s.isActive !== false 
-                                ? 'text-red-600 border-red-200 hover:bg-red-50' 
-                                : 'text-green-600 border-green-200 hover:bg-green-50'}`}
+                              className={`flex items-center gap-1.5 ml-auto px-4 py-2 rounded-full border transition-all text-xs font-bold ${s.isActive !== false 
+                                ? 'text-red-600 border-red-100 hover:bg-red-50' 
+                                : 'text-green-600 border-green-100 hover:bg-green-50'}`}
                             >
                               {s.isActive !== false ? <><Ban className="w-3 h-3" /> Disable</> : <><CheckCircle className="w-3 h-3" /> Enable</>}
                             </button>
@@ -228,42 +229,42 @@ export const AdminDashboard = () => {
                    ))}
                 </tbody>
              </table>
-             {sellers.length === 0 && <div className="p-8 text-center text-gray-500">No sellers found.</div>}
+             {sellers.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No sellers found.</div>}
           </div>
         )}
 
         {activeTab === 'users' && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+          <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+             <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-white">
                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">User</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
                    </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-50">
                    {users.map(u => (
-                      <tr key={u.id}>
+                      <tr key={u.id} className="hover:bg-gray-50 transition-colors">
                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="text-sm font-medium text-gray-900">{u.name}</div>
-                            <div className="text-sm text-gray-500">{u.email}</div>
+                            <div className="text-sm font-bold text-gray-900">{u.name}</div>
+                            <div className="text-xs text-gray-500 font-medium">{u.email}</div>
                          </td>
                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                               ${u.role === 'admin' ? 'bg-purple-100 text-purple-800' : 
-                                 u.role === 'seller' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}`}>
-                               {u.role}
+                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                               ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' : 
+                                 u.role === 'seller' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                               {u.role.toUpperCase()}
                             </span>
                          </td>
                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                               ${u.isActive !== false ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                               ${u.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
                                {u.isActive !== false ? 'Active' : 'Disabled'}
                             </span>
                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{u.createdAt || 'N/A'}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{u.createdAt || 'N/A'}</td>
                       </tr>
                    ))}
                 </tbody>
@@ -272,14 +273,14 @@ export const AdminDashboard = () => {
         )}
         
         {activeTab === 'orders' && (
-           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-             <div className="p-4 border-b border-gray-200 bg-gray-50 flex items-center gap-4">
+           <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+             <div className="p-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-4">
                 <div className="flex items-center gap-2 text-gray-600">
                   <Filter className="w-4 h-4" />
-                  <span className="text-sm font-medium">Filter by Seller:</span>
+                  <span className="text-sm font-bold">Filter by Seller:</span>
                 </div>
                 <select 
-                  className="border border-gray-300 rounded-md text-sm p-1.5 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="border-none bg-white rounded-lg text-sm p-2 px-4 shadow-sm focus:ring-2 focus:ring-indigo-100"
                   value={sellerFilter}
                   onChange={(e) => setSellerFilter(e.target.value)}
                 >
@@ -289,75 +290,76 @@ export const AdminDashboard = () => {
                   ))}
                 </select>
              </div>
-             <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+             <table className="min-w-full divide-y divide-gray-100">
+                <thead className="bg-white">
                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Customer</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Items & Fulfillment</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Total</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Order ID</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Customer</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Items & Fulfillment</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Total</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
                    </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white divide-y divide-gray-50">
                    {filteredOrders.map(order => (
-                      <tr key={order.id}>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">#{order.id}</td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.customerName}</td>
+                      <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">#{order.id}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{order.customerName}</td>
                          <td className="px-6 py-4 text-sm text-gray-500">
-                           <div className="space-y-1">
+                           <div className="space-y-2">
                              {order.items?.map((item, idx) => {
                                const seller = users.find(u => u.id === item.userId);
                                return (
-                                 <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 p-1 rounded">
-                                   <span className="font-medium truncate max-w-[150px]">{item.name}</span>
-                                   <span className="text-gray-400 text-[10px] ml-2">Sold by: {seller?.name || 'Unknown'}</span>
+                                 <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
+                                   <span className="font-bold text-gray-700 truncate max-w-[150px]">{item.name}</span>
+                                   <span className="text-indigo-500 font-medium text-[10px] ml-2">Sold by: {seller?.name || 'Unknown'}</span>
                                  </div>
                                )
                              })}
                              {(!order.items || order.items.length === 0) && <span className="text-gray-400 italic">No items details</span>}
                            </div>
                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${order.totalPrice.toFixed(2)}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${order.totalPrice.toFixed(2)}</td>
                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                               ${order.status === 'delivered' ? 'bg-green-100 text-green-800' : 
-                                 order.status === 'shipped' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                            <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                               ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 
+                                 order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
                                {order.status}
                             </span>
                          </td>
-                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{order.createdAt}</td>
+                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{order.createdAt}</td>
                       </tr>
                    ))}
                 </tbody>
              </table>
-             {filteredOrders.length === 0 && <div className="p-8 text-center text-gray-500">No orders found.</div>}
+             {filteredOrders.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No orders found.</div>}
            </div>
         )}
+        </div>
 
       </div>
       
       {/* Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl shadow-xl max-w-lg w-full p-6 animate-fade-in">
-             <h3 className="text-lg font-bold mb-4">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-white rounded-[2rem] shadow-2xl max-w-lg w-full p-8 animate-scale-in">
+             <h3 className="text-2xl font-bold mb-6 text-gray-900">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
              <form onSubmit={handleSubmit} className="space-y-4">
-                <input className="w-full border rounded p-2" placeholder="Product Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
+                <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Product Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required />
                 <div className="grid grid-cols-2 gap-4">
-                   <input className="border rounded p-2" placeholder="Price" type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
-                   <input className="border rounded p-2" placeholder="Stock" type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
+                   <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Price" type="number" value={formData.price} onChange={e => setFormData({...formData, price: e.target.value})} required />
+                   <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Stock" type="number" value={formData.stock} onChange={e => setFormData({...formData, stock: e.target.value})} required />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                   <input className="border rounded p-2" placeholder="Category" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
-                   <input className="border rounded p-2" placeholder="Brand" value={formData.brand} onChange={e => setFormData({...formData, brand: e.target.value})} required />
+                   <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Category" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})} required />
+                   <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Brand" value={formData.brand} onChange={e => setFormData({...formData, brand: e.target.value})} required />
                 </div>
-                <input className="w-full border rounded p-2" placeholder="Image URL" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} required />
-                <textarea className="w-full border rounded p-2" placeholder="Description" rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
-                <div className="flex justify-end gap-2">
-                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 text-gray-600">Cancel</button>
-                   <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700">Save</button>
+                <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Image URL" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} required />
+                <textarea className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Description" rows={3} value={formData.description} onChange={e => setFormData({...formData, description: e.target.value})} />
+                <div className="flex justify-end gap-3 pt-4">
+                   <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancel</button>
+                   <button type="submit" className="px-6 py-2.5 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">Save</button>
                 </div>
              </form>
           </div>
@@ -367,14 +369,14 @@ export const AdminDashboard = () => {
   );
 };
 
-const StatCard = ({ title, value, icon: Icon, color, bg }: any) => (
-  <div className="bg-white overflow-hidden rounded-xl shadow-sm border border-gray-200 p-6 flex items-center">
-    <div className={`p-3 rounded-full ${bg} ${color} mr-4`}>
+const StatCard = ({ title, value, icon: Icon, color, bg, delay }: any) => (
+  <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
+    <div className={`p-4 rounded-2xl ${bg} ${color} mr-5`}>
       <Icon className="h-8 w-8" />
     </div>
     <div>
-      <p className="text-sm font-medium text-gray-500 truncate">{title}</p>
-      <p className="text-2xl font-semibold text-gray-900">{value}</p>
+      <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">{title}</p>
+      <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
     </div>
   </div>
 );

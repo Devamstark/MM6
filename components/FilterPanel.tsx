@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
+import { X } from 'lucide-react';
 
 interface FilterPanelProps {
   filters: {
@@ -25,14 +26,56 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
     fetchData();
   }, []);
 
+  const hasActiveFilters = filters.category || filters.brand || filters.minPrice || filters.maxPrice;
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-bold text-gray-900">Filters</h2>
+        {hasActiveFilters && (
+            <button
+                onClick={onClearFilters}
+                className="text-xs font-semibold text-red-600 hover:text-red-800 bg-red-50 px-2 py-1 rounded-md transition-colors"
+            >
+                Clear All
+            </button>
+        )}
+      </div>
+
+      {/* Price Filter */}
+      <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm">
+        <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide">Price Range</h3>
+        <div className="flex items-center gap-3">
+          <div className="relative flex-1">
+             <span className="absolute left-3 top-2.5 text-gray-400 text-sm">$</span>
+             <input
+                type="number"
+                placeholder="0"
+                className="w-full pl-6 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50 focus:bg-white transition-all"
+                value={filters.minPrice}
+                onChange={(e) => onFilterChange('minPrice', e.target.value)}
+            />
+          </div>
+          <span className="text-gray-300 font-light">—</span>
+          <div className="relative flex-1">
+             <span className="absolute left-3 top-2.5 text-gray-400 text-sm">$</span>
+             <input
+                type="number"
+                placeholder="Max"
+                className="w-full pl-6 pr-3 py-2 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none bg-gray-50 focus:bg-white transition-all"
+                value={filters.maxPrice}
+                onChange={(e) => onFilterChange('maxPrice', e.target.value)}
+            />
+          </div>
+        </div>
+      </div>
+
       {/* Category Filter */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-2">Category</h3>
-        <div className="space-y-1">
+        <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1">Categories</h3>
+        <div className="space-y-2">
           <div 
-             className={`cursor-pointer text-sm ${filters.category === '' ? 'font-bold text-blue-600' : 'text-gray-600'}`}
+             className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.category === '' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-gray-600 hover:bg-gray-100'}`}
              onClick={() => onFilterChange('category', '')}
           >
             All Departments
@@ -40,7 +83,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
           {categories.map(cat => (
             <div 
               key={cat}
-              className={`cursor-pointer text-sm hover:text-blue-600 ${filters.category === cat ? 'font-bold text-blue-600' : 'text-gray-600'}`}
+              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.category === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-gray-600 hover:bg-gray-100'}`}
               onClick={() => onFilterChange('category', cat)}
             >
               {cat}
@@ -49,42 +92,20 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
         </div>
       </div>
 
-      {/* Price Filter */}
-      <div>
-        <h3 className="font-bold text-gray-900 mb-2">Price</h3>
-        <div className="flex items-center space-x-2">
-          <input
-            type="number"
-            placeholder="Min"
-            className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-            value={filters.minPrice}
-            onChange={(e) => onFilterChange('minPrice', e.target.value)}
-          />
-          <span className="text-gray-400">-</span>
-          <input
-            type="number"
-            placeholder="Max"
-            className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-            value={filters.maxPrice}
-            onChange={(e) => onFilterChange('maxPrice', e.target.value)}
-          />
-        </div>
-      </div>
-
       {/* Brand Filter */}
       <div>
-        <h3 className="font-bold text-gray-900 mb-2">Brand</h3>
-        <div className="space-y-1">
+        <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1">Brands</h3>
+        <div className="flex flex-wrap gap-2">
           <div 
-             className={`cursor-pointer text-sm ${filters.brand === '' ? 'font-bold text-blue-600' : 'text-gray-600'}`}
+             className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${filters.brand === '' ? 'bg-gray-900 text-white border-gray-900' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'}`}
              onClick={() => onFilterChange('brand', '')}
           >
-            All Brands
+            All
           </div>
           {brands.map(brand => (
             <div 
               key={brand}
-              className={`cursor-pointer text-sm hover:text-blue-600 ${filters.brand === brand ? 'font-bold text-blue-600' : 'text-gray-600'}`}
+              className={`cursor-pointer px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${filters.brand === brand ? 'bg-gray-900 text-white border-gray-900' : 'bg-white border-gray-200 text-gray-600 hover:border-gray-400'}`}
               onClick={() => onFilterChange('brand', brand)}
             >
               {brand}
@@ -92,13 +113,6 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
           ))}
         </div>
       </div>
-
-      <button
-        onClick={onClearFilters}
-        className="text-sm text-blue-600 hover:underline"
-      >
-        Clear all filters
-      </button>
     </div>
   );
 };
