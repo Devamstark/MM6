@@ -26,7 +26,15 @@ const Product = sequelize.define('Product', {
 // --- Order Model ---
 const Order = sequelize.define('Order', {
   totalPrice: { type: DataTypes.DECIMAL(10, 2), allowNull: false },
-  status: { type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'), defaultValue: 'pending' }
+  status: { type: DataTypes.ENUM('pending', 'shipped', 'delivered', 'cancelled'), defaultValue: 'pending' },
+  customerName: { type: DataTypes.STRING },
+  shippingAddress: { type: DataTypes.TEXT }
+});
+
+// --- OrderItem Model ---
+const OrderItem = sequelize.define('OrderItem', {
+  quantity: { type: DataTypes.INTEGER, allowNull: false },
+  price: { type: DataTypes.DECIMAL(10, 2), allowNull: false } // Price at time of purchase
 });
 
 // Relationships
@@ -37,4 +45,10 @@ Order.belongsTo(User);
 User.hasMany(Product, { foreignKey: 'userId' });
 Product.belongsTo(User, { foreignKey: 'userId' });
 
-module.exports = { sequelize, User, Product, Order };
+// Order Items Relationship
+Order.hasMany(OrderItem);
+OrderItem.belongsTo(Order);
+Product.hasMany(OrderItem);
+OrderItem.belongsTo(Product);
+
+module.exports = { sequelize, User, Product, Order, OrderItem };

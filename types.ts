@@ -43,7 +43,14 @@ export interface Order {
   totalPrice: number;
   status: 'pending' | 'shipped' | 'delivered' | 'cancelled';
   createdAt: string;
-  items?: Product[];
+  items?: Product[]; // For the UI to display details
+  shippingAddress?: string;
+}
+
+export interface OrderItem {
+  productId: number;
+  quantity: number;
+  price: number;
 }
 
 export interface DashboardStats {

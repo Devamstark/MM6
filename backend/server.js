@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const { sequelize, User, Product, Order } = require('./models');
+const { sequelize, User, Product, Order, OrderItem } = require('./models');
 const { Op } = require('sequelize');
 require('dotenv').config();
 
@@ -40,7 +40,6 @@ const isSellerOrAdmin = (req, res, next) => {
 app.post('/api/auth/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
-    // Security check: Only allow 'user' or 'seller' registration publicly
     const finalRole = (role === 'seller') ? 'seller' : 'user';
     
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -119,12 +118,9 @@ app.put('/api/products/:id', authenticate, isSellerOrAdmin, async (req, res) => 
   try {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    
-    // Check ownership if not admin
     if (req.user.role !== 'admin' && product.userId !== req.user.id) {
       return res.status(403).json({ message: 'You can only edit your own products' });
     }
-
     await product.update(req.body);
     res.json(product);
   } catch (err) {
@@ -136,11 +132,9 @@ app.delete('/api/products/:id', authenticate, isSellerOrAdmin, async (req, res) 
   try {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ message: 'Product not found' });
-    
     if (req.user.role !== 'admin' && product.userId !== req.user.id) {
       return res.status(403).json({ message: 'You can only delete your own products' });
     }
-
     await product.destroy();
     res.json({ message: 'Product deleted' });
   } catch (err) {
@@ -148,7 +142,48 @@ app.delete('/api/products/:id', authenticate, isSellerOrAdmin, async (req, res) 
   }
 });
 
-// --- Admin Data Routes ---
+// --- Order Routes ---
+app.post('/api/orders', authenticate, async (req, res) => {
+  const t = await sequelize.transaction();
+  try {
+    const { items, shippingAddress, totalPrice } = req.body; // items: [{ productId, quantity, price }]
+    
+    // Create Order
+    const order = await Order.create({
+      UserId: req.user.id,
+      customerName: req.user.name || 'Customer', // In real app, might come from profile
+      totalPrice,
+      shippingAddress,
+      status: 'pending'
+    }, { transaction: t });
+
+    // Create Order Items
+    const orderItemsData = items.map(item => ({
+      OrderId: order.id,
+      ProductId: item.productId,
+      quantity: item.quantity,
+      price: item.price
+    }));
+
+    await OrderItem.bulkCreate(orderItemsData, { transaction: t });
+
+    // Update Stock (Optional: Basic implementation)
+    for (const item of items) {
+      const product = await Product.findByPk(item.productId);
+      if (product) {
+         await product.update({ stock: product.stock - item.quantity }, { transaction: t });
+      }
+    }
+
+    await t.commit();
+    res.status(201).json(order);
+  } catch (err) {
+    await t.rollback();
+    res.status(400).json({ error: err.message });
+  }
+});
+
+// --- Admin/Dashboard Routes ---
 app.get('/api/admin/stats', authenticate, isAdmin, async (req, res) => {
   const totalRevenue = await Order.sum('totalPrice') || 0;
   const totalOrders = await Order.count();
@@ -166,10 +201,8 @@ app.put('/api/admin/users/:id/status', authenticate, isAdmin, async (req, res) =
   try {
     const user = await User.findByPk(req.params.id);
     if (!user) return res.status(404).json({ message: 'User not found' });
-    
     user.isActive = req.body.isActive;
     await user.save();
-    
     res.json({ message: 'User status updated', user: { id: user.id, isActive: user.isActive } });
   } catch (err) {
     res.status(400).json({ error: err.message });

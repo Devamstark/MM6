@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { UserPlus, Store } from 'lucide-react';
@@ -11,6 +11,7 @@ export const Register = () => {
   const [isSeller, setIsSeller] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +19,13 @@ export const Register = () => {
       const role = isSeller ? 'seller' : 'user';
       const { user, token } = await api.register(name, email, password, role);
       login(user, token);
-      navigate(isSeller ? '/seller' : '/');
+      
+      const from = location.state?.from?.pathname;
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        navigate(isSeller ? '/seller' : '/');
+      }
     } catch (err) {
       alert('Registration failed');
     }
@@ -102,7 +109,7 @@ export const Register = () => {
             </div>
             
              <div className="text-center mt-4">
-              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">Already have an account? Sign in</Link>
+              <Link to="/login" state={{ from: location.state?.from }} className="font-medium text-indigo-600 hover:text-indigo-500">Already have an account? Sign in</Link>
             </div>
           </form>
         </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { Lock } from 'lucide-react';
@@ -10,6 +10,7 @@ export const Login = () => {
   const [error, setError] = useState('');
   const { login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +18,14 @@ export const Login = () => {
     try {
       const { user, token } = await api.login(email, password);
       login(user, token);
-      navigate(user.role === 'admin' ? '/admin' : '/');
+      
+      // Navigate back to where they came from (e.g., checkout), or default dashboard
+      const from = location.state?.from?.pathname;
+      if (from) {
+        navigate(from, { replace: true });
+      } else {
+        navigate(user.role === 'admin' ? '/admin' : '/');
+      }
     } catch (err: any) {
       setError(err.message || 'Login failed');
     }
@@ -32,7 +40,7 @@ export const Login = () => {
           </div>
           <h2 className="mt-6 text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
           <p className="mt-2 text-sm text-gray-600">
-            Or <Link to="/register" className="font-medium text-blue-600 hover:text-blue-500">start your 14-day free trial</Link>
+            Or <Link to="/register" state={{ from: location.state?.from }} className="font-medium text-blue-600 hover:text-blue-500">start your 14-day free trial</Link>
           </p>
         </div>
         

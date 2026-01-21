@@ -4,13 +4,13 @@ import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, Sell
 // MOCK DATA & STORAGE (For Preview Environment Only)
 // ============================================================================
 
-const MOCK_DELAY = 400;
+const MOCK_DELAY = 800; // Increased delay to simulate payment processing
 const STORAGE_KEYS = {
   USERS: 'cm_users',
   PRODUCTS: 'cm_products',
   TOKEN: 'cm_token',
   USER: 'cm_user_data',
-  ORDERS: 'cm_orders'
+  ORDERS: 'cm_orders' // New key for orders
 };
 
 const INITIAL_PRODUCTS: Product[] = [
@@ -33,24 +33,19 @@ const INITIAL_USERS: User[] = [
 ];
 
 const INITIAL_ORDERS: Order[] = [
-  {
+  { 
     id: 101, userId: 3, customerName: 'John Doe', totalPrice: 348.00, status: 'delivered', createdAt: '2023-10-01',
-    items: [] // Populated dynamically in real app, simplified here
+    items: [INITIAL_PRODUCTS[0]]
   },
-  {
+  { 
     id: 102, userId: 4, customerName: 'Jane Smith', totalPrice: 89.99, status: 'shipped', createdAt: '2023-10-02',
-    items: []
-  },
-  {
-    id: 103, userId: 3, customerName: 'John Doe', totalPrice: 1250.00, status: 'pending', createdAt: '2023-10-03',
-    items: []
+    items: [INITIAL_PRODUCTS[2]]
   }
 ];
 
 // Helper to simulate network delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper to get local storage data
 const getStoredProducts = (): Product[] => {
   const stored = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
   if (!stored) {
@@ -59,29 +54,6 @@ const getStoredProducts = (): Product[] => {
   }
   return JSON.parse(stored);
 };
-
-const getStoredOrders = (): Order[] => {
-  const stored = localStorage.getItem(STORAGE_KEYS.ORDERS);
-  if (!stored) {
-    // Populate initial orders with items for demo
-    // We do this here to avoid circular dep with INITIAL_PRODUCTS if we tried to use it above
-    const products = INITIAL_PRODUCTS;
-    const initialWithItems = INITIAL_ORDERS.map(o => {
-      if (o.id === 101) return { ...o, items: [products[0]] };
-      if (o.id === 102) return { ...o, items: [products[2]] };
-      if (o.id === 103) return { ...o, items: [products[1]] };
-      return o;
-    });
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(initialWithItems));
-    return initialWithItems;
-  }
-  return JSON.parse(stored);
-};
-
-const setStoredOrders = (orders: Order[]) => {
-  localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-};
-
 
 const setStoredProducts = (products: Product[]) => {
   localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
@@ -100,6 +72,19 @@ const setStoredUsers = (users: User[]) => {
   localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
 };
 
+const getStoredOrders = (): Order[] => {
+  const stored = localStorage.getItem(STORAGE_KEYS.ORDERS);
+  if (!stored) {
+    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
+    return INITIAL_ORDERS;
+  }
+  return JSON.parse(stored);
+};
+
+const setStoredOrders = (orders: Order[]) => {
+  localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+};
+
 // ============================================================================
 // API SERVICE
 // ============================================================================
@@ -109,8 +94,7 @@ export const api = {
   login: async (email: string, password: string): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-
-    // Mock authentication logic
+    
     let user: User | undefined;
     if (email === 'admin@cloudmart.com' && password === 'admin') user = users.find(u => u.email === email);
     else if (email === 'seller@cloudmart.com' && password === 'seller') user = users.find(u => u.email === email);
@@ -118,30 +102,30 @@ export const api = {
 
     if (user) {
       if (user.isActive === false) throw new Error('Account is disabled. Contact admin.');
-
+      
       const token = `mock-jwt-token-${user.role}`;
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       return { user, token };
     }
-
+    
     throw new Error('Invalid credentials.');
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-    const newUser: User = {
-      id: Date.now(),
-      name,
-      email,
-      role,
-      isActive: true,
-      createdAt: new Date().toISOString().split('T')[0]
+    const newUser: User = { 
+      id: Date.now(), 
+      name, 
+      email, 
+      role, 
+      isActive: true, 
+      createdAt: new Date().toISOString().split('T')[0] 
     };
     users.push(newUser);
     setStoredUsers(users);
-
+    
     localStorage.setItem(STORAGE_KEYS.TOKEN, 'mock-jwt-token-new');
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
     return { user: newUser, token: 'mock-jwt-token-new' };
@@ -154,7 +138,7 @@ export const api = {
 
   // --- Products ---
   getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
-    await delay(MOCK_DELAY);
+    await delay(400); // Shorter delay for read ops
     let products = getStoredProducts();
 
     if (filters.sellerId) products = products.filter(p => p.userId === filters.sellerId);
@@ -180,7 +164,7 @@ export const api = {
   },
 
   getProduct: async (id: number): Promise<Product | undefined> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     return getStoredProducts().find(p => p.id === id);
   },
 
@@ -188,10 +172,10 @@ export const api = {
     await delay(MOCK_DELAY);
     const products = getStoredProducts();
     const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 1 }; // Default to ID 1 if null (admin)
+    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 1 };
 
-    const newProduct = {
-      ...product,
+    const newProduct = { 
+      ...product, 
       id: Date.now(),
       userId: currentUser.id,
       brand: product.brand || 'Generic',
@@ -207,7 +191,6 @@ export const api = {
     await delay(MOCK_DELAY);
     let products = getStoredProducts();
     let updatedProduct: Product | undefined;
-
     products = products.map(p => {
       if (p.id === id) {
         updatedProduct = { ...p, ...updates };
@@ -215,7 +198,6 @@ export const api = {
       }
       return p;
     });
-
     if (!updatedProduct) throw new Error("Product not found");
     setStoredProducts(products);
     return updatedProduct;
@@ -228,101 +210,122 @@ export const api = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     const products = getStoredProducts();
     const categories = Array.from(new Set(products.map(p => p.category)));
     return categories.sort();
   },
 
   getBrands: async (): Promise<string[]> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     const products = getStoredProducts();
     const brands = Array.from(new Set(products.map(p => p.brand)));
     return brands.sort();
   },
 
+  // --- Orders & Checkout ---
+  createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails: any, totalPrice: number }): Promise<Order> => {
+    await delay(1500); // Simulate Payment Gateway Processing Time
+    const orders = getStoredOrders();
+    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
+    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 999, name: 'Guest' };
+
+    // Format items to look like Product[] so dashboards can display them easily
+    // In a real app, this would be a JOIN query
+    const newOrder: Order = {
+        id: Date.now(),
+        userId: currentUser.id,
+        customerName: currentUser.name,
+        totalPrice: orderData.totalPrice,
+        status: 'pending',
+        createdAt: new Date().toISOString().split('T')[0],
+        shippingAddress: `${orderData.shippingAddress.address}, ${orderData.shippingAddress.city}`,
+        items: orderData.items // Preserves the full product object including userId for seller filtering
+    };
+
+    orders.unshift(newOrder); // Add to top of list
+    setStoredOrders(orders);
+    
+    // Decrease stock (mock logic)
+    const products = getStoredProducts();
+    orderData.items.forEach((item: any) => {
+        const product = products.find(p => p.id === item.id);
+        if(product) {
+            product.stock = Math.max(0, product.stock - (item.quantity || 1));
+        }
+    });
+    setStoredProducts(products);
+
+    return newOrder;
+  },
+
+  getRecentOrders: async (sellerId?: number): Promise<Order[]> => {
+    await delay(400);
+    const orders = getStoredOrders();
+    if (sellerId) {
+      return orders.filter(order => order.items?.some(item => item.userId === sellerId));
+    }
+    return orders;
+  },
+
   // --- Dashboard Data (Mocked) ---
   getDashboardStats: async (): Promise<DashboardStats> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     const products = getStoredProducts();
     const users = getStoredUsers();
+    const orders = getStoredOrders();
+    
+    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+
     return {
-      totalRevenue: 15430.50,
-      totalOrders: 42,
+      totalRevenue: totalRevenue,
+      totalOrders: orders.length,
       totalProducts: products.length,
       totalUsers: users.length
     };
   },
 
   getSellerStats: async (sellerId: number): Promise<SellerStats> => {
-    await delay(MOCK_DELAY);
-    // In a real app, we would aggregate orders for this seller.
-    // For the mock, we return realistic looking static data + some randomization to feel alive
+    await delay(400);
+    // Calculate somewhat real stats based on orders
+    const orders = getStoredOrders().filter(order => order.items?.some(item => item.userId === sellerId));
+    let revenue = 0;
+    let units = 0;
+    
+    orders.forEach(order => {
+        const sellerItems = order.items?.filter(item => item.userId === sellerId) || [];
+        sellerItems.forEach(item => {
+            // Assume quantity is 1 if not present for mock compat
+            const qty = (item as any).quantity || 1;
+            revenue += item.price * qty;
+            units += qty;
+        });
+    });
+
+    // Fallback if no orders yet for demo purposes
+    if (revenue === 0) revenue = 12450; 
+    if (units === 0) units = 142;
+
     return {
-      totalRevenue: 12450.00,
-      revenueGrowth: 12,
-      unitsSold: 142,
-      unitsGrowth: 8.5,
-      conversionRate: 3.2,
-      conversionGrowth: 0.4,
-      monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95] // Normalized for chart
+        totalRevenue: revenue,
+        revenueGrowth: 12,
+        unitsSold: units,
+        unitsGrowth: 8.5,
+        conversionRate: 3.2,
+        conversionGrowth: 0.4,
+        monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95]
     };
   },
 
   getUsers: async (): Promise<User[]> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     return getStoredUsers();
   },
 
   updateUserStatus: async (userId: number, isActive: boolean): Promise<void> => {
-    await delay(MOCK_DELAY);
+    await delay(400);
     const users = getStoredUsers();
     const updatedUsers = users.map(u => u.id === userId ? { ...u, isActive } : u);
     setStoredUsers(updatedUsers);
-  },
-
-  getRecentOrders: async (): Promise<Order[]> => {
-    await delay(MOCK_DELAY);
-    const orders = getStoredOrders();
-    // Return most recent first
-    return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  },
-
-  createOrder: async (orderData: any): Promise<Order> => {
-    await delay(MOCK_DELAY);
-    const orders = getStoredOrders();
-
-    // Create new order
-    const newOrder: Order = {
-      id: Math.floor(Math.random() * 10000) + 1000,
-      userId: orderData.userId,
-      customerName: orderData.shippingAddress.fullName,
-      totalPrice: orderData.totalAmount,
-      status: 'pending',
-      createdAt: new Date().toISOString().split('T')[0],
-      items: orderData.items
-    };
-
-    // Save to storage
-    orders.push(newOrder);
-    setStoredOrders(orders);
-
-    return newOrder;
-  },
-
-  getMyOrders: async (userId: number): Promise<Order[]> => {
-    await delay(MOCK_DELAY);
-    const orders = getStoredOrders();
-    return orders.filter(o => o.userId === userId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-  },
-
-  getSellerOrders: async (sellerId: number): Promise<Order[]> => {
-    await delay(MOCK_DELAY);
-    const orders = getStoredOrders();
-
-    return orders.filter(order => {
-      // Check if any item in the order belongs to this seller
-      return order.items?.some(item => item.userId === sellerId);
-    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 };
