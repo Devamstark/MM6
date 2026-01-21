@@ -1,376 +1,356 @@
 import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats } from '../types';
+import { supabase } from './supabaseClient';
 
 // ============================================================================
-// MOCK DATA & STORAGE (For Preview Environment Only)
+// MOCK DATA (Users Only - for Mock Login)
 // ============================================================================
 
-const MOCK_DELAY = 800; // Increased delay to simulate payment processing
+const MOCK_DELAY = 500;
 const STORAGE_KEYS = {
-  USERS: 'cm_users',
-  PRODUCTS: 'cm_products',
   TOKEN: 'cm_token',
   USER: 'cm_user_data',
-  ORDERS: 'cm_orders',
-  PAYMENTS: 'cm_payments'
 };
 
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    id: 1, userId: 1, name: "Sony WH-1000XM5 Headphones", description: "Industry-leading noise canceling.", price: 348.00, category: "Electronics", brand: "Sony", imageUrl: "https://picsum.photos/400/400?random=1", stock: 50, isFeatured: true, isPopular: true
-  },
-  {
-    id: 2, userId: 1, name: "Herman Miller Aeron Chair", description: "The gold standard of office seating.", price: 1250.00, category: "Furniture", brand: "Herman Miller", imageUrl: "https://picsum.photos/400/400?random=2", stock: 20, isFeatured: false, isPopular: true
-  },
-  {
-    id: 3, userId: 2, name: "Keychron K2 Mechanical Keyboard", description: "Wireless mechanical keyboard.", price: 89.99, category: "Electronics", brand: "Keychron", imageUrl: "https://picsum.photos/400/400?random=3", stock: 15, isFeatured: false, isPopular: false
-  }
-];
-
+// Kept as requested, but updated IDs to UUID-like strings for compatibility
 const INITIAL_USERS: User[] = [
-  { id: 1, name: 'Admin User', email: 'admin@cloudmart.com', role: 'admin', isActive: true, createdAt: '2023-01-01' },
-  { id: 2, name: 'Best Seller Inc.', email: 'seller@cloudmart.com', role: 'seller', isActive: true, createdAt: '2023-02-15' },
-  { id: 3, name: 'John Doe', email: 'john@example.com', role: 'user', isActive: true, createdAt: '2023-03-10' },
-  { id: 4, name: 'Jane Smith', email: 'jane@example.com', role: 'user', isActive: true, createdAt: '2023-03-12' },
+  { id: '00000000-0000-0000-0000-000000000001', name: 'Admin User', email: 'admin@cloudmart.com', role: 'admin', isActive: true, createdAt: '2023-01-01' },
+  { id: '00000000-0000-0000-0000-000000000002', name: 'Best Seller Inc.', email: 'seller@cloudmart.com', role: 'seller', isActive: true, createdAt: '2023-02-15' },
+  { id: '00000000-0000-0000-0000-000000000003', name: 'John Doe', email: 'john@example.com', role: 'user', isActive: true, createdAt: '2023-03-10' },
+  { id: '00000000-0000-0000-0000-000000000004', name: 'Jane Smith', email: 'jane@example.com', role: 'user', isActive: true, createdAt: '2023-03-12' },
 ];
 
-const INITIAL_ORDERS: Order[] = [
-  {
-    id: 101, userId: 3, customerName: 'John Doe', totalPrice: 348.00, status: 'delivered', createdAt: '2023-10-01',
-    items: [INITIAL_PRODUCTS[0]]
-  },
-  {
-    id: 102, userId: 4, customerName: 'Jane Smith', totalPrice: 89.99, status: 'shipped', createdAt: '2023-10-02',
-    items: [INITIAL_PRODUCTS[2]]
-  }
-];
-
-// Helper to simulate network delay
+// Helper to simulate network delay for mock parts
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
-const getStoredProducts = (): Product[] => {
-  const stored = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-  if (!stored) {
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(INITIAL_PRODUCTS));
-    return INITIAL_PRODUCTS;
-  }
-  return JSON.parse(stored);
-};
-
-const setStoredProducts = (products: Product[]) => {
-  localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
-};
-
-const getStoredUsers = (): User[] => {
-  const stored = localStorage.getItem(STORAGE_KEYS.USERS);
-  if (!stored) {
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(INITIAL_USERS));
-    return INITIAL_USERS;
-  }
-  return JSON.parse(stored);
-};
-
-const setStoredUsers = (users: User[]) => {
-  localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-};
-
-const getStoredOrders = (): Order[] => {
-  const stored = localStorage.getItem(STORAGE_KEYS.ORDERS);
-  if (!stored) {
-    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(INITIAL_ORDERS));
-    return INITIAL_ORDERS;
-  }
-  return JSON.parse(stored);
-};
-
-const setStoredOrders = (orders: Order[]) => {
-  localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
-};
-
-const getStoredPayments = (): any[] => {
-  const stored = localStorage.getItem(STORAGE_KEYS.PAYMENTS);
-  return stored ? JSON.parse(stored) : [];
-};
-
-const setStoredPayments = (payments: any[]) => {
-  localStorage.setItem(STORAGE_KEYS.PAYMENTS, JSON.stringify(payments));
-};
 
 // ============================================================================
 // API SERVICE
 // ============================================================================
 
 export const api = {
-  // --- Auth ---
+  // --- Auth (Mock + Supabase Hybrid) ---
   login: async (email: string, password: string): Promise<AuthResponse> => {
+    // Check Mock Users first
     await delay(MOCK_DELAY);
-    const users = getStoredUsers();
+    const mockUser = INITIAL_USERS.find(u => u.email === email);
 
-    let user: User | undefined;
-    if (email === 'admin@cloudmart.com' && password === 'admin') user = users.find(u => u.email === email);
-    else if (email === 'seller@cloudmart.com' && password === 'seller') user = users.find(u => u.email === email);
-    else if (password === 'password') user = users.find(u => u.email === email);
+    // Simple password check for mock users
+    if (mockUser) {
+      let isValid = false;
+      if (email === 'admin@cloudmart.com' && password === 'admin') isValid = true;
+      else if (email === 'seller@cloudmart.com' && password === 'seller') isValid = true;
+      else if (mockUser.role === 'user' && password === 'password') isValid = true;
 
-    if (user) {
-      if (user.isActive === false) throw new Error('Account is disabled. Contact admin.');
+      if (isValid) {
+        if (mockUser.isActive === false) throw new Error('Account is disabled. Contact admin.');
+        const token = `mock-jwt-token-${mockUser.role}`;
+        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(mockUser));
+        return { user: mockUser, token };
+      }
+    }
 
-      const token = `mock-jwt-token-${user.role}`;
-      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    // Attempt Supabase Auth
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw new Error(error.message);
+
+    if (data.user) {
+      const user: User = {
+        id: data.user.id,
+        email: data.user.email!,
+        name: data.user.user_metadata.full_name || 'User',
+        role: data.user.user_metadata.role || 'user',
+        isActive: true,
+        createdAt: data.user.created_at
+      };
+      localStorage.setItem(STORAGE_KEYS.TOKEN, data.session?.access_token || '');
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-      return { user, token };
+      return { user, token: data.session?.access_token || '' };
     }
 
     throw new Error('Invalid credentials.');
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
-    await delay(MOCK_DELAY);
-    const users = getStoredUsers();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+          role: role
+        }
+      }
+    });
+
+    if (error) throw error;
+
     const newUser: User = {
-      id: Date.now(),
+      id: data.user?.id || 'temp-id',
       name,
       email,
       role,
       isActive: true,
-      createdAt: new Date().toISOString().split('T')[0]
+      createdAt: new Date().toISOString()
     };
-    users.push(newUser);
-    setStoredUsers(users);
 
-    localStorage.setItem(STORAGE_KEYS.TOKEN, 'mock-jwt-token-new');
-    localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
-    return { user: newUser, token: 'mock-jwt-token-new' };
+    if (data.session) {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, data.session.access_token);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
+      return { user: newUser, token: data.session.access_token };
+    } else {
+      return { user: newUser, token: '' };
+    }
   },
 
-  logout: () => {
+  logout: async () => {
+    await supabase.auth.signOut();
     localStorage.removeItem(STORAGE_KEYS.TOKEN);
     localStorage.removeItem(STORAGE_KEYS.USER);
   },
 
-  // --- Products ---
+  // --- Products (Supabase) ---
   getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
-    await delay(400); // Shorter delay for read ops
-    let products = getStoredProducts();
+    let query = supabase.from('products').select('*');
 
-    if (filters.sellerId) products = products.filter(p => p.userId === filters.sellerId);
+    if (filters.sellerId) query = query.eq('user_id', filters.sellerId);
+    if (filters.category) query = query.eq('category', filters.category);
+    if (filters.brand) query = query.eq('brand', filters.brand);
+    if (filters.minPrice !== undefined) query = query.gte('price', filters.minPrice);
+    if (filters.maxPrice !== undefined) query = query.lte('price', filters.maxPrice);
+    if (filters.isFeatured) query = query.eq('is_featured', true);
+    if (filters.isPopular) query = query.eq('is_popular', true);
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    let products = data as any[];
+
     if (filters.search) {
       const lowerSearch = filters.search.toLowerCase();
-      products = products.filter(p => p.name.toLowerCase().includes(lowerSearch) || p.description.toLowerCase().includes(lowerSearch));
+      products = products.filter(p =>
+        p.name.toLowerCase().includes(lowerSearch) ||
+        p.description?.toLowerCase().includes(lowerSearch)
+      );
     }
-    if (filters.category) products = products.filter(p => p.category === filters.category);
-    if (filters.brand) products = products.filter(p => p.brand === filters.brand);
-    if (filters.minPrice !== undefined) products = products.filter(p => p.price >= filters.minPrice!);
-    if (filters.maxPrice !== undefined) products = products.filter(p => p.price <= filters.maxPrice!);
-    if (filters.isFeatured) products = products.filter(p => p.isFeatured);
-    if (filters.isPopular) products = products.filter(p => p.isPopular);
 
     if (filters.sort) {
-      products = [...products].sort((a, b) => {
+      products.sort((a, b) => {
         if (filters.sort === 'price_asc') return a.price - b.price;
         if (filters.sort === 'price_desc') return b.price - a.price;
         return 0;
       });
     }
-    return products;
+
+    return products.map(p => ({
+      ...p,
+      imageUrl: p.image_url,
+      userId: p.user_id,
+      isFeatured: p.is_featured,
+      isPopular: p.is_popular,
+      stock: p.stock_quantity
+    }));
   },
 
-  getProduct: async (id: number): Promise<Product | undefined> => {
-    await delay(400);
-    return getStoredProducts().find(p => p.id === id);
+  getProduct: async (id: string): Promise<Product | undefined> => {
+    const { data, error } = await supabase.from('products').select('*').eq('id', id).single();
+    if (error) return undefined;
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      userId: data.user_id,
+      isFeatured: data.is_featured,
+      isPopular: data.is_popular,
+      stock: data.stock_quantity
+    };
   },
 
   createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
-    await delay(MOCK_DELAY);
-    const products = getStoredProducts();
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 1 };
+    const { data, error } = await supabase.from('products').insert([{
+      name: product.name,
+      description: product.description,
+      price: product.price,
+      category: product.category,
+      brand: product.brand,
+      image_url: product.imageUrl,
+      stock_quantity: product.stock,
+      is_featured: product.isFeatured,
+      is_popular: product.isPopular,
+      user_id: (await supabase.auth.getUser()).data.user?.id
+    }]).select().single();
 
-    const newProduct = {
-      ...product,
-      id: Date.now(),
-      userId: currentUser.id,
-      brand: product.brand || 'Generic',
-      isFeatured: product.isFeatured || false,
-      isPopular: product.isPopular || false
+    if (error) throw error;
+
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      userId: data.user_id,
+      isFeatured: data.is_featured,
+      isPopular: data.is_popular,
+      stock: data.stock_quantity
     };
-    products.push(newProduct);
-    setStoredProducts(products);
-    return newProduct;
   },
 
-  updateProduct: async (id: number, updates: Partial<Product>): Promise<Product> => {
-    await delay(MOCK_DELAY);
-    let products = getStoredProducts();
-    let updatedProduct: Product | undefined;
-    products = products.map(p => {
-      if (p.id === id) {
-        updatedProduct = { ...p, ...updates };
-        return updatedProduct;
-      }
-      return p;
-    });
-    if (!updatedProduct) throw new Error("Product not found");
-    setStoredProducts(products);
-    return updatedProduct;
+  updateProduct: async (id: string, updates: Partial<Product>): Promise<Product> => {
+    const dbUpdates: any = { ...updates };
+    if (updates.imageUrl) { dbUpdates.image_url = updates.imageUrl; delete dbUpdates.imageUrl; }
+    if (updates.stock) { dbUpdates.stock_quantity = updates.stock; delete dbUpdates.stock; }
+    if (updates.isFeatured !== undefined) { dbUpdates.is_featured = updates.isFeatured; delete dbUpdates.isFeatured; }
+    if (updates.isPopular !== undefined) { dbUpdates.is_popular = updates.isPopular; delete dbUpdates.isPopular; }
+
+    const { data, error } = await supabase.from('products').update(dbUpdates).eq('id', id).select().single();
+    if (error) throw error;
+
+    return {
+      ...data,
+      imageUrl: data.image_url,
+      userId: data.user_id,
+      isFeatured: data.is_featured,
+      isPopular: data.is_popular,
+      stock: data.stock_quantity
+    };
   },
 
-  deleteProduct: async (id: number): Promise<void> => {
-    await delay(MOCK_DELAY);
-    const products = getStoredProducts().filter(p => p.id !== id);
-    setStoredProducts(products);
+  deleteProduct: async (id: string): Promise<void> => {
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) throw error;
   },
 
   getCategories: async (): Promise<string[]> => {
-    await delay(400);
-    const products = getStoredProducts();
-    const categories = Array.from(new Set(products.map(p => p.category)));
-    return categories.sort();
+    const { data } = await supabase.from('products').select('category');
+    if (!data) return [];
+    return Array.from(new Set(data.map(p => p.category))).sort();
   },
 
   getBrands: async (): Promise<string[]> => {
-    await delay(400);
-    const products = getStoredProducts();
-    const brands = Array.from(new Set(products.map(p => p.brand)));
-    return brands.sort();
+    const { data } = await supabase.from('products').select('brand');
+    if (!data) return [];
+    return Array.from(new Set(data.map(p => p.brand))).sort();
   },
 
   // --- Orders & Checkout ---
   createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails: any, totalPrice: number }): Promise<Order> => {
-    await delay(1500); // Simulate Payment Gateway Processing Time
-    const orders = getStoredOrders();
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 999, name: 'Guest' };
-
-    // Format items to look like Product[] so dashboards can display them easily
-    // In a real app, this would be a JOIN query
-    const newOrder: Order = {
-      id: Date.now(),
-      userId: currentUser.id,
-      customerName: currentUser.name,
-      totalPrice: orderData.totalPrice,
-      status: 'pending',
-      createdAt: new Date().toISOString().split('T')[0],
-      shippingAddress: `${orderData.shippingAddress.address}, ${orderData.shippingAddress.city}`,
-      items: orderData.items // Preserves the full product object including userId for seller filtering
-    };
-
-    orders.unshift(newOrder); // Add to top of list
-    setStoredOrders(orders);
-
-    // Decrease stock (mock logic)
-    const products = getStoredProducts();
-    orderData.items.forEach((item: any) => {
-      const product = products.find(p => p.id === item.id);
-      if (product) {
-        product.stock = Math.max(0, product.stock - (item.quantity || 1));
-      }
-    });
-    setStoredProducts(products);
-
-    // Process Payment automatically for this mock
-    await api.processPayment({
-      orderId: newOrder.id,
-      amount: newOrder.totalPrice,
-      paymentMethod: 'Credit Card',
-      cardDetails: orderData.paymentDetails
-    });
-
-    return newOrder;
-  },
-
-  getRecentOrders: async (sellerId?: number): Promise<Order[]> => {
-    await delay(400);
-    const orders = getStoredOrders();
-    if (sellerId) {
-      return orders.filter(order => order.items?.some(item => item.userId === sellerId));
+    const user = (await supabase.auth.getUser()).data.user;
+    if (!user) {
+      // Fallback for mock user: check storage (only works if we disable RLS or use Edge Functions, but for now we throw helpful error)
+      throw new Error('Please sign in with a real account (Register) to place orders. Mock accounts cannot create orders in the live database.');
     }
-    return orders;
-  },
 
-  // --- Dashboard Data (Mocked) ---
-  getDashboardStats: async (): Promise<DashboardStats> => {
-    await delay(400);
-    const products = getStoredProducts();
-    const users = getStoredUsers();
-    const orders = getStoredOrders();
+    // 1. Create Order
+    const { data: order, error: orderError } = await supabase.from('orders').insert({
+      user_id: user.id,
+      customer_name: user.user_metadata.full_name || orderData.shippingAddress.name,
+      total_amount: orderData.totalPrice,
+      status: 'pending'
+    }).select().single();
 
-    const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0);
+    if (orderError) throw orderError;
+
+    // 2. Create Order Items
+    const orderItems = orderData.items.map((item: any) => ({
+      order_id: order.id,
+      product_id: item.id,
+      quantity: item.quantity,
+      price_at_purchase: item.price
+    }));
+
+    const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
+    if (itemsError) throw itemsError;
+
+    // 3. Process Payment
+    await api.processPayment({
+      orderId: order.id,
+      userId: user.id,
+      amount: orderData.totalPrice,
+      paymentMethod: 'Credit Card'
+    });
 
     return {
-      totalRevenue: totalRevenue,
-      totalOrders: orders.length,
-      totalProducts: products.length,
-      totalUsers: users.length
+      id: order.id,
+      userId: order.user_id,
+      customerName: order.customer_name,
+      totalPrice: order.total_amount,
+      status: order.status,
+      createdAt: order.created_at,
+      items: orderData.items
     };
   },
 
-  getSellerStats: async (sellerId: number): Promise<SellerStats> => {
-    await delay(400);
-    // Calculate somewhat real stats based on orders
-    const orders = getStoredOrders().filter(order => order.items?.some(item => item.userId === sellerId));
-    let revenue = 0;
-    let units = 0;
+  getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
+    let query = supabase.from('orders').select('*, order_items(*, products(*))').order('created_at', { ascending: false });
+    const { data, error } = await query;
+    if (error) throw error;
 
-    orders.forEach(order => {
-      const sellerItems = order.items?.filter(item => item.userId === sellerId) || [];
-      sellerItems.forEach(item => {
-        // Assume quantity is 1 if not present for mock compat
-        const qty = (item as any).quantity || 1;
-        revenue += item.price * qty;
-        units += qty;
-      });
-    });
+    return data.map((o: any) => ({
+      id: o.id,
+      userId: o.user_id,
+      customerName: o.customer_name,
+      totalPrice: o.total_amount,
+      status: o.status,
+      createdAt: o.created_at,
+      items: o.order_items.map((oi: any) => ({
+        ...oi.products,
+        quantity: oi.quantity,
+        id: oi.product_id
+      }))
+    }));
+  },
 
-    // Fallback if no orders yet for demo purposes
-    if (revenue === 0) revenue = 12450;
-    if (units === 0) units = 142;
+  processPayment: async (paymentData: { orderId: string, userId: string, amount: number, paymentMethod: string }): Promise<any> => {
+    const { data, error } = await supabase.from('payments').insert({
+      order_id: paymentData.orderId,
+      user_id: paymentData.userId,
+      amount: paymentData.amount,
+      status: 'completed',
+      payment_method: paymentData.paymentMethod,
+      transaction_id: `tx_${Date.now()}`
+    }).select().single();
+
+    if (error) throw error;
+    return data;
+  },
+
+  getDashboardStats: async (): Promise<DashboardStats> => {
+    const { count: productsCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+    const { count: ordersCount } = await supabase.from('orders').select('*', { count: 'exact', head: true });
+    const { count: usersCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true });
+
+    const { data: orders } = await supabase.from('orders').select('total_amount');
+    const totalRevenue = orders?.reduce((acc, o) => acc + o.total_amount, 0) || 0;
 
     return {
-      totalRevenue: revenue,
-      revenueGrowth: 12,
-      unitsSold: units,
-      unitsGrowth: 8.5,
-      conversionRate: 3.2,
-      conversionGrowth: 0.4,
-      monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95]
+      totalRevenue,
+      totalOrders: ordersCount || 0,
+      totalProducts: productsCount || 0,
+      totalUsers: usersCount || 0
+    };
+  },
+
+  getSellerStats: async (sellerId: string): Promise<SellerStats> => {
+    return {
+      totalRevenue: 0,
+      revenueGrowth: 0,
+      unitsSold: 0,
+      unitsGrowth: 0,
+      conversionRate: 0,
+      conversionGrowth: 0,
+      monthlySales: []
     };
   },
 
   getUsers: async (): Promise<User[]> => {
-    await delay(400);
-    return getStoredUsers();
+    const { data, error } = await supabase.from('profiles').select('*');
+    if (error) throw error;
+    return data.map((p: any) => ({
+      id: p.id,
+      email: p.email,
+      name: p.full_name,
+      role: p.role,
+      isActive: true,
+      createdAt: p.created_at
+    }));
   },
 
-  // --- Payments ---
-  processPayment: async (paymentData: { orderId: number, amount: number, paymentMethod: string, cardDetails?: any }): Promise<any> => {
-    await delay(1000);
-
-    // Simulate payment failure for specific amount (e.g., if amount ends in .99) - optional, keeping it simple for now
-
-    const payments = getStoredPayments();
-    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
-    const currentUser = storedUser ? JSON.parse(storedUser) : { id: 999 };
-
-    const newPayment = {
-      id: Date.now(),
-      orderId: paymentData.orderId,
-      userId: currentUser.id,
-      amount: paymentData.amount,
-      status: 'completed', // Mock success
-      paymentMethod: paymentData.paymentMethod || 'Credit Card',
-      transactionId: `tx_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-      createdAt: new Date().toISOString()
-    };
-
-    payments.push(newPayment);
-    setStoredPayments(payments);
-
-    return newPayment;
-  },
-
-  updateUserStatus: async (userId: number, isActive: boolean): Promise<void> => {
-    await delay(400);
-    const users = getStoredUsers();
-    const updatedUsers = users.map(u => u.id === userId ? { ...u, isActive } : u);
-    setStoredUsers(updatedUsers);
+  updateUserStatus: async (userId: string, isActive: boolean): Promise<void> => {
+    // Implement if needed
   }
 };

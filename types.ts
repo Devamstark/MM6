@@ -1,5 +1,5 @@
 export interface User {
-  id: number;
+  id: string; // Changed from number to string (UUID)
   name: string;
   email: string;
   role: 'admin' | 'seller' | 'user';
@@ -9,8 +9,8 @@ export interface User {
 }
 
 export interface Product {
-  id: number;
-  userId?: number; // The seller ID
+  id: string; // Changed from number to string
+  userId?: string; // Changed from number to string
   name: string;
   description: string;
   price: number;
@@ -33,12 +33,12 @@ export interface ProductFilter {
   sort?: 'price_asc' | 'price_desc' | 'newest';
   isFeatured?: boolean;
   isPopular?: boolean;
-  sellerId?: number; // Filter by seller
+  sellerId?: string; // Changed from number to string
 }
 
 export interface Order {
-  id: number;
-  userId: number;
+  id: string; // Changed from number to string
+  userId: string; // Changed from number to string
   customerName?: string;
   totalPrice: number;
   status: 'pending' | 'shipped' | 'delivered' | 'cancelled';
@@ -48,7 +48,7 @@ export interface Order {
 }
 
 export interface OrderItem {
-  productId: number;
+  productId: string;
   quantity: number;
   price: number;
 }
@@ -76,9 +76,9 @@ export interface AuthResponse {
 }
 
 export interface Payment {
-  id: number;
-  orderId: number;
-  userId: number;
+  id: string;
+  orderId: string;
+  userId: string;
   amount: number;
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   paymentMethod: string;
