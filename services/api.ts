@@ -9,7 +9,8 @@ const STORAGE_KEYS = {
   USERS: 'cm_users',
   PRODUCTS: 'cm_products',
   TOKEN: 'cm_token',
-  USER: 'cm_user_data'
+  USER: 'cm_user_data',
+  ORDERS: 'cm_orders'
 };
 
 const INITIAL_PRODUCTS: Product[] = [
@@ -31,6 +32,21 @@ const INITIAL_USERS: User[] = [
   { id: 4, name: 'Jane Smith', email: 'jane@example.com', role: 'user', isActive: true, createdAt: '2023-03-12' },
 ];
 
+const INITIAL_ORDERS: Order[] = [
+  {
+    id: 101, userId: 3, customerName: 'John Doe', totalPrice: 348.00, status: 'delivered', createdAt: '2023-10-01',
+    items: [] // Populated dynamically in real app, simplified here
+  },
+  {
+    id: 102, userId: 4, customerName: 'Jane Smith', totalPrice: 89.99, status: 'shipped', createdAt: '2023-10-02',
+    items: []
+  },
+  {
+    id: 103, userId: 3, customerName: 'John Doe', totalPrice: 1250.00, status: 'pending', createdAt: '2023-10-03',
+    items: []
+  }
+];
+
 // Helper to simulate network delay
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -43,6 +59,29 @@ const getStoredProducts = (): Product[] => {
   }
   return JSON.parse(stored);
 };
+
+const getStoredOrders = (): Order[] => {
+  const stored = localStorage.getItem(STORAGE_KEYS.ORDERS);
+  if (!stored) {
+    // Populate initial orders with items for demo
+    // We do this here to avoid circular dep with INITIAL_PRODUCTS if we tried to use it above
+    const products = INITIAL_PRODUCTS;
+    const initialWithItems = INITIAL_ORDERS.map(o => {
+      if (o.id === 101) return { ...o, items: [products[0]] };
+      if (o.id === 102) return { ...o, items: [products[2]] };
+      if (o.id === 103) return { ...o, items: [products[1]] };
+      return o;
+    });
+    localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(initialWithItems));
+    return initialWithItems;
+  }
+  return JSON.parse(stored);
+};
+
+const setStoredOrders = (orders: Order[]) => {
+  localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(orders));
+};
+
 
 const setStoredProducts = (products: Product[]) => {
   localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
@@ -70,7 +109,7 @@ export const api = {
   login: async (email: string, password: string): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-    
+
     // Mock authentication logic
     let user: User | undefined;
     if (email === 'admin@cloudmart.com' && password === 'admin') user = users.find(u => u.email === email);
@@ -79,30 +118,30 @@ export const api = {
 
     if (user) {
       if (user.isActive === false) throw new Error('Account is disabled. Contact admin.');
-      
+
       const token = `mock-jwt-token-${user.role}`;
       localStorage.setItem(STORAGE_KEYS.TOKEN, token);
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
       return { user, token };
     }
-    
+
     throw new Error('Invalid credentials.');
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
     await delay(MOCK_DELAY);
     const users = getStoredUsers();
-    const newUser: User = { 
-      id: Date.now(), 
-      name, 
-      email, 
-      role, 
-      isActive: true, 
-      createdAt: new Date().toISOString().split('T')[0] 
+    const newUser: User = {
+      id: Date.now(),
+      name,
+      email,
+      role,
+      isActive: true,
+      createdAt: new Date().toISOString().split('T')[0]
     };
     users.push(newUser);
     setStoredUsers(users);
-    
+
     localStorage.setItem(STORAGE_KEYS.TOKEN, 'mock-jwt-token-new');
     localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(newUser));
     return { user: newUser, token: 'mock-jwt-token-new' };
@@ -151,8 +190,8 @@ export const api = {
     const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
     const currentUser = storedUser ? JSON.parse(storedUser) : { id: 1 }; // Default to ID 1 if null (admin)
 
-    const newProduct = { 
-      ...product, 
+    const newProduct = {
+      ...product,
       id: Date.now(),
       userId: currentUser.id,
       brand: product.brand || 'Generic',
@@ -168,7 +207,7 @@ export const api = {
     await delay(MOCK_DELAY);
     let products = getStoredProducts();
     let updatedProduct: Product | undefined;
-    
+
     products = products.map(p => {
       if (p.id === id) {
         updatedProduct = { ...p, ...updates };
@@ -220,13 +259,13 @@ export const api = {
     // In a real app, we would aggregate orders for this seller.
     // For the mock, we return realistic looking static data + some randomization to feel alive
     return {
-        totalRevenue: 12450.00,
-        revenueGrowth: 12,
-        unitsSold: 142,
-        unitsGrowth: 8.5,
-        conversionRate: 3.2,
-        conversionGrowth: 0.4,
-        monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95] // Normalized for chart
+      totalRevenue: 12450.00,
+      revenueGrowth: 12,
+      unitsSold: 142,
+      unitsGrowth: 8.5,
+      conversionRate: 3.2,
+      conversionGrowth: 0.4,
+      monthlySales: [40, 65, 45, 80, 55, 90, 70, 85, 60, 75, 50, 95] // Normalized for chart
     };
   },
 
@@ -244,31 +283,46 @@ export const api = {
 
   getRecentOrders: async (): Promise<Order[]> => {
     await delay(MOCK_DELAY);
-    const products = getStoredProducts();
-    
-    // Helper to get random products for an order
-    const getRandomItems = (count: number) => {
-        const shuffled = [...products].sort(() => 0.5 - Math.random());
-        return shuffled.slice(0, count);
+    const orders = getStoredOrders();
+    // Return most recent first
+    return orders.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+
+  createOrder: async (orderData: any): Promise<Order> => {
+    await delay(MOCK_DELAY);
+    const orders = getStoredOrders();
+
+    // Create new order
+    const newOrder: Order = {
+      id: Math.floor(Math.random() * 10000) + 1000,
+      userId: orderData.userId,
+      customerName: orderData.shippingAddress.fullName,
+      totalPrice: orderData.totalAmount,
+      status: 'pending',
+      createdAt: new Date().toISOString().split('T')[0],
+      items: orderData.items
     };
 
-    return [
-      { 
-        id: 101, userId: 3, customerName: 'John Doe', totalPrice: 348.00, status: 'delivered', createdAt: '2023-10-01',
-        items: [products.find(p => p.id === 1) || products[0]]
-      },
-      { 
-        id: 102, userId: 4, customerName: 'Jane Smith', totalPrice: 89.99, status: 'shipped', createdAt: '2023-10-02',
-        items: [products.find(p => p.id === 3) || products[1]]
-      },
-      { 
-        id: 103, userId: 3, customerName: 'John Doe', totalPrice: 1250.00, status: 'pending', createdAt: '2023-10-03',
-        items: [products.find(p => p.id === 2) || products[0]]
-      },
-      {
-        id: 104, userId: 4, customerName: 'Jane Smith', totalPrice: 437.99, status: 'pending', createdAt: '2023-10-05',
-        items: getRandomItems(2)
-      }
-    ];
+    // Save to storage
+    orders.push(newOrder);
+    setStoredOrders(orders);
+
+    return newOrder;
+  },
+
+  getMyOrders: async (userId: number): Promise<Order[]> => {
+    await delay(MOCK_DELAY);
+    const orders = getStoredOrders();
+    return orders.filter(o => o.userId === userId).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  },
+
+  getSellerOrders: async (sellerId: number): Promise<Order[]> => {
+    await delay(MOCK_DELAY);
+    const orders = getStoredOrders();
+
+    return orders.filter(order => {
+      // Check if any item in the order belongs to this seller
+      return order.items?.some(item => item.userId === sellerId);
+    }).sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 };

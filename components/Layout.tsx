@@ -36,16 +36,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       <nav className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
-            
+
             {/* Left: Logo & Desktop Links */}
             <div className="flex items-center gap-8">
               <Link to="/" className="flex-shrink-0 flex items-center gap-2">
                 <div className="bg-indigo-600 p-1.5 rounded-lg">
-                   <Store className="h-6 w-6 text-white" />
+                  <Store className="h-6 w-6 text-white" />
                 </div>
                 <span className="font-bold text-xl text-indigo-900 tracking-tight">CloudMart</span>
               </Link>
-              
+
               <div className="hidden md:flex space-x-6">
                 <Link to="/products" className={`text-sm font-medium transition-colors ${isActive('/products') ? 'text-indigo-600' : 'text-gray-500 hover:text-gray-900'}`}>
                   Marketplace
@@ -93,25 +93,25 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       Seller Hub
                     </Link>
                   )}
-                  
+
                   <div className="relative group">
-                     <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none py-2">
-                        <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold">
-                           {user?.name.charAt(0)}
+                    <button className="flex items-center gap-2 text-sm font-medium text-gray-700 hover:text-gray-900 focus:outline-none py-2">
+                      <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold">
+                        {user?.name.charAt(0)}
+                      </div>
+                    </button>
+                    {/* Dropdown with padding-top to bridge the gap */}
+                    <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
+                      <div className="bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                        <div className="px-4 py-2 border-b border-gray-100">
+                          <p className="text-xs text-gray-500">Signed in as</p>
+                          <p className="text-sm font-bold text-gray-900 truncate">{user?.email}</p>
                         </div>
-                     </button>
-                     {/* Dropdown with padding-top to bridge the gap */}
-                     <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                        <div className="bg-white rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
-                          <div className="px-4 py-2 border-b border-gray-100">
-                            <p className="text-xs text-gray-500">Signed in as</p>
-                            <p className="text-sm font-bold text-gray-900 truncate">{user?.email}</p>
-                          </div>
-                          <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
-                            <LogOut className="w-4 h-4" /> Sign out
-                          </button>
-                        </div>
-                     </div>
+                        <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                          <LogOut className="w-4 h-4" /> Sign out
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </>
               ) : (
@@ -124,7 +124,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               )}
 
               {/* Cart Button */}
-              <button 
+              <button
                 onClick={() => setCartOpen(true)}
                 className="relative p-2 text-gray-400 hover:text-gray-500"
               >
@@ -135,8 +135,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </span>
                 )}
               </button>
-              
-               {/* Mobile menu button */}
+
+              {/* Mobile menu button */}
               <div className="flex items-center md:hidden">
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-2 text-gray-400 hover:text-gray-500">
                   <Menu className="h-6 w-6" />
@@ -145,15 +145,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
         </div>
-        
+
         {/* Mobile Menu */}
         {mobileMenuOpen && (
           <div className="md:hidden bg-white border-t border-gray-200">
-             <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <Link to="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Shop All</Link>
-                {isAdmin && <Link to="/admin" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50">Admin Dashboard</Link>}
-                {isSeller && <Link to="/seller" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50">Seller Dashboard</Link>}
-             </div>
+            <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              <Link to="/products" className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50">Shop All</Link>
+              {isAdmin && <Link to="/admin" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50">Admin Dashboard</Link>}
+              {isSeller && <Link to="/seller" className="block px-3 py-2 rounded-md text-base font-medium text-indigo-600 hover:bg-indigo-50">Seller Dashboard</Link>}
+            </div>
           </div>
         )}
       </nav>
@@ -221,7 +221,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                     <p className="mt-0.5 text-sm text-gray-500">Shipping and taxes calculated at checkout.</p>
                     <div className="mt-6">
-                      <button className="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700">
+                      <button
+                        onClick={() => {
+                          setCartOpen(false);
+                          navigate('/checkout');
+                        }}
+                        className="w-full flex justify-center items-center px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                      >
                         Checkout
                       </button>
                     </div>
