@@ -64,7 +64,14 @@ export const api = {
 
       // Fetch User Profile
       const userResponse = await client.get('/users/me/');
-      const user = userResponse.data;
+      const userData = userResponse.data;
+
+      // Map backend user to frontend user type
+      // Ensure 'name' exists to avoid charAt() errors in frontend
+      const user = {
+        ...userData,
+        name: userData.first_name ? `${userData.first_name} ${userData.last_name}`.trim() : (userData.username || userData.email)
+      };
 
       localStorage.setItem('cm_user_data', JSON.stringify(user));
 
