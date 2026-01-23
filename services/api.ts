@@ -82,17 +82,17 @@ export const api = {
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
-    // Note: Standard Django registration requires a separate view or just creating a User.
-    // For this capstone, we assume there is a /users/ endpoints that accepts POST (public) or a specific register endpoint.
-    // Since I didn't create a 'public' register view in the Plan, I will simulate it via the UsersViewSet 
-    // BUT UserViewSet is IsAuthenticated. 
-    // Migration Fix: I should have added a RegisterView. 
-    // I will assume /api/users/ is open for POST or I will fix it later. 
-    // Academic assumption: "Register" creates a user. 
-    // I'll call a hypothetical /auth/register/ which I should have added, 
-    // OR I will fail gracefully.
-    // Let's assume generic error if not implemented, strictly replacing Supabase.
-    throw new Error("Registration is handled by the Admin in this strict demo version, or requires a custom Django RegisterView.");
+    // Call Django Register View
+    const response = await client.post('/auth/register/', {
+      email,
+      password,
+      role,
+      name
+    });
+
+    // Auto-login after register (optional, but typical UX) to get tokens
+    // Since RegisterView returns User (not token), we need to call login
+    return api.login(email, password);
   },
 
   logout: async () => {

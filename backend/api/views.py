@@ -9,6 +9,45 @@ from .serializers import ProductSerializer, OrderSerializer, UserSerializer, Pay
 
 User = get_user_model()
 
+class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username')
+        email = request.data.get('email')
+        password = request.data.get('password')
+        role = request.data.get('role', 'user')
+        name = request.data.get('name', '')
+
+        if not email or not password:
+            return Response({'error': 'Email and Password are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Use email as username if username not provided
+        if not username:
+            username = email
+
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'User already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        first_name = ""
+        last_name = ""
+        if name:
+            parts = name.split(' ', 1)
+            first_name = parts[0]
+            last_name = parts[1] if len(parts) > 1 else ""
+
+        user = User.objects.create_user(
+            username=username,
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            role=role
+        )
+        
+        return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
+
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
