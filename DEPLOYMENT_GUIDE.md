@@ -10,33 +10,45 @@ This guide details the steps to deploy the CloudMart Capstone project to a live 
 
 ---
 
-## 🏗 Phase 1: Backend & Database (Render)
+## 🏗 Phase 1: Database Setup (Neon)
 
-We will use Render's "Blueprints" feature to automatically provision the Django Service and the PostgreSQL Database.
+Since `render.yaml` separates the database to avoid costs, we will use **Neon** (Free Tier) for the database.
 
-### 1. Connect to Render
-1.  Log in to the [Render Dashboard](https://dashboard.render.com/).
-2.  Click **New +** and select **Blueprint**.
-3.  Connect your GitHub account and select the `cloudmart-e-commerce` repository.
+1.  **Create Database**:
+    *   Go to [Neon.tech](https://neon.tech/) and sign up.
+    *   Create a new Project (e.g., `cloudmart`).
+    *   **Important**: Copy the **Connection String** (e.g., `postgres://user:pass@ep-xyz.neon.tech/neondb?sslmode=require`).
 
-### 2. Configure the Blueprint
-Render will detect the `render.yaml` file in the root of your repository.
-1.  **Service Name**: Ensure it is set to `cloudmart-backend`.
-2.  **Environment Variables**: The `render.yaml` will automatically prompt strictly required variables, but you may need to add:
-    *   `SECRET_KEY`: (Render generates this automatically due to `generateValue: true` in the yaml).
-    *   `DATABASE_URL`: (Render connects this automatically).
+## 🏗 Phase 2: Backend Setup (Render Manual Deployment)
 
-### 3. Deploy
-1.  Click **Apply**.
-2.  Render will:
-    *   Spin up a generic PostgreSQL instance (`cloudmart-db`).
-    *   Build the Python environment (`pip install`).
-    *   Run migrations (`manage.py migrate`).
-    *   Start the Gunicorn server.
+**Note:** We use Manual Deployment to avoid the requirement of adding a credit card, which is often enforced when using Blueprints (`render.yaml`).
 
-### 4. Locate Backend URL
-Once deployed (green checkmark), find your **Service URL** at the top of the Dashboard (e.g., `https://cloudmart-backend.onrender.com`).
-> **Copy this URL. You will need it for the Frontend.**
+1.  **Create New Web Service**:
+    *   Log in to [Render Dashboard](https://dashboard.render.com/).
+    *   Click **New +** -> **Web Service**.
+    *   **Do NOT** select "Blueprint". Select **"Build and deploy from a Git repository"**.
+    *   Connect your `cloudmart-e-commerce` repository.
+
+2.  **Configure Service Details**:
+    *   **Name**: `cloudmart-backend`
+    *   **Region**: Oregon (US West) or closest to you.
+    *   **Branch**: `main`
+    *   **Runtime**: **Python 3**
+    *   **Build Command**: `pip install -r backend/requirements.txt && python backend/manage.py collectstatic --noinput && python backend/manage.py migrate`
+    *   **Start Command**: `gunicorn backend.core.wsgi:application`
+    *   **Instance Type**: **Free**.
+
+3.  **Environment Variables**:
+    *   Scroll down to "Environment Variables" and add:
+        *   `PYTHON_VERSION`: `3.10.0`
+        *   `DATABASE_URL`: *(Paste your Neon Connection String)*
+        *   `SECRET_KEY`: `django-insecure-change-me` (or generate a random string)
+        *   `WEB_CONCURRENCY`: `4`
+
+4.  **Deploy**:
+    *   Click **Create Web Service**.
+    *   Wait for the build to finish.
+    *   Copy the **onrender.com** URL once live.
 
 ---
 
