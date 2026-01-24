@@ -113,6 +113,35 @@ export const api = {
     localStorage.removeItem('cm_user_data');
   },
 
+  // --- Password Reset with MFA ---
+  requestPasswordReset: async (email: string): Promise<void> => {
+    try {
+      await client.post('/auth/password-reset/request/', { email });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to send reset code');
+    }
+  },
+
+  verifyResetCode: async (email: string, code: string): Promise<void> => {
+    try {
+      await client.post('/auth/password-reset/verify/', { email, code });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Invalid or expired verification code');
+    }
+  },
+
+  resetPassword: async (email: string, code: string, newPassword: string): Promise<void> => {
+    try {
+      await client.post('/auth/password-reset/confirm/', {
+        email,
+        code,
+        new_password: newPassword
+      });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to reset password');
+    }
+  },
+
   // --- Products ---
   getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
     const params: any = {};
