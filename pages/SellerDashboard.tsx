@@ -5,6 +5,14 @@ import { Product, SellerStats, Order } from '../types';
 import { Plus, Edit2, Trash2, Loader2, Package, TrendingUp, DollarSign, BarChart2, Upload, Image as ImageIcon, ShoppingBag, Truck } from 'lucide-react';
 
 export const SellerDashboard = () => {
+  // Fixed Categories Structure
+  const CATEGORIES = {
+    'Women': ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Shoes', 'Accessories'],
+    'Men': ['Tops', 'Bottoms', 'Outerwear', 'Suits', 'Shoes', 'Accessories'],
+    'Kids': ['Boys', 'Girls', 'Baby'],
+    'Accessories': ['Bags', 'Jewelry', 'Watches', 'Sunglasses']
+  };
+
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<SellerStats | null>(null);
@@ -12,7 +20,11 @@ export const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string; description: string; price: string; category: string; subcategory: string;
+    brand: string; imageUrl: string; stock: string; gender: string; sizes: string; colors: string;
+    imageFile?: File;
+  }>({
     name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
     gender: 'Unisex', sizes: '', colors: ''
   });
@@ -79,7 +91,11 @@ export const SellerDashboard = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, imageUrl: reader.result as string }));
+        setFormData(prev => ({
+          ...prev,
+          imageUrl: reader.result as string, // keep preview
+          imageFile: file // store actual file for upload
+        }));
       };
       reader.readAsDataURL(file);
     }
@@ -94,7 +110,8 @@ export const SellerDashboard = () => {
       sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
       colors: formData.colors.split(',').map(c => c.trim()).filter(c => c),
       isFeatured: editingProduct ? editingProduct.isFeatured : false,
-      isPopular: editingProduct ? editingProduct.isPopular : false
+      isPopular: editingProduct ? editingProduct.isPopular : false,
+      imageFile: formData.imageFile // Pass the file
     };
     try {
       if (editingProduct) await api.updateProduct(editingProduct.id, payload);
@@ -331,11 +348,31 @@ export const SellerDashboard = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Category</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="e.g. Electronics" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value })} required />
+                    <select
+                      className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
+                      value={formData.category}
+                      onChange={e => setFormData({ ...formData, category: e.target.value, subcategory: '' })}
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      {Object.keys(CATEGORIES).map(cat => (
+                        <option key={cat} value={cat}>{cat}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Sub-Category</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="e.g. Headphones" value={formData.subcategory} onChange={e => setFormData({ ...formData, subcategory: e.target.value })} />
+                    <select
+                      className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
+                      value={formData.subcategory}
+                      onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
+                      disabled={!formData.category}
+                    >
+                      <option value="">Select Sub-Category</option>
+                      {formData.category && (CATEGORIES as any)[formData.category]?.map((sub: string) => (
+                        <option key={sub} value={sub}>{sub}</option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

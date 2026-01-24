@@ -44,7 +44,7 @@ class Product(models.Model):
     stock_quantity = models.IntegerField(default=0)
     category = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
-    image_url = models.URLField(max_length=500, blank=True, null=True)
+    image = models.ImageField(upload_to='products/', blank=True, null=True)
     additional_images = models.JSONField(default=list, blank=True) # List of image URLs
     gender = models.CharField(max_length=20, choices=[('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex')], default='Unisex')
     subcategory = models.CharField(max_length=100, blank=True, null=True)

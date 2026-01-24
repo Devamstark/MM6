@@ -135,45 +135,57 @@ export const api = {
     }
   },
 
-  createProduct: async (product: Omit<Product, 'id'>): Promise<Product> => {
-    const formData = {
-      name: product.name,
-      description: product.description,
-      price: product.price,
-      category: product.category,
-      subcategory: product.subcategory, // New
-      brand: product.brand,
-      stock_quantity: product.stock,
-      image_url: product.imageUrl,
-      additional_images: product.additionalImages || [], // New
-      gender: product.gender || 'Unisex', // New
-      sizes: product.sizes || [], // New
-      colors: product.colors || [], // New
-      is_featured: product.isFeatured || false,
-      is_popular: product.isPopular || false,
-    };
-    const response = await client.post('/products/', formData);
+  createProduct: async (product: Omit<Product, 'id'> & { imageFile?: File }): Promise<Product> => {
+    const formData = new FormData();
+    formData.append('name', product.name);
+    formData.append('description', product.description);
+    formData.append('price', product.price.toString());
+    formData.append('category', product.category);
+    if (product.subcategory) formData.append('subcategory', product.subcategory);
+    formData.append('brand', product.brand);
+    formData.append('stock_quantity', product.stock.toString());
+    formData.append('gender', product.gender || 'Unisex');
+
+    if (product.sizes) formData.append('sizes', JSON.stringify(product.sizes));
+    if (product.colors) formData.append('colors', JSON.stringify(product.colors));
+
+    // File
+    if (product.imageFile) {
+      formData.append('image', product.imageFile);
+    }
+
+    formData.append('is_featured', String(product.isFeatured || false));
+    formData.append('is_popular', String(product.isPopular || false));
+
+    const response = await client.post('/products/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return mapProduct(response.data);
   },
 
-  updateProduct: async (id: string, updates: Partial<Product>): Promise<Product> => {
-    const formData: any = {};
-    if (updates.name) formData.name = updates.name;
-    if (updates.description) formData.description = updates.description;
-    if (updates.price) formData.price = updates.price;
-    if (updates.category) formData.category = updates.category;
-    if (updates.subcategory) formData.subcategory = updates.subcategory;
-    if (updates.brand) formData.brand = updates.brand;
-    if (updates.stock) formData.stock_quantity = updates.stock;
-    if (updates.imageUrl) formData.image_url = updates.imageUrl;
-    if (updates.additionalImages) formData.additional_images = updates.additionalImages;
-    if (updates.gender) formData.gender = updates.gender;
-    if (updates.sizes) formData.sizes = updates.sizes;
-    if (updates.colors) formData.colors = updates.colors;
-    if (updates.isFeatured !== undefined) formData.is_featured = updates.isFeatured;
-    if (updates.isPopular !== undefined) formData.is_popular = updates.isPopular;
+  updateProduct: async (id: string, updates: Partial<Product> & { imageFile?: File }): Promise<Product> => {
+    const formData = new FormData();
+    if (updates.name) formData.append('name', updates.name);
+    if (updates.description) formData.append('description', updates.description);
+    if (updates.price) formData.append('price', updates.price.toString());
+    if (updates.category) formData.append('category', updates.category);
+    if (updates.subcategory) formData.append('subcategory', updates.subcategory);
+    if (updates.brand) formData.append('brand', updates.brand);
+    if (updates.stock) formData.append('stock_quantity', updates.stock.toString());
+    if (updates.gender) formData.append('gender', updates.gender);
+    if (updates.sizes) formData.append('sizes', JSON.stringify(updates.sizes));
+    if (updates.colors) formData.append('colors', JSON.stringify(updates.colors));
+    if (updates.isFeatured !== undefined) formData.append('is_featured', String(updates.isFeatured));
+    if (updates.isPopular !== undefined) formData.append('is_popular', String(updates.isPopular));
 
-    const response = await client.patch(`/products/${id}/`, formData);
+    // File update
+    if (updates.imageFile) {
+      formData.append('image', updates.imageFile);
+    }
+
+    const response = await client.patch(`/products/${id}/`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
     return mapProduct(response.data);
   },
 
