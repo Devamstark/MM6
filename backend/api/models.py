@@ -11,9 +11,29 @@ class User(AbstractUser):
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
     bio = models.TextField(blank=True, null=True)
+    bonus_points = models.IntegerField(default=0)
 
     def __str__(self):
         return self.username
+
+class PageContent(models.Model):
+    slug = models.SlugField(unique=True)
+    title = models.CharField(max_length=200)
+    content = models.TextField()
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+
+class Affiliate(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='affiliate_profile')
+    referral_code = models.CharField(max_length=20, unique=True)
+    earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    clicks = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.referral_code
 
 class Product(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -25,6 +45,11 @@ class Product(models.Model):
     category = models.CharField(max_length=100)
     brand = models.CharField(max_length=100)
     image_url = models.URLField(max_length=500, blank=True, null=True)
+    additional_images = models.JSONField(default=list, blank=True) # List of image URLs
+    gender = models.CharField(max_length=20, choices=[('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex')], default='Unisex')
+    subcategory = models.CharField(max_length=100, blank=True, null=True)
+    sizes = models.JSONField(default=list, blank=True) # List of sizes e.g. ["S", "M", "L"]
+    colors = models.JSONField(default=list, blank=True) # List of colors e.g. ["Red", "Blue"]
     is_featured = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

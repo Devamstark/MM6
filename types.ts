@@ -3,9 +3,27 @@ export interface User {
   name: string;
   email: string;
   role: 'admin' | 'seller' | 'user';
+  bio?: string;
   token?: string;
   isActive?: boolean;
   createdAt?: string;
+  bonusPoints?: number;
+}
+
+export interface PageContent {
+  slug: string;
+  title: string;
+  content: string;
+  updatedAt: string;
+}
+
+export interface Affiliate {
+  id: number;
+  userName: string;
+  referralCode: string;
+  earnings: number;
+  clicks: number;
+  createdAt: string;
 }
 
 export interface Product {
@@ -15,9 +33,14 @@ export interface Product {
   description: string;
   price: number;
   category: string;
+  subcategory?: string; // New
   brand: string;
   imageUrl: string;
+  additionalImages?: string[]; // New
   stock: number;
+  gender?: 'Male' | 'Female' | 'Unisex'; // New
+  sizes?: string[]; // New
+  colors?: string[]; // New
   isFeatured: boolean;
   isPopular: boolean;
   createdAt?: string;

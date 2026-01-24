@@ -4,8 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer
 
 User = get_user_model()
 
@@ -102,6 +102,25 @@ class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+class PageContentViewSet(viewsets.ModelViewSet):
+    queryset = PageContent.objects.all()
+    serializer_class = PageContentSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    lookup_field = 'slug'
+
+class AffiliateViewSet(viewsets.ModelViewSet):
+    serializer_class = AffiliateSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return Affiliate.objects.all()
+        return Affiliate.objects.filter(user=user)
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()

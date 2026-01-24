@@ -26,9 +26,14 @@ const mapProduct = (p: any): Product => ({
   description: p.description,
   price: parseFloat(p.price),
   category: p.category,
+  subcategory: p.subcategory, // New
   brand: p.brand,
   imageUrl: p.image_url,
+  additionalImages: p.additional_images || [], // New
   stock: p.stock_quantity,
+  gender: p.gender, // New
+  sizes: p.sizes || [], // New
+  colors: p.colors || [], // New
   isFeatured: p.is_featured,
   isPopular: p.is_popular,
   userId: p.seller, // mapped from 'seller' FK
@@ -43,12 +48,25 @@ const mapOrder = (o: any): Order => ({
   status: o.status,
   createdAt: o.created_at,
   items: o.items.map((i: any) => ({
-    id: i.product.id,
-    name: i.product.name,
+    id: i.product?.id,
+    name: i.product?.name || 'Unknown Product',
     price: parseFloat(i.price_at_purchase),
     quantity: i.quantity,
-    imageUrl: i.product.image_url,
+    imageUrl: i.product?.image_url,
   })),
+});
+
+// Helper to map User (API) to Frontend
+const mapUser = (u: any): User => ({
+  id: u.id,
+  name: u.first_name ? `${u.first_name} ${u.last_name}`.trim() : (u.username || u.email),
+  email: u.email,
+  role: u.role,
+  bio: u.bio,
+  bonusPoints: u.bonus_points || 0,
+  isActive: u.is_active,
+  createdAt: u.date_joined,
+  token: u.token // preserved if exists
 });
 
 export const api = {
@@ -65,13 +83,7 @@ export const api = {
       // Fetch User Profile
       const userResponse = await client.get('/users/me/');
       const userData = userResponse.data;
-
-      // Map backend user to frontend user type
-      // Ensure 'name' exists to avoid charAt() errors in frontend
-      const user = {
-        ...userData,
-        name: userData.first_name ? `${userData.first_name} ${userData.last_name}`.trim() : (userData.username || userData.email)
-      };
+      const user = mapUser(userData);
 
       localStorage.setItem('cm_user_data', JSON.stringify(user));
 
@@ -129,9 +141,14 @@ export const api = {
       description: product.description,
       price: product.price,
       category: product.category,
+      subcategory: product.subcategory, // New
       brand: product.brand,
       stock_quantity: product.stock,
       image_url: product.imageUrl,
+      additional_images: product.additionalImages || [], // New
+      gender: product.gender || 'Unisex', // New
+      sizes: product.sizes || [], // New
+      colors: product.colors || [], // New
       is_featured: product.isFeatured || false,
       is_popular: product.isPopular || false,
     };
@@ -142,9 +159,19 @@ export const api = {
   updateProduct: async (id: string, updates: Partial<Product>): Promise<Product> => {
     const formData: any = {};
     if (updates.name) formData.name = updates.name;
+    if (updates.description) formData.description = updates.description;
     if (updates.price) formData.price = updates.price;
+    if (updates.category) formData.category = updates.category;
+    if (updates.subcategory) formData.subcategory = updates.subcategory;
+    if (updates.brand) formData.brand = updates.brand;
     if (updates.stock) formData.stock_quantity = updates.stock;
-    // ... map others as needed
+    if (updates.imageUrl) formData.image_url = updates.imageUrl;
+    if (updates.additionalImages) formData.additional_images = updates.additionalImages;
+    if (updates.gender) formData.gender = updates.gender;
+    if (updates.sizes) formData.sizes = updates.sizes;
+    if (updates.colors) formData.colors = updates.colors;
+    if (updates.isFeatured !== undefined) formData.is_featured = updates.isFeatured;
+    if (updates.isPopular !== undefined) formData.is_popular = updates.isPopular;
 
     const response = await client.patch(`/products/${id}/`, formData);
     return mapProduct(response.data);
@@ -155,9 +182,6 @@ export const api = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    // Helper to get unique categories. 
-    // In a real app, use a distinct endpoint. 
-    // Here we fetch all and filter (inefficient but works for capstone scale)
     const response = await client.get('/products/');
     const products = response.data;
     const categories = new Set(products.map((p: any) => p.category));
@@ -176,14 +200,12 @@ export const api = {
     const payload = {
       items: orderData.items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
       totalPrice: orderData.totalPrice,
-      customerName: orderData.shippingAddress.name, // passed to backend
+      customerName: orderData.shippingAddress.name,
     };
 
-    // 1. Create Order
     const response = await client.post('/orders/', payload);
     const newOrder = mapOrder(response.data);
 
-    // 2. Process Payment (Mock/API)
     await api.processPayment({
       orderId: newOrder.id,
       userId: newOrder.userId,
@@ -195,14 +217,11 @@ export const api = {
   },
 
   getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
-    // If sellerId is passed, the backend OrderViewSet should handle filtering via query params if implemented
-    // For now, we just fetch '/orders/' which returns 'my' orders or 'all' if admin.
     const response = await client.get('/orders/');
     return response.data.map(mapOrder);
   },
 
   processPayment: async (paymentData: { orderId: string, userId: string, amount: number, paymentMethod: string }): Promise<any> => {
-    // Call the Payment Endpoint
     const payload = {
       order: paymentData.orderId,
       user: paymentData.userId,
@@ -222,7 +241,6 @@ export const api = {
   },
 
   getSellerStats: async (sellerId: string): Promise<SellerStats> => {
-    // Mocking for now as backend endpoint isn't strictly defined in the minimal plan
     return {
       totalRevenue: 0,
       revenueGrowth: 0,
@@ -236,10 +254,57 @@ export const api = {
 
   getUsers: async (): Promise<User[]> => {
     const response = await client.get('/users/');
-    return response.data;
+    return response.data.map(mapUser);
   },
 
   updateUserStatus: async (userId: string, isActive: boolean): Promise<void> => {
     // Not implemented in backend MVP
+  },
+
+  getPage: async (slug: string): Promise<import('../types').PageContent | undefined> => {
+    try {
+      const response = await client.get(`/pages/${slug}/`);
+      return {
+        slug: response.data.slug,
+        title: response.data.title,
+        content: response.data.content,
+        updatedAt: response.data.updated_at
+      };
+    } catch (e) {
+      return undefined;
+    }
+  },
+
+  getAffiliate: async (): Promise<import('../types').Affiliate | null> => {
+    try {
+      const response = await client.get('/affiliates/');
+      if (response.data.results && response.data.results.length > 0) {
+        const data = response.data.results[0];
+        return {
+          id: data.id,
+          userName: data.user_name,
+          referralCode: data.referral_code,
+          earnings: parseFloat(data.earnings),
+          clicks: data.clicks,
+          createdAt: data.created_at
+        };
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
+  },
+
+  createAffiliate: async (referralCode: string): Promise<import('../types').Affiliate> => {
+    const response = await client.post('/affiliates/', { referral_code: referralCode });
+    const data = response.data;
+    return {
+      id: data.id,
+      userName: data.user_name,
+      referralCode: data.referral_code,
+      earnings: parseFloat(data.earnings),
+      clicks: data.clicks,
+      createdAt: data.created_at
+    };
   }
 };

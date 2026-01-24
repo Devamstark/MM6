@@ -13,17 +13,22 @@ import { Checkout } from './pages/Checkout';
 
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'admin' | 'seller' }) => {
   const { isAuthenticated, user } = useAuth();
-  
+
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  
+
   if (requiredRole && user?.role !== requiredRole) {
     // If user is admin, they can access seller routes generally
     if (requiredRole === 'seller' && user?.role === 'admin') return <>{children}</>;
     return <Navigate to="/" replace />;
   }
-  
+
   return <>{children}</>;
 };
+
+import { StaticPage } from './pages/StaticPage';
+import { Contact } from './pages/Contact';
+import { Affiliate } from './pages/Affiliate';
+import { BonusPoints } from './pages/BonusPoints';
 
 const AppRoutes = () => {
   return (
@@ -33,21 +38,25 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/checkout" element={<Checkout />} />
-      <Route 
-        path="/admin" 
+      <Route path="/contact" element={<Contact />} />
+      <Route path="/page/:slug" element={<StaticPage />} />
+      <Route path="/affiliate" element={<Affiliate />} />
+      <Route path="/bonus-points" element={<BonusPoints />} />
+      <Route
+        path="/admin"
         element={
           <ProtectedRoute requiredRole="admin">
             <AdminDashboard />
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/seller" 
+      <Route
+        path="/seller"
         element={
           <ProtectedRoute requiredRole="seller">
             <SellerDashboard />
           </ProtectedRoute>
-        } 
+        }
       />
     </Routes>
   );
