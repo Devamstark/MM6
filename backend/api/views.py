@@ -4,7 +4,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate
+from django.utils import timezone
+import random
+from datetime import timedelta
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken
 from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer
 
 User = get_user_model()
@@ -148,3 +151,95 @@ class DashboardStatsView(APIView):
             "totalProducts": total_products,
             "totalUsers": total_users
         })
+
+class RequestPasswordResetView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        if not email:
+            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            # For security, don't reveal that the user doesn't exist
+            return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
+
+        if user.role == 'admin':
+             return Response({'error': 'Password reset is not allowed for admin accounts.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Generate 6-digit code
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        # Save token
+        # Invalidate old tokens for this user
+        PasswordResetToken.objects.filter(user=user).delete()
+        
+        PasswordResetToken.objects.create(
+            user=user,
+            token=code,
+            expires_at=timezone.now() + timedelta(minutes=15)
+        )
+        
+        # Send Email (Mocking for now as per usual local dev without SMTP)
+        print(f"PASSWORD RESET CODE FOR {email}: {code}")
+        
+        return Response({'message': 'Reset code sent successfully'}, status=status.HTTP_200_OK)
+
+class VerifyResetCodeView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        
+        if not email or not code:
+            return Response({'error': 'Email and code are required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = User.objects.get(email=email)
+            token = PasswordResetToken.objects.get(user=user, token=code)
+            
+            if not token.is_valid():
+                token.delete()
+                return Response({'error': 'Code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+                
+            return Response({'message': 'Code verified'}, status=status.HTTP_200_OK)
+            
+        except (User.DoesNotExist, PasswordResetToken.DoesNotExist):
+            return Response({'error': 'Invalid code or email'}, status=status.HTTP_400_BAD_REQUEST)
+
+class ResetPasswordView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        code = request.data.get('code')
+        new_password = request.data.get('new_password')
+        
+        if not email or not code or not new_password:
+            return Response({'error': 'Email, code, and new password are required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        try:
+            user = User.objects.get(email=email)
+            if user.role == 'admin':
+                return Response({'error': 'Password reset is not allowed for admin accounts.'}, status=status.HTTP_403_FORBIDDEN)
+
+            token = PasswordResetToken.objects.get(user=user, token=code)
+            
+            if not token.is_valid():
+                token.delete()
+                return Response({'error': 'Code has expired'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Reset Password
+            user.set_password(new_password)
+            user.save()
+            
+            # Delete token
+            token.delete()
+            
+            return Response({'message': 'Password reset successfully'}, status=status.HTTP_200_OK)
+            
+        except (User.DoesNotExist, PasswordResetToken.DoesNotExist):
+            return Response({'error': 'Invalid code or email'}, status=status.HTTP_400_BAD_REQUEST)

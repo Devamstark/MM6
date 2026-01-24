@@ -20,7 +20,7 @@ export const Login = () => {
     try {
       const { user, token } = await api.login(email, password);
       login(user, token);
-      
+
       const from = location.state?.from?.pathname;
       if (from) {
         navigate(from, { replace: true });
@@ -36,28 +36,28 @@ export const Login = () => {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-       {/* Background Decoration */}
-       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-100/50 rounded-full blur-3xl -z-10 animate-fade-up delay-100"></div>
-       <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-purple-100/50 rounded-full blur-3xl -z-10 animate-fade-up delay-200"></div>
+      {/* Background Decoration */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-indigo-100/50 rounded-full blur-3xl -z-10 animate-fade-up delay-100"></div>
+      <div className="absolute bottom-[-10%] right-[-5%] w-[40%] h-[40%] bg-purple-100/50 rounded-full blur-3xl -z-10 animate-fade-up delay-200"></div>
 
       <div className="max-w-md w-full space-y-8 bg-white p-8 sm:p-12 rounded-[2.5rem] shadow-xl shadow-indigo-100 animate-scale-in">
         <div className="text-center">
           <Link to="/" className="inline-flex items-center justify-center p-3 bg-indigo-50 rounded-2xl mb-4 group hover:bg-indigo-100 transition-colors">
-             <Store className="h-8 w-8 text-indigo-600 group-hover:scale-110 transition-transform duration-300" />
+            <Store className="h-8 w-8 text-indigo-600 group-hover:scale-110 transition-transform duration-300" />
           </Link>
           <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Welcome back</h2>
           <p className="mt-3 text-base text-gray-500">
             Don't have an account? <Link to="/register" state={{ from: location.state?.from }} className="font-semibold text-indigo-600 hover:text-indigo-500 hover:underline">Sign up for free</Link>
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-50 border border-red-100 text-red-700 px-4 py-3 rounded-2xl text-sm flex items-center animate-fade-up">
               <span className="block sm:inline">{error}</span>
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 ml-1 mb-1">Email address</label>
@@ -98,9 +98,9 @@ export const Login = () => {
             </div>
 
             <div className="text-sm">
-              <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
+              <Link to="/forgot-password" className="font-medium text-indigo-600 hover:text-indigo-500">
                 Forgot password?
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -112,7 +112,7 @@ export const Login = () => {
             {isLoading ? 'Signing in...' : 'Sign In'}
             {!isLoading && <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />}
           </button>
-          
+
           <div className="text-center text-xs text-gray-400 mt-6 pt-6 border-t border-gray-100">
             <p>Demo Admin: admin@cloudmart.com / admin</p>
             <p className="mt-1">Demo User: user@cloudmart.com / password</p>

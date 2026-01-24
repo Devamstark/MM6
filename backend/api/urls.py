@@ -4,7 +4,11 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, RegisterView, PageContentViewSet, AffiliateViewSet
+from .views import (
+    ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, 
+    RegisterView, PageContentViewSet, AffiliateViewSet,
+    RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView
+)
 
 router = DefaultRouter()
 router.register(r'products', ProductViewSet)
@@ -19,5 +23,8 @@ urlpatterns = [
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/register/', RegisterView.as_view(), name='auth_register'),
+    path('auth/password-reset/request/', RequestPasswordResetView.as_view(), name='password_reset_request'),
+    path('auth/password-reset/verify/', VerifyResetCodeView.as_view(), name='password_reset_verify'),
+    path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
 ]

@@ -7,6 +7,8 @@ import { Home } from './pages/Home';
 import { ProductList } from './pages/ProductList';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
+import { ForgotPassword } from './pages/ForgotPassword';
+import { ResetPassword } from './pages/ResetPassword';
 import { AdminDashboard } from './pages/AdminDashboard';
 import { SellerDashboard } from './pages/SellerDashboard';
 import { Checkout } from './pages/Checkout';
@@ -37,6 +39,8 @@ const AppRoutes = () => {
       <Route path="/products" element={<ProductList />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/checkout" element={<Checkout />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/page/:slug" element={<StaticPage />} />
