@@ -156,15 +156,18 @@ export const AdminDashboard = () => {
       </div>
     )
   }
-
-  const StatCard = ({ title, value, icon: Icon, color, bg, delay }: any) => (
-    <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
-      <div className={`p-4 rounded-2xl ${bg} ${color} mr-5`}>
-        <Icon className="h-8 w-8" />
-      </div>
-      <div>
-        <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">{title}</p>
-        <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
-      </div>
-    </div>
+    </div >
   );
+};
+
+const StatCard = ({ title, value, icon: Icon, color, bg, delay }: any) => (
+  <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
+    <div className={`p-4 rounded-2xl ${bg} ${color} mr-5`}>
+      <Icon className="h-8 w-8" />
+    </div>
+    <div>
+      <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">{title}</p>
+      <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+    </div>
+  </div>
+);
