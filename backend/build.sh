@@ -1,3 +1,7 @@
+#!/usr/bin/env bash
+# exit on error
+set -o errexit
+
 # cd into backend if we aren't already there (Render might start at root)
 if [ -d "backend" ]; then
   cd backend
