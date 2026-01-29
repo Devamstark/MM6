@@ -154,3 +154,11 @@ We are constantly improving. Here is what is coming next:
 ## 10. 🎯 Conclusion
 
 CloudMart is more than just a website; it is a scalable platform built to make buying and selling effortless. By using modern technology and focusing on a simple, clean user experience, we have created a foundation that is secure, fast, and ready for the future 🚀. Whether you are a buyer looking for a deal or a seller starting a business, CloudMart is built for you! 🤝
+
+---
+
+## 11. 🔄 Recent Updates (Devam Updates)
+- **Unified Category Management**: We have standardized the product categories and subcategories across the entire platform.
+  - **Single Source of Truth**: The navigation menu, product creation form, and search filters now use the exact same list of categories (Women, Men, Accessories) and subcategories (Dresses, Tops, Jeans, etc.).
+  - **Improved Data Quality**: Sellers can no longer type random categories; they must select from the predefined structure, ensuring products always appear in the correct search results.
+  - **UX Consistency**: The "Add Product" form and "Filters" panel now align perfectly with the top navigation bar.

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { X } from 'lucide-react';
 
+import { CATEGORIES, MAIN_CATEGORIES } from '../utils/categories';
+
 interface FilterPanelProps {
   filters: {
     category: string;
@@ -16,27 +18,26 @@ interface FilterPanelProps {
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChange, onClearFilters }) => {
-  const [categories, setCategories] = useState<string[]>([]);
+  // Use constants for categories
+  const categories = MAIN_CATEGORIES;
   const [subcategories, setSubcategories] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setCategories(await api.getCategories());
+    // Only fetch brands from API
+    const fetchBrands = async () => {
       setBrands(await api.getBrands());
     };
-    fetchData();
+    fetchBrands();
   }, []);
 
   useEffect(() => {
-    const fetchSub = async () => {
-      if (filters.category) {
-        setSubcategories(await api.getSubcategories(filters.category));
-      } else {
-        setSubcategories([]);
-      }
+    // derive subcategories from constant
+    if (filters.category && CATEGORIES[filters.category]) {
+      setSubcategories(CATEGORIES[filters.category]);
+    } else {
+      setSubcategories([]);
     }
-    fetchSub();
   }, [filters.category]);
 
   const hasActiveFilters = filters.category || filters.brand || filters.minPrice || filters.maxPrice;

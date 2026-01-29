@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Product } from '../types';
 import { Upload, Trash2, Plus, Image as ImageIcon, X } from 'lucide-react';
+import { CATEGORIES, MAIN_CATEGORIES } from '../utils/categories';
 
 interface ProductFormProps {
     initialData?: Product | null;
@@ -11,9 +12,10 @@ interface ProductFormProps {
 }
 
 export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, onSubmit, isInline = false }) => {
-    const [categories, setCategories] = useState<string[]>([]);
-    const [dbCategories, setDbCategories] = useState<string[]>([]);
-    const [dbSubcategories, setDbSubcategories] = useState<string[]>([]);
+    // Remove old state for categories/subcategories as we use constants now
+    // convert dbSubcategories to simple derived state or use effect if needed
+
+    const [subcats, setSubcats] = useState<string[]>([]);
 
     const [formData, setFormData] = useState<{
         name: string;
@@ -39,16 +41,6 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
     });
 
     useEffect(() => {
-        // Load categories
-        api.getCategories().then(cats => {
-            if (cats.length === 0) {
-                // Default categories if DB is empty to help user start
-                setDbCategories(['Electronics', 'Clothing', 'Home', 'Beauty', 'Sports']);
-            } else {
-                setDbCategories(cats);
-            }
-        });
-
         if (initialData) {
             setFormData({
                 name: initialData.name,
@@ -71,11 +63,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         }
     }, [initialData]);
 
+    // Update subcategories when category changes
     useEffect(() => {
-        if (formData.category) {
-            api.getSubcategories(formData.category).then(setDbSubcategories);
+        if (formData.category && CATEGORIES[formData.category]) {
+            setSubcats(CATEGORIES[formData.category]);
         } else {
-            setDbSubcategories([]);
+            setSubcats([]);
         }
     }, [formData.category]);
 
@@ -191,33 +184,40 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase ml-2">Category</label>
                         <div className="relative">
-                            <input
-                                list="categories"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
+                            <select
+                                className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
                                 value={formData.category}
                                 onChange={e => setFormData({ ...formData, category: e.target.value, subcategory: '' })}
-                                placeholder="Select or Type..."
                                 required
-                            />
-                            <datalist id="categories">
-                                {dbCategories.map(c => <option key={c} value={c} />)}
-                            </datalist>
+                            >
+                                <option value="">Select Category</option>
+                                {MAIN_CATEGORIES.map(c => (
+                                    <option key={c} value={c}>{c}</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </div>
                         </div>
                     </div>
                     <div>
                         <label className="text-xs font-bold text-gray-500 uppercase ml-2">Sub-Category</label>
                         <div className="relative">
-                            <input
-                                list="subcategories"
-                                className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
+                            <select
+                                className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all appearance-none"
                                 value={formData.subcategory}
                                 onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
-                                placeholder="Select or Type..."
                                 disabled={!formData.category}
-                            />
-                            <datalist id="subcategories">
-                                {dbSubcategories.map(s => <option key={s} value={s} />)}
-                            </datalist>
+                                required
+                            >
+                                <option value="">Select Sub-Category</option>
+                                {subcats.map(s => (
+                                    <option key={s} value={s}>{s}</option>
+                                ))}
+                            </select>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-gray-500">
+                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                            </div>
                         </div>
                     </div>
                 </div>
