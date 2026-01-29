@@ -2,6 +2,7 @@ import React from 'react';
 import { Product } from '../types';
 import { ShoppingBag, Star } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { Link } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -16,7 +17,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <div className="group cursor-pointer">
+    <Link to={`/product/${product.id}`} className="group cursor-pointer block">
       {/* Image */}
       <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 rounded-sm mb-3">
         <img
@@ -55,6 +56,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <span className="text-gray-300 mx-1">|</span>
         <span>1.2k+ sold</span>
       </div>
-    </div>
+    </Link>
   );
 };
