@@ -15,8 +15,15 @@ export const AdminDashboard = () => {
   // Filters
   const [sellerFilter, setSellerFilter] = useState<string>('');
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const formRef = React.useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (isFormOpen && formRef.current) {
+      formRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [isFormOpen]);
 
   useEffect(() => {
     loadData();
@@ -60,9 +67,10 @@ export const AdminDashboard = () => {
     }
   };
 
-  const openModal = (product?: Product) => {
+  const openForm = (product?: Product) => {
     setEditingProduct(product || null);
-    setIsModalOpen(true);
+    setIsFormOpen(true);
+    setActiveTab('products');
   };
 
   // derived state
@@ -201,52 +209,69 @@ export const AdminDashboard = () => {
           )}
 
           {activeTab === 'products' && (
-            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-              <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                <h3 className="font-bold text-lg text-gray-800">All Products</h3>
-                <button onClick={() => openModal()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
-                  <Plus className="w-4 h-4" /> Add Product
-                </button>
-              </div>
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-white">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-50">
-                  {products.map(p => {
-                    const seller = users.find(u => u.id === p.userId);
-                    return (
-                      <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
-                            <div className="ml-4">
-                              <div className="text-sm font-bold text-gray-900">{p.name}</div>
-                              <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
+            <>
+              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                  <h3 className="font-bold text-lg text-gray-800">All Products</h3>
+                  <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                    <Plus className="w-4 h-4" /> Add Product
+                  </button>
+                </div>
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {products.map(p => {
+                      const seller = users.find(u => u.id === p.userId);
+                      return (
+                        <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
+                              <div className="ml-4">
+                                <div className="text-sm font-bold text-gray-900">{p.name}</div>
+                                <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
+                              </div>
                             </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                          {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${p.price}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                          <button onClick={() => openModal(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                          <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                            {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${p.price}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                            <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div ref={formRef}>
+                {isFormOpen && (
+                  <ProductForm
+                    isInline={true}
+                    initialData={editingProduct}
+                    onClose={() => setIsFormOpen(false)}
+                    onSubmit={() => {
+                      setIsFormOpen(false);
+                      loadData();
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                  />
+                )}
+              </div>
+            </>
           )}
 
           {/* Sellers Management Tab */}
@@ -410,17 +435,8 @@ export const AdminDashboard = () => {
       </div>
 
       {/* Product Modal */}
-      {isModalOpen && (
-        <ProductForm
-          initialData={editingProduct}
-          onClose={() => setIsModalOpen(false)}
-          onSubmit={() => {
-            setIsModalOpen(false);
-            loadData();
-          }}
-        />
-      )}
-    </div>
+
+    </div >
   );
 };
 

@@ -40,3 +40,10 @@
 - **Implementation**:
     - Ported "Business Performance" analytics (Total Revenue, Units Sold, Sales Trend) to Admin Overview.
     - Enhanced Admin "Orders" tab to show detailed item information (images, names) matching the Seller experience.
+
+## 8. UX Improvements (Product Form & Admin)
+- **Feature**: Improved "Add Product" workflow and Product Form usability.
+- **Implementation**:
+    - **Inline Product Form**: Replaced popup modal with an inline form at the bottom of the Admin Products list for better accessibility.
+    - **Stock Management Fix**: Allowed manual stock editing for simple products (previously readonly).
+    - **Category Defaults**: Added default category suggestions (Electronics, Clothing, etc.) if the database is empty, preventing "missing options" confusion.
