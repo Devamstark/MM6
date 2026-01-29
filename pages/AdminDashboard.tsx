@@ -27,10 +27,10 @@ export const AdminDashboard = () => {
   const [formData, setFormData] = useState<{
     name: string; description: string; price: string; category: string; subcategory: string;
     brand: string; imageUrl: string; stock: string; gender: string; sizes: string; colors: string;
-    isFeatured: boolean; isPopular: boolean; imageFile?: File;
+    isFeatured: boolean; isPopular: boolean; imageFile?: File; additionalImages?: (string | File)[];
   }>({
     name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-    gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false
+    gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false, additionalImages: []
   });
 
   useEffect(() => {
@@ -85,13 +85,14 @@ export const AdminDashboard = () => {
         gender: product.gender || 'Unisex',
         sizes: product.sizes ? product.sizes.join(', ') : '',
         colors: product.colors ? product.colors.join(', ') : '',
-        isFeatured: product.isFeatured, isPopular: product.isPopular
+        isFeatured: product.isFeatured, isPopular: product.isPopular,
+        additionalImages: product.additionalImages || []
       });
     } else {
       setEditingProduct(null);
       setFormData({
         name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-        gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false
+        gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false, additionalImages: []
       });
     }
     setIsModalOpen(true);
@@ -120,14 +121,19 @@ export const AdminDashboard = () => {
       stock: parseInt(formData.stock),
       sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
       colors: formData.colors.split(',').map(c => c.trim()).filter(c => c),
-      imageFile: formData.imageFile
+      imageFile: formData.imageFile,
+      additionalImages: formData.additionalImages
     };
     try {
       if (editingProduct) await api.updateProduct(editingProduct.id, payload);
       else await api.createProduct(payload);
       setIsModalOpen(false);
       loadData();
-    } catch (err) { alert('Error saving product'); }
+    } catch (err: any) {
+      console.error('Error saving product:', err);
+      const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : err.message;
+      alert(`Error saving product: ${errorMessage}`);
+    }
   };
 
   // derived state
@@ -428,6 +434,46 @@ export const AdminDashboard = () => {
                     </div>
                   )}
                   <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleImageUpload} accept="image/*" />
+                </div>
+              </div>
+
+              {/* Multiple Images Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-bold text-gray-700">Additional Images</label>
+                <div className="flex flex-wrap gap-4">
+                  {formData.additionalImages?.map((img, idx) => (
+                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 group">
+                      <img src={img instanceof File ? URL.createObjectURL(img) : img} alt="" className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImages = [...(formData.additionalImages || [])];
+                          newImages.splice(idx, 1);
+                          setFormData({ ...formData, additionalImages: newImages });
+                        }}
+                        className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
+                  <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors text-gray-400 hover:text-indigo-600">
+                    <Plus className="w-6 h-6" />
+                    <input
+                      type="file"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        if (e.target.files) {
+                          setFormData(prev => ({
+                            ...prev,
+                            additionalImages: [...(prev.additionalImages || []), ...Array.from(e.target.files || [])]
+                          }));
+                        }
+                      }}
+                      accept="image/*"
+                    />
+                  </label>
                 </div>
               </div>
 

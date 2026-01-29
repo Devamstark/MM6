@@ -183,6 +183,17 @@ export const api = {
       formData.append('image', product.imageFile);
     }
 
+    if (product.additionalImages) {
+      product.additionalImages.forEach((img) => {
+        if (img instanceof File) {
+          formData.append('additional_images_files', img);
+        } else {
+          // If it's a string (URL), we might want to keep it.
+          // But for now let's focus on uploading new files.
+        }
+      });
+    }
+
     formData.append('is_featured', String(product.isFeatured || false));
     formData.append('is_popular', String(product.isPopular || false));
 
@@ -210,6 +221,14 @@ export const api = {
     // File update
     if (updates.imageFile) {
       formData.append('image', updates.imageFile);
+    }
+
+    if (updates.additionalImages) {
+      updates.additionalImages.forEach((img) => {
+        if (img instanceof File) {
+          formData.append('additional_images_files', img);
+        }
+      });
     }
 
     const response = await client.patch(`/products/${id}/`, formData, {

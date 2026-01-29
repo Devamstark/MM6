@@ -36,14 +36,7 @@ export interface Product {
   subcategory?: string; // New
   brand: string;
   imageUrl: string;
-  additionalImages?: string[]; // New
-  stock: number;
-  gender?: 'Male' | 'Female' | 'Unisex'; // New
-  sizes?: string[]; // New
-  colors?: string[]; // New
-  isFeatured: boolean;
-  isPopular: boolean;
-  createdAt?: string;
+  additionalImages?: (string | File)[]; // For UI handling
   updatedAt?: string;
 }
 

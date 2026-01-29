@@ -1,4 +1,4 @@
-from rest_framework import viewsets, permissions, status, filters
+from rest_framework import viewsets, permissions, status, filters, parsers
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -52,13 +52,14 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
     filterset_fields = ['category', 'brand', 'seller', 'is_featured', 'is_popular']
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
 
     def perform_create(self, serializer):
-        # Assign current user as seller if they have the role
+        # Allow admins to create products (assign to themselves or handle normally)
         serializer.save(seller=self.request.user)
 
 class OrderViewSet(viewsets.ModelViewSet):
