@@ -2,16 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
 import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter } from 'lucide-react';
+import { ProductForm } from '../components/ProductForm';
 
 export const AdminDashboard = () => {
-  // Categories structure
-  const CATEGORIES = {
-    'Women': ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Shoes', 'Accessories'],
-    'Men': ['Tops', 'Bottoms', 'Outerwear', 'Suits', 'Shoes', 'Accessories'],
-    'Kids': ['Boys', 'Girls', 'Baby'],
-    'Accessories': ['Bags', 'Jewelry', 'Watches', 'Sunglasses']
-  };
-
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
@@ -24,14 +17,6 @@ export const AdminDashboard = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<{
-    name: string; description: string; price: string; category: string; subcategory: string;
-    brand: string; imageUrl: string; stock: string; gender: string; sizes: string; colors: string;
-    isFeatured: boolean; isPopular: boolean; imageFile?: File; additionalImages?: (string | File)[];
-  }>({
-    name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-    gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false, additionalImages: []
-  });
 
   useEffect(() => {
     loadData();
@@ -76,64 +61,8 @@ export const AdminDashboard = () => {
   };
 
   const openModal = (product?: Product) => {
-    if (product) {
-      setEditingProduct(product);
-      setFormData({
-        name: product.name, description: product.description, price: product.price.toString(),
-        category: product.category, subcategory: product.subcategory || '', brand: product.brand,
-        imageUrl: product.imageUrl, stock: product.stock.toString(),
-        gender: product.gender || 'Unisex',
-        sizes: product.sizes ? product.sizes.join(', ') : '',
-        colors: product.colors ? product.colors.join(', ') : '',
-        isFeatured: product.isFeatured, isPopular: product.isPopular,
-        additionalImages: product.additionalImages || []
-      });
-    } else {
-      setEditingProduct(null);
-      setFormData({
-        name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-        gender: 'Unisex', sizes: '', colors: '', isFeatured: false, isPopular: false, additionalImages: []
-      });
-    }
+    setEditingProduct(product || null);
     setIsModalOpen(true);
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          imageUrl: reader.result as string,
-          imageFile: file
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = {
-      ...formData,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-      sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
-      colors: formData.colors.split(',').map(c => c.trim()).filter(c => c),
-      imageFile: formData.imageFile,
-      additionalImages: formData.additionalImages
-    };
-    try {
-      if (editingProduct) await api.updateProduct(editingProduct.id, payload);
-      else await api.createProduct(payload);
-      setIsModalOpen(false);
-      loadData();
-    } catch (err: any) {
-      console.error('Error saving product:', err);
-      const errorMessage = err.response?.data ? JSON.stringify(err.response.data) : err.message;
-      alert(`Error saving product: ${errorMessage}`);
-    }
   };
 
   // derived state
@@ -170,12 +99,104 @@ export const AdminDashboard = () => {
 
         {/* Tab Content */}
         <div className="animate-fade-up delay-200">
-          {activeTab === 'overview' && stats && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard title="Total Revenue" value={`$${stats.totalRevenue.toLocaleString()}`} icon={DollarSign} color="text-green-600" bg="bg-green-50" delay={0} />
-              <StatCard title="Total Orders" value={stats.totalOrders} icon={ShoppingBag} color="text-blue-600" bg="bg-blue-50" delay={100} />
-              <StatCard title="Total Products" value={stats.totalProducts} icon={Package} color="text-orange-600" bg="bg-orange-50" delay={200} />
-              <StatCard title="Total Users" value={stats.totalUsers || 0} icon={Users} color="text-purple-600" bg="bg-purple-50" delay={300} />
+          {activeTab === 'overview' && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-green-50 text-green-600 rounded-xl"><DollarSign className="w-6 h-6" /></div>
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Revenue</span>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mt-2">
+                    ${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}
+                  </div>
+                  <div className="text-green-600 text-xs font-bold mt-2 flex items-center gap-1">
+                    <span className="bg-green-100 px-2 py-0.5 rounded-full">+12%</span> from last month
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><ShoppingBag className="w-6 h-6" /></div>
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Units Sold</span>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mt-2">
+                    {orders.reduce((sum, o) => sum + (o.items?.reduce((isum, i) => isum + (i.quantity || 1), 0) || 0), 0)}
+                  </div>
+                  <div className="text-blue-600 text-xs font-bold mt-2 flex items-center gap-1">
+                    <span className="bg-blue-100 px-2 py-0.5 rounded-full">+5%</span> from last month
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Users className="w-6 h-6" /></div>
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Users</span>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mt-2">{users.length}</div>
+                  <div className="text-purple-600 text-xs font-bold mt-2">
+                    {users.filter(u => u.role === 'seller').length} Sellers
+                  </div>
+                </div>
+
+                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="p-3 bg-orange-50 text-orange-600 rounded-xl"><Package className="w-6 h-6" /></div>
+                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Low Stock Alerts</span>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-900 mt-2">{products.filter(p => p.stock < 10).length}</div>
+                  <div className="text-orange-600 text-xs font-bold mt-2">Items need restocking</div>
+                </div>
+              </div>
+
+              {/* Monthly Sales Trend Chart (Mock) */}
+              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+                <h3 className="font-bold text-gray-900 mb-6 text-lg">Monthly Sales Trend</h3>
+                <div className="h-40 flex items-end gap-3 justify-between">
+                  {[65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 85, 120].map((h, i) => (
+                    <div key={i} className="w-full bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
+                      <div style={{ height: `${(h / 150) * 100}%` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
+                      <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg">
+                        ${h * 100}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
+                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+                </div>
+              </div>
+
+              {/* Recent Orders Preview */}
+              <h3 className="font-bold text-gray-900 text-lg mt-8 mb-4">Recent Orders</h3>
+              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Order ID</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Items</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {orders.slice(0, 5).map(order => (
+                      <tr key={order.id} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 font-bold text-indigo-600">#{order.id}</td>
+                        <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                          {order.items?.length || 0} items
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 text-right font-bold text-gray-900">${order.totalPrice.toFixed(2)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -353,9 +374,15 @@ export const AdminDashboard = () => {
                           {order.items?.map((item, idx) => {
                             const seller = users.find(u => u.id === item.userId);
                             return (
-                              <div key={idx} className="flex items-center justify-between text-xs bg-gray-50 p-2 rounded-lg border border-gray-100">
-                                <span className="font-bold text-gray-700 truncate max-w-[150px]">{item.name}</span>
-                                <span className="text-indigo-500 font-medium text-[10px] ml-2">Sold by: {seller?.name || 'Unknown'}</span>
+                              <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50 border border-gray-100 hover:border-indigo-100 transition-colors">
+                                <div className="h-10 w-10 rounded-lg bg-white flex-shrink-0 overflow-hidden border border-gray-200">
+                                  <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                                </div>
+                                <div className="flex flex-col">
+                                  <span className="font-bold text-gray-900 text-xs">{item.name}</span>
+                                  <span className="text-indigo-500 font-medium text-[10px]">Seller: {seller?.name || 'Unknown'}</span>
+                                  <span className="text-gray-400 text-[10px]">Qty: {item.quantity || 1}</span>
+                                </div>
                               </div>
                             )
                           })}
@@ -384,108 +411,14 @@ export const AdminDashboard = () => {
 
       {/* Product Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-[2rem] shadow-2xl max-w-lg w-full p-8 animate-scale-in">
-            <h3 className="text-2xl font-bold mb-6 text-gray-900">{editingProduct ? 'Edit Product' : 'Add New Product'}</h3>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Product Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
-              <div className="grid grid-cols-2 gap-4">
-                <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Price" type="number" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} required />
-                <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Stock" type="number" value={formData.stock} onChange={e => setFormData({ ...formData, stock: e.target.value })} required />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <select className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" value={formData.category} onChange={e => setFormData({ ...formData, category: e.target.value, subcategory: '' })} required>
-                  <option value="">Category</option>
-                  {Object.keys(CATEGORIES).map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
-                <select className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" value={formData.subcategory} onChange={e => setFormData({ ...formData, subcategory: e.target.value })} disabled={!formData.category}>
-                  <option value="">Sub-Category</option>
-                  {formData.category && (CATEGORIES as any)[formData.category]?.map((s: string) => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Brand" value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })} required />
-                <select className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })}>
-                  <option value="Unisex">Unisex</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Sizes (e.g. S, M)" value={formData.sizes} onChange={e => setFormData({ ...formData, sizes: e.target.value })} />
-                <input className="bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Colors (e.g. Red)" value={formData.colors} onChange={e => setFormData({ ...formData, colors: e.target.value })} />
-              </div>
-
-              {/* Image Upload */}
-              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 border-dashed rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer relative group">
-                <div className="space-y-1 text-center">
-                  {formData.imageUrl ? (
-                    <div className="relative">
-                      <img src={formData.imageUrl} alt="Preview" className="h-32 object-contain mx-auto rounded-lg shadow-sm" />
-                      <p className="text-xs text-gray-500 mt-2">Click to change</p>
-                    </div>
-                  ) : (
-                    <div className="text-gray-400">
-                      <span className="block text-sm font-bold text-indigo-600">Upload Image</span>
-                      <span className="text-xs">PNG, JPG up to 10MB</span>
-                    </div>
-                  )}
-                  <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleImageUpload} accept="image/*" />
-                </div>
-              </div>
-
-              {/* Multiple Images Upload */}
-              <div className="space-y-2">
-                <label className="block text-sm font-bold text-gray-700">Additional Images</label>
-                <div className="flex flex-wrap gap-4">
-                  {formData.additionalImages?.map((img, idx) => (
-                    <div key={idx} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 group">
-                      <img src={img instanceof File ? URL.createObjectURL(img) : img} alt="" className="w-full h-full object-cover" />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newImages = [...(formData.additionalImages || [])];
-                          newImages.splice(idx, 1);
-                          setFormData({ ...formData, additionalImages: newImages });
-                        }}
-                        className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  ))}
-                  <label className="w-20 h-20 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors text-gray-400 hover:text-indigo-600">
-                    <Plus className="w-6 h-6" />
-                    <input
-                      type="file"
-                      multiple
-                      className="hidden"
-                      onChange={(e) => {
-                        if (e.target.files) {
-                          setFormData(prev => ({
-                            ...prev,
-                            additionalImages: [...(prev.additionalImages || []), ...Array.from(e.target.files || [])]
-                          }));
-                        }
-                      }}
-                      accept="image/*"
-                    />
-                  </label>
-                </div>
-              </div>
-
-              <textarea className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Description" rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-
-              <div className="flex justify-end gap-3 pt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full font-bold text-gray-500 hover:bg-gray-50 transition-colors">Cancel</button>
-                <button type="submit" className="px-6 py-2.5 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">Save</button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <ProductForm
+          initialData={editingProduct}
+          onClose={() => setIsModalOpen(false)}
+          onSubmit={() => {
+            setIsModalOpen(false);
+            loadData();
+          }}
+        />
       )}
     </div>
   );

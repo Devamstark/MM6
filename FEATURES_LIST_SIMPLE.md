@@ -2,7 +2,7 @@
 // 01.28.2026
 Here is the list of changes and features we are working on:
 
-1.  **Fix Broken Product Images**
+1.  **Fix Broken Product Images** 
     *   The product images were not loading. We will fix the URLs so they show up correctly.
 
 2.  **Fix Product Visibility in Sub-Categories**

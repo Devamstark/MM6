@@ -50,6 +50,7 @@ class Product(models.Model):
     subcategory = models.CharField(max_length=100, blank=True, null=True)
     sizes = models.JSONField(default=list, blank=True) # List of sizes e.g. ["S", "M", "L"]
     colors = models.JSONField(default=list, blank=True) # List of colors e.g. ["Red", "Blue"]
+    variants = models.JSONField(default=list, blank=True) # List of variants e.g. [{size: "M", color: "Red", stock: 5}]
     is_featured = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
