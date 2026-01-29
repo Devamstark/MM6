@@ -19,6 +19,15 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+// Helper to ensure absolute URL
+const getAbsoluteUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  // If it's a relative path starting with /media, prepend the base domain (without /api)
+  const baseUrl = API_URL.replace('/api', '');
+  return `${baseUrl}${url}`;
+};
+
 // Helper to map Snake Case (API) to Camel Case (Frontend)
 const mapProduct = (p: any): Product => ({
   id: p.id,
@@ -26,17 +35,17 @@ const mapProduct = (p: any): Product => ({
   description: p.description,
   price: parseFloat(p.price),
   category: p.category,
-  subcategory: p.subcategory, // New
+  subcategory: p.subcategory,
   brand: p.brand,
-  imageUrl: p.image_url,
-  additionalImages: p.additional_images || [], // New
+  imageUrl: getAbsoluteUrl(p.image || p.image_url), // Handle both keys and ensure absolute
+  additionalImages: (p.additional_images || []).map(getAbsoluteUrl), // Handle additional images too
   stock: p.stock_quantity,
-  gender: p.gender, // New
-  sizes: p.sizes || [], // New
-  colors: p.colors || [], // New
+  gender: p.gender,
+  sizes: p.sizes || [],
+  colors: p.colors || [],
   isFeatured: p.is_featured,
   isPopular: p.is_popular,
-  userId: p.seller, // mapped from 'seller' FK
+  userId: p.seller,
   createdAt: p.created_at,
 });
 

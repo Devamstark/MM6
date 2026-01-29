@@ -54,7 +54,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'brand', 'seller', 'is_featured', 'is_popular']
+    filterset_fields = ['category', 'subcategory', 'brand', 'seller', 'is_featured', 'is_popular']
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
 

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Product } from '../types';
-import { ShoppingBag, Star } from 'lucide-react';
+import { ShoppingBag, Star, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -10,10 +10,19 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleBuy = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     addToCart(product);
+  };
+
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+    navigate('/checkout');
   };
 
   return (
@@ -34,12 +43,22 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         )}
 
         {/* Quick Add Button */}
-        <button
-          onClick={handleBuy}
-          className="absolute bottom-3 right-3 bg-white hover:bg-black text-black hover:text-white p-2.5 rounded-full shadow-lg translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
-        >
-          <ShoppingBag className="w-5 h-5" />
-        </button>
+        <div className="absolute bottom-3 right-3 flex gap-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+          <button
+            onClick={handleBuy}
+            className="bg-white hover:bg-black text-black hover:text-white p-2.5 rounded-full shadow-lg"
+            title="Add to Cart"
+          >
+            <ShoppingBag className="w-5 h-5" />
+          </button>
+          <button
+            onClick={handleBuyNow}
+            className="bg-black hover:bg-red-600 text-white p-2.5 rounded-full shadow-lg"
+            title="Buy Now"
+          >
+            <Zap className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
       {/* Info */}
@@ -50,12 +69,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <span className="text-base font-bold text-red-600">${product.price.toFixed(2)}</span>
         <span className="text-xs text-gray-400 line-through">${(product.price * 1.2).toFixed(2)}</span>
       </div>
-      <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-        <Star className="w-3 h-3 text-black fill-current" />
-        <span>4.9</span>
-        <span className="text-gray-300 mx-1">|</span>
-        <span>1.2k+ sold</span>
-      </div>
+
     </Link>
   );
 };
