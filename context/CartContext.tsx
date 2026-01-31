@@ -24,13 +24,23 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     const storedCart = localStorage.getItem('cm_cart');
     if (storedCart) {
-      setItems(JSON.parse(storedCart));
+      try {
+        // Simple obfuscation using Base64 to hide plain text JSON
+        const decoded = atob(storedCart);
+        setItems(JSON.parse(decoded));
+      } catch (e) {
+        console.error("Failed to parse cart", e);
+        localStorage.removeItem('cm_cart');
+      }
     }
   }, []);
 
   // Save cart to local storage on change
   useEffect(() => {
-    localStorage.setItem('cm_cart', JSON.stringify(items));
+    // Simple obfuscation using Base64
+    const json = JSON.stringify(items);
+    const encoded = btoa(json);
+    localStorage.setItem('cm_cart', encoded);
   }, [items]);
 
   const addToCart = (product: Product) => {

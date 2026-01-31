@@ -96,6 +96,22 @@
 <body class="bg-[#f0f4f8] text-gray-900 antialiased selection:bg-indigo-100 selection:text-indigo-700">
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
+  <script>
+    // Disable right-click
+    document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+    document.onkeydown = function (e) {
+      if (
+        e.keyCode == 123 ||
+        (e.ctrlKey && e.shiftKey && e.keyCode == 'I'.charCodeAt(0)) ||
+        (e.ctrlKey && e.shiftKey && e.keyCode == 'J'.charCodeAt(0)) ||
+        (e.ctrlKey && e.keyCode == 'U'.charCodeAt(0))
+      ) {
+        return false;
+      }
+    };
+  </script>
 </body>
 
 </html>
