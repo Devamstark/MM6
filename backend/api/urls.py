@@ -20,7 +20,7 @@ else:
 router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'payments', PaymentViewSet)
-router.register(r'users', UserViewSet)
+router.register(r'users', UserViewSet, basename='user')
 router.register(r'pages', PageContentViewSet)
 router.register(r'affiliates', AffiliateViewSet, basename='affiliate')
 router.register(r'categories', CategoryViewSet, basename='categories')
