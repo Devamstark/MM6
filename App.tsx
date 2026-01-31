@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { ProductList } from './pages/ProductList';
+import { ProductDetail } from './pages/ProductDetail';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ForgotPassword } from './pages/ForgotPassword';
@@ -37,6 +38,7 @@ const AppRoutes = () => {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/products" element={<ProductList />} />
+      <Route path="/product/:id" element={<ProductDetail />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />

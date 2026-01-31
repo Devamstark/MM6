@@ -19,6 +19,17 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
+// Helper to ensure absolute URL
+const getAbsoluteUrl = (url: string | null | undefined) => {
+  if (!url) return '';
+  if (url.startsWith('http')) return url;
+  // If it's a relative path starting with /media, prepend the base domain (without /api)
+  const baseUrl = API_URL.replace('/api', '');
+  // Ensure we don't have double slashes or missing slashes
+  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${baseUrl}${cleanUrl}`;
+};
+
 // Helper to map Snake Case (API) to Camel Case (Frontend)
 const mapProduct = (p: any): Product => ({
   id: p.id,
@@ -26,17 +37,18 @@ const mapProduct = (p: any): Product => ({
   description: p.description,
   price: parseFloat(p.price),
   category: p.category,
-  subcategory: p.subcategory, // New
+  subcategory: p.subcategory,
   brand: p.brand,
-  imageUrl: p.image_url,
-  additionalImages: p.additional_images || [], // New
+  imageUrl: getAbsoluteUrl(p.image || p.image_url), // Handle both keys and ensure absolute
+  additionalImages: (p.additional_images || []).map(getAbsoluteUrl), // Handle additional images too
   stock: p.stock_quantity,
-  gender: p.gender, // New
-  sizes: p.sizes || [], // New
-  colors: p.colors || [], // New
+  gender: p.gender,
+  sizes: p.sizes || [],
+  colors: p.colors || [],
   isFeatured: p.is_featured,
   isPopular: p.is_popular,
-  userId: p.seller, // mapped from 'seller' FK
+  variants: p.variants || [],
+  userId: p.seller,
   createdAt: p.created_at,
 });
 
@@ -146,6 +158,7 @@ export const api = {
   getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
     const params: any = {};
     if (filters.category) params.category = filters.category;
+    if (filters.subcategory) params.subcategory = filters.subcategory;
     if (filters.brand) params.brand = filters.brand;
     if (filters.sellerId) params.seller = filters.sellerId;
     if (filters.search) params.search = filters.search;
@@ -178,9 +191,23 @@ export const api = {
     if (product.sizes) formData.append('sizes', JSON.stringify(product.sizes));
     if (product.colors) formData.append('colors', JSON.stringify(product.colors));
 
+    // Variants
+    if (product.variants) formData.append('variants', JSON.stringify(product.variants));
+
     // File
     if (product.imageFile) {
       formData.append('image', product.imageFile);
+    }
+
+    if (product.additionalImages) {
+      product.additionalImages.forEach((img) => {
+        if (img instanceof File) {
+          formData.append('additional_images_files', img);
+        } else {
+          // If it's a string (URL), we might want to keep it.
+          // But for now let's focus on uploading new files.
+        }
+      });
     }
 
     formData.append('is_featured', String(product.isFeatured || false));
@@ -204,12 +231,21 @@ export const api = {
     if (updates.gender) formData.append('gender', updates.gender);
     if (updates.sizes) formData.append('sizes', JSON.stringify(updates.sizes));
     if (updates.colors) formData.append('colors', JSON.stringify(updates.colors));
+    if (updates.variants) formData.append('variants', JSON.stringify(updates.variants));
     if (updates.isFeatured !== undefined) formData.append('is_featured', String(updates.isFeatured));
     if (updates.isPopular !== undefined) formData.append('is_popular', String(updates.isPopular));
 
     // File update
     if (updates.imageFile) {
       formData.append('image', updates.imageFile);
+    }
+
+    if (updates.additionalImages) {
+      updates.additionalImages.forEach((img) => {
+        if (img instanceof File) {
+          formData.append('additional_images_files', img);
+        }
+      });
     }
 
     const response = await client.patch(`/products/${id}/`, formData, {
@@ -234,6 +270,44 @@ export const api = {
     const products = response.data;
     const brands = new Set(products.map((p: any) => p.brand));
     return Array.from(brands) as string[];
+  },
+
+  getSubcategories: async (category?: string): Promise<string[]> => {
+    const response = await client.get('/products/');
+    const products = response.data;
+    const subcats = new Set<string>();
+    products.forEach((p: any) => {
+      if (p.subcategory) {
+        if (!category || p.category === category) {
+          subcats.add(p.subcategory);
+        }
+      }
+    });
+    return Array.from(subcats) as string[];
+  },
+
+  // --- Reviews (Mock / LocalStorage for now as Backend doesn't support it yet) ---
+  getReviews: async (productId: string): Promise<import('../types').Review[]> => {
+    const reviewsStr = localStorage.getItem(`cm_reviews_${productId}`);
+    if (reviewsStr) return JSON.parse(reviewsStr);
+    return [];
+  },
+
+  createReview: async (productId: string, rating: number, comment: string, user: User): Promise<import('../types').Review> => {
+    const newReview: import('../types').Review = {
+      id: Date.now().toString(),
+      productId,
+      userId: user.id,
+      userName: user.name,
+      rating,
+      comment,
+      createdAt: new Date().toISOString()
+    };
+
+    const reviews = await api.getReviews(productId);
+    reviews.push(newReview);
+    localStorage.setItem(`cm_reviews_${productId}`, JSON.stringify(reviews));
+    return newReview;
   },
 
   // --- Orders ---

@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { X } from 'lucide-react';
 
+import { CATEGORIES, MAIN_CATEGORIES } from '../utils/categories';
+
 interface FilterPanelProps {
   filters: {
     category: string;
+    subcategory?: string;
     brand: string;
     minPrice: string;
     maxPrice: string;
@@ -15,16 +18,27 @@ interface FilterPanelProps {
 }
 
 export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChange, onClearFilters }) => {
-  const [categories, setCategories] = useState<string[]>([]);
+  // Use constants for categories
+  const categories = MAIN_CATEGORIES;
+  const [subcategories, setSubcategories] = useState<string[]>([]);
   const [brands, setBrands] = useState<string[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      setCategories(await api.getCategories());
+    // Only fetch brands from API
+    const fetchBrands = async () => {
       setBrands(await api.getBrands());
     };
-    fetchData();
+    fetchBrands();
   }, []);
+
+  useEffect(() => {
+    // derive subcategories from constant
+    if (filters.category && CATEGORIES[filters.category]) {
+      setSubcategories(CATEGORIES[filters.category]);
+    } else {
+      setSubcategories([]);
+    }
+  }, [filters.category]);
 
   const hasActiveFilters = filters.category || filters.brand || filters.minPrice || filters.maxPrice;
 
@@ -91,6 +105,30 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
           ))}
         </div>
       </div>
+
+      {/* Subcategory Filter */}
+      {filters.category && subcategories.length > 0 && (
+        <div>
+          <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1">Subcategories</h3>
+          <div className="space-y-2">
+            <div
+              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${!filters.subcategory ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-gray-600 hover:bg-gray-100'}`}
+              onClick={() => onFilterChange('subcategory', '')}
+            >
+              All {filters.category}
+            </div>
+            {subcategories.map(sub => (
+              <div
+                key={sub}
+                className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.subcategory === sub ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200' : 'text-gray-600 hover:bg-gray-100'}`}
+                onClick={() => onFilterChange('subcategory', sub)}
+              >
+                {sub}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Brand Filter */}
       <div>

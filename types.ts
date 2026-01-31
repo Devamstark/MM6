@@ -36,20 +36,25 @@ export interface Product {
   subcategory?: string; // New
   brand: string;
   imageUrl: string;
-  additionalImages?: string[]; // New
-  stock: number;
-  gender?: 'Male' | 'Female' | 'Unisex'; // New
-  sizes?: string[]; // New
-  colors?: string[]; // New
-  isFeatured: boolean;
-  isPopular: boolean;
-  createdAt?: string;
+  additionalImages?: (string | File)[];
+  sizes?: string[];
+  colors?: string[];
+  isFeatured?: boolean;
+  isPopular?: boolean;
+  stock?: number;
+  gender?: string;
+  variants?: {
+    size: string;
+    color: string;
+    stock: number;
+  }[];
   updatedAt?: string;
 }
 
 export interface ProductFilter {
   search?: string;
   category?: string;
+  subcategory?: string;
   brand?: string;
   minPrice?: number;
   maxPrice?: number;
@@ -106,5 +111,15 @@ export interface Payment {
   status: 'pending' | 'completed' | 'failed' | 'refunded';
   paymentMethod: string;
   transactionId?: string;
+  createdAt: string;
+}
+
+export interface Review {
+  id: string;
+  productId: string;
+  userId: string;
+  userName: string;
+  rating: number;
+  comment: string;
   createdAt: string;
 }

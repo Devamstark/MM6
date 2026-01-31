@@ -14,6 +14,7 @@ export const ProductList = () => {
   // Parse filters from URL
   const filters = {
     category: searchParams.get('category') || '',
+    subcategory: searchParams.get('subcategory') || '',
     brand: searchParams.get('brand') || '',
     minPrice: searchParams.get('minPrice') || '',
     maxPrice: searchParams.get('maxPrice') || '',

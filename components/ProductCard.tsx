@@ -1,7 +1,8 @@
 import React from 'react';
 import { Product } from '../types';
-import { ShoppingBag, Star } from 'lucide-react';
+import { ShoppingBag, Star, Zap } from 'lucide-react';
 import { useCart } from '../context/CartContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 interface ProductCardProps {
   product: Product;
@@ -9,14 +10,23 @@ interface ProductCardProps {
 
 export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const { addToCart } = useCart();
+  const navigate = useNavigate();
 
   const handleBuy = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
     addToCart(product);
   };
 
+  const handleBuyNow = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product);
+    navigate('/checkout');
+  };
+
   return (
-    <div className="group cursor-pointer">
+    <Link to={`/product/${product.id}`} className="group cursor-pointer block">
       {/* Image */}
       <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 rounded-sm mb-3">
         <img
@@ -32,13 +42,32 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           </div>
         )}
 
-        {/* Quick Add Button */}
-        <button
-          onClick={handleBuy}
-          className="absolute bottom-3 right-3 bg-white hover:bg-black text-black hover:text-white p-2.5 rounded-full shadow-lg translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300"
-        >
-          <ShoppingBag className="w-5 h-5" />
-        </button>
+        {/* Stock Badge */}
+        {product.stock <= 0 && (
+          <div className="absolute top-0 right-0 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+            Out of Stock
+          </div>
+        )}
+
+        {/* Quick Add Button - Only if in stock */}
+        {product.stock > 0 && (
+          <div className="absolute bottom-3 right-3 flex gap-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+            <button
+              onClick={handleBuy}
+              className="bg-white hover:bg-black text-black hover:text-white p-2.5 rounded-full shadow-lg"
+              title="Add to Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+            </button>
+            <button
+              onClick={handleBuyNow}
+              className="bg-black hover:bg-red-600 text-white p-2.5 rounded-full shadow-lg"
+              title="Buy Now"
+            >
+              <Zap className="w-5 h-5" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Info */}
@@ -49,12 +78,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <span className="text-base font-bold text-red-600">${product.price.toFixed(2)}</span>
         <span className="text-xs text-gray-400 line-through">${(product.price * 1.2).toFixed(2)}</span>
       </div>
-      <div className="flex items-center gap-1 mt-1 text-xs text-gray-500">
-        <Star className="w-3 h-3 text-black fill-current" />
-        <span>4.9</span>
-        <span className="text-gray-300 mx-1">|</span>
-        <span>1.2k+ sold</span>
-      </div>
-    </div>
+      {product.stock > 0 && product.stock < 10 && (
+        <div className="text-[10px] font-bold text-orange-600 mt-1">Only {product.stock} left</div>
+      )}
+
+    </Link>
   );
 };

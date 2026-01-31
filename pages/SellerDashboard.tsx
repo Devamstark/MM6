@@ -2,17 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { Product, SellerStats, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, Package, TrendingUp, DollarSign, BarChart2, Upload, Image as ImageIcon, ShoppingBag, Truck } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, Package, TrendingUp, DollarSign, BarChart2, ShoppingBag, Truck } from 'lucide-react';
+import { ProductForm } from '../components/ProductForm';
 
 export const SellerDashboard = () => {
-  // Fixed Categories Structure
-  const CATEGORIES = {
-    'Women': ['Dresses', 'Tops', 'Bottoms', 'Outerwear', 'Shoes', 'Accessories'],
-    'Men': ['Tops', 'Bottoms', 'Outerwear', 'Suits', 'Shoes', 'Accessories'],
-    'Kids': ['Boys', 'Girls', 'Baby'],
-    'Accessories': ['Bags', 'Jewelry', 'Watches', 'Sunglasses']
-  };
-
   const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [stats, setStats] = useState<SellerStats | null>(null);
@@ -20,14 +13,6 @@ export const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [formData, setFormData] = useState<{
-    name: string; description: string; price: string; category: string; subcategory: string;
-    brand: string; imageUrl: string; stock: string; gender: string; sizes: string; colors: string;
-    imageFile?: File;
-  }>({
-    name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-    gender: 'Unisex', sizes: '', colors: ''
-  });
 
   useEffect(() => {
     loadData();
@@ -61,64 +46,8 @@ export const SellerDashboard = () => {
   };
 
   const openModal = (product?: Product) => {
-    if (product) {
-      setEditingProduct(product);
-      setFormData({
-        name: product.name,
-        description: product.description,
-        price: product.price.toString(),
-        category: product.category,
-        subcategory: product.subcategory || '',
-        brand: product.brand,
-        imageUrl: product.imageUrl,
-        stock: product.stock.toString(),
-        gender: product.gender || 'Unisex',
-        sizes: product.sizes ? product.sizes.join(', ') : '',
-        colors: product.colors ? product.colors.join(', ') : ''
-      });
-    } else {
-      setEditingProduct(null);
-      setFormData({
-        name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
-        gender: 'Unisex', sizes: '', colors: ''
-      });
-    }
+    setEditingProduct(product || null);
     setIsModalOpen(true);
-  };
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({
-          ...prev,
-          imageUrl: reader.result as string, // keep preview
-          imageFile: file // store actual file for upload
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const payload = {
-      ...formData,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
-      sizes: formData.sizes.split(',').map(s => s.trim()).filter(s => s),
-      colors: formData.colors.split(',').map(c => c.trim()).filter(c => c),
-      isFeatured: editingProduct ? editingProduct.isFeatured : false,
-      isPopular: editingProduct ? editingProduct.isPopular : false,
-      imageFile: formData.imageFile // Pass the file
-    };
-    try {
-      if (editingProduct) await api.updateProduct(editingProduct.id, payload);
-      else await api.createProduct(payload);
-      setIsModalOpen(false);
-      loadData();
-    } catch (err) { alert('Error saving product'); }
   };
 
   if (loading) return <div className="p-10 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-indigo-600" /></div>;
@@ -321,126 +250,14 @@ export const SellerDashboard = () => {
 
         {/* Modal */}
         {isModalOpen && (
-          <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900/50 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-[2rem] shadow-2xl max-w-lg w-full p-8 animate-scale-in">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-bold text-gray-900">{editingProduct ? 'Edit Product' : 'List New Product'}</h3>
-                <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-gray-600 transition-colors text-2xl">×</button>
-              </div>
-
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Product Name</label>
-                  <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="e.g. Wireless Headphones" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} required />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Price ($)</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" type="number" placeholder="0.00" value={formData.price} onChange={e => setFormData({ ...formData, price: e.target.value })} required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Stock Quantity</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" type="number" placeholder="0" value={formData.stock} onChange={e => setFormData({ ...formData, stock: e.target.value })} required />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Category</label>
-                    <select
-                      className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
-                      value={formData.category}
-                      onChange={e => setFormData({ ...formData, category: e.target.value, subcategory: '' })}
-                      required
-                    >
-                      <option value="">Select Category</option>
-                      {Object.keys(CATEGORIES).map(cat => (
-                        <option key={cat} value={cat}>{cat}</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Sub-Category</label>
-                    <select
-                      className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all"
-                      value={formData.subcategory}
-                      onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
-                      disabled={!formData.category}
-                    >
-                      <option value="">Select Sub-Category</option>
-                      {formData.category && (CATEGORIES as any)[formData.category]?.map((sub: string) => (
-                        <option key={sub} value={sub}>{sub}</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Brand</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Brand Name" value={formData.brand} onChange={e => setFormData({ ...formData, brand: e.target.value })} required />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Gender</label>
-                    <select className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })}>
-                      <option value="Unisex">Unisex</option>
-                      <option value="Male">Male</option>
-                      <option value="Female">Female</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Sizes (comma separated)</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="S, M, L, XL" value={formData.sizes} onChange={e => setFormData({ ...formData, sizes: e.target.value })} />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Colors (comma separated)</label>
-                    <input className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Red, Blue, Green" value={formData.colors} onChange={e => setFormData({ ...formData, colors: e.target.value })} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Product Image</label>
-                  <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-200 border-dashed rounded-2xl hover:bg-gray-50 transition-colors cursor-pointer relative group">
-                    <div className="space-y-1 text-center">
-                      {formData.imageUrl ? (
-                        <div className="relative">
-                          <img src={formData.imageUrl} alt="Preview" className="h-32 object-contain mx-auto rounded-lg shadow-sm" />
-                          <p className="text-xs text-gray-500 mt-2 font-medium group-hover:text-indigo-600 transition-colors">Click to replace</p>
-                        </div>
-                      ) : (
-                        <>
-                          <ImageIcon className="mx-auto h-12 w-12 text-gray-400 group-hover:text-indigo-500 transition-colors" />
-                          <div className="flex text-sm text-gray-600 justify-center mt-2">
-                            <span className="relative cursor-pointer font-bold text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
-                              <span>Upload a file</span>
-                            </span>
-                          </div>
-                          <p className="text-xs text-gray-500 mt-1">PNG, JPG, GIF up to 10MB</p>
-                        </>
-                      )}
-                      <input type="file" className="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onChange={handleImageUpload} accept="image/*" />
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block text-sm font-bold text-gray-700 mb-1 ml-1">Description</label>
-                  <textarea className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all" placeholder="Describe your product..." rows={3} value={formData.description} onChange={e => setFormData({ ...formData, description: e.target.value })} />
-                </div>
-
-                <div className="flex justify-end gap-3 mt-6">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-6 py-2.5 rounded-full font-bold text-gray-500 hover:bg-gray-100 transition-colors">Cancel</button>
-                  <button type="submit" className="px-6 py-2.5 bg-indigo-600 text-white rounded-full font-bold hover:bg-indigo-700 shadow-lg shadow-indigo-200 flex items-center gap-2 hover:-translate-y-0.5 transition-all">
-                    <Upload className="w-4 h-4" /> Save Product
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
+          <ProductForm
+            initialData={editingProduct}
+            onClose={() => setIsModalOpen(false)}
+            onSubmit={() => {
+              setIsModalOpen(false);
+              loadData();
+            }}
+          />
         )}
       </div>
     </div>
