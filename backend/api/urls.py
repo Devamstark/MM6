@@ -10,7 +10,13 @@ from .views import (
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView
 )
 
-router = DefaultRouter()
+from rest_framework.routers import SimpleRouter, DefaultRouter
+from django.conf import settings
+
+if settings.DEBUG:
+    router = DefaultRouter()
+else:
+    router = SimpleRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'payments', PaymentViewSet)
