@@ -8,15 +8,10 @@ import uuid
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('api', '0004_remove_product_image_url_product_image'),
+        ('api', '0005_product_variants_fake'),
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='product',
-            name='variants',
-            field=models.JSONField(blank=True, default=list),
-        ),
         migrations.CreateModel(
             name='PasswordResetToken',
             fields=[
