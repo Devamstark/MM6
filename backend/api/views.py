@@ -46,7 +46,7 @@ class RegisterView(APIView):
             password=password,
             first_name=first_name,
             last_name=last_name,
-            role=role
+            role='user' # Force role to be user for public registration
         )
         
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
@@ -105,8 +105,15 @@ class ProductViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
+        user = self.request.user
+        if user.role not in ['admin', 'seller']:
+            # In a real app we might raise PermissionDenied, but here we just won't save or raise error
+            # Better to use proper Permission classes, but this is a quick fix
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only sellers and admins can create products.")
+        
         # Allow admins to create products (assign to themselves or handle normally)
-        serializer.save(seller=self.request.user)
+        serializer.save(seller=user)
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
@@ -170,9 +177,14 @@ class AffiliateViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.role == 'admin':
+            return User.objects.all()
+        return User.objects.filter(id=user.id)
 
     @action(detail=False, methods=['get'])
     def me(self, request):
