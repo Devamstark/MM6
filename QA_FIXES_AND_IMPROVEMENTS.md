@@ -33,6 +33,8 @@ This document tracks the issues identified during QA testing and the solutions i
     *   **Solution:** Added **"Quick Add"** (bag icon) and **"Buy Now"** (lightning icon) buttons directly on the product card.
 *   **Problem:** Users couldn't easily browse filtered lists.
     *   **Solution:** Implemented a sidebar filter panel for recursive filtering by Category, Price, and Brand.
+*   **Problem:** Cart allowed adding more items than available in stock (e.g., adding 2 when stock was 1).
+    *   **Solution:** Added strict stock checks in `CartContext` (`addToCart`, `updateQuantity`). The system now alerts "Sorry, only X items in stock!" and prevents the addition. On the product page, the "Add to Cart" button now respects the specific stock level of the selected size/color variant.
 
 ## 5. Admin Dashboard & Management
 *   **Problem:** Admins had no way to put items on sale.
@@ -47,6 +49,14 @@ This document tracks the issues identified during QA testing and the solutions i
     *   **Solution:** Overrode the `Product` model's `save()` method. Now, whenever a `discount_percentage` is set, the system automatically calculates and saves the `sale_price`.
 *   **Problem:** API search was fuzzy and returned irrelevant results.
     *   **Solution:** Refined `ProductFilter` in Django to support strict filtering for categories/subcategories while keeping broad text search for the search bar.
+
+## 7. Security Hardening
+*   **Problem:** Privilege Escalation (users could register as 'admin').
+    *   **Solution:** Hardcoded `role='user'` in the registration endpoint, ignoring any user-submitted role data.
+*   **Problem:** Data Leakage (users could list all other users).
+    *   **Solution:** Restricted `UserViewSet` so standard users can only view their own profile.
+*   **Problem:** Unauthorized Product Creation.
+    *   **Solution:** Added explicit checks to ensure only Admins and Sellers can create products via the API.
 
 ---
 *Last Updated: 2026-01-31*
