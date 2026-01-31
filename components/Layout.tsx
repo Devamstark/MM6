@@ -77,37 +77,37 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Dresses</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Casual+Dresses" className="hover:text-indigo-600 hover:underline">Casual Dresses</Link></li>
-                        <li><Link to="/products?search=Evening+Dresses" className="hover:text-indigo-600 hover:underline">Evening Dresses</Link></li>
-                        <li><Link to="/products?search=Maxi+Dresses" className="hover:text-indigo-600 hover:underline">Maxi Dresses</Link></li>
-                        <li><Link to="/products?search=Mini+Dresses" className="hover:text-indigo-600 hover:underline">Mini Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Casual+Dresses" className="hover:text-indigo-600 hover:underline">Casual Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Evening+Dresses" className="hover:text-indigo-600 hover:underline">Evening Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" className="hover:text-indigo-600 hover:underline">Maxi Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Mini+Dresses" className="hover:text-indigo-600 hover:underline">Mini Dresses</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Women+T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?search=Blouses" className="hover:text-indigo-600 hover:underline">Blouses</Link></li>
-                        <li><Link to="/products?search=Women+Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
-                        <li><Link to="/products?search=Crop+Tops" className="hover:text-indigo-600 hover:underline">Crop Tops</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Blouses" className="hover:text-indigo-600 hover:underline">Blouses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Crop+Tops" className="hover:text-indigo-600 hover:underline">Crop Tops</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Women+Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?search=Skirts" className="hover:text-indigo-600 hover:underline">Skirts</Link></li>
-                        <li><Link to="/products?search=Women+Pants" className="hover:text-indigo-600 hover:underline">Pants</Link></li>
-                        <li><Link to="/products?search=Women+Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Skirts" className="hover:text-indigo-600 hover:underline">Skirts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Pants" className="hover:text-indigo-600 hover:underline">Pants</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Women+Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?search=Women+Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
-                        <li><Link to="/products?search=Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
-                        <li><Link to="/products?search=Cardigans" className="hover:text-indigo-600 hover:underline">Cardigans</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Cardigans" className="hover:text-indigo-600 hover:underline">Cardigans</Link></li>
                       </ul>
                     </div>
                   </div>
@@ -115,7 +115,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">Men</span>
+                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">Men</Link>
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-indigo-600 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Men's Mega Menu */}
@@ -124,37 +124,37 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Men+T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?search=Men+Shirts" className="hover:text-indigo-600 hover:underline">Shirts</Link></li>
-                        <li><Link to="/products?search=Polos" className="hover:text-indigo-600 hover:underline">Polos</Link></li>
-                        <li><Link to="/products?search=Men+Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Shirts" className="hover:text-indigo-600 hover:underline">Shirts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Polos" className="hover:text-indigo-600 hover:underline">Polos</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Men+Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?search=Chinos" className="hover:text-indigo-600 hover:underline">Chinos</Link></li>
-                        <li><Link to="/products?search=Joggers" className="hover:text-indigo-600 hover:underline">Joggers</Link></li>
-                        <li><Link to="/products?search=Men+Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Chinos" className="hover:text-indigo-600 hover:underline">Chinos</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Joggers" className="hover:text-indigo-600 hover:underline">Joggers</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Men+Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?search=Men+Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
-                        <li><Link to="/products?search=Hoodies" className="hover:text-indigo-600 hover:underline">Hoodies</Link></li>
-                        <li><Link to="/products?search=Men+Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Hoodies" className="hover:text-indigo-600 hover:underline">Hoodies</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Suits</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?search=Full+Suits" className="hover:text-indigo-600 hover:underline">Full Suits</Link></li>
-                        <li><Link to="/products?search=Suit+Jackets" className="hover:text-indigo-600 hover:underline">Suit Jackets</Link></li>
-                        <li><Link to="/products?search=Dress+Pants" className="hover:text-indigo-600 hover:underline">Dress Pants</Link></li>
-                        <li><Link to="/products?search=Vests" className="hover:text-indigo-600 hover:underline">Vests</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Full+Suits" className="hover:text-indigo-600 hover:underline">Full Suits</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Suit+Jackets" className="hover:text-indigo-600 hover:underline">Suit Jackets</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Dress+Pants" className="hover:text-indigo-600 hover:underline">Dress Pants</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Vests" className="hover:text-indigo-600 hover:underline">Vests</Link></li>
                       </ul>
                     </div>
                   </div>
