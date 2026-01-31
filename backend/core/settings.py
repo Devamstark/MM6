@@ -96,7 +96,7 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
 }
 
-if os.environ.get('Use_Cloudinary', 'False') == 'True':
+if str(os.environ.get('Use_Cloudinary', 'False')).lower() in ['true', '1', 'yes']:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
