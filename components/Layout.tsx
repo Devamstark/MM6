@@ -163,7 +163,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
                 Accessories
               </Link>
-              <Link to="/products?sort=price_asc" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
+              <Link to="/products?on_sale=true" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
                 Sale
               </Link>
             </div>

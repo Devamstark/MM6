@@ -56,10 +56,18 @@ class RegisterView(APIView):
 class ProductFilter(django_filters.FilterSet):
     min_price = django_filters.NumberFilter(field_name="price", lookup_expr='gte')
     max_price = django_filters.NumberFilter(field_name="price", lookup_expr='lte')
+    # ordering is handled by OrderingFilter backend, but we can verify it here
+
+    on_sale = django_filters.BooleanFilter(method='filter_on_sale')
 
     class Meta:
         model = Product
         fields = ['category', 'subcategory', 'brand', 'seller', 'is_featured', 'is_popular']
+
+    def filter_on_sale(self, queryset, name, value):
+        if value:
+            return queryset.filter(discount_percentage__gt=0)
+        return queryset
 
 
 class CategoryViewSet(viewsets.ViewSet):

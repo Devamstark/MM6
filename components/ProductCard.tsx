@@ -36,11 +36,18 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         />
 
         {/* Badges */}
-        {(product.isFeatured || product.isPopular) && (
-          <div className="absolute top-0 left-0 bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-            {product.isFeatured ? 'Hot' : 'Popular'}
-          </div>
-        )}
+        <div className="absolute top-0 left-0 flex flex-col gap-1">
+          {(product.isFeatured || product.isPopular) && (
+            <div className="bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+              {product.isFeatured ? 'Hot' : 'Popular'}
+            </div>
+          )}
+          {product.salePrice && product.salePrice < product.price && (
+            <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
+              {product.discountPercentage ? `-${product.discountPercentage}% OFF` : 'SALE'}
+            </div>
+          )}
+        </div>
 
         {/* Stock Badge */}
         {product.stock <= 0 && (
@@ -75,8 +82,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {product.name}
       </h3>
       <div className="flex items-center gap-2 mt-1">
-        <span className="text-base font-bold text-red-600">${product.price.toFixed(2)}</span>
-        <span className="text-xs text-gray-400 line-through">${(product.price * 1.2).toFixed(2)}</span>
+        {product.salePrice && product.salePrice < product.price ? (
+          <>
+            <span className="text-base font-bold text-red-600">${product.salePrice.toFixed(2)}</span>
+            <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
+          </>
+        ) : (
+          <span className="text-base font-bold text-gray-900">${product.price.toFixed(2)}</span>
+        )}
       </div>
       {product.stock > 0 && product.stock < 10 && (
         <div className="text-[10px] font-bold text-orange-600 mt-1">Only {product.stock} left</div>

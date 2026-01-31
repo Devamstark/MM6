@@ -50,6 +50,8 @@ const mapProduct = (p: any): Product => ({
   variants: p.variants || [],
   userId: p.seller,
   createdAt: p.created_at,
+  discountPercentage: p.discount_percentage,
+  salePrice: p.sale_price ? parseFloat(p.sale_price) : undefined,
 });
 
 const mapOrder = (o: any): Order => ({
@@ -162,6 +164,7 @@ export const api = {
     if (filters.brand) params.brand = filters.brand;
     if (filters.sellerId) params.seller = filters.sellerId;
     if (filters.search) params.search = filters.search;
+    if (filters.onSale) params.on_sale = 'true';
 
     if (filters.minPrice !== undefined) params.min_price = filters.minPrice;
     if (filters.maxPrice !== undefined) params.max_price = filters.maxPrice;
@@ -241,6 +244,7 @@ export const api = {
     if (updates.variants) formData.append('variants', JSON.stringify(updates.variants));
     if (updates.isFeatured !== undefined) formData.append('is_featured', String(updates.isFeatured));
     if (updates.isPopular !== undefined) formData.append('is_popular', String(updates.isPopular));
+    if (updates.discountPercentage !== undefined) formData.append('discount_percentage', updates.discountPercentage.toString());
 
     // File update
     if (updates.imageFile) {

@@ -64,8 +64,22 @@ class Product(models.Model):
     variants = models.JSONField(default=list, blank=True) # List of variants e.g. [{size: "M", color: "Red", stock: 5}]
     is_featured = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
+    
+    # Discount fields
+    discount_percentage = models.IntegerField(default=0)
+    sale_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        if self.discount_percentage > 0:
+             # Calculate sale price
+             discount_amount = (self.price * self.discount_percentage) / 100
+             self.sale_price = self.price - discount_amount
+        else:
+             self.sale_price = None
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name

@@ -43,6 +43,8 @@ export interface Product {
   isPopular?: boolean;
   stock?: number;
   gender?: string;
+  discountPercentage?: number;
+  salePrice?: number;
   variants?: {
     size: string;
     color: string;
@@ -61,6 +63,7 @@ export interface ProductFilter {
   sort?: 'price_asc' | 'price_desc' | 'newest';
   isFeatured?: boolean;
   isPopular?: boolean;
+  onSale?: boolean;
   sellerId?: string; // Changed from number to string
 }
 

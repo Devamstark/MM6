@@ -21,7 +21,8 @@ export const ProductList = () => {
     sort: searchParams.get('sort') || '',
     search: searchParams.get('search') || '',
     isFeatured: searchParams.get('isFeatured') === 'true',
-    isPopular: searchParams.get('isPopular') === 'true'
+    isPopular: searchParams.get('isPopular') === 'true',
+    onSale: searchParams.get('on_sale') === 'true'
   };
 
   useEffect(() => {

@@ -15,6 +15,8 @@ export const AdminDashboard = () => {
   // Filters
   const [sellerFilter, setSellerFilter] = useState<string>('');
 
+  const [discountProduct, setDiscountProduct] = useState<Product | null>(null);
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const formRef = React.useRef<HTMLDivElement>(null);
@@ -53,6 +55,18 @@ export const AdminDashboard = () => {
     if (window.confirm('Delete this product?')) {
       await api.deleteProduct(id);
       loadData();
+    }
+  };
+
+  const applyDiscount = async (percentage: number) => {
+    if (!discountProduct) return;
+    try {
+      await api.updateProduct(discountProduct.id, { discountPercentage: percentage });
+      setDiscountProduct(null);
+      loadData();
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update discount');
     }
   };
 
@@ -223,6 +237,7 @@ export const AdminDashboard = () => {
                       <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
                       <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
                       <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
@@ -244,9 +259,20 @@ export const AdminDashboard = () => {
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
                             {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${p.price}</td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                            ${p.price}
+                            {p.salePrice && <div className="text-xs text-red-600 line-through">${p.price}</div>}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            {p.discountPercentage ? (
+                              <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold">-{p.discountPercentage}%</span>
+                            ) : (
+                              <span className="text-gray-400 text-xs">-</span>
+                            )}
+                          </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
                           <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button onClick={() => setDiscountProduct(p)} className="text-green-600 hover:bg-green-50 p-2 rounded-full mr-1 transition-colors" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
                             <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
                             <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
                           </td>
@@ -433,6 +459,44 @@ export const AdminDashboard = () => {
         </div>
 
       </div>
+
+      {/* Discount Modal */}
+      {discountProduct && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full animate-fade-in">
+            <h3 className="text-xl font-bold text-gray-900 mb-2">Set Sale Discount</h3>
+            <p className="text-sm text-gray-500 mb-6">Select a discount percentage for "{discountProduct.name}".</p>
+
+            <div className="grid grid-cols-3 gap-3 mb-6">
+              {[10, 20, 30, 40, 50, 60].map(p => (
+                <button
+                  key={p}
+                  onClick={() => applyDiscount(p)}
+                  className={`py-3 rounded-xl font-bold border transition-all ${discountProduct.discountPercentage === p
+                      ? 'bg-red-600 text-white border-red-600'
+                      : 'bg-white text-gray-700 border-gray-200 hover:border-red-600 hover:text-red-600'
+                    }`}
+                >
+                  {p}%
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={() => applyDiscount(0)}
+              className="w-full py-3 bg-gray-100 text-gray-900 font-bold rounded-xl hover:bg-gray-200 transition-colors mb-3"
+            >
+              Remove Sale
+            </button>
+            <button
+              onClick={() => setDiscountProduct(null)}
+              className="w-full py-3 text-gray-500 font-medium"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Product Modal */}
 
