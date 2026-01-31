@@ -36,9 +36,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const addToCart = (product: Product) => {
     setItems(prev => {
       const existing = prev.find(item => item.id === product.id);
+
+      // Check stock limit
+      const currentQty = existing ? existing.quantity : 0;
+      const stock = product.stock !== undefined ? product.stock : Infinity;
+
+      if (currentQty + 1 > stock) {
+        alert(`Sorry, only ${stock} items in stock!`);
+        return prev;
+      }
+
       if (existing) {
         return prev.map(item =>
-          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + 1, stock: product.stock } : item
         );
       }
       return [...prev, { ...product, quantity: 1 }];
@@ -51,9 +61,19 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const updateQuantity = (productId: string, quantity: number) => {
     if (quantity < 1) return removeFromCart(productId);
-    setItems(prev => prev.map(item =>
-      item.id === productId ? { ...item, quantity } : item
-    ));
+
+    setItems(prev => {
+      const item = prev.find(i => i.id === productId);
+      if (!item) return prev;
+
+      const stock = item.stock !== undefined ? item.stock : Infinity;
+      if (quantity > stock) {
+        alert(`Sorry, only ${stock} items in stock!`);
+        return prev.map(i => i.id === productId ? { ...i, quantity: stock } : i);
+      }
+
+      return prev.map(i => i.id === productId ? { ...i, quantity } : i);
+    });
   };
 
   const clearCart = () => setItems([]);

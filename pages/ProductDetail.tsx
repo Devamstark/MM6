@@ -53,7 +53,9 @@ export const ProductDetail = () => {
 
     const handleBuyNow = () => {
         if (product) {
-            addToCart(product);
+            const variant = product.variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+            const stockLimit = variant ? variant.stock : product.stock;
+            addToCart({ ...product, stock: stockLimit });
             navigate('/checkout');
         }
     };
@@ -233,7 +235,14 @@ export const ProductDetail = () => {
                                         ) : (
                                             <>
                                                 <button
-                                                    onClick={() => addToCart(product)}
+                                                    onClick={() => {
+                                                        const variant = product.variants?.find(v => v.size === selectedSize && v.color === selectedColor);
+                                                        // If a variant is selected, use its stock. Otherwise use product stock.
+                                                        // Note: Cart currently merges by Product ID, so mixing variants might overwrite stock limit.
+                                                        // But this ensures the "Add" button respects the currently viewed stock limit.
+                                                        const stockLimit = variant ? variant.stock : product.stock;
+                                                        addToCart({ ...product, stock: stockLimit });
+                                                    }}
                                                     className="flex-1 bg-black text-white px-8 py-4 rounded-full font-bold uppercase tracking-wider hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
                                                 >
                                                     <ShoppingBag className="w-5 h-5" /> Add to Cart
