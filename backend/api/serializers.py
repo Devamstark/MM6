@@ -26,8 +26,13 @@ class AffiliateSerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = '__all__'
-        read_only_fields = ('seller', 'created_at', 'updated_at', 'sale_price')
+        fields = [
+            'id', 'name', 'description', 'price', 'category', 'subcategory', 'brand',
+            'image', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
+            'is_featured', 'is_popular', 'variants', 'seller', 'created_at',
+            'discount_percentage', 'sale_price'
+        ]
+        read_only_fields = ('seller', 'created_at', 'sale_price')
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
