@@ -162,6 +162,10 @@ export const api = {
     if (filters.brand) params.brand = filters.brand;
     if (filters.sellerId) params.seller = filters.sellerId;
     if (filters.search) params.search = filters.search;
+
+    if (filters.minPrice !== undefined) params.min_price = filters.minPrice;
+    if (filters.maxPrice !== undefined) params.max_price = filters.maxPrice;
+
     if (filters.sort) {
       if (filters.sort === 'price_asc') params.ordering = 'price';
       else if (filters.sort === 'price_desc') params.ordering = '-price';
