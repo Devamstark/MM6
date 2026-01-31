@@ -88,6 +88,14 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        # Explicitly apply manual overrides if needed, BUT
+        # with filterset_class defined properly above, min_price/max_price should work automatically.
+        # The issue might be that previous implementations mixed get_queryset with filter_backends.
+        # By strictly using django-filters (ProductFilter class), we ensure clean logic.
+        return queryset
+
     def perform_create(self, serializer):
         # Allow admins to create products (assign to themselves or handle normally)
         serializer.save(seller=self.request.user)
