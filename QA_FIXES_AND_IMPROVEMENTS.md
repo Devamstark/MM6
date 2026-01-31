@@ -57,6 +57,16 @@ This document tracks the issues identified during QA testing and the solutions i
     *   **Solution:** Restricted `UserViewSet` so standard users can only view their own profile.
 *   **Problem:** Unauthorized Product Creation.
     *   **Solution:** Added explicit checks to ensure only Admins and Sellers can create products via the API.
+*   **Problem:** Local Storage Data Visibility.
+    *   **Solution:** Implemented **Data Obfuscation** for the cart in `localStorage` using Base64 encoding. This prevents the cart data from being easily readable as plain text in the browser.
+*   **Problem:** API Data Exposure (Excessive Fields).
+    *   **Solution:** Refactored `ProductSerializer` to explicitly whitelist public-only fields. Sensitive or internal fields (like `updated_at`, internal flags) are now excluded from the API response.
+*   **Problem:** Exposed Browsable API Interface.
+    *   **Solution:** Disabled the Django Rest Framework "Browsable API" in production environments. The API now returns strict JSON only, reducing the "developer" surface area visible to the public.
+*   **Problem:** Exposed API Root Directory.
+    *   **Solution:** Switched to `SimpleRouter` in production to hide the `/api/` root listing, returning a 404 instead of a map of all endpoints.
+*   **Problem:** Backend Router Configuration Error (`UserViewSet`).
+    *   **Solution:** Added `basename='user'` to the `UserViewSet` registration in `urls.py` to support the dynamic `get_queryset` security logic.
 
 ---
 *Last Updated: 2026-01-31*
