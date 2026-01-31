@@ -162,7 +162,10 @@ export const api = {
     if (filters.brand) params.brand = filters.brand;
     if (filters.sellerId) params.seller = filters.sellerId;
     if (filters.search) params.search = filters.search;
-    if (filters.sort) params.ordering = filters.sort === 'price_asc' ? 'price' : '-price';
+    if (filters.sort) {
+      if (filters.sort === 'price_asc') params.ordering = 'price';
+      else if (filters.sort === 'price_desc') params.ordering = '-price';
+    }
 
     const response = await client.get('/products/', { params });
     return response.data.map(mapProduct);
