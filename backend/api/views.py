@@ -3,6 +3,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_filters.rest_framework import DjangoFilterBackend
+import django_filters
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 import random
@@ -51,13 +52,39 @@ class RegisterView(APIView):
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
+
+class ProductFilter(django_filters.FilterSet):
+    min_price = django_filters.NumberFilter(field_name="price", lookup_expr='gte')
+    max_price = django_filters.NumberFilter(field_name="price", lookup_expr='lte')
+
+    class Meta:
+        model = Product
+        fields = ['category', 'subcategory', 'brand', 'seller', 'is_featured', 'is_popular']
+
+
+class CategoryViewSet(viewsets.ViewSet):
+    permission_classes = [permissions.AllowAny]
+
+    def list(self, request):
+        items = Product.objects.values('category', 'subcategory').distinct()
+        data = {}
+        for item in items:
+            cat = item['category']
+            sub = item['subcategory']
+            if cat:
+                if cat not in data:
+                    data[cat] = []
+                if sub and sub not in data[cat]:
+                    data[cat].append(sub)
+        return Response(data)
+
 class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all()
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     parser_classes = (parsers.MultiPartParser, parsers.FormParser)
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_fields = ['category', 'subcategory', 'brand', 'seller', 'is_featured', 'is_popular']
+    filterset_class = ProductFilter
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
 

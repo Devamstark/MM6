@@ -6,7 +6,7 @@ from rest_framework_simplejwt.views import (
 )
 from .views import (
     ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, 
-    RegisterView, PageContentViewSet, AffiliateViewSet,
+    RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView
 )
 
@@ -17,6 +17,7 @@ router.register(r'payments', PaymentViewSet)
 router.register(r'users', UserViewSet)
 router.register(r'pages', PageContentViewSet)
 router.register(r'affiliates', AffiliateViewSet, basename='affiliate')
+router.register(r'categories', CategoryViewSet, basename='categories')
 
 urlpatterns = [
     path('', include(router.urls)),
