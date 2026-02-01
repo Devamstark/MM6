@@ -17,9 +17,10 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage', # Add this
+    'whitenoise.runserver_nostatic', 
+    'cloudinary_storage',
     'django.contrib.staticfiles',
-    'cloudinary', # Add this
+    'cloudinary',
     'rest_framework',
     'rest_framework_simplejwt',
     'django_filters',
@@ -82,10 +83,9 @@ TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-WHITENOISE_MANIFEST_STRICT = False  # Critical: Prevents build crashes on missing internal CSS references
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
