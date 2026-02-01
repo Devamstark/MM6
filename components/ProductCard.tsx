@@ -91,10 +91,35 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <span className="text-base font-bold text-gray-900">${product.price.toFixed(2)}</span>
         )}
       </div>
-      {product.stock > 0 && product.stock < 10 && (
-        <div className="text-[10px] font-bold text-orange-600 mt-1">Only {product.stock} left</div>
-      )}
 
-    </Link>
+      {/* Colors & Sizes */}
+      {
+        (product.colors && product.colors.length > 0 || product.sizes && product.sizes.length > 0) && (
+          <div className="flex items-center gap-3 mt-2">
+            {product.colors && product.colors.length > 0 && (
+              <div className="flex -space-x-1">
+                {product.colors.slice(0, 3).map((c, i) => (
+                  <div key={i} className="w-3 h-3 rounded-full border border-gray-100 shadow-sm" style={{ backgroundColor: c.toLowerCase() }} title={c} />
+                ))}
+                {product.colors.length > 3 && <span className="text-[10px] text-gray-400 pl-1">+{product.colors.length - 3}</span>}
+              </div>
+            )}
+            {product.sizes && product.sizes.length > 0 && (
+              <div className="text-[10px] text-gray-500 font-medium truncate max-w-[100px]">
+                {product.sizes.slice(0, 3).join(', ')}
+                {product.sizes.length > 3 && '...'}
+              </div>
+            )}
+          </div>
+        )
+      }
+
+      {
+        product.stock > 0 && product.stock < 10 && (
+          <div className="text-[10px] font-bold text-orange-600 mt-1">Only {product.stock} left</div>
+        )
+      }
+
+    </Link >
   );
 };

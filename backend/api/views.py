@@ -8,8 +8,8 @@ from django.contrib.auth import get_user_model
 from django.utils import timezone
 import random
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer
 
 User = get_user_model()
 
@@ -299,3 +299,38 @@ class ResetPasswordView(APIView):
             
         except (User.DoesNotExist, PasswordResetToken.DoesNotExist):
             return Response({'error': 'Invalid code or email'}, status=status.HTTP_400_BAD_REQUEST)
+
+class ReviewViewSet(viewsets.ModelViewSet):
+    queryset = Review.objects.all()
+    serializer_class = ReviewSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['product']
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        product = serializer.validated_data['product']
+
+        # Verify if user has purchased this product and order is delivered
+        # Note: 'items' is the related name for OrderItem -> Order (not User -> OrderItem directly).
+        # User -> Orders -> Items -> Product
+        has_purchased = OrderItem.objects.filter(
+            order__user=user,
+            order__status='delivered',
+            product=product
+        ).exists()
+
+        # For MVP flexibility, we might also allow 'shipped' or even just 'purchased' regardless of status
+        # but 'delivered' is safer for "Verified Buyer".
+        # However, for testing WITHOUT a full logistics flow, we might relax this to just strict purchase.
+        # Let's check if there is ANY order with this item.
+        has_ordered = OrderItem.objects.filter(
+            order__user=user,
+            product=product
+        ).exists()
+
+        if not has_ordered:
+             from rest_framework.exceptions import PermissionDenied
+             raise PermissionDenied("You can only review products you have purchased.")
+
+        serializer.save(user=user)

@@ -297,28 +297,46 @@ export const api = {
     return Array.from(subcats) as string[];
   },
 
-  // --- Reviews (Mock / LocalStorage for now as Backend doesn't support it yet) ---
+  // --- Reviews ---
   getReviews: async (productId: string): Promise<import('../types').Review[]> => {
-    const reviewsStr = localStorage.getItem(`cm_reviews_${productId}`);
-    if (reviewsStr) return JSON.parse(reviewsStr);
-    return [];
+    try {
+      // Filter by product
+      const response = await client.get(`/reviews/?product=${productId}`);
+      return response.data.map((r: any) => ({
+        id: r.id,
+        productId: r.product,
+        userId: r.user,
+        userName: r.user_name,
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: r.created_at
+      }));
+    } catch (e) {
+      return [];
+    }
   },
 
   createReview: async (productId: string, rating: number, comment: string, user: User): Promise<import('../types').Review> => {
-    const newReview: import('../types').Review = {
-      id: Date.now().toString(),
-      productId,
-      userId: user.id,
-      userName: user.name,
-      rating,
-      comment,
-      createdAt: new Date().toISOString()
-    };
-
-    const reviews = await api.getReviews(productId);
-    reviews.push(newReview);
-    localStorage.setItem(`cm_reviews_${productId}`, JSON.stringify(reviews));
-    return newReview;
+    try {
+      const response = await client.post('/reviews/', {
+        product: productId,
+        rating,
+        comment
+      });
+      const r = response.data;
+      return {
+        id: r.id,
+        productId: r.product,
+        userId: r.user,
+        userName: r.user_name,
+        rating: r.rating,
+        comment: r.comment,
+        createdAt: r.created_at
+      };
+    } catch (e: any) {
+      // Pass the permission error detail if available
+      throw new Error(e.response?.data?.detail || e.message || 'Failed to submit review');
+    }
   },
 
   // --- Orders ---

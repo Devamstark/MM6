@@ -7,7 +7,7 @@ from rest_framework_simplejwt.views import (
 from .views import (
     ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, 
     RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
-    RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView
+    RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet
 )
 
 from rest_framework.routers import SimpleRouter, DefaultRouter
@@ -24,6 +24,7 @@ router.register(r'users', UserViewSet, basename='user')
 router.register(r'pages', PageContentViewSet)
 router.register(r'affiliates', AffiliateViewSet, basename='affiliate')
 router.register(r'categories', CategoryViewSet, basename='categories')
+router.register(r'reviews', ReviewViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

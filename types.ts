@@ -50,6 +50,7 @@ export interface Product {
     color: string;
     stock: number;
   }[];
+  createdAt?: string;
   updatedAt?: string;
 }
 

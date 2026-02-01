@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review
 
 User = get_user_model()
 
@@ -54,3 +54,11 @@ class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = '__all__'
+
+class ReviewSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = Review
+        fields = ['id', 'product', 'user', 'user_name', 'rating', 'comment', 'created_at']
+        read_only_fields = ('user', 'created_at')
