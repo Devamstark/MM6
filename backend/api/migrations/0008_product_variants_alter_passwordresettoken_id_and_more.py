@@ -13,11 +13,11 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='product',
-            name='variants',
-            field=models.JSONField(blank=True, default=list),
-        ),
+        # migrations.AddField(
+        #     model_name='product',
+        #     name='variants',
+        #     field=models.JSONField(blank=True, default=list),
+        # ),
         migrations.AlterField(
             model_name='passwordresettoken',
             name='id',
