@@ -20,18 +20,8 @@ class Migration(migrations.Migration):
         # ),
         migrations.AlterField(
             model_name='passwordresettoken',
-            name='id',
-            field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
-        ),
-        migrations.AlterField(
-            model_name='passwordresettoken',
             name='token',
             field=models.CharField(max_length=6),
-        ),
-        migrations.AlterField(
-            model_name='passwordresettoken',
-            name='user',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
         ),
         migrations.CreateModel(
             name='Review',
