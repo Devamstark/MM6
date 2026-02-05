@@ -372,9 +372,9 @@ export const AdminDashboard = () => {
                 {isFormOpen && (
                   <ProductForm
                     isInline={true}
-                    product={editingProduct}
+                    initialData={editingProduct}
                     onClose={() => setIsFormOpen(false)}
-                    onSave={() => {
+                    onSubmit={() => {
                       setIsFormOpen(false);
                       loadData();
                       window.scrollTo({ top: 0, behavior: 'smooth' });
