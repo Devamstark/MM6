@@ -18,6 +18,12 @@ interface BatchProductCreatorProps {
     existingCategories?: string[]; // strings of "Category" or "Category > Subcategory" ideally, but let's stick to simple for now
 }
 
+const SUBCATEGORIES: Record<string, string[]> = {
+    'Men': ['T-Shirts', 'Shirts', 'Pants', 'Jeans', 'Jackets', 'Suits', 'Activewear', 'Shoes'],
+    'Women': ['Dresses', 'Tops', 'Blouses', 'Skirts', 'Pants', 'Jeans', 'Jackets', 'Activewear', 'Shoes', 'Handbags'],
+    'Accessories': ['Watches', 'Wallets', 'Bags', 'Belts', 'Hats', 'Sunglasses', 'Jewelry']
+};
+
 export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClose, onSuccess, existingCategories = [] }) => {
     const [drafts, setDrafts] = useState<BatchDraft[]>([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -179,13 +185,16 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                                             </div>
                                             <div>
                                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Sub Category</label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     value={draft.subcategory}
                                                     onChange={(e) => updateDraft(draft.id, 'subcategory', e.target.value)}
-                                                    className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-all"
-                                                    placeholder="e.g. Shirts"
-                                                />
+                                                    className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-gray-600 transition-all appearance-none"
+                                                >
+                                                    <option value="">Select...</option>
+                                                    {(SUBCATEGORIES[draft.category] || []).map(sub => (
+                                                        <option key={sub} value={sub}>{sub}</option>
+                                                    ))}
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
