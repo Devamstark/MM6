@@ -2,6 +2,27 @@
 
 from django.db import migrations, models
 
+def add_variants_field_if_not_exists(apps, schema_editor):
+    Product = apps.get_model('api', 'Product')
+    column_name = 'variants'
+    # Use the table name from the model meta
+    table_name = Product._meta.db_table
+    
+    # Check if the column already exists
+    with schema_editor.connection.cursor() as cursor:
+        # Get list of columns in the table using introspection
+        columns = [
+            col.name 
+            for col in schema_editor.connection.introspection.get_table_description(cursor, table_name)
+        ]
+    
+    if column_name not in columns:
+        print(f"Adding '{column_name}' column to '{table_name}' table.")
+        field = models.JSONField(blank=True, default=list)
+        field.set_attributes_from_name(column_name)
+        schema_editor.add_field(Product, field)
+    else:
+        print(f"Column '{column_name}' already exists in '{table_name}' table. Skipping.")
 
 class Migration(migrations.Migration):
 
@@ -10,9 +31,16 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='product',
-            name='variants',
-            field=models.JSONField(blank=True, default=list),
+        migrations.SeparateDatabaseAndState(
+            database_operations=[
+                migrations.RunPython(add_variants_field_if_not_exists, migrations.RunPython.noop),
+            ],
+            state_operations=[
+                migrations.AddField(
+                    model_name='product',
+                    name='variants',
+                    field=models.JSONField(blank=True, default=list),
+                ),
+            ],
         ),
     ]
