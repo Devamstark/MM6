@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
 import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload } from 'lucide-react';
@@ -126,6 +126,36 @@ export const AdminDashboard = () => {
   const filteredOrders = sellerFilter
     ? orders.filter(order => order.items?.some(item => item.userId === parseInt(sellerFilter)))
     : orders;
+
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleBulkUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0];
+      if (!file.name.endsWith('.zip')) {
+        alert('Please upload a .zip file');
+        return;
+      }
+
+      setIsUploading(true);
+      try {
+        const result = await api.bulkUploadProducts(file);
+        alert(result.message);
+        if (result.errors && result.errors.length > 0) {
+          console.warn('Upload errors:', result.errors);
+          alert('Some products failed to upload. Check console for details.');
+        }
+        loadData();
+      } catch (error) {
+        console.error(error);
+        alert('Failed to upload products');
+      } finally {
+        setIsUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = '';
+      }
+    }
+  };
 
   if (loading) return <div className="p-10 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-indigo-600" /></div>;
 
