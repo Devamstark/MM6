@@ -84,6 +84,7 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
 
                 formData.append('is_featured', 'false');
                 formData.append('is_popular', 'false');
+                formData.append('cogs', '0'); // Default COGS
 
                 formData.append('image', draft.file);
 
