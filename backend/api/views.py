@@ -104,6 +104,18 @@ class ProductViewSet(viewsets.ModelViewSet):
         # By strictly using django-filters (ProductFilter class), we ensure clean logic.
         return queryset
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            import traceback
+            print(traceback.format_exc())
+            return Response({
+                "error": str(e),
+                "type": type(e).__name__,
+                "trace": traceback.format_exc()
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
     def perform_create(self, serializer):
         user = self.request.user
         if user.role not in ['admin', 'seller']:
