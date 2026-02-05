@@ -10,6 +10,7 @@ interface BatchDraft {
     price: string;
     category: string;
     subcategory: string;
+    brand: string;
 }
 
 interface BatchProductCreatorProps {
@@ -38,7 +39,8 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 name: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "), // Remove extension and cleanup
                 price: '',
                 category: 'Men',
-                subcategory: ''
+                subcategory: '',
+                brand: 'Generic'
             }));
             setDrafts(prev => [...prev, ...newDrafts]);
         }
@@ -69,6 +71,7 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 formData.append('description', 'Quickly added via Batch Creator');
                 formData.append('category', draft.category);
                 formData.append('subcategory', draft.subcategory);
+                formData.append('brand', draft.brand);
                 formData.append('stock_quantity', '1'); // Default stock
                 formData.append('image', draft.file);
 
@@ -161,6 +164,17 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                                                 onChange={(e) => updateDraft(draft.id, 'name', e.target.value)}
                                                 className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm font-bold text-gray-900 transition-all"
                                                 placeholder="Product Name"
+                                            />
+                                        </div>
+
+                                        <div>
+                                            <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Brand</label>
+                                            <input
+                                                type="text"
+                                                value={draft.brand}
+                                                onChange={(e) => updateDraft(draft.id, 'brand', e.target.value)}
+                                                className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-all"
+                                                placeholder="Brand Name"
                                             />
                                         </div>
 
