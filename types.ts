@@ -52,6 +52,7 @@ export interface Product {
   }[];
   createdAt?: string;
   updatedAt?: string;
+  display_order?: number;
 }
 
 export interface ProductFilter {

@@ -115,6 +115,22 @@ class ProductViewSet(viewsets.ModelViewSet):
         # Allow admins to create products (assign to themselves or handle normally)
         serializer.save(seller=user)
 
+    @action(detail=False, methods=['post'], url_path='reorder')
+    def reorder(self, request):
+        """
+        Expects a list of objects with 'id' and 'display_order'.
+        Example: [{id: 1, display_order: 0}, {id: 2, display_order: 1}]
+        """
+        items = request.data.get('items', [])
+        for item in items:
+            try:
+                obj = Product.objects.get(id=item['id'])
+                obj.display_order = item['display_order']
+                obj.save(update_fields=['display_order'])
+            except Product.DoesNotExist:
+                continue
+        return Response({'status': 'reordered'})
+
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer
     permission_classes = [permissions.IsAuthenticated]

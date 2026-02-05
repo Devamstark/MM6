@@ -72,9 +72,9 @@ export const Home = () => {
       <div className="relative bg-[#f6f6f6]">
         <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
           <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
-            <span className="text-red-600 font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
-            <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100">
-              UP TO <span className="text-red-600">70%</span> OFF
+            <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
+            <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading">
+              UP TO <span className="text-primary">70%</span> OFF
             </h1>
             <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200">
               Discover the hottest trends of the season. Shop the collection now before it's gone.
@@ -117,13 +117,13 @@ export const Home = () => {
 
       {/* Flash Sale Banner */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="bg-red-50 border border-red-100 rounded-xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
+        <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center text-white animate-pulse">
+            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white animate-pulse">
               <Zap className="w-8 h-8 fill-current" />
             </div>
             <div>
-              <h2 className="text-3xl font-black uppercase text-red-600 italic">Flash Sale</h2>
+              <h2 className="text-3xl font-black uppercase text-primary italic font-heading">Flash Sale</h2>
               <p className="text-gray-600 font-medium">Limited time offer on selected items</p>
             </div>
           </div>
@@ -138,7 +138,7 @@ export const Home = () => {
             ))}
           </div>
 
-          <Link to="/products" className="px-8 py-3 bg-red-600 text-white font-bold uppercase rounded hover:bg-red-700 transition-colors shadow-lg shadow-red-200">
+          <Link to="/products" className="px-8 py-3 bg-primary text-white font-bold uppercase rounded hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
             View All
           </Link>
         </div>
@@ -147,18 +147,18 @@ export const Home = () => {
       {/* Featured Grid */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
         <div className="text-center mb-10">
-          <h2 className="text-3xl font-black uppercase tracking-tight mb-2">Daily Drops</h2>
-          <div className="w-16 h-1 bg-black mx-auto"></div>
+          <h2 className="text-3xl font-black uppercase tracking-tight mb-2 font-heading text-zinc-900">Daily Drops</h2>
+          <div className="w-16 h-1 bg-zinc-900 mx-auto"></div>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-4 gap-y-10">
-          {featuredProducts.map((p) => (
-            <ProductCard key={p.id} product={p} />
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
+          {featuredProducts.map((p, i) => (
+            <ProductCard key={p.id} product={p} index={i} />
           ))}
         </div>
 
         <div className="mt-12 text-center">
-          <Link to="/products" className="inline-flex items-center gap-2 border-b-2 border-black pb-1 text-sm font-bold uppercase tracking-widest hover:text-red-600 hover:border-red-600 transition-all">
+          <Link to="/products" className="inline-flex items-center gap-2 border-b-2 border-black pb-1 text-sm font-bold uppercase tracking-widest hover:text-primary hover:border-primary transition-all">
             View More <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

@@ -265,6 +265,11 @@ export const api = {
     return mapProduct(response.data);
   },
 
+  reorderProducts: async (items: { id: string; display_order: number }[]) => {
+    const response = await client.post('/products/reorder/', { items });
+    return response.data;
+  },
+
   deleteProduct: async (id: string): Promise<void> => {
     await client.delete(`/products/${id}/`);
   },
@@ -405,6 +410,16 @@ export const api = {
     // Not implemented in backend MVP
   },
 
+  getPages: async (): Promise<import('../types').PageContent[]> => {
+    const response = await client.get('/pages/');
+    return response.data.map((p: any) => ({
+      slug: p.slug,
+      title: p.title,
+      content: p.content,
+      updatedAt: p.updated_at
+    }));
+  },
+
   getPage: async (slug: string): Promise<import('../types').PageContent | undefined> => {
     try {
       const response = await client.get(`/pages/${slug}/`);
@@ -417,6 +432,18 @@ export const api = {
     } catch (e) {
       return undefined;
     }
+  },
+
+  createPage: async (title: string, content: string, slug: string): Promise<void> => {
+    await client.post('/pages/', { title, content, slug });
+  },
+
+  updatePage: async (slug: string, title: string, content: string): Promise<void> => {
+    await client.patch(`/pages/${slug}/`, { title, content });
+  },
+
+  deletePage: async (slug: string): Promise<void> => {
+    await client.delete(`/pages/${slug}/`);
   },
 
   getAffiliate: async (): Promise<import('../types').Affiliate | null> => {

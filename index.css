@@ -1,7 +1,8 @@
 @import "tailwindcss";
+@config "./tailwind.config.js";
 
 body {
-  @apply bg-white text-black font-sans antialiased;
+  @apply bg-background text-zinc-950 font-sans antialiased;
 }
 
 

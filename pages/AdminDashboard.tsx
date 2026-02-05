@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
-import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter } from 'lucide-react';
+import { Product, DashboardStats, User as UserType, Order, PageContent } from '../types';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, FileText, Move, GripVertical } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
+import { SortableProductList } from '../components/SortableProductList';
+import { PageEditor } from '../components/PageEditor';
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'pages'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [pages, setPages] = useState<PageContent[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -19,6 +22,13 @@ export const AdminDashboard = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  const [isPageEditorOpen, setIsPageEditorOpen] = useState(false);
+  const [editingPage, setEditingPage] = useState<PageContent | null>(null);
+
+  const [isReordering, setIsReordering] = useState(false);
+  const [savingReorder, setSavingReorder] = useState(false);
+
   const formRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -34,16 +44,19 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, productsData, usersData, ordersData] = await Promise.all([
+      const [statsData, productsData, usersData, ordersData, pagesData] = await Promise.all([
         api.getDashboardStats(),
         api.getProducts(),
         api.getUsers(),
-        api.getRecentOrders()
+        api.getRecentOrders(),
+        api.getPages(),
       ]);
       setStats(statsData);
-      setProducts(productsData);
+      // Sort products by display_order
+      setProducts(productsData.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)));
       setUsers(usersData);
       setOrders(ordersData);
+      setPages(pagesData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -55,6 +68,31 @@ export const AdminDashboard = () => {
     if (window.confirm('Delete this product?')) {
       await api.deleteProduct(id);
       loadData();
+    }
+  };
+
+  const handlePageDelete = async (slug: string) => {
+    if (window.confirm('Delete this page?')) {
+      await api.deletePage(slug);
+      loadData();
+    }
+  };
+
+  const handleReorderSave = async () => {
+    setSavingReorder(true);
+    try {
+      const itemsToUpdate = products.map((p, index) => ({
+        id: p.id,
+        display_order: index
+      }));
+      await api.reorderProducts(itemsToUpdate);
+      setIsReordering(false);
+      // No need to reload, local state is already updated by the drag component
+    } catch (e) {
+      console.error(e);
+      alert('Failed to save order');
+    } finally {
+      setSavingReorder(false);
     }
   };
 
@@ -87,6 +125,11 @@ export const AdminDashboard = () => {
     setActiveTab('products');
   };
 
+  const openPageEditor = (page?: PageContent) => {
+    setEditingPage(page || null);
+    setIsPageEditorOpen(true);
+  };
+
   // derived state
   const sellers = users.filter(u => u.role === 'seller');
   const getSellerProductCount = (sellerId: number) => products.filter(p => p.userId === sellerId).length;
@@ -107,7 +150,7 @@ export const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="flex space-x-2 bg-white p-1.5 rounded-full shadow-sm mb-8 w-fit border border-gray-100 overflow-x-auto animate-fade-up delay-100">
-          {['overview', 'products', 'sellers', 'users', 'orders'].map((tab) => (
+          {['overview', 'products', 'sellers', 'users', 'orders', 'pages'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -124,51 +167,38 @@ export const AdminDashboard = () => {
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-green-50 text-green-600 rounded-xl"><DollarSign className="w-6 h-6" /></div>
-                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Revenue</span>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mt-2">
-                    ${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}
-                  </div>
-                  <div className="text-green-600 text-xs font-bold mt-2 flex items-center gap-1">
-                    <span className="bg-green-100 px-2 py-0.5 rounded-full">+12%</span> from last month
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-blue-50 text-blue-600 rounded-xl"><ShoppingBag className="w-6 h-6" /></div>
-                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Units Sold</span>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mt-2">
-                    {orders.reduce((sum, o) => sum + (o.items?.reduce((isum, i) => isum + (i.quantity || 1), 0) || 0), 0)}
-                  </div>
-                  <div className="text-blue-600 text-xs font-bold mt-2 flex items-center gap-1">
-                    <span className="bg-blue-100 px-2 py-0.5 rounded-full">+5%</span> from last month
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-purple-50 text-purple-600 rounded-xl"><Users className="w-6 h-6" /></div>
-                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Total Users</span>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mt-2">{users.length}</div>
-                  <div className="text-purple-600 text-xs font-bold mt-2">
-                    {users.filter(u => u.role === 'seller').length} Sellers
-                  </div>
-                </div>
-
-                <div className="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className="p-3 bg-orange-50 text-orange-600 rounded-xl"><Package className="w-6 h-6" /></div>
-                    <span className="text-gray-400 text-xs font-bold uppercase tracking-wide">Low Stock Alerts</span>
-                  </div>
-                  <div className="text-3xl font-bold text-gray-900 mt-2">{products.filter(p => p.stock < 10).length}</div>
-                  <div className="text-orange-600 text-xs font-bold mt-2">Items need restocking</div>
-                </div>
+                <StatCard
+                  title="Total Revenue"
+                  value={`$${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
+                  icon={DollarSign}
+                  color="text-green-600"
+                  bg="bg-green-50"
+                  delay={0}
+                />
+                <StatCard
+                  title="Total Units Sold"
+                  value={orders.reduce((sum, o) => sum + (o.items?.reduce((isum, i) => isum + (i.quantity || 1), 0) || 0), 0)}
+                  icon={ShoppingBag}
+                  color="text-blue-600"
+                  bg="bg-blue-50"
+                  delay={100}
+                />
+                <StatCard
+                  title="Total Users"
+                  value={users.length}
+                  icon={Users}
+                  color="text-purple-600"
+                  bg="bg-purple-50"
+                  delay={200}
+                />
+                <StatCard
+                  title="Low Stock Alerts"
+                  value={products.filter(p => p.stock < 10).length}
+                  icon={Package}
+                  color="text-orange-600"
+                  bg="bg-orange-50"
+                  delay={300}
+                />
               </div>
 
               {/* Monthly Sales Trend Chart (Mock) */}
@@ -227,60 +257,75 @@ export const AdminDashboard = () => {
               <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
-                  <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
-                    <Plus className="w-4 h-4" /> Add Product
-                  </button>
+                  <div className="flex gap-2">
+                    <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'}`}>
+                      <Move className="w-4 h-4" /> {isReordering ? 'Done Reordering' : 'Reorder'}
+                    </button>
+                    <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
+                      <Plus className="w-4 h-4" /> Add Product
+                    </button>
+                  </div>
                 </div>
-                <table className="min-w-full divide-y divide-gray-100">
-                  <thead className="bg-white">
-                    <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
-                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-50">
-                    {products.map(p => {
-                      const seller = users.find(u => u.id === p.userId);
-                      return (
-                        <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
-                              <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
-                              <div className="ml-4">
-                                <div className="text-sm font-bold text-gray-900">{p.name}</div>
-                                <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
+
+                {isReordering ? (
+                  <SortableProductList
+                    products={products}
+                    onReorder={setProducts}
+                    onSave={handleReorderSave}
+                    saving={savingReorder}
+                  />
+                ) : (
+                  <table className="min-w-full divide-y divide-gray-100">
+                    <thead className="bg-white">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
+                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
+                        <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-50">
+                      {products.map(p => {
+                        const seller = users.find(u => u.id === p.userId);
+                        return (
+                          <tr key={p.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex items-center">
+                                <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
+                                <div className="ml-4">
+                                  <div className="text-sm font-bold text-gray-900">{p.name}</div>
+                                  <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                            {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                            ${p.price}
-                            {p.salePrice && <div className="text-xs text-red-600 line-through">${p.price}</div>}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            {p.discountPercentage ? (
-                              <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold">-{p.discountPercentage}%</span>
-                            ) : (
-                              <span className="text-gray-400 text-xs">-</span>
-                            )}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
-                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <button onClick={() => setDiscountProduct(p)} className="text-green-600 hover:bg-green-50 p-2 rounded-full mr-1 transition-colors" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
-                            <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                            <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
-                          </td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
+                              {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
+                              ${p.price}
+                              {p.salePrice && <div className="text-xs text-red-600 line-through">${p.price}</div>}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              {p.discountPercentage ? (
+                                <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold">-{p.discountPercentage}%</span>
+                              ) : (
+                                <span className="text-gray-400 text-xs">-</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                              <button onClick={() => setDiscountProduct(p)} className="text-green-600 hover:bg-green-50 p-2 rounded-full mr-1 transition-colors" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
+                              <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                              <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            </td>
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                )}
               </div>
 
               <div ref={formRef}>
@@ -331,7 +376,6 @@ export const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          // User toggle is not defined but we can skip implementation or add dummy
                           className={`flex items-center gap-1.5 ml-auto px-4 py-2 rounded-full border transition-all text-xs font-bold ${s.isActive !== false
                             ? 'text-red-600 border-red-100 hover:bg-red-50'
                             : 'text-green-600 border-green-100 hover:bg-green-50'}`}
@@ -456,6 +500,74 @@ export const AdminDashboard = () => {
               {filteredOrders.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No orders found.</div>}
             </div>
           )}
+
+          {activeTab === 'pages' && (
+            <>
+              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+                <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+                  <h3 className="font-bold text-lg text-gray-800">Content Pages</h3>
+                  <button onClick={() => openPageEditor()} className="bg-black text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg hover:bg-gray-800 transition-all">
+                    <Plus className="w-4 h-4" /> Add Page
+                  </button>
+                </div>
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-white">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Title</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Slug</th>
+                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Last Updated</th>
+                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {pages.map(p => (
+                      <tr key={p.slug} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center gap-3">
+                            <div className="p-2 bg-gray-100 rounded-lg text-gray-500">
+                              <FileText className="w-5 h-5" />
+                            </div>
+                            <span className="text-sm font-bold text-gray-900">{p.title}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono bg-gray-50 px-2 py-1 rounded w-fit">
+                          /{p.slug}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                          {new Date(p.updatedAt).toLocaleDateString()}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                          <button onClick={() => openPageEditor(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
+                          <button onClick={() => handlePageDelete(p.slug)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {pages.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No pages found. Create one to get started.</div>}
+              </div>
+
+              {isPageEditorOpen && (
+                <PageEditor
+                  initialTitle={editingPage?.title || ''}
+                  initialContent={editingPage?.content || ''}
+                  slug={editingPage?.slug || ''}
+                  onClose={() => setIsPageEditorOpen(false)}
+                  onSave={async (slug, title, content) => {
+                    if (editingPage) {
+                      await api.updatePage(editingPage.slug, title, content);
+                    } else {
+                      // Simple slug generation
+                      const newSlug = slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                      await api.createPage(title, content, newSlug);
+                    }
+                    loadData();
+                  }}
+                />
+              )}
+            </>
+          )}
+
         </div>
 
       </div>
@@ -473,8 +585,8 @@ export const AdminDashboard = () => {
                   key={p}
                   onClick={() => applyDiscount(p)}
                   className={`py-3 rounded-xl font-bold border transition-all ${discountProduct.discountPercentage === p
-                      ? 'bg-red-600 text-white border-red-600'
-                      : 'bg-white text-gray-700 border-gray-200 hover:border-red-600 hover:text-red-600'
+                    ? 'bg-red-600 text-white border-red-600'
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-red-600 hover:text-red-600'
                     }`}
                 >
                   {p}%
@@ -497,8 +609,6 @@ export const AdminDashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Product Modal */}
 
     </div >
   );

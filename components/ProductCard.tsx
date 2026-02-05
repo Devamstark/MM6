@@ -1,16 +1,36 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Product } from '../types';
-import { ShoppingBag, Star, Zap } from 'lucide-react';
+import { ShoppingBag, Zap, Star } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
+import gsap from 'gsap';
+import { cn } from '../utils/cn';
 
 interface ProductCardProps {
   product: Product;
+  index?: number;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (cardRef.current) {
+      gsap.fromTo(
+        cardRef.current,
+        { opacity: 0, y: 20 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+          delay: index * 0.1,
+          ease: 'power2.out',
+        }
+      );
+    }
+  }, [index]);
 
   const handleBuy = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -26,100 +46,103 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   };
 
   return (
-    <Link to={`/product/${product.id}`} className="group cursor-pointer block">
-      {/* Image */}
-      <div className="relative aspect-[3/4] overflow-hidden bg-gray-100 rounded-sm mb-3">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-        />
+    <div ref={cardRef} className="opacity-0">
+      <Link to={`/product/${product.id}`} className="group cursor-pointer block h-full">
+        <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col border border-gray-100">
 
-        {/* Badges */}
-        <div className="absolute top-0 left-0 flex flex-col gap-1">
-          {(product.isFeatured || product.isPopular) && (
-            <div className="bg-black text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-              {product.isFeatured ? 'Hot' : 'Popular'}
+          {/* Image Container */}
+          <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
+            <img
+              src={product.imageUrl}
+              alt={product.name}
+              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            />
+
+            {/* Overlay Gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+            {/* Badges */}
+            <div className="absolute top-3 left-3 flex flex-col gap-2">
+              {(product.isFeatured || product.isPopular) && (
+                <div className="bg-white/90 backdrop-blur-sm text-zinc-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                  {product.isFeatured ? 'Hot' : 'Popular'}
+                </div>
+              )}
+              {product.salePrice && product.salePrice < product.price && (
+                <div className="bg-primary text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                  {product.discountPercentage ? `-${product.discountPercentage}% OFF` : 'SALE'}
+                </div>
+              )}
             </div>
-          )}
-          {product.salePrice && product.salePrice < product.price && (
-            <div className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-              {product.discountPercentage ? `-${product.discountPercentage}% OFF` : 'SALE'}
+
+            {/* Action Buttons */}
+            {product.stock > 0 && (
+              <div className="absolute bottom-4 right-4 flex flex-col gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+                <button
+                  onClick={handleBuy}
+                  className="bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white p-3 rounded-full shadow-lg transition-colors duration-200"
+                  title="Add to Cart"
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={handleBuyNow}
+                  className="bg-primary text-white hover:bg-primary/90 p-3 rounded-full shadow-lg transition-colors duration-200"
+                  title="Buy Now"
+                >
+                  <Zap className="w-5 h-5" />
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Content */}
+          <div className="p-4 flex flex-col flex-grow">
+            <div className="mb-1 text-xs text-zinc-500 font-medium uppercase tracking-wider font-sans">
+              {product.category}
             </div>
-          )}
+            <h3 className="text-zinc-900 font-heading font-semibold text-lg leading-tight mb-2 group-hover:text-primary transition-colors">
+              {product.name}
+            </h3>
+
+            {/* Rating Placeholder (if reviews exist) */}
+            <div className="flex items-center gap-1 mb-2">
+              <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+              <span className="text-xs text-zinc-500 font-medium">4.8 (120)</span>
+            </div>
+
+            <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
+              <div className="flex flex-col">
+                {product.salePrice && product.salePrice < product.price ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-bold text-primary">${product.salePrice.toFixed(2)}</span>
+                    <span className="text-xs text-zinc-400 line-through">${product.price.toFixed(2)}</span>
+                  </div>
+                ) : (
+                  <span className="text-lg font-bold text-zinc-900">${product.price.toFixed(2)}</span>
+                )}
+              </div>
+
+              {/* Size/Color Indicator */}
+              {(product.colors?.length > 0 || product.sizes?.length > 0) && (
+                <div className="flex -space-x-2">
+                  {product.colors?.slice(0, 3).map((c, i) => (
+                    <div key={i}
+                      className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                      style={{ backgroundColor: c.toLowerCase() }}
+                    />
+                  ))}
+                  {product.colors?.length > 3 && (
+                    <div className="w-5 h-5 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-500">
+                      +{product.colors.length - 3}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-
-        {/* Stock Badge */}
-        {product.stock <= 0 && (
-          <div className="absolute top-0 right-0 bg-gray-900 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider">
-            Out of Stock
-          </div>
-        )}
-
-        {/* Quick Add Button - Only if in stock */}
-        {product.stock > 0 && (
-          <div className="absolute bottom-3 right-3 flex gap-2 translate-y-full opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-            <button
-              onClick={handleBuy}
-              className="bg-white hover:bg-black text-black hover:text-white p-2.5 rounded-full shadow-lg"
-              title="Add to Cart"
-            >
-              <ShoppingBag className="w-5 h-5" />
-            </button>
-            <button
-              onClick={handleBuyNow}
-              className="bg-black hover:bg-red-600 text-white p-2.5 rounded-full shadow-lg"
-              title="Buy Now"
-            >
-              <Zap className="w-5 h-5" />
-            </button>
-          </div>
-        )}
-      </div>
-
-      {/* Info */}
-      <h3 className="text-sm text-gray-900 truncate font-medium group-hover:underline decoration-1 underline-offset-2">
-        {product.name}
-      </h3>
-      <div className="flex items-center gap-2 mt-1">
-        {product.salePrice && product.salePrice < product.price ? (
-          <>
-            <span className="text-base font-bold text-red-600">${product.salePrice.toFixed(2)}</span>
-            <span className="text-xs text-gray-400 line-through">${product.price.toFixed(2)}</span>
-          </>
-        ) : (
-          <span className="text-base font-bold text-gray-900">${product.price.toFixed(2)}</span>
-        )}
-      </div>
-
-      {/* Colors & Sizes */}
-      {
-        (product.colors && product.colors.length > 0 || product.sizes && product.sizes.length > 0) && (
-          <div className="flex items-center gap-3 mt-2">
-            {product.colors && product.colors.length > 0 && (
-              <div className="flex -space-x-1">
-                {product.colors.slice(0, 3).map((c, i) => (
-                  <div key={i} className="w-3 h-3 rounded-full border border-gray-100 shadow-sm" style={{ backgroundColor: c.toLowerCase() }} title={c} />
-                ))}
-                {product.colors.length > 3 && <span className="text-[10px] text-gray-400 pl-1">+{product.colors.length - 3}</span>}
-              </div>
-            )}
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="text-[10px] text-gray-500 font-medium truncate max-w-[100px]">
-                {product.sizes.slice(0, 3).join(', ')}
-                {product.sizes.length > 3 && '...'}
-              </div>
-            )}
-          </div>
-        )
-      }
-
-      {
-        product.stock > 0 && product.stock < 10 && (
-          <div className="text-[10px] font-bold text-orange-600 mt-1">Only {product.stock} left</div>
-        )
-      }
-
-    </Link >
+      </Link>
+    </div>
   );
 };

@@ -36,7 +36,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex flex-col font-sans text-slate-900">
+    <div className="min-h-screen bg-background flex flex-col font-sans text-slate-900">
       <style>{`
         @keyframes slideInRight {
           from { transform: translateX(100%); opacity: 0; }
@@ -64,12 +64,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
-              <Link to="/products?sort=newest" className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+              <Link to="/products?sort=newest" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
                 New Arrivals
               </Link>
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <span className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">Women</span>
-                <svg className="w-3 h-3 text-gray-500 group-hover:text-indigo-600 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                <span className="text-sm font-medium text-gray-900 group-hover:text-primary">Women</span>
+                <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Women's Mega Menu */}
                 <div className="absolute top-full -left-20 w-[800px] bg-white shadow-xl border-t border-gray-100 hidden group-hover:block p-8 z-50 animate-fade-in">
@@ -77,37 +77,37 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Dresses</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=Casual+Dresses" className="hover:text-indigo-600 hover:underline">Casual Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Evening+Dresses" className="hover:text-indigo-600 hover:underline">Evening Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" className="hover:text-indigo-600 hover:underline">Maxi Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Mini+Dresses" className="hover:text-indigo-600 hover:underline">Mini Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Casual+Dresses" className="hover:text-primary hover:underline">Casual Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Evening+Dresses" className="hover:text-primary hover:underline">Evening Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" className="hover:text-primary hover:underline">Maxi Dresses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Mini+Dresses" className="hover:text-primary hover:underline">Mini Dresses</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Blouses" className="hover:text-indigo-600 hover:underline">Blouses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Crop+Tops" className="hover:text-indigo-600 hover:underline">Crop Tops</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=T-Shirts" className="hover:text-primary hover:underline">T-Shirts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Blouses" className="hover:text-primary hover:underline">Blouses</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Sweaters" className="hover:text-primary hover:underline">Sweaters</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Crop+Tops" className="hover:text-primary hover:underline">Crop Tops</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Skirts" className="hover:text-indigo-600 hover:underline">Skirts</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Pants" className="hover:text-indigo-600 hover:underline">Pants</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Jeans" className="hover:text-primary hover:underline">Jeans</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Skirts" className="hover:text-primary hover:underline">Skirts</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Pants" className="hover:text-primary hover:underline">Pants</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Shorts" className="hover:text-primary hover:underline">Shorts</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Cardigans" className="hover:text-indigo-600 hover:underline">Cardigans</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Jackets" className="hover:text-primary hover:underline">Jackets</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Coats" className="hover:text-primary hover:underline">Coats</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Blazers" className="hover:text-primary hover:underline">Blazers</Link></li>
+                        <li><Link to="/products?category=Women&subcategory=Cardigans" className="hover:text-primary hover:underline">Cardigans</Link></li>
                       </ul>
                     </div>
                   </div>
@@ -115,8 +115,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-indigo-600">Men</Link>
-                <svg className="w-3 h-3 text-gray-500 group-hover:text-indigo-600 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-primary">Men</Link>
+                <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Men's Mega Menu */}
                 <div className="absolute top-full -left-20 w-[800px] bg-white shadow-xl border-t border-gray-100 hidden group-hover:block p-8 z-50 animate-fade-in">
@@ -124,43 +124,43 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=T-Shirts" className="hover:text-indigo-600 hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Shirts" className="hover:text-indigo-600 hover:underline">Shirts</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Polos" className="hover:text-indigo-600 hover:underline">Polos</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Sweaters" className="hover:text-indigo-600 hover:underline">Sweaters</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=T-Shirts" className="hover:text-primary hover:underline">T-Shirts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Shirts" className="hover:text-primary hover:underline">Shirts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Polos" className="hover:text-primary hover:underline">Polos</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Sweaters" className="hover:text-primary hover:underline">Sweaters</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Jeans" className="hover:text-indigo-600 hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Chinos" className="hover:text-indigo-600 hover:underline">Chinos</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Joggers" className="hover:text-indigo-600 hover:underline">Joggers</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Shorts" className="hover:text-indigo-600 hover:underline">Shorts</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Jeans" className="hover:text-primary hover:underline">Jeans</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Chinos" className="hover:text-primary hover:underline">Chinos</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Joggers" className="hover:text-primary hover:underline">Joggers</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Shorts" className="hover:text-primary hover:underline">Shorts</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Jackets" className="hover:text-indigo-600 hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Coats" className="hover:text-indigo-600 hover:underline">Coats</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Hoodies" className="hover:text-indigo-600 hover:underline">Hoodies</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Blazers" className="hover:text-indigo-600 hover:underline">Blazers</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Jackets" className="hover:text-primary hover:underline">Jackets</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Coats" className="hover:text-primary hover:underline">Coats</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Hoodies" className="hover:text-primary hover:underline">Hoodies</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Blazers" className="hover:text-primary hover:underline">Blazers</Link></li>
                       </ul>
                     </div>
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Suits</h4>
                       <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Full+Suits" className="hover:text-indigo-600 hover:underline">Full Suits</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Suit+Jackets" className="hover:text-indigo-600 hover:underline">Suit Jackets</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Dress+Pants" className="hover:text-indigo-600 hover:underline">Dress Pants</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Vests" className="hover:text-indigo-600 hover:underline">Vests</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Full+Suits" className="hover:text-primary hover:underline">Full Suits</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Suit+Jackets" className="hover:text-primary hover:underline">Suit Jackets</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Dress+Pants" className="hover:text-primary hover:underline">Dress Pants</Link></li>
+                        <li><Link to="/products?category=Men&subcategory=Vests" className="hover:text-primary hover:underline">Vests</Link></li>
                       </ul>
                     </div>
                   </div>
                 </div>
               </div>
-              <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-indigo-600 transition-colors">
+              <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
                 Accessories
               </Link>
               <Link to="/products?on_sale=true" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
@@ -173,7 +173,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {/* Search */}
               <button
                 onClick={() => document.getElementById('search-input')?.focus()}
-                className="text-gray-900 hover:text-indigo-600 transition-colors"
+                className="text-gray-900 hover:text-primary transition-colors"
                 title="Search"
               >
                 <Search className="w-5 h-5" />
@@ -182,7 +182,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {/* User Account */}
               {isAuthenticated ? (
                 <div className="relative group">
-                  <Link to="/bonus-points" className="text-gray-900 hover:text-indigo-600 transition-colors flex items-center justify-center">
+                  <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center">
                     <UserIcon className="w-5 h-5" />
                   </Link>
                   {/* Minimal Dropdown */}
@@ -200,20 +200,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 </div>
               ) : (
-                <Link to="/login" className="text-gray-900 hover:text-indigo-600 transition-colors">
+                <Link to="/login" className="text-gray-900 hover:text-primary transition-colors">
                   <UserIcon className="w-5 h-5" />
                 </Link>
               )}
 
               {/* Wishlist (Mock) */}
-              <button className="text-gray-900 hover:text-indigo-600 transition-colors relative">
+              <button className="text-gray-900 hover:text-primary transition-colors relative">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               </button>
 
               {/* Shopping Bag */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="text-gray-900 hover:text-indigo-600 transition-colors relative"
+                className="text-gray-900 hover:text-primary transition-colors relative"
               >
                 <div className="relative">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
@@ -283,7 +283,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 {/* Header */}
                 <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50">
                   <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
-                    <div className="bg-indigo-100 p-2 rounded-full text-indigo-600">
+                    <div className="bg-primary/10 p-2 rounded-full text-primary">
                       <ShoppingCart className="w-5 h-5" />
                     </div>
                     Your Cart
@@ -298,8 +298,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/30">
                   {items.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-6">
-                      <div className="w-24 h-24 bg-indigo-50 rounded-3xl flex items-center justify-center transform rotate-3">
-                        <ShoppingCart className="w-10 h-10 text-indigo-300" />
+                      <div className="w-24 h-24 bg-primary/5 rounded-3xl flex items-center justify-center transform rotate-3">
+                        <ShoppingCart className="w-10 h-10 text-primary/50" />
                       </div>
                       <div className="space-y-2">
                         <p className="text-xl font-bold text-gray-900">Your cart is empty</p>
@@ -307,7 +307,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       </div>
                       <button
                         onClick={() => { setCartOpen(false); navigate('/products'); }}
-                        className="px-8 py-3 bg-white border border-gray-200 text-indigo-600 font-bold rounded-full hover:bg-gray-50 hover:shadow-md transition-all"
+                        className="px-8 py-3 bg-white border border-gray-200 text-primary font-bold rounded-full hover:bg-gray-50 hover:shadow-md transition-all"
                       >
                         Start Shopping
                       </button>
@@ -328,7 +328,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                             <div>
                               <div className="flex justify-between text-base font-medium text-gray-900">
                                 <h3 className="line-clamp-2 pr-4 leading-tight">{item.name}</h3>
-                                <p className="whitespace-nowrap font-bold text-indigo-600">${(item.price * item.quantity).toFixed(2)}</p>
+                                <p className="whitespace-nowrap font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</p>
                               </div>
                               <p className="mt-1 text-sm text-gray-500">{item.brand}</p>
                             </div>
@@ -345,7 +345,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                                 <span className="px-2 text-sm font-semibold text-gray-900 min-w-[1.5rem] text-center">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="p-1.5 hover:bg-white hover:text-indigo-600 rounded-full transition-colors text-gray-400 m-1"
+                                  className="p-1.5 hover:bg-white hover:text-primary rounded-full transition-colors text-gray-400 m-1"
                                 >
                                   <Plus className="w-4 h-4" />
                                 </button>
@@ -377,7 +377,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     </div>
                     <button
                       onClick={handleCheckout}
-                      className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-indigo-600 hover:shadow-indigo-200 transition-all duration-300 active:scale-[0.98]"
+                      className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-primary hover:shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
                     >
                       Proceed to Checkout <ArrowRight className="w-5 h-5" />
                     </button>
@@ -401,9 +401,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Company Info</h3>
               <ul className="space-y-3">
-                <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">About Us</Link></li>
-                <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Affiliate</Link></li>
-                <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Fashion Blogger</Link></li>
+                <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-primary transition-colors">About Us</Link></li>
+                <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors">Affiliate</Link></li>
+                <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-primary transition-colors">Fashion Blogger</Link></li>
               </ul>
             </div>
 
@@ -411,10 +411,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Help & Support</h3>
               <ul className="space-y-3">
-                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Shipping Info</Link></li>
-                <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Returns</Link></li>
-                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">How to Order</Link></li>
-                <li><Link to="/page/size-guide" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Size Guide</Link></li>
+                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-primary transition-colors">Shipping Info</Link></li>
+                <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-primary transition-colors">Returns</Link></li>
+                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-primary transition-colors">How to Order</Link></li>
+                <li><Link to="/page/size-guide" className="text-sm text-gray-500 hover:text-primary transition-colors">Size Guide</Link></li>
               </ul>
             </div>
 
@@ -422,9 +422,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Customer Care</h3>
               <ul className="space-y-3">
-                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Contact Us</Link></li>
-                <li><Link to="/page/payment-method" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Payment Method</Link></li>
-                <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-indigo-600 transition-colors">Bonus Point System</Link></li>
+                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-primary transition-colors">Contact Us</Link></li>
+                <li><Link to="/page/payment-method" className="text-sm text-gray-500 hover:text-primary transition-colors">Payment Method</Link></li>
+                <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-primary transition-colors">Bonus Point System</Link></li>
               </ul>
             </div>
 
@@ -434,13 +434,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <p className="text-sm text-gray-500">Sign up for our newsletter to get updates on new arrivals and special offers.</p>
               <div className="flex space-x-4 pt-2">
                 {/* Social Icons Placeholder */}
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-indigo-100 hover:text-indigo-600 transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">FB</span>
                 </div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-indigo-100 hover:text-indigo-600 transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">IG</span>
                 </div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-indigo-100 hover:text-indigo-600 transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">TW</span>
                 </div>
               </div>
