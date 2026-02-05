@@ -262,7 +262,7 @@ export const AdminDashboard = () => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
                   <div className="flex gap-2">
-                    <button onClick={() => setIsReordering(!isReordering)} className={`px - 4 py - 2.5 rounded - full text - sm font - bold flex items - center gap - 2 transition - all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'} `}>
+                    <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'} `}>
                       <Move className="w-4 h-4" /> {isReordering ? 'Done Reordering' : 'Reorder'}
                     </button>
                     <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">

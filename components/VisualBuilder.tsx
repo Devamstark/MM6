@@ -78,7 +78,7 @@ const TextEditor = ({ data, onChange }: { data: any, onChange: (d: any) => void 
             theme="snow"
             value={data.content || ''}
             onChange={content => onChange({ ...data, content })}
-            className="h-40 mb-12"
+            className="h-64 mb-12"
         />
     </div>
 );
@@ -219,7 +219,7 @@ export const VisualBuilder: React.FC<VisualBuilderProps> = ({ initialTitle, init
     };
 
     return (
-        <div className="fixed inset-0 bg-gray-100 z-50 flex flex-col animate-fade-in">
+        <div className="fixed inset-0 bg-gray-100 z-[100] flex flex-col animate-fade-in">
             {/* Header */}
             <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
                 <div className="flex items-center gap-4">
