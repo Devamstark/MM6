@@ -1,8 +1,29 @@
-# CloudMart Deployment Guide (Vercel + Render + Neon)
+# CloudMart Deployment Guide (Docker / Vercel / Render)
 
-This guide details the steps to deploy the CloudMart Capstone project to a live production environment using the approved technology stack.
+This guide details the steps to deploy the CloudMart project. **Option 1 (Docker)** is the easiest "One-Place" method to get a single URL for everything.
+
+---
+
+## 🚀 Option 1: One-Click Docker Deployment (Easiest)
+
+This method combines the Frontend and Backend into a single container. You get **one URL** for the entire site.
+
+1.  **Push to GitHub**: Ensure your latest code (with the `Dockerfile`) is pushed to GitHub.
+2.  **Go to [Render.com](https://render.com/)**:
+    *   Click **New +** -> **Web Service**.
+    *   Connect your GitHub repository.
+3.  **Configure**:
+    *   **Runtime**: Select **Docker**. (Render will automatically detect the `Dockerfile` in the root).
+    *   **Instance Type**: **Free**.
+4.  **Environment Variables**:
+    *   `SECRET_KEY`: `any-random-string`
+    *   `DATABASE_URL`: *(Optionally add a Neon.tech URL, otherwise it uses a local SQLite file).*
+5.  **Get Your URL**: Once the build finishes (approx. 3-5 mins), your live URL will appear at the top (e.g., `https://cloudmart-xyz.onrender.com`).
+
+---
 
 ## 📋 Prerequisites
+... (rest of the previous content)
 
 1.  A **GitHub Account** with the project code pushed to a public repository.
 2.  A **Render Account** (for Backend & Database).

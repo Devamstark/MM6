@@ -1,0 +1,541 @@
+# 🏗️ CloudMart - System Architecture
+
+## 📐 High-Level Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         CLIENT LAYER                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                    Web Browser                            │   │
+│  │  (Chrome, Firefox, Safari, Edge)                         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│                              ↕                                   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              React Frontend (SPA)                        │   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐        │   │
+│  │  │   Pages    │  │ Components │  │  Context   │        │   │
+│  │  │  (Routes)  │  │    (UI)    │  │  (State)   │        │   │
+│  │  └────────────┘  └────────────┘  └────────────┘        │   │
+│  │                                                          │   │
+│  │  ┌────────────────────────────────────────────┐        │   │
+│  │  │         Services Layer (API Client)        │        │   │
+│  │  │              Axios + JWT                    │        │   │
+│  │  └────────────────────────────────────────────┘        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↕ HTTPS
+┌─────────────────────────────────────────────────────────────────┐
+│                         SERVER LAYER                             │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │           Django REST Framework (API)                    │   │
+│  │  ┌────────────┐  ┌────────────┐  ┌────────────┐        │   │
+│  │  │  ViewSets  │  │Serializers │  │Permissions │        │   │
+│  │  │  (Logic)   │  │(Validation)│  │   (RBAC)   │        │   │
+│  │  └────────────┘  └────────────┘  └────────────┘        │   │
+│  │                                                          │   │
+│  │  ┌────────────────────────────────────────────┐        │   │
+│  │  │         Django ORM (Data Layer)            │        │   │
+│  │  └────────────────────────────────────────────┘        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+                              ↕ SQL
+┌─────────────────────────────────────────────────────────────────┐
+│                      DATABASE LAYER                              │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │              PostgreSQL Database                         │   │
+│  │  ┌────────┐ ┌────────┐ ┌────────┐ ┌────────┐           │   │
+│  │  │ Users  │ │Products│ │ Orders │ │Reviews │           │   │
+│  │  └────────┘ └────────┘ └────────┘ └────────┘           │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│                    EXTERNAL SERVICES                             │
+│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
+│  │  Cloudinary  │  │    Vercel    │  │    Render    │          │
+│  │   (Images)   │  │  (Frontend)  │  │  (Backend)   │          │
+│  └──────────────┘  └──────────────┘  └──────────────┘          │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🔄 Request Flow Diagram
+
+### User Authentication Flow
+```
+┌──────┐                ┌──────────┐              ┌──────────┐
+│Client│                │ Frontend │              │ Backend  │
+└──┬───┘                └────┬─────┘              └────┬─────┘
+   │                         │                         │
+   │  1. Enter credentials   │                         │
+   ├────────────────────────>│                         │
+   │                         │                         │
+   │                         │  2. POST /api/auth/login/
+   │                         ├────────────────────────>│
+   │                         │                         │
+   │                         │  3. Validate credentials│
+   │                         │     & Generate JWT      │
+   │                         │<────────────────────────┤
+   │                         │                         │
+   │  4. Store JWT in        │                         │
+   │     localStorage        │                         │
+   │<────────────────────────┤                         │
+   │                         │                         │
+   │  5. Redirect to         │                         │
+   │     Dashboard           │                         │
+   │<────────────────────────┤                         │
+   │                         │                         │
+```
+
+### Product Purchase Flow
+```
+┌──────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
+│Client│     │ Frontend │     │ Backend  │     │ Database │
+└──┬───┘     └────┬─────┘     └────┬─────┘     └────┬─────┘
+   │              │                 │                │
+   │ 1. Browse    │                 │                │
+   ├─────────────>│                 │                │
+   │              │ 2. GET /api/products/            │
+   │              ├────────────────>│                │
+   │              │                 │ 3. Query       │
+   │              │                 ├───────────────>│
+   │              │                 │<───────────────┤
+   │              │<────────────────┤                │
+   │<─────────────┤                 │                │
+   │              │                 │                │
+   │ 4. Add to    │                 │                │
+   │    Cart      │                 │                │
+   ├─────────────>│ 5. Store in     │                │
+   │              │    Context      │                │
+   │              │                 │                │
+   │ 6. Checkout  │                 │                │
+   ├─────────────>│ 7. POST /api/orders/             │
+   │              ├────────────────>│                │
+   │              │                 │ 8. Create Order│
+   │              │                 │    & Update    │
+   │              │                 │    Stock       │
+   │              │                 ├───────────────>│
+   │              │                 │<───────────────┤
+   │              │<────────────────┤                │
+   │<─────────────┤                 │                │
+   │              │                 │                │
+```
+
+---
+
+## 🗄️ Database Schema
+
+### Entity Relationship Diagram
+
+```
+┌─────────────────┐
+│      User       │
+├─────────────────┤
+│ id (PK)         │
+│ username        │
+│ email           │
+│ password        │
+│ role            │◄──────────┐
+│ bio             │           │
+│ bonus_points    │           │
+└─────────────────┘           │
+        │                     │
+        │ 1:N                 │ 1:N
+        ▼                     │
+┌─────────────────┐           │
+│    Product      │           │
+├─────────────────┤           │
+│ id (PK)         │           │
+│ seller_id (FK)  │───────────┘
+│ name            │
+│ description     │
+│ price           │
+│ stock_quantity  │
+│ category        │
+│ brand           │
+│ image           │
+│ sizes (JSON)    │
+│ colors (JSON)   │
+│ variants (JSON) │
+│ discount_%      │
+│ sale_price      │
+└─────────────────┘
+        │
+        │ 1:N
+        ▼
+┌─────────────────┐
+│     Review      │
+├─────────────────┤
+│ id (PK)         │
+│ product_id (FK) │
+│ user_id (FK)    │
+│ rating          │
+│ comment         │
+│ created_at      │
+└─────────────────┘
+
+┌─────────────────┐
+│      Order      │
+├─────────────────┤
+│ id (PK)         │
+│ user_id (FK)    │───────┐
+│ customer_name   │       │
+│ total_amount    │       │
+│ status          │       │
+│ created_at      │       │
+└─────────────────┘       │
+        │                 │
+        │ 1:N             │ N:1
+        ▼                 │
+┌─────────────────┐       │
+│   OrderItem     │       │
+├─────────────────┤       │
+│ id (PK)         │       │
+│ order_id (FK)   │       │
+│ product_id (FK) │       │
+│ quantity        │       │
+│ price_at_purch. │       │
+└─────────────────┘       │
+                          │
+                          │
+┌─────────────────┐       │
+│    Payment      │       │
+├─────────────────┤       │
+│ id (PK)         │       │
+│ order_id (FK)   │───────┘
+│ user_id (FK)    │
+│ amount          │
+│ status          │
+│ payment_method  │
+│ transaction_id  │
+└─────────────────┘
+
+┌─────────────────┐
+│   Affiliate     │
+├─────────────────┤
+│ id (PK)         │
+│ user_id (FK)    │
+│ referral_code   │
+│ earnings        │
+│ clicks          │
+└─────────────────┘
+
+┌─────────────────┐
+│  PageContent    │
+├─────────────────┤
+│ id (PK)         │
+│ slug            │
+│ title           │
+│ content         │
+│ updated_at      │
+└─────────────────┘
+```
+
+---
+
+## 🔐 Security Architecture
+
+### Authentication Flow
+```
+┌─────────────────────────────────────────────────────────┐
+│                  Security Layers                         │
+├─────────────────────────────────────────────────────────┤
+│                                                          │
+│  Layer 1: HTTPS/TLS                                     │
+│  ├─ All traffic encrypted in transit                    │
+│  └─ SSL certificates (Vercel/Render automatic)          │
+│                                                          │
+│  Layer 2: CORS Protection                               │
+│  ├─ Whitelist allowed origins                           │
+│  └─ Prevent unauthorized cross-origin requests          │
+│                                                          │
+│  Layer 3: JWT Authentication                            │
+│  ├─ Stateless token-based auth                          │
+│  ├─ Token expiration (24 hours)                         │
+│  └─ Refresh token mechanism                             │
+│                                                          │
+│  Layer 4: Role-Based Access Control (RBAC)              │
+│  ├─ User roles: admin, seller, user                     │
+│  ├─ Permission classes on API endpoints                 │
+│  └─ Frontend route protection                           │
+│                                                          │
+│  Layer 5: Input Validation                              │
+│  ├─ DRF serializer validation                           │
+│  ├─ Frontend form validation                            │
+│  └─ SQL injection prevention (ORM)                      │
+│                                                          │
+│  Layer 6: Password Security                             │
+│  ├─ Django PBKDF2 hashing                               │
+│  ├─ Password strength requirements                      │
+│  └─ Secure password reset flow                          │
+│                                                          │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Component Architecture
+
+### Frontend Component Hierarchy
+
+```
+App.tsx
+├── AuthContext.Provider
+│   └── CartContext.Provider
+│       └── Router
+│           ├── Layout
+│           │   ├── Header
+│           │   │   ├── Logo
+│           │   │   ├── Navigation
+│           │   │   └── UserMenu
+│           │   ├── Main (Outlet)
+│           │   └── Footer
+│           │
+│           ├── Public Routes
+│           │   ├── Home
+│           │   │   ├── HeroSection
+│           │   │   ├── FeaturedProducts
+│           │   │   └── CategoryGrid
+│           │   ├── Shop
+│           │   │   ├── FilterSidebar
+│           │   │   ├── ProductGrid
+│           │   │   └── ProductCard
+│           │   ├── ProductDetail
+│           │   │   ├── ImageGallery
+│           │   │   ├── ProductInfo
+│           │   │   ├── VariantSelector
+│           │   │   └── ReviewSection
+│           │   ├── Login
+│           │   └── Register
+│           │
+│           ├── Protected Routes (User)
+│           │   ├── Cart
+│           │   │   └── CartItem
+│           │   ├── Checkout
+│           │   │   ├── ShippingForm
+│           │   │   └── PaymentForm
+│           │   └── OrderHistory
+│           │       └── OrderCard
+│           │
+│           ├── Protected Routes (Seller)
+│           │   ├── SellerDashboard
+│           │   │   ├── StatsCards
+│           │   │   ├── SalesChart
+│           │   │   └── RecentOrders
+│           │   └── ProductManagement
+│           │       └── ProductForm
+│           │
+│           └── Protected Routes (Admin)
+│               └── AdminDashboard
+│                   ├── PlatformStats
+│                   ├── UserManagement
+│                   ├── ProductModeration
+│                   └── ContentEditor
+```
+
+---
+
+## 🔄 State Management
+
+### Context Architecture
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    AuthContext                           │
+├─────────────────────────────────────────────────────────┤
+│  State:                                                  │
+│  ├─ user: User | null                                   │
+│  ├─ token: string | null                                │
+│  └─ isAuthenticated: boolean                            │
+│                                                          │
+│  Actions:                                                │
+│  ├─ login(email, password)                              │
+│  ├─ register(userData)                                  │
+│  ├─ logout()                                            │
+│  └─ updateUser(userData)                                │
+│                                                          │
+│  Storage: localStorage (persist on refresh)             │
+└─────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────┐
+│                    CartContext                           │
+├─────────────────────────────────────────────────────────┤
+│  State:                                                  │
+│  ├─ items: CartItem[]                                   │
+│  ├─ totalItems: number                                  │
+│  └─ totalPrice: number                                  │
+│                                                          │
+│  Actions:                                                │
+│  ├─ addToCart(product, quantity, variant)               │
+│  ├─ removeFromCart(productId)                           │
+│  ├─ updateQuantity(productId, quantity)                 │
+│  └─ clearCart()                                         │
+│                                                          │
+│  Storage: localStorage (persist on refresh)             │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🚀 Deployment Architecture
+
+### Production Environment
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      PRODUCTION                              │
+└─────────────────────────────────────────────────────────────┘
+
+┌──────────────────┐         ┌──────────────────┐
+│   Vercel CDN     │         │   Render.com     │
+│  (Frontend Host) │         │  (Backend Host)  │
+├──────────────────┤         ├──────────────────┤
+│ • React Build    │◄───────►│ • Django API     │
+│ • Static Assets  │  HTTPS  │ • Gunicorn       │
+│ • Edge Network   │         │ • WhiteNoise     │
+│ • Auto HTTPS     │         │ • Auto Deploy    │
+└──────────────────┘         └────────┬─────────┘
+                                      │
+                                      │ PostgreSQL
+                                      ▼
+                             ┌──────────────────┐
+                             │   Neon.tech      │
+                             │  (Database)      │
+                             ├──────────────────┤
+                             │ • PostgreSQL 15  │
+                             │ • Serverless     │
+                             │ • Auto Scaling   │
+                             │ • Backups        │
+                             └──────────────────┘
+
+┌──────────────────┐
+│  Cloudinary      │
+│  (Image CDN)     │
+├──────────────────┤
+│ • Image Storage  │
+│ • Optimization   │
+│ • Transformations│
+└──────────────────┘
+```
+
+---
+
+## 📊 Data Flow Patterns
+
+### Read Operation (GET)
+```
+User Action → Frontend Component → API Service → 
+Backend ViewSet → Serializer → Database → 
+Serializer → JSON Response → Frontend State → UI Update
+```
+
+### Write Operation (POST/PUT)
+```
+User Input → Form Validation → API Service → 
+Backend ViewSet → Permission Check → Serializer Validation → 
+Database Write → Success Response → Frontend State Update → 
+UI Feedback (Toast/Redirect)
+```
+
+### Error Handling
+```
+Error Occurs → Backend Exception → 
+DRF Error Handler → JSON Error Response → 
+Axios Interceptor → Error Context → 
+UI Error Display (Toast/Alert)
+```
+
+---
+
+## 🔧 Technology Integration Points
+
+### Frontend ↔ Backend
+- **Protocol**: REST API over HTTPS
+- **Format**: JSON
+- **Auth**: JWT Bearer Token in Authorization header
+- **CORS**: Configured in Django settings
+
+### Backend ↔ Database
+- **ORM**: Django ORM
+- **Connection**: psycopg2 (PostgreSQL driver)
+- **Migrations**: Django migrations system
+- **Pooling**: Database connection pooling
+
+### Backend ↔ Cloudinary
+- **SDK**: cloudinary Python library
+- **Upload**: Direct upload from Django
+- **Storage**: django-cloudinary-storage
+- **URLs**: Cloudinary CDN URLs in responses
+
+---
+
+## 📈 Scalability Considerations
+
+### Horizontal Scaling
+```
+┌─────────────────────────────────────────────────────────┐
+│  Load Balancer (Render/Vercel automatic)                │
+└────────────────────┬────────────────────────────────────┘
+                     │
+        ┌────────────┼────────────┐
+        ▼            ▼            ▼
+   ┌────────┐   ┌────────┐   ┌────────┐
+   │ Server │   │ Server │   │ Server │
+   │   1    │   │   2    │   │   3    │
+   └────────┘   └────────┘   └────────┘
+        │            │            │
+        └────────────┼────────────┘
+                     ▼
+              ┌────────────┐
+              │  Database  │
+              │   (Shared) │
+              └────────────┘
+```
+
+### Caching Strategy (Future)
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Cache Layers                          │
+├─────────────────────────────────────────────────────────┤
+│  L1: Browser Cache (Static Assets)                      │
+│  L2: CDN Cache (Vercel Edge, Cloudinary)                │
+│  L3: Redis Cache (API Responses) [Future]               │
+│  L4: Database Query Cache (PostgreSQL)                  │
+└─────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 🎯 Architecture Principles
+
+### 1. **Separation of Concerns**
+- Frontend handles UI/UX only
+- Backend handles business logic and data
+- Database handles persistence
+
+### 2. **Stateless API**
+- JWT tokens for authentication
+- No server-side sessions
+- Enables horizontal scaling
+
+### 3. **RESTful Design**
+- Resource-based URLs
+- HTTP methods for CRUD
+- Standard status codes
+
+### 4. **Security First**
+- HTTPS everywhere
+- Input validation at all layers
+- Principle of least privilege (RBAC)
+
+### 5. **Performance Optimized**
+- CDN for static assets
+- Database indexing
+- Lazy loading on frontend
+- Pagination for large datasets
+
+---
+
+**Last Updated**: February 4, 2026  
+**Version**: 1.0.0
