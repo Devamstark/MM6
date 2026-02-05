@@ -86,6 +86,7 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 formData.append('is_popular', 'false');
                 formData.append('cogs', '0');
                 formData.append('marketing_cost', '0');
+                formData.append('shipping_cost', '0');
 
                 formData.append('image', draft.file);
 

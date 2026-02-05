@@ -149,7 +149,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
             additionalImages: formData.additionalImages,
             variants: formData.variants,
             cogs: 0,
-            marketing_cost: 0
+            marketing_cost: 0,
+            shipping_cost: 0
         };
 
         try {

@@ -73,6 +73,7 @@ class Product(models.Model):
     # Cost of Goods Sold (Internal use only)
     cogs = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
     marketing_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
     
     display_order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
