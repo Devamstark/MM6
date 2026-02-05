@@ -9,6 +9,7 @@ interface BatchDraft {
     name: string;
     price: string;
     category: string;
+    subcategory: string;
 }
 
 interface BatchProductCreatorProps {
@@ -30,7 +31,8 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 previewUrl: URL.createObjectURL(file), // Create local preview
                 name: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " "), // Remove extension and cleanup
                 price: '',
-                category: 'Uncategorized'
+                category: 'Men',
+                subcategory: ''
             }));
             setDrafts(prev => [...prev, ...newDrafts]);
         }
@@ -60,6 +62,7 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 formData.append('price', draft.price);
                 formData.append('description', 'Quickly added via Batch Creator');
                 formData.append('category', draft.category);
+                formData.append('subcategory', draft.subcategory);
                 formData.append('stock_quantity', '1'); // Default stock
                 formData.append('image', draft.file);
 
@@ -151,8 +154,8 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                                             />
                                         </div>
 
-                                        <div className="flex gap-2">
-                                            <div className="flex-1">
+                                        <div className="grid grid-cols-3 gap-2">
+                                            <div>
                                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Price ($)</label>
                                                 <input
                                                     type="number"
@@ -162,27 +165,27 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                                                     placeholder="0.00"
                                                 />
                                             </div>
-                                            <div className="flex-1">
+                                            <div>
                                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Category</label>
                                                 <select
                                                     value={draft.category}
                                                     onChange={(e) => updateDraft(draft.id, 'category', e.target.value)}
                                                     className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-gray-600 transition-all appearance-none"
                                                 >
-                                                    <option value="Uncategorized">Uncategorized</option>
-                                                    {existingCategories.length > 0 ? (
-                                                        existingCategories.map(c => (
-                                                            <option key={c} value={c}>{c}</option>
-                                                        ))
-                                                    ) : (
-                                                        <>
-                                                            <option value="Clothing">Clothing</option>
-                                                            <option value="Electronics">Electronics</option>
-                                                            <option value="Accessories">Accessories</option>
-                                                            <option value="Home">Home</option>
-                                                        </>
-                                                    )}
+                                                    <option value="Men">Men</option>
+                                                    <option value="Women">Women</option>
+                                                    <option value="Accessories">Accessories</option>
                                                 </select>
+                                            </div>
+                                            <div>
+                                                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Sub Category</label>
+                                                <input
+                                                    type="text"
+                                                    value={draft.subcategory}
+                                                    onChange={(e) => updateDraft(draft.id, 'subcategory', e.target.value)}
+                                                    className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm font-medium text-gray-900 transition-all"
+                                                    placeholder="e.g. Shirts"
+                                                />
                                             </div>
                                         </div>
                                     </div>
