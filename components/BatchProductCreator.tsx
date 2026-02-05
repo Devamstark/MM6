@@ -70,9 +70,21 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 formData.append('price', draft.price);
                 formData.append('description', 'Quickly added via Batch Creator');
                 formData.append('category', draft.category);
-                formData.append('subcategory', draft.subcategory);
-                formData.append('brand', draft.brand);
-                formData.append('stock_quantity', '1'); // Default stock
+
+                if (draft.subcategory) {
+                    formData.append('subcategory', draft.subcategory);
+                }
+
+                formData.append('brand', draft.brand || 'Generic');
+                formData.append('stock_quantity', '1');
+
+                // Infer gender
+                const gender = draft.category === 'Men' ? 'Male' : draft.category === 'Women' ? 'Female' : 'Unisex';
+                formData.append('gender', gender);
+
+                formData.append('is_featured', 'false');
+                formData.append('is_popular', 'false');
+
                 formData.append('image', draft.file);
 
                 // We use the direct API client logic here or existing createProduct if it supported FormData properly with separate args
