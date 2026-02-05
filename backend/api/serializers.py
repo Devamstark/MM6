@@ -30,7 +30,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'id', 'name', 'description', 'price', 'category', 'subcategory', 'brand',
             'image', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
             'is_featured', 'is_popular', 'variants', 'seller', 'created_at',
-            'discount_percentage', 'sale_price', 'cogs'
+            'discount_percentage', 'sale_price'
         ]
         read_only_fields = ('seller', 'created_at', 'sale_price')
 
