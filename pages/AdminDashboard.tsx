@@ -5,7 +5,7 @@ import { Product, DashboardStats, User as UserType, Order, PageContent } from '.
 import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, FileText, Move, GripVertical } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
-import { VisualBuilder } from '../components/VisualBuilder';
+import { PageEditor } from '../components/PageEditor';
 
 export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'pages'>('overview');
@@ -555,11 +555,10 @@ export const AdminDashboard = () => {
               </div>
 
               {isPageEditorOpen && (
-                <VisualBuilder
+                <PageEditor
                   initialTitle={editingPage?.title || ''}
                   initialContent={editingPage?.content || ''}
                   slug={editingPage?.slug || ''}
-                  categories={categories}
                   onClose={() => setIsPageEditorOpen(false)}
                   onSave={async (slug, title, content) => {
                     if (editingPage) {
