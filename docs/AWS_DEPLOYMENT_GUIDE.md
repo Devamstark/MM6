@@ -161,3 +161,20 @@ gunicorn core.wsgi:application
 4.  **Config**: Updated Env Vars (`DATABASE_URL`, `VITE_API_URL`) in the AWS consoles.
 
 You are now live on the AWS Cloud! 🌤️
+
+---
+
+## ❓ Do I still need Vercel, Render, Neon, or Cloudinary?
+
+If you migrate to AWS, here is what happens to your current services:
+
+| Current Service | AWS Equivalent | Do you need to keep the old one? | Notes |
+| :--- | :--- | :--- | :--- |
+| **Vercel** (Frontend) | **AWS Amplify** | **NO** | AWS Amplify completely replaces Vercel for hosting your React frontend. |
+| **Render** (Backend) | **AWS App Runner** | **NO** | AWS App Runner completely replaces Render for running your Django API. |
+| **Neon** (Database) | **AWS RDS** | **NO** | AWS RDS (PostgreSQL) completely replaces Neon. You will migrate your data to AWS. |
+| **Cloudinary** (Images) | **AWS S3** | **MAYBE** | **Recommendation: KEEP Cloudinary.** <br><br>While AWS S3 stores files, it **does not** edit, resize, or optimize images on the fly like Cloudinary. <br><br>To replace Cloudinary with AWS, you would need S3 + CloudFront + Lambda (complex to build). **Most AWS-hosted apps still use Cloudinary** for their media management because it is specialized and superior. |
+
+### Summary
+- **Cancel**: Vercel, Render, Neon.
+- **Keep**: Cloudinary (unless you want to build a custom image processor).
