@@ -237,8 +237,8 @@ export const VisualBuilder: React.FC<VisualBuilderProps> = ({ initialTitle, init
                 <div className="flex gap-3">
                     <button
                         onClick={handleSave}
-                        disabled={loading}
-                        className="bg-black text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors flex items-center gap-2"
+                        disabled={loading || !title.trim()}
+                        className="bg-black text-white px-6 py-2 rounded-full font-bold text-sm hover:bg-gray-800 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {loading ? 'Saving...' : <><Save className="w-4 h-4" /> Save Page</>}
                     </button>
