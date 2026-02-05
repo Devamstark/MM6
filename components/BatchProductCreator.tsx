@@ -78,8 +78,12 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                 });
 
                 successCount++;
-            } catch (e) {
+            } catch (e: any) {
                 console.error(`Failed to create ${draft.name}`, e);
+                if (e.response && e.response.data) {
+                    console.error('Validation errors:', e.response.data);
+                    alert(`Failed to create ${draft.name}: ${JSON.stringify(e.response.data)}`);
+                }
             }
         }
 
