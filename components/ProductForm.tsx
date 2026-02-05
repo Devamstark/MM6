@@ -147,7 +147,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
             colors: formData.colors.split(',').map(c => c.trim()).filter(c => c),
             imageFile: formData.imageFile,
             additionalImages: formData.additionalImages,
-            variants: formData.variants
+            variants: formData.variants,
+            cogs: 0,
+            marketing_cost: 0
         };
 
         try {
