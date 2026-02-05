@@ -25,6 +25,7 @@ export const AdminDashboard = () => {
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isBatchCreatorOpen, setIsBatchCreatorOpen] = useState(false);
 
 
 
