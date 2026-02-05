@@ -238,6 +238,8 @@ export const api = {
     return response.data;
   },
 
+  client,
+
   updateProduct: async (id: string, updates: Partial<Product> & { imageFile?: File }): Promise<Product> => {
     const formData = new FormData();
     if (updates.name) formData.append('name', updates.name);
