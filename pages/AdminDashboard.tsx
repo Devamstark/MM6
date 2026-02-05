@@ -1,10 +1,11 @@
+
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order, PageContent } from '../types';
 import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, FileText, Move, GripVertical } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
-import { PageEditor } from '../components/PageEditor';
+import { VisualBuilder } from '../components/VisualBuilder';
 
 export const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'pages'>('overview');
@@ -13,6 +14,7 @@ export const AdminDashboard = () => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [pages, setPages] = useState<PageContent[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Filters
@@ -44,12 +46,13 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, productsData, usersData, ordersData, pagesData] = await Promise.all([
+      const [statsData, productsData, usersData, ordersData, pagesData, categoriesData] = await Promise.all([
         api.getDashboardStats(),
         api.getProducts(),
         api.getUsers(),
         api.getRecentOrders(),
         api.getPages(),
+        api.getCategories(),
       ]);
       setStats(statsData);
       // Sort products by display_order
@@ -57,6 +60,7 @@ export const AdminDashboard = () => {
       setUsers(usersData);
       setOrders(ordersData);
       setPages(pagesData);
+      setCategories(categoriesData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -154,8 +158,8 @@ export const AdminDashboard = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-5 py-2.5 rounded-full text-sm font-bold capitalize transition-all whitespace-nowrap ${activeTab === tab ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                }`}
+              className={`px - 5 py - 2.5 rounded - full text - sm font - bold capitalize transition - all whitespace - nowrap ${activeTab === tab ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
+                } `}
             >
               {tab}
             </button>
@@ -169,7 +173,7 @@ export const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <StatCard
                   title="Total Revenue"
-                  value={`$${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()}`}
+                  value={`$${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()} `}
                   icon={DollarSign}
                   color="text-green-600"
                   bg="bg-green-50"
@@ -207,7 +211,7 @@ export const AdminDashboard = () => {
                 <div className="h-40 flex items-end gap-3 justify-between">
                   {[65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 85, 120].map((h, i) => (
                     <div key={i} className="w-full bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
-                      <div style={{ height: `${(h / 150) * 100}%` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
+                      <div style={{ height: `${(h / 150) * 100}% ` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
                       <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg">
                         ${h * 100}
                       </div>
@@ -239,7 +243,7 @@ export const AdminDashboard = () => {
                           {order.items?.length || 0} items
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                          <span className={`px - 3 py - 1 rounded - full text - xs font - bold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} `}>
                             {order.status}
                           </span>
                         </td>
@@ -258,7 +262,7 @@ export const AdminDashboard = () => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
                   <div className="flex gap-2">
-                    <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'}`}>
+                    <button onClick={() => setIsReordering(!isReordering)} className={`px - 4 py - 2.5 rounded - full text - sm font - bold flex items - center gap - 2 transition - all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'} `}>
                       <Move className="w-4 h-4" /> {isReordering ? 'Done Reordering' : 'Reorder'}
                     </button>
                     <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
@@ -364,21 +368,22 @@ export const AdminDashboard = () => {
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-50">
                   {sellers.map(s => (
-                    <tr key={s.id} className={`hover:bg-gray-50 transition-colors ${s.isActive === false ? 'bg-gray-50/80 opacity-75' : ''}`}>
+                    <tr key={s.id} className={`hover: bg - gray - 50 transition - colors ${s.isActive === false ? 'bg-gray-50/80 opacity-75' : ''} `}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{s.name}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{s.email}</td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{getSellerProductCount(s.id)}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
-                               ${s.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
+                               ${s.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} `}>
                           {s.isActive !== false ? 'Active' : 'Disabled'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <button
-                          className={`flex items-center gap-1.5 ml-auto px-4 py-2 rounded-full border transition-all text-xs font-bold ${s.isActive !== false
+                          className={`flex items - center gap - 1.5 ml - auto px - 4 py - 2 rounded - full border transition - all text - xs font - bold ${s.isActive !== false
                             ? 'text-red-600 border-red-100 hover:bg-red-50'
-                            : 'text-green-600 border-green-100 hover:bg-green-50'}`}
+                            : 'text-green-600 border-green-100 hover:bg-green-50'
+                            } `}
                         >
                           {s.isActive !== false ? <><Ban className="w-3 h-3" /> Disable</> : <><CheckCircle className="w-3 h-3" /> Enable</>}
                         </button>
@@ -410,15 +415,16 @@ export const AdminDashboard = () => {
                         <div className="text-xs text-gray-500 font-medium">{u.email}</div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
                                ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                            u.role === 'seller' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'}`}>
+                            u.role === 'seller' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                          } `}>
                           {u.role.toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
-                               ${u.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'}`}>
+                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
+                               ${u.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'} `}>
                           {u.isActive !== false ? 'Active' : 'Disabled'}
                         </span>
                       </td>
@@ -486,9 +492,10 @@ export const AdminDashboard = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${order.totalPrice.toFixed(2)}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-3 py-1 inline-flex text-xs leading-5 font-bold rounded-full 
+                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
                                ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                            order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                            order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
+                          } `}>
                           {order.status}
                         </span>
                       </td>
@@ -548,10 +555,11 @@ export const AdminDashboard = () => {
               </div>
 
               {isPageEditorOpen && (
-                <PageEditor
+                <VisualBuilder
                   initialTitle={editingPage?.title || ''}
                   initialContent={editingPage?.content || ''}
                   slug={editingPage?.slug || ''}
+                  categories={categories}
                   onClose={() => setIsPageEditorOpen(false)}
                   onSave={async (slug, title, content) => {
                     if (editingPage) {
@@ -615,8 +623,8 @@ export const AdminDashboard = () => {
 };
 
 const StatCard = ({ title, value, icon: Icon, color, bg, delay }: any) => (
-  <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
-    <div className={`p-4 rounded-2xl ${bg} ${color} mr-5`}>
+  <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay} ms` }}>
+    <div className={`p - 4 rounded - 2xl ${bg} ${color} mr - 5`}>
       <Icon className="h-8 w-8" />
     </div>
     <div>
