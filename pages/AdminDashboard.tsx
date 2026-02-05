@@ -2,9 +2,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload, Image as Images } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
+import { BatchProductCreator } from '../components/BatchProductCreator';
 
 
 export const AdminDashboard = () => {
@@ -152,7 +153,6 @@ export const AdminDashboard = () => {
         alert('Failed to upload products');
       } finally {
         setIsUploading(false);
-        if (fileInputRef.current) fileInputRef.current.value = '';
       }
     }
   };
@@ -279,6 +279,13 @@ export const AdminDashboard = () => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
                   <div className="flex gap-2">
+                    <button
+                      onClick={() => setIsBatchCreatorOpen(true)}
+                      className="bg-white border hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all"
+                    >
+                      <Images className="w-4 h-4" /> Batch Creator
+                    </button>
+
                     <input
                       type="file"
                       accept=".zip"
@@ -292,10 +299,10 @@ export const AdminDashboard = () => {
                       className="bg-white border hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50"
                     >
                       {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                      Bulk Import
+                      Import ZIP
                     </button>
                     <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'} `}>
-                      <Move className="w-4 h-4" /> {isReordering ? 'Done Reordering' : 'Reorder'}
+                      <Move className="w-4 h-4" /> {isReordering ? 'Done' : 'Reorder'}
                     </button>
                     <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
                       <Plus className="w-4 h-4" /> Add Product
@@ -343,14 +350,10 @@ export const AdminDashboard = () => {
                               ${p.price}
                               {p.salePrice && <div className="text-xs text-red-600 line-through">${p.price}</div>}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              {p.discountPercentage ? (
-                                <span className="bg-red-100 text-red-600 px-2 py-1 rounded-full text-xs font-bold">-{p.discountPercentage}%</span>
-                              ) : (
-                                <span className="text-gray-400 text-xs">-</span>
-                              )}
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
+                              {p.discountPercentage ? p.discountPercentage + '%' : '-'}
                             </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{p.stock}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{p.stock} units</td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                               <button onClick={() => setDiscountProduct(p)} className="text-green-600 hover:bg-green-50 p-2 rounded-full mr-1 transition-colors" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
                               <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
@@ -368,9 +371,9 @@ export const AdminDashboard = () => {
                 {isFormOpen && (
                   <ProductForm
                     isInline={true}
-                    initialData={editingProduct}
+                    product={editingProduct}
                     onClose={() => setIsFormOpen(false)}
-                    onSubmit={() => {
+                    onSave={() => {
                       setIsFormOpen(false);
                       loadData();
                       window.scrollTo({ top: 0, behavior: 'smooth' });
