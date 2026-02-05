@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 
@@ -144,8 +144,8 @@ export const AdminDashboard = () => {
               key={tab}
               onClick={() => setActiveTab(tab as any)}
               className={`px-6 py-3 rounded-2xl text-sm font-bold capitalize transition-all duration-300 whitespace-nowrap ${activeTab === tab
-                  ? 'bg-black text-white shadow-lg transform -translate-y-1'
-                  : 'bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 shadow-sm hover:shadow-md border border-gray-100'
+                ? 'bg-black text-white shadow-lg transform -translate-y-1'
+                : 'bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 shadow-sm hover:shadow-md border border-gray-100'
                 }`}
             >
               {tab}
@@ -249,6 +249,21 @@ export const AdminDashboard = () => {
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
                   <div className="flex gap-2">
+                    <input
+                      type="file"
+                      accept=".zip"
+                      className="hidden"
+                      ref={fileInputRef}
+                      onChange={handleBulkUpload}
+                    />
+                    <button
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={isUploading}
+                      className="bg-white border hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50"
+                    >
+                      {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                      Bulk Import
+                    </button>
                     <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all ${isReordering ? 'bg-black text-white' : 'bg-white border hover:bg-gray-50'} `}>
                       <Move className="w-4 h-4" /> {isReordering ? 'Done Reordering' : 'Reorder'}
                     </button>

@@ -229,6 +229,15 @@ export const api = {
     return mapProduct(response.data);
   },
 
+  bulkUploadProducts: async (zipFile: File): Promise<{ message: string; errors: string[] }> => {
+    const formData = new FormData();
+    formData.append('file', zipFile);
+    const response = await client.post('/products/bulk_upload/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return response.data;
+  },
+
   updateProduct: async (id: string, updates: Partial<Product> & { imageFile?: File }): Promise<Product> => {
     const formData = new FormData();
     if (updates.name) formData.append('name', updates.name);

@@ -350,3 +350,94 @@ class ReviewViewSet(viewsets.ModelViewSet):
              raise PermissionDenied("You can only review products you have purchased.")
 
         serializer.save(user=user)
+
+        serializer.save(user=user)
+
+class BulkProductUploadView(APIView):
+    parser_classes = (parsers.MultiPartParser,)
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if 'file' not in request.FILES:
+            return Response({'error': 'No file provided. Please upload a ZIP file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        zip_file = request.FILES['file']
+        if not zip_file.name.endswith('.zip'):
+             return Response({'error': 'File must be a .zip file.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        import zipfile
+        import csv
+        import io
+        from django.core.files.base import ContentFile
+
+        try:
+            with zipfile.ZipFile(zip_file, 'r') as z:
+                # Find CSV file
+                csv_filename = None
+                for name in z.namelist():
+                    if name.endswith('.csv') and not name.startswith('__MACOSX'):
+                        csv_filename = name
+                        break
+                
+                if not csv_filename:
+                    return Response({'error': 'No CSV file found in the ZIP archive.'}, status=status.HTTP_400_BAD_REQUEST)
+
+                # Read CSV
+                with z.open(csv_filename) as csv_file:
+                    decoded_file = io.TextIOWrapper(csv_file, encoding='utf-8')
+                    reader = csv.DictReader(decoded_file)
+                    
+                    products_created = 0
+                    errors = []
+
+                    for row in reader:
+                        try:
+                            # Basic validation
+                            if not row.get('name') or not row.get('price'):
+                                continue
+
+                            product_data = {
+                                'name': row.get('name'),
+                                'description': row.get('description', ''),
+                                'price': row.get('price'),
+                                'stock_quantity': row.get('stock', 0),
+                                'category': row.get('category', 'Uncategorized'),
+                                'subcategory': row.get('subcategory', ''),
+                                'brand': row.get('brand', 'Generic'),
+                                'seller': request.user,
+                                'gender': row.get('gender', 'Unisex'),
+                                'is_featured': row.get('is_featured', 'false').lower() == 'true',
+                                'is_popular': row.get('is_popular', 'false').lower() == 'true'
+                            }
+
+                            product = Product.objects.create(**product_data)
+
+                            # Handle Image
+                            image_name = row.get('image_filename')
+                            if image_name:
+                                image_name = image_name.strip()
+                                # Try to find the file in the zip
+                                image_path_in_zip = None
+                                for z_name in z.namelist():
+                                    if z_name.endswith(image_name) and not z_name.startswith('__MACOSX'):
+                                        image_path_in_zip = z_name
+                                        break
+                                
+                                if image_path_in_zip:
+                                    img_data = z.read(image_path_in_zip)
+                                    product.image.save(image_name, ContentFile(img_data), save=True)
+
+                            products_created += 1
+
+                        except Exception as e:
+                            errors.append(f"Error processing row {row.get('name', 'unknown')}: {str(e)}")
+
+                    return Response({
+                        'message': f'Successfully uploaded {products_created} products.',
+                        'errors': errors
+                    }, status=status.HTTP_201_CREATED)
+
+        except zipfile.BadZipFile:
+            return Response({'error': 'Invalid ZIP file.'}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
