@@ -549,6 +549,16 @@ export const AdminDashboard = () => {
 
       </div>
 
+      {isBatchCreatorOpen && (
+        <BatchProductCreator
+          onClose={() => setIsBatchCreatorOpen(false)}
+          onSuccess={() => {
+            loadData();
+          }}
+          existingCategories={categories}
+        />
+      )}
+
       {/* Discount Modal */}
       {discountProduct && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
