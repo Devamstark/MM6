@@ -726,6 +726,24 @@
 
 ---
 
+### Feature 37: Batch Product Creator
+**User Story:** *As an admin, I want to quickly add multiple products by uploading images.*
+
+**Functionality:**
+- Drag and drop multiple product images
+- Auto-generate product drafts from images
+- Auto-infer category/gender from explicit folders or defaults
+- Edit pricing/names for all drafts in one view
+- Bulk publish all drafts
+- "Add More" capability to continue adding
+
+**Technical Details:**
+- Frontend: `components/BatchProductCreator.tsx`
+- Integration: Cloudinary for bulk image upload
+- API: Batch create requests
+
+---
+
 ## 🎨 UI/UX Features
 
 ### Feature 37: Responsive Design
