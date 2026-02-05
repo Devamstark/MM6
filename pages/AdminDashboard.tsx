@@ -138,13 +138,15 @@ export const AdminDashboard = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex space-x-2 bg-white p-1.5 rounded-full shadow-sm mb-8 w-fit border border-gray-100 overflow-x-auto animate-fade-up delay-100">
+        <div className="flex flex-wrap gap-4 mb-8 w-full animate-fade-up delay-100">
           {['overview', 'products', 'sellers', 'users', 'orders'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px - 5 py - 2.5 rounded - full text - sm font - bold capitalize transition - all whitespace - nowrap ${activeTab === tab ? 'bg-gray-900 text-white shadow-md' : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                } `}
+              className={`px-6 py-3 rounded-2xl text-sm font-bold capitalize transition-all duration-300 whitespace-nowrap ${activeTab === tab
+                  ? 'bg-black text-white shadow-lg transform -translate-y-1'
+                  : 'bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 shadow-sm hover:shadow-md border border-gray-100'
+                }`}
             >
               {tab}
             </button>
