@@ -164,14 +164,25 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
                                             </div>
                                             <div className="flex-1">
                                                 <label className="text-xs font-bold text-gray-400 uppercase tracking-wider block mb-1">Category</label>
-                                                <input
-                                                    type="text"
+                                                <select
                                                     value={draft.category}
                                                     onChange={(e) => updateDraft(draft.id, 'category', e.target.value)}
-                                                    className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-gray-600 transition-all"
-                                                    placeholder="Category"
-                                                    list="categories-list"
-                                                />
+                                                    className="w-full bg-gray-50 border-transparent focus:bg-white focus:border-indigo-500 rounded-lg px-3 py-2 text-sm text-gray-600 transition-all appearance-none"
+                                                >
+                                                    <option value="Uncategorized">Uncategorized</option>
+                                                    {existingCategories.length > 0 ? (
+                                                        existingCategories.map(c => (
+                                                            <option key={c} value={c}>{c}</option>
+                                                        ))
+                                                    ) : (
+                                                        <>
+                                                            <option value="Clothing">Clothing</option>
+                                                            <option value="Electronics">Electronics</option>
+                                                            <option value="Accessories">Accessories</option>
+                                                            <option value="Home">Home</option>
+                                                        </>
+                                                    )}
+                                                </select>
                                             </div>
                                         </div>
                                     </div>
