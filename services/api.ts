@@ -410,41 +410,7 @@ export const api = {
     // Not implemented in backend MVP
   },
 
-  getPages: async (): Promise<import('../types').PageContent[]> => {
-    const response = await client.get('/pages/');
-    return response.data.map((p: any) => ({
-      slug: p.slug,
-      title: p.title,
-      content: p.content,
-      updatedAt: p.updated_at
-    }));
-  },
 
-  getPage: async (slug: string): Promise<import('../types').PageContent | undefined> => {
-    try {
-      const response = await client.get(`/pages/${slug}/`);
-      return {
-        slug: response.data.slug,
-        title: response.data.title,
-        content: response.data.content,
-        updatedAt: response.data.updated_at
-      };
-    } catch (e) {
-      return undefined;
-    }
-  },
-
-  createPage: async (title: string, content: string, slug: string): Promise<void> => {
-    await client.post('/pages/', { title, content, slug });
-  },
-
-  updatePage: async (slug: string, title: string, content: string): Promise<void> => {
-    await client.patch(`/pages/${slug}/`, { title, content });
-  },
-
-  deletePage: async (slug: string): Promise<void> => {
-    await client.delete(`/pages/${slug}/`);
-  },
 
   getAffiliate: async (): Promise<import('../types').Affiliate | null> => {
     try {

@@ -10,12 +10,7 @@ export interface User {
   bonusPoints?: number;
 }
 
-export interface PageContent {
-  slug: string;
-  title: string;
-  content: string;
-  updatedAt: string;
-}
+
 
 export interface Affiliate {
   id: number;
