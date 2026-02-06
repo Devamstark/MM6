@@ -33,11 +33,13 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         additionalImages: (string | File)[];
         isFeatured: boolean;
         isPopular: boolean;
-        variants: { size: string; color: string; stock: number }[];
+        cogs: string;
+        marketing_cost: string;
+        shipping_cost: string;
     }>({
         name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
         gender: 'Unisex', sizes: '', colors: '', additionalImages: [], isFeatured: false, isPopular: false,
-        variants: []
+        variants: [], cogs: '0', marketing_cost: '0', shipping_cost: '0'
     });
 
     useEffect(() => {
@@ -58,7 +60,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                 additionalImages: initialData.additionalImages || [],
                 isFeatured: initialData.isFeatured || false,
                 isPopular: initialData.isPopular || false,
-                variants: initialData.variants || []
+                variants: initialData.variants || [],
+                cogs: initialData.cogs?.toString() || '0',
+                marketing_cost: initialData.marketingCost?.toString() || '0',
+                shipping_cost: initialData.shippingCost?.toString() || '0'
             });
         }
     }, [initialData]);
@@ -148,9 +153,9 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
             imageFile: formData.imageFile,
             additionalImages: formData.additionalImages,
             variants: formData.variants,
-            cogs: 0,
-            marketing_cost: 0,
-            shipping_cost: 0
+            cogs: parseFloat(formData.cogs),
+            marketing_cost: parseFloat(formData.marketing_cost),
+            shipping_cost: parseFloat(formData.shipping_cost)
         };
 
         try {
@@ -327,6 +332,46 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     </div>
                 )}
 
+            </div>
+
+            <div className="space-y-4">
+                <h4 className="font-bold text-gray-900 border-b pb-2">Financials (Internal Use)</h4>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase ml-2">COGS ($)</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all font-bold"
+                            value={formData.cogs}
+                            onChange={(e) => setFormData({ ...formData, cogs: e.target.value })}
+                        />
+                        <p className="text-xs text-gray-400 mt-1 ml-2">Cost of Goods Sold</p>
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase ml-2">Marketing Cost ($)</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all font-bold"
+                            value={formData.marketing_cost}
+                            onChange={(e) => setFormData({ ...formData, marketing_cost: e.target.value })}
+                        />
+                    </div>
+                    <div>
+                        <label className="text-xs font-bold text-gray-500 uppercase ml-2">Shipping Cost ($)</label>
+                        <input
+                            type="number"
+                            step="0.01"
+                            placeholder="0.00"
+                            className="w-full bg-gray-50 border-none rounded-xl p-3.5 focus:ring-2 focus:ring-indigo-100 transition-all font-bold"
+                            value={formData.shipping_cost}
+                            onChange={(e) => setFormData({ ...formData, shipping_cost: e.target.value })}
+                        />
+                    </div>
+                </div>
             </div>
 
             <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">

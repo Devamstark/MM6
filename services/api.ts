@@ -52,6 +52,9 @@ const mapProduct = (p: any): Product => ({
   createdAt: p.created_at,
   discountPercentage: p.discount_percentage,
   salePrice: p.sale_price ? parseFloat(p.sale_price) : undefined,
+  cogs: p.cogs ? parseFloat(p.cogs) : undefined,
+  marketingCost: p.marketing_cost ? parseFloat(p.marketing_cost) : undefined,
+  shippingCost: p.shipping_cost ? parseFloat(p.shipping_cost) : undefined,
 });
 
 const mapOrder = (o: any): Order => ({
@@ -230,6 +233,9 @@ export const api = {
 
     formData.append('is_featured', String(product.isFeatured || false));
     formData.append('is_popular', String(product.isPopular || false));
+    formData.append('cogs', product.cogs?.toString() || '0');
+    formData.append('marketing_cost', product.marketingCost?.toString() || '0');
+    formData.append('shipping_cost', product.shippingCost?.toString() || '0');
 
     const response = await client.post('/products/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -273,6 +279,9 @@ export const api = {
     if (updates.isFeatured !== undefined) formData.append('is_featured', String(updates.isFeatured));
     if (updates.isPopular !== undefined) formData.append('is_popular', String(updates.isPopular));
     if (updates.discountPercentage !== undefined) formData.append('discount_percentage', updates.discountPercentage.toString());
+    if (updates.cogs !== undefined) formData.append('cogs', updates.cogs.toString());
+    if (updates.marketingCost !== undefined) formData.append('marketing_cost', updates.marketingCost.toString());
+    if (updates.shippingCost !== undefined) formData.append('shipping_cost', updates.shippingCost.toString());
 
     // File update
     if (updates.imageFile) {

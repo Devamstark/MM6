@@ -48,6 +48,9 @@ export interface Product {
   createdAt?: string;
   updatedAt?: string;
   display_order?: number;
+  cogs?: number;
+  marketingCost?: number;
+  shippingCost?: number;
 }
 
 export interface ProductFilter {
