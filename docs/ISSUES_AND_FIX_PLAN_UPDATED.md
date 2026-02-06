@@ -12,6 +12,16 @@
 - Added "Add to Wishlist" toggle on Product Detail page.
 
 ## 3. Fix Login Session Persistence Issue
-**Problem:** After logging in, refreshing the page sends users back to the sign-in page.
+**Status: Fixed**
+- Implemented `isLoading` state in `AuthContext` to handle initial session check.
+- Updated `ProtectedRoute` to wait for session restoration before redirecting.
 
-**Plan:** Implement proper session handling using cookies, JWT tokens, or local storage so users stay logged in after refreshing the page.
+## 4. Enable Wishlist Heart Icon on Product Images
+**Status: Fixed**
+- Added heart icon overlay to `ProductCard.tsx` in listings.
+- Connected to Wishlist API (toggle functionality).
+- Requires login (redirects if not logged in).
+
+## 5. Fix Product Stock Display
+**Status: Fixed**
+- Updated `ProductDetail.tsx` to ensure stock displays as at least 1 (e.g. "Only 1 left") instead of "Out of Stock" (0).
