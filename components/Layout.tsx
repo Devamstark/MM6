@@ -182,9 +182,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {/* User Account */}
               {isAuthenticated ? (
                 <div className="relative group">
-                  <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center">
-                    <UserIcon className="w-5 h-5" />
-                  </Link>
+                  {isAdmin ? (
+                    <div className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                      <UserIcon className="w-5 h-5" />
+                    </div>
+                  ) : (
+                    <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center">
+                      <UserIcon className="w-5 h-5" />
+                    </Link>
+                  )}
                   {/* Minimal Dropdown */}
                   <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
                     <div className="bg-white border border-gray-100 shadow-xl rounded-lg py-2">
@@ -424,7 +430,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <ul className="space-y-3">
                 <li><Link to="/contact" className="text-sm text-gray-500 hover:text-primary transition-colors">Contact Us</Link></li>
                 <li><Link to="/page/payment-method" className="text-sm text-gray-500 hover:text-primary transition-colors">Payment Method</Link></li>
-                <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-primary transition-colors">Bonus Point System</Link></li>
+                {!isAdmin && <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-primary transition-colors">Bonus Point System</Link></li>}
               </ul>
             </div>
 
