@@ -6,6 +6,8 @@ from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.contrib.auth import get_user_model
 from django.utils import timezone
+from django.core.mail import send_mail
+from django.conf import settings
 import random
 from datetime import timedelta
 from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review
@@ -266,8 +268,20 @@ class RequestPasswordResetView(APIView):
             expires_at=timezone.now() + timedelta(minutes=15)
         )
         
-        # Send Email (Mocking for now as per usual local dev without SMTP)
-        print(f"PASSWORD RESET CODE FOR {email}: {code}")
+        # Send Email
+        try:
+            send_mail(
+                'Password Reset Code',
+                f'Your password reset code is: {code}',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=False,
+            )
+        except Exception as e:
+            print(f"Error sending email: {e}")
+            # If email fails, we shouldn't crash the response if possible, or maybe we should?
+            # For this task, if SMTP is wrong, they want to know.
+            return Response({'error': 'Failed to send reset email. Please contact support.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response({'message': 'Reset code sent successfully'}, status=status.HTTP_200_OK)
 
@@ -453,3 +467,38 @@ class BulkProductUploadView(APIView):
             return Response({'error': 'Invalid ZIP file.'}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class SubmitInquiryView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        name = request.data.get('name')
+        email = request.data.get('email')
+        subject = request.data.get('subject')
+        message = request.data.get('message')
+
+        if not all([name, email, subject, message]):
+             return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Send email to Admin
+        try:
+            # Send to admin
+            send_mail(
+                f'New Inquiry from {name}: {subject}',
+                f'Name: {name}\nEmail: {email}\n\nMessage:\n{message}',
+                settings.DEFAULT_FROM_EMAIL,
+                [settings.SERVER_EMAIL], 
+                fail_silently=False,
+            )
+            # Optional: Send confirmation to user
+            send_mail(
+                'We received your inquiry',
+                f'Hi {name},\n\nWe have received your message: "{subject}".\nWe will get back to you soon.\n\nBest,\nCloudMart Team',
+                settings.DEFAULT_FROM_EMAIL,
+                [email],
+                fail_silently=True,
+            )
+            
+            return Response({'message': 'Inquiry sent successfully.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+             return Response({'error': f'Failed to send email: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

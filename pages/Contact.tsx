@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { api } from '../services/api';
 
 export const Contact = () => {
     const [formData, setFormData] = useState({
@@ -9,12 +10,14 @@ export const Contact = () => {
     });
     const [submitted, setSubmitted] = useState(false);
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Simulate API call
-        setTimeout(() => {
+        try {
+            await api.submitInquiry(formData.name, formData.email, formData.subject, formData.message);
             setSubmitted(true);
-        }, 1000);
+        } catch (error) {
+            alert('Failed to send message. Please try again.');
+        }
     };
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
