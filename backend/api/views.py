@@ -100,11 +100,44 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        # Explicitly apply manual overrides if needed, BUT
-        # with filterset_class defined properly above, min_price/max_price should work automatically.
-        # The issue might be that previous implementations mixed get_queryset with filter_backends.
-        # By strictly using django-filters (ProductFilter class), we ensure clean logic.
-        return queryset
+    # Explicitly apply manual overrides if needed, BUT
+    # with filterset_class defined properly above, min_price/max_price should work automatically.
+    # The issue might be that previous implementations mixed get_queryset with filter_backends.
+    # By strictly using django-filters (ProductFilter class), we ensure clean logic.
+    return queryset
+
+    @action(detail=False, methods=['get'])
+    def search(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+             return Response([])
+        
+        from django.db.models import Q
+        # Search name, description, category, brand
+        products = Product.objects.filter(
+            Q(name__icontains=query) | 
+            Q(description__icontains=query) | 
+            Q(category__icontains=query) |
+            Q(brand__icontains=query)
+        ).distinct()[:20] # Limit results
+        
+        serializer = self.get_serializer(products, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'])
+    def suggestions(self, request):
+        query = request.query_params.get('q', '')
+        if not query:
+            return Response([])
+        
+        # Simple suggestions based on name and category
+        # Using icontains for SQLite compatibility (instead of postgres triggers)
+        names = Product.objects.filter(name__icontains=query).values_list('name', flat=True).distinct()[:5]
+        cats = Product.objects.filter(category__icontains=query).values_list('category', flat=True).distinct()[:3]
+        
+        # Combine and unique
+        suggestions = list(set(list(names) + list(cats)))
+        return Response(suggestions)
 
     def create(self, request, *args, **kwargs):
         try:

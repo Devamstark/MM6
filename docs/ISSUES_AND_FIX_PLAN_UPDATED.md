@@ -3,7 +3,7 @@
 ## 1. Fix Search Button Not Working
 **Problem:** The search button is currently locked and not responding.
 
-**Plan:** We will fix the frontend event handler and backend API call so users can search products properly.
+**Plan:** Implement **Database Search & Auto-suggestions**. We will create a backend endpoint that returns search results and keyword suggestions using optimized database queries (compatible with Postgres/SQLite), avoiding the high cost of ElasticSearch.
 
 ## 2. Fix Wishlist Button Not Working
 **Problem:** The wishlist button is locked and not functioning.
