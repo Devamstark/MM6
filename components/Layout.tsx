@@ -194,7 +194,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       </div>
                       {isAdmin && <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Admin Dashboard</Link>}
                       {isSeller && <Link to="/seller" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Seller Dashboard</Link>}
-                      <Link to="/affiliate" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Affiliate</Link>
+                      {!isAdmin && <Link to="/affiliate" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Affiliate</Link>}
                       <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 mt-1">Sign out</button>
                     </div>
                   </div>
@@ -402,7 +402,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Company Info</h3>
               <ul className="space-y-3">
                 <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-primary transition-colors">About Us</Link></li>
-                <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors">Affiliate</Link></li>
+                {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors">Affiliate</Link></li>}
                 <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-primary transition-colors">Fashion Blogger</Link></li>
               </ul>
             </div>
