@@ -268,18 +268,12 @@ class RequestPasswordResetView(APIView):
             expires_at=timezone.now() + timedelta(minutes=15)
         )
         
-        # Send Email
-        try:
-            resend.api_key = settings.EMAIL_HOST_PASSWORD
-            resend.Emails.send({
-                "from": settings.DEFAULT_FROM_EMAIL,
-                "to": [email],
-                "subject": 'Password Reset Code',
-                "html": f'<p>Your password reset code is: <strong>{code}</strong></p>'
-            })
-        except Exception as e:
-            print(f"Error sending email: {e}")
-            return Response({'error': 'Failed to send reset email. Please contact support.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Send Email (Mocking for now)
+        print(f"PASSWORD RESET CODE FOR {email}: {code}")
+        # In production without email service, we can't do much.
+        # For now, we mock success so the UI doesn't break.
+        
+        return Response({'message': 'Reset code sent successfully (Check console)'}, status=status.HTTP_200_OK)
         
         return Response({'message': 'Reset code sent successfully'}, status=status.HTTP_200_OK)
 
@@ -478,29 +472,6 @@ class SubmitInquiryView(APIView):
         if not all([name, email, subject, message]):
              return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Send email to Admin
-        try:
-            resend.api_key = settings.EMAIL_HOST_PASSWORD
-            
-            # Send to admin
-            resend.Emails.send({
-                "from": settings.DEFAULT_FROM_EMAIL,
-                "to": [settings.SERVER_EMAIL],
-                "subject": f'New Inquiry from {name}: {subject}',
-                "html": f'<p><strong>Name:</strong> {name}</p><p><strong>Email:</strong> {email}</p><p><strong>Message:</strong><br>{message}</p>'
-            })
-
-            # Optional: Send confirmation to user (Fail silently if trial limit)
-            try:
-                resend.Emails.send({
-                    "from": settings.DEFAULT_FROM_EMAIL,
-                    "to": [email],
-                    "subject": 'We received your inquiry',
-                    "html": f'<p>Hi {name},</p><p>We have received your message: "{subject}".</p><p>We will get back to you soon.</p><p>Best,<br>CloudMart Team</p>'
-                })
-            except Exception:
-                pass # Fail silently for user confirmation
-            
-            return Response({'message': 'Inquiry sent successfully.'}, status=status.HTTP_200_OK)
-        except Exception as e:
-             return Response({'error': f'Failed to send email: {str(e)}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        # Mock success for now
+        print(f"New Inquiry from {name} <{email}>: {subject}\n{message}")
+        return Response({'message': 'Inquiry received (Mock mode).'}, status=status.HTTP_200_OK)
