@@ -12,6 +12,6 @@
 - Added "Add to Wishlist" toggle on Product Detail page.
 
 ## 3. Fix Login Session Persistence Issue
-**Status: Fixed**
-- Implemented `isLoading` state in `AuthContext` to handle initial session check.
-- Updated `ProtectedRoute` to wait for session restoration before redirecting.
+**Problem:** After logging in, refreshing the page sends users back to the sign-in page.
+
+**Plan:** Implement proper session handling using cookies, JWT tokens, or local storage so users stay logged in after refreshing the page.

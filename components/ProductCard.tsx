@@ -75,25 +75,23 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
               )}
             </div>
 
-            {/* Action Buttons */}
-            {product.stock > 0 && (
-              <div className="absolute bottom-4 right-4 flex flex-col gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                <button
-                  onClick={handleBuy}
-                  className="bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white p-3 rounded-full shadow-lg transition-colors duration-200"
-                  title="Add to Cart"
-                >
-                  <ShoppingBag className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={handleBuyNow}
-                  className="bg-primary text-white hover:bg-primary/90 p-3 rounded-full shadow-lg transition-colors duration-200"
-                  title="Buy Now"
-                >
-                  <Zap className="w-5 h-5" />
-                </button>
-              </div>
-            )}
+            {/* Action Buttons - Always visible as min stock is 1 */}
+            <div className="absolute bottom-4 right-4 flex flex-col gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
+              <button
+                onClick={handleBuy}
+                className="bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white p-3 rounded-full shadow-lg transition-colors duration-200"
+                title="Add to Cart"
+              >
+                <ShoppingBag className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleBuyNow}
+                className="bg-primary text-white hover:bg-primary/90 p-3 rounded-full shadow-lg transition-colors duration-200"
+                title="Buy Now"
+              >
+                <Zap className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
           {/* Content */}
