@@ -252,23 +252,42 @@ class OrderViewSet(viewsets.ModelViewSet):
         if not data.get('items'):
             return Response({"error": "No items provided"}, status=status.HTTP_400_BAD_REQUEST)
 
-        order = Order.objects.create(
-            user=request.user,
-            customer_name=data.get('customerName') or request.user.get_full_name(),
-            total_amount=data.get('totalPrice'),
-            status='pending'
-        )
+        from django.db import transaction
+        try:
+            with transaction.atomic():
+                order = Order.objects.create(
+                    user=request.user,
+                    customer_name=data.get('customerName') or request.user.get_full_name(),
+                    total_amount=data.get('totalPrice'),
+                    status='pending'
+                )
 
-        for item in data.get('items'):
-            OrderItem.objects.create(
-                order=order,
-                product_id=item['id'],
-                quantity=item['quantity'],
-                price_at_purchase=item['price']
-            )
+                for item in data.get('items'):
+                    product = Product.objects.select_for_update().get(id=item['id'])
+                    
+                    quantity = int(item['quantity'])
+                    if product.stock_quantity < quantity:
+                        raise ValueError(f"Insufficient stock for {product.name}. Available: {product.stock_quantity}")
+                    
+                    # Decrement stock
+                    product.stock_quantity -= quantity
+                    product.save(update_fields=['stock_quantity'])
 
-        serializer = self.get_serializer(order)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        quantity=quantity,
+                        price_at_purchase=item['price']
+                    )
+
+                serializer = self.get_serializer(order)
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+        except Product.DoesNotExist:
+            return Response({"error": "One or more products not found"}, status=status.HTTP_404_NOT_FOUND)
+        except ValueError as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
