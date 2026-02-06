@@ -25,3 +25,9 @@
 ## 5. Fix Product Stock Display
 **Status: Fixed**
 - Updated `ProductDetail.tsx` to ensure stock displays as at least 1 (e.g. "Only 1 left") instead of "Out of Stock" (0).
+
+## 6. Fix Stock Quantity Validation
+**Status: Fixed**
+- Added `MinValueValidator(0)` to `Product.stock_quantity`.
+- Allows 0 (for Out of Stock).
+- Restricts negative values.
