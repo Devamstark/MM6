@@ -6,7 +6,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-from django.core.mail import send_mail
+import resend
 from django.conf import settings
 import random
 from datetime import timedelta
@@ -270,17 +270,15 @@ class RequestPasswordResetView(APIView):
         
         # Send Email
         try:
-            send_mail(
-                'Password Reset Code',
-                f'Your password reset code is: {code}',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=False,
-            )
+            resend.api_key = settings.EMAIL_HOST_PASSWORD
+            resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [email],
+                "subject": 'Password Reset Code',
+                "html": f'<p>Your password reset code is: <strong>{code}</strong></p>'
+            })
         except Exception as e:
             print(f"Error sending email: {e}")
-            # If email fails, we shouldn't crash the response if possible, or maybe we should?
-            # For this task, if SMTP is wrong, they want to know.
             return Response({'error': 'Failed to send reset email. Please contact support.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
         return Response({'message': 'Reset code sent successfully'}, status=status.HTTP_200_OK)
@@ -482,22 +480,26 @@ class SubmitInquiryView(APIView):
 
         # Send email to Admin
         try:
+            resend.api_key = settings.EMAIL_HOST_PASSWORD
+            
             # Send to admin
-            send_mail(
-                f'New Inquiry from {name}: {subject}',
-                f'Name: {name}\nEmail: {email}\n\nMessage:\n{message}',
-                settings.DEFAULT_FROM_EMAIL,
-                [settings.SERVER_EMAIL], 
-                fail_silently=False,
-            )
-            # Optional: Send confirmation to user
-            send_mail(
-                'We received your inquiry',
-                f'Hi {name},\n\nWe have received your message: "{subject}".\nWe will get back to you soon.\n\nBest,\nCloudMart Team',
-                settings.DEFAULT_FROM_EMAIL,
-                [email],
-                fail_silently=True,
-            )
+            resend.Emails.send({
+                "from": settings.DEFAULT_FROM_EMAIL,
+                "to": [settings.SERVER_EMAIL],
+                "subject": f'New Inquiry from {name}: {subject}',
+                "html": f'<p><strong>Name:</strong> {name}</p><p><strong>Email:</strong> {email}</p><p><strong>Message:</strong><br>{message}</p>'
+            })
+
+            # Optional: Send confirmation to user (Fail silently if trial limit)
+            try:
+                resend.Emails.send({
+                    "from": settings.DEFAULT_FROM_EMAIL,
+                    "to": [email],
+                    "subject": 'We received your inquiry',
+                    "html": f'<p>Hi {name},</p><p>We have received your message: "{subject}".</p><p>We will get back to you soon.</p><p>Best,<br>CloudMart Team</p>'
+                })
+            except Exception:
+                pass # Fail silently for user confirmation
             
             return Response({'message': 'Inquiry sent successfully.'}, status=status.HTTP_200_OK)
         except Exception as e:
