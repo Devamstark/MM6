@@ -127,7 +127,15 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True # For development; restrict in prod
+CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOWED_ORIGINS = [
+    "https://mm-6.vercel.app",
+    "http://localhost:5173",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://mm6-backend.onrender.com",
+    "https://mm-6.vercel.app",
+]
 
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
