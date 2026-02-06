@@ -32,6 +32,7 @@ import { StaticPage } from './pages/StaticPage';
 import { Contact } from './pages/Contact';
 import { Affiliate } from './pages/Affiliate';
 import { BonusPoints } from './pages/BonusPoints';
+import { Wishlist } from './pages/Wishlist';
 
 const AppRoutes = () => {
   return (
@@ -48,6 +49,14 @@ const AppRoutes = () => {
       <Route path="/page/:slug" element={<StaticPage />} />
       <Route path="/affiliate" element={<Affiliate />} />
       <Route path="/bonus-points" element={<BonusPoints />} />
+      <Route
+        path="/wishlist"
+        element={
+          <ProtectedRoute>
+            <Wishlist />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/admin"
         element={

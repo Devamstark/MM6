@@ -8,7 +8,7 @@ from .views import (
     ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, 
     RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
-    SubmitInquiryView
+    SubmitInquiryView, WishlistViewSet
 )
 
 from rest_framework.routers import SimpleRouter, DefaultRouter
@@ -26,6 +26,7 @@ router.register(r'pages', PageContentViewSet)
 router.register(r'affiliates', AffiliateViewSet, basename='affiliate')
 router.register(r'categories', CategoryViewSet, basename='categories')
 router.register(r'reviews', ReviewViewSet)
+router.register(r'wishlist', WishlistViewSet, basename='wishlist')
 
 urlpatterns = [
     path('', include(router.urls)),

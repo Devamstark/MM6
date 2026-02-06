@@ -23,6 +23,28 @@ export const ProductDetail = () => {
     const [canReview, setCanReview] = useState(false);
     const [newReviewRating, setNewReviewRating] = useState(5);
     const [newReviewComment, setNewReviewComment] = useState('');
+    const [inWishlist, setInWishlist] = useState(false);
+
+    useEffect(() => {
+        const checkWishlist = async () => {
+            if (user && product) {
+                const wishlist = await api.getWishlist();
+                setInWishlist(wishlist.some(p => p.id === product.id));
+            }
+        };
+        checkWishlist();
+    }, [user, product]);
+
+    const handleWishlistToggle = async () => {
+        if (!user) {
+            navigate('/login');
+            return;
+        }
+        if (product) {
+            const status = await api.toggleWishlist(product.id);
+            setInWishlist(status);
+        }
+    };
 
     // Check if user bought the product
     useEffect(() => {
@@ -114,7 +136,14 @@ export const ProductDetail = () => {
                     <div className="space-y-6">
                         <div className="aspect-square bg-gray-50 rounded-2xl overflow-hidden relative group">
                             <img src={mainImage} alt={product.name} className="w-full h-full object-cover object-center" />
-                            {/* Icons removed for cleaner look or keep them if preferred */}
+                            <div className="absolute top-4 right-4 z-10 transition-opacity">
+                                <button
+                                    onClick={handleWishlistToggle}
+                                    className="bg-white p-3 rounded-full shadow-md hover:scale-110 transition-transform"
+                                >
+                                    <Heart className={`w-6 h-6 ${inWishlist ? 'fill-red-600 text-red-600' : 'text-gray-900'}`} />
+                                </button>
+                            </div>
                         </div>
 
                         {/* Thumbnails */}

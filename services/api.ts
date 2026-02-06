@@ -471,5 +471,21 @@ export const api = {
       clicks: data.clicks,
       createdAt: data.created_at
     };
+  },
+
+  // --- Wishlist ---
+  getWishlist: async (): Promise<Product[]> => {
+    try {
+      const response = await client.get('/wishlist/');
+      return response.data.map((item: any) => mapProduct(item.product));
+    } catch (e) {
+      return [];
+    }
+  },
+
+  toggleWishlist: async (productId: string): Promise<boolean> => {
+    // Returns true if added, false if removed
+    const response = await client.post('/wishlist/toggle/', { product_id: productId });
+    return response.data.in_wishlist;
   }
 };

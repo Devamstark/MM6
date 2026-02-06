@@ -10,8 +10,63 @@ import resend
 from django.conf import settings
 import random
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer
+
+# ...
+
+class SubmitInquiryView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        name = request.data.get('name')
+        email = request.data.get('email')
+        subject = request.data.get('subject')
+        message = request.data.get('message')
+
+        if not all([name, email, subject, message]):
+             return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Mock success for now
+        print(f"New Inquiry from {name} <{email}>: {subject}\n{message}")
+        return Response({'message': 'Inquiry received (Mock mode).'}, status=status.HTTP_200_OK)
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WishlistSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        product_id = serializer.validated_data.get('product_id')
+        product = Product.objects.get(id=product_id)
+        
+        # Check if already in wishlist
+        if Wishlist.objects.filter(user=self.request.user, product=product).exists():
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("Product already in wishlist")
+            
+        serializer.save(user=self.request.user, product=product)
+
+    @action(detail=False, methods=['post'])
+    def toggle(self, request):
+        product_id = request.data.get('product_id')
+        if not product_id:
+            return Response({'error': 'Product ID is required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+             return Response({'error': 'Product not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        wishlist_item = Wishlist.objects.filter(user=request.user, product=product).first()
+        if wishlist_item:
+            wishlist_item.delete()
+            return Response({'status': 'removed', 'in_wishlist': False})
+        else:
+            Wishlist.objects.create(user=request.user, product=product)
+            return Response({'status': 'added', 'in_wishlist': True})
 
 User = get_user_model()
 
@@ -100,11 +155,11 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-    # Explicitly apply manual overrides if needed, BUT
-    # with filterset_class defined properly above, min_price/max_price should work automatically.
-    # The issue might be that previous implementations mixed get_queryset with filter_backends.
-    # By strictly using django-filters (ProductFilter class), we ensure clean logic.
-    return queryset
+        # Explicitly apply manual overrides if needed, BUT
+        # with filterset_class defined properly above, min_price/max_price should work automatically.
+        # The issue might be that previous implementations mixed get_queryset with filter_backends.
+        # By strictly using django-filters (ProductFilter class), we ensure clean logic.
+        return queryset
 
     @action(detail=False, methods=['get'])
     def search(self, request):

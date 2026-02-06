@@ -1,6 +1,12 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist
+
+# ... (existing imports)
+
+
+# ... (existing imports)
+
 
 User = get_user_model()
 
@@ -62,4 +68,13 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
         fields = ['id', 'product', 'user', 'user_name', 'rating', 'comment', 'created_at']
+        read_only_fields = ('user', 'created_at')
+
+class WishlistSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
+    product_id = serializers.UUIDField(write_only=True)
+
+    class Meta:
+        model = Wishlist
+        fields = ['id', 'user', 'product', 'product_id', 'created_at']
         read_only_fields = ('user', 'created_at')
