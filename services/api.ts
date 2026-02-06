@@ -237,6 +237,15 @@ export const api = {
     return mapProduct(response.data);
   },
 
+  getSuggestions: async (query: string): Promise<string[]> => {
+    try {
+      const response = await client.get(`/products/suggestions/?q=${query}`);
+      return response.data;
+    } catch {
+      return [];
+    }
+  },
+
   bulkUploadProducts: async (zipFile: File): Promise<{ message: string; errors: string[] }> => {
     const formData = new FormData();
     formData.append('file', zipFile);

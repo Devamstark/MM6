@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
+import { api } from '../services/api';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
@@ -11,8 +12,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+
+  // Fetch suggestions when query changes
+  React.useEffect(() => {
+    const fetchSuggestions = async () => {
+      if (searchQuery.length > 2) {
+        const results = await api.getSuggestions(searchQuery);
+        setSuggestions(results);
+      } else {
+        setSuggestions([]);
+      }
+    };
+    const timeoutId = setTimeout(fetchSuggestions, 300); // Debounce
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery]);
 
   const handleLogout = () => {
     logout();
@@ -170,13 +187,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Right: Icons */}
             <div className="flex items-center gap-6">
-              {/* Search */}
               <button
-                onClick={() => document.getElementById('search-input')?.focus()}
+                onClick={() => setSearchOpen(!searchOpen)}
                 className="text-gray-900 hover:text-primary transition-colors"
                 title="Search"
               >
-                <Search className="w-5 h-5" />
+                {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
               </button>
 
               {/* User Account */}
@@ -241,10 +257,41 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           </div>
 
-          {/* Hidden Search Input (conditionally shown or just for binding focus) */}
-          <form onSubmit={handleSearch} className="hidden">
-            <input id="search-input" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
-          </form>
+          {/* Search Overlay */}
+          {searchOpen && (
+            <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl p-6 z-40 animate-fade-in">
+              <form onSubmit={(e) => { handleSearch(e); setSearchOpen(false); }} className="relative max-w-3xl mx-auto">
+                <input
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search products, categories, brands..."
+                  className="w-full text-2xl font-bold border-b-2 border-gray-200 py-4 focus:outline-none focus:border-black placeholder:text-gray-300"
+                />
+                <button type="submit" className="absolute right-0 top-4 text-gray-400 hover:text-black">
+                  <ArrowRight className="w-8 h-8" />
+                </button>
+
+                {/* Suggestions */}
+                {suggestions.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Suggestions</p>
+                    <div className="flex flex-wrap gap-2">
+                      {suggestions.map((s, idx) => (
+                        <span
+                          key={idx}
+                          onClick={() => { setSearchQuery(s); navigate(`/products?search=${encodeURIComponent(s)}`); setSearchOpen(false); }}
+                          className="px-4 py-2 bg-gray-50 rounded-full text-sm font-medium hover:bg-black hover:text-white cursor-pointer transition-colors"
+                        >
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </form>
+            </div>
+          )}
         </div>
 
         {/* Mobile Menu */}
