@@ -156,6 +156,14 @@ export const api = {
     }
   },
 
+  submitInquiry: async (name: string, email: string, subject: string, message: string): Promise<void> => {
+    try {
+      await client.post('/inquiries/', { name, email, subject, message });
+    } catch (error: any) {
+      throw new Error(error.response?.data?.error || 'Failed to submit inquiry');
+    }
+  },
+
   // --- Products ---
   getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
     const params: any = {};

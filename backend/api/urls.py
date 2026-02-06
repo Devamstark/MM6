@@ -7,7 +7,8 @@ from rest_framework_simplejwt.views import (
 from .views import (
     ProductViewSet, OrderViewSet, UserViewSet, DashboardStatsView, PaymentViewSet, 
     RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
-    RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView
+    RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
+    SubmitInquiryView
 )
 
 from rest_framework.routers import SimpleRouter, DefaultRouter
@@ -35,5 +36,6 @@ urlpatterns = [
     path('auth/password-reset/request/', RequestPasswordResetView.as_view(), name='password_reset_request'),
     path('auth/password-reset/verify/', VerifyResetCodeView.as_view(), name='password_reset_verify'),
     path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
+    path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
 ]
