@@ -5,6 +5,7 @@ import { api } from '../services/api';
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  isLoading: boolean;
   isAdmin: boolean;
   isSeller: boolean;
   login: (user: User, token: string) => void;
@@ -15,13 +16,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('cm_user_data');
     const token = localStorage.getItem('cm_token');
     if (storedUser && token) {
-      setUser(JSON.parse(storedUser));
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user data", e);
+        // If parse fails, clear storage to avoid loop
+        localStorage.removeItem('cm_user_data');
+        localStorage.removeItem('cm_token');
+      }
     }
+    setIsLoading(false);
   }, []);
 
   const login = (userData: User, token: string) => {
@@ -34,13 +44,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      isLoading,
       isAdmin: user?.role === 'admin',
       isSeller: user?.role === 'seller',
-      login, 
-      logout 
+      login,
+      logout
     }}>
       {children}
     </AuthContext.Provider>

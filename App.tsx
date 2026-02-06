@@ -15,7 +15,11 @@ import { SellerDashboard } from './pages/SellerDashboard';
 import { Checkout } from './pages/Checkout';
 
 const ProtectedRoute = ({ children, requiredRole }: { children: React.ReactNode, requiredRole?: 'admin' | 'seller' }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="min-h-screen flex justify-center items-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div></div>;
+  }
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
 
