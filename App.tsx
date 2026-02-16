@@ -39,14 +39,19 @@ function App() {
                         {/* Public Routes with Layout */}
                         <Route path="/" element={<Layout><Outlet /></Layout>}>
                             <Route index element={<Home />} />
-                            <Route path="shop" element={<Shop />} />
+                            <Route path="products" element={<Shop />} />
                             <Route path="product/:id" element={<ProductDetail />} />
                             <Route path="login" element={<Login />} />
                             <Route path="register" element={<Register />} />
                             <Route path="contact" element={<Contact />} />
                             <Route path="forgot-password" element={<ForgotPassword />} />
                             <Route path="reset-password" element={<ResetPassword />} />
-                            <Route path="about" element={<StaticPage page="about" />} />
+
+                            {/* Static Pages */}
+                            <Route path="page/:slug" element={<StaticPage />} />
+
+                            {/* Explicit Static Page Routes if needed */}
+                            <Route path="about" element={<StaticPage page="about-us" />} />
                             <Route path="terms" element={<StaticPage page="terms" />} />
                             <Route path="privacy" element={<StaticPage page="privacy" />} />
 
