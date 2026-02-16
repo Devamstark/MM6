@@ -138,6 +138,6 @@ Your navigation guide to all documentation. Start here to understand what each d
 
 ---
 
-**Last Updated:** February 4, 2026  
-**Version:** 1.0.0  
+**Last Updated:** February 16, 2026  
+**Version:** 1.1.0  
 **Status:** ✅ Complete

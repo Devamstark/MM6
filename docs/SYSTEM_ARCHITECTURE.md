@@ -13,8 +13,8 @@
 │  ┌──────────────────────────────────────────────────────────┐   │
 │  │              React Frontend (SPA)                        │   │
 │  │  ┌────────────┐  ┌────────────┐  ┌────────────┐        │   │
-│  │  │   Pages    │  │ Components │  │  Context   │        │   │
-│  │  │  (Routes)  │  │    (UI)    │  │  (State)   │        │   │
+│  │  │   Pages    │  │ Components │  │ Jotai Store│        │   │
+│  │  │  (Routes)  │  │    (UI)    │  │  (Atoms)   │        │   │
 │  │  └────────────┘  └────────────┘  └────────────┘        │   │
 │  │                                                          │   │
 │  │  ┌────────────────────────────────────────────┐        │   │
@@ -70,7 +70,6 @@
    │                         │                         │
    │  1. Enter credentials   │                         │
    ├────────────────────────>│                         │
-   │                         │                         │
    │                         │  2. POST /api/auth/login/
    │                         ├────────────────────────>│
    │                         │                         │
@@ -107,7 +106,7 @@
    │ 4. Add to    │                 │                │
    │    Cart      │                 │                │
    ├─────────────>│ 5. Store in     │                │
-   │              │    Context      │                │
+   │              │    Atom (Jotai) │                │
    │              │                 │                │
    │ 6. Checkout  │                 │                │
    ├─────────────>│ 7. POST /api/orders/             │
@@ -281,64 +280,90 @@
 
 ```
 App.tsx
-├── AuthContext.Provider
-│   └── CartContext.Provider
-│       └── Router
-│           ├── Layout
-│           │   ├── Header
-│           │   │   ├── Logo
-│           │   │   ├── Navigation
-│           │   │   └── UserMenu
-│           │   ├── Main (Outlet)
-│           │   └── Footer
-│           │
-│           ├── Public Routes
-│           │   ├── Home
-│           │   │   ├── HeroSection
-│           │   │   ├── FeaturedProducts
-│           │   │   └── CategoryGrid
-│           │   ├── Shop
-│           │   │   ├── FilterSidebar
-│           │   │   ├── ProductGrid
-│           │   │   └── ProductCard
-│           │   ├── ProductDetail
-│           │   │   ├── ImageGallery
-│           │   │   ├── ProductInfo
-│           │   │   ├── VariantSelector
-│           │   │   └── ReviewSection
-│           │   ├── Login
-│           │   └── Register
-│           │
-│           ├── Protected Routes (User)
-│           │   ├── Cart
-│           │   │   └── CartItem
-│           │   ├── Checkout
-│           │   │   ├── ShippingForm
-│           │   │   └── PaymentForm
-│           │   └── OrderHistory
-│           │       └── OrderCard
-│           │
-│           ├── Protected Routes (Seller)
-│           │   ├── SellerDashboard
-│           │   │   ├── StatsCards
-│           │   │   ├── SalesChart
-│           │   │   └── RecentOrders
-│           │   └── ProductManagement
-│           │       └── ProductForm
-│           │
-│           └── Protected Routes (Admin)
-│               └── AdminDashboard
-│                   ├── PlatformStats
-│                   ├── UserManagement
-│                   ├── ProductModeration
-│                   └── ContentEditor
+├── JotaiProvider
+│   ├── AuthProvider
+│   │   ├── Router
+│   │   │   ├── Layout
+│   │   │   │   ├── Header
+│   │   │   │   │   ├── Logo
+│   │   │   │   │   ├── Navigation
+│   │   │   │   │   └── UserMenu (useAtom)
+│   │   │   │   ├── Main (Outlet)
+│   │   │   │   └── Footer
+│   │   │   │
+│   │   │   ├── Public Routes
+│   │   │   │   ├── Home
+│   │   │   │   │   ├── HeroSection
+│   │   │   │   │   ├── FeaturedProducts
+│   │   │   │   │   └── CategoryGrid
+│   │   │   │   ├── Shop
+│   │   │   │   │   ├── FilterSidebar
+│   │   │   │   │   ├── ProductGrid
+│   │   │   │   │   └── ProductCard
+│   │   │   │   ├── ProductDetail
+│   │   │   │   │   ├── ImageGallery
+│   │   │   │   │   ├── ProductInfo
+│   │   │   │   │   ├── VariantSelector
+│   │   │   │   │   └── ReviewSection
+│   │   │   │   ├── Login
+│   │   │   │   └── Register
+│   │   │   │
+│   │   │   ├── Protected Routes (User)
+│   │   │   │   ├── Cart (CartAtom)
+│   │   │   │   │   └── CartItem
+│   │   │   │   ├── Checkout
+│   │   │   │   │   ├── ShippingForm
+│   │   │   │   │   └── PaymentForm
+│   │   │   │   └── OrderHistory
+│   │   │   │       └── OrderCard
+│   │   │   │
+│   │   │   ├── Protected Routes (Seller)
+│   │   │   │   ├── SellerDashboard
+│   │   │   │   │   ├── StatsCards
+│   │   │   │   │   ├── SalesChart
+│   │   │   │   │   └── RecentOrders
+│   │   │   │   └── ProductManagement
+│   │   │   │       └── ProductForm
+│   │   │   │
+│   │   │   └── Protected Routes (Admin)
+│   │   │       └── AdminDashboard
+│   │   │           ├── PlatformStats
+│   │   │           ├── UserManagement
+│   │   │           ├── ProductModeration
+│   │   │           └── ContentEditor
 ```
 
 ---
 
 ## 🔄 State Management
 
-### Context Architecture
+### Jotai Atoms (New)
+
+We have migrated global state management to **Jotai** for better performance and atomic updates.
+
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Store (atoms.ts)                      │
+├─────────────────────────────────────────────────────────┤
+│  User State:                                             │
+│  ├─ userAtom: User | null                               │
+│  ├─ tokenAtom: string | null                            │
+│                                                          │
+│  Cart State:                                             │
+│  ├─ cartAtom: CartItem[]                                │
+│  ├─ cartCountAtom (derived): number                     │
+│  ├─ cartTotalAtom (derived): number                     │
+│                                                          │
+│  UI State:                                               │
+│  ├─ isCartOpenAtom: boolean                             │
+│  ├─ isMobileMenuOpenAtom: boolean                       │
+│  ├─ searchQueryAtom: string                             │
+└─────────────────────────────────────────────────────────┘
+```
+
+### Context Architecture (Legacy/Wrappers)
+
+Some contexts remain as wrappers or for specific logic not yet fully migrated, but core state is moving to atoms.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -346,33 +371,13 @@ App.tsx
 ├─────────────────────────────────────────────────────────┤
 │  State:                                                  │
 │  ├─ user: User | null                                   │
-│  ├─ token: string | null                                │
-│  └─ isAuthenticated: boolean                            │
+│  ├─ isAuthenticated: boolean                            │
 │                                                          │
 │  Actions:                                                │
 │  ├─ login(email, password)                              │
 │  ├─ register(userData)                                  │
 │  ├─ logout()                                            │
 │  └─ updateUser(userData)                                │
-│                                                          │
-│  Storage: localStorage (persist on refresh)             │
-└─────────────────────────────────────────────────────────┘
-
-┌─────────────────────────────────────────────────────────┐
-│                    CartContext                           │
-├─────────────────────────────────────────────────────────┤
-│  State:                                                  │
-│  ├─ items: CartItem[]                                   │
-│  ├─ totalItems: number                                  │
-│  └─ totalPrice: number                                  │
-│                                                          │
-│  Actions:                                                │
-│  ├─ addToCart(product, quantity, variant)               │
-│  ├─ removeFromCart(productId)                           │
-│  ├─ updateQuantity(productId, quantity)                 │
-│  └─ clearCart()                                         │
-│                                                          │
-│  Storage: localStorage (persist on refresh)             │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -427,14 +432,14 @@ App.tsx
 ```
 User Action → Frontend Component → API Service → 
 Backend ViewSet → Serializer → Database → 
-Serializer → JSON Response → Frontend State → UI Update
+Serializer → JSON Response → Jotai Atom Update → UI Update
 ```
 
 ### Write Operation (POST/PUT)
 ```
 User Input → Form Validation → API Service → 
 Backend ViewSet → Permission Check → Serializer Validation → 
-Database Write → Success Response → Frontend State Update → 
+Database Write → Success Response → Atom/Context Update → 
 UI Feedback (Toast/Redirect)
 ```
 
@@ -481,8 +486,8 @@ UI Error Display (Toast/Alert)
         ┌────────────┼────────────┐
         ▼            ▼            ▼
    ┌────────┐   ┌────────┐   ┌────────┐
-   │ Server │   │ Server │   │ Server │
-   │   1    │   │   2    │   │   3    │
+   │ Server │   │   2    │   │   3    │
+   │   1    │   │ Server │   │ Server │
    └────────┘   └────────┘   └────────┘
         │            │            │
         └────────────┼────────────┘
@@ -537,5 +542,5 @@ UI Error Display (Toast/Alert)
 
 ---
 
-**Last Updated**: February 4, 2026  
-**Version**: 1.0.0
+**Last Updated**: February 16, 2026  
+**Version**: 1.1.0

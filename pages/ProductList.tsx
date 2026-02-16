@@ -20,8 +20,8 @@ export const ProductList = () => {
     maxPrice: searchParams.get('maxPrice') || '',
     sort: searchParams.get('sort') || '',
     search: searchParams.get('search') || '',
-    isFeatured: searchParams.get('isFeatured') === 'true',
-    isPopular: searchParams.get('isPopular') === 'true',
+    isFeatured: searchParams.get('isFeatured'),
+    isPopular: searchParams.get('isPopular'),
     onSale: searchParams.get('on_sale') === 'true'
   };
 
@@ -42,6 +42,8 @@ export const ProductList = () => {
         ...filters,
         minPrice: filters.minPrice ? parseFloat(filters.minPrice) : undefined,
         maxPrice: filters.maxPrice ? parseFloat(filters.maxPrice) : undefined,
+        isFeatured: filters.isFeatured === 'true' ? true : (filters.isFeatured === 'false' ? false : undefined),
+        isPopular: filters.isPopular === 'true' ? true : (filters.isPopular === 'false' ? false : undefined),
         sort,
       };
 
@@ -76,7 +78,11 @@ export const ProductList = () => {
         <aside className="w-full md:w-72 flex-shrink-0 animate-fade-up delay-100">
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 sticky top-24">
             <FilterPanel
-              filters={filters}
+              filters={{
+                ...filters,
+                isFeatured: filters.isFeatured === 'true',
+                isPopular: filters.isPopular === 'true'
+              }}
               onFilterChange={updateFilter}
               onClearFilters={clearFilters}
             />
@@ -87,7 +93,7 @@ export const ProductList = () => {
         <div className="flex-grow animate-fade-up delay-200">
           <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
             <div className="text-sm font-medium text-gray-600 px-2">
-              {products.length} results {filters.search && `for "${filters.search}"`}
+              {products.length} {products.length === 1 ? 'item' : 'items'} found {filters.search && `for "${filters.search}"`}
             </div>
             <select
               className="border-none bg-gray-50 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-100 cursor-pointer hover:bg-gray-100 transition-colors"
@@ -95,6 +101,7 @@ export const ProductList = () => {
               onChange={(e) => updateFilter('sort', e.target.value)}
             >
               <option value="">Sort by: Featured</option>
+              <option value="newest">Sort by: Newest</option>
               <option value="price_asc">Price: Low to High</option>
               <option value="price_desc">Price: High to Low</option>
             </select>

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage
 
 # ... (existing imports)
 
@@ -37,7 +37,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'image', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
             'is_featured', 'is_popular', 'variants', 'seller', 'created_at',
             'discount_percentage', 'sale_price',
-            'cogs', 'marketing_cost', 'shipping_cost'
+            'cogs', 'marketing_cost', 'shipping_cost',
+            'flash_sale_start', 'flash_sale_end'
         ]
         read_only_fields = ('seller', 'created_at', 'sale_price')
 
@@ -78,3 +79,9 @@ class WishlistSerializer(serializers.ModelSerializer):
         model = Wishlist
         fields = ['id', 'user', 'product', 'product_id', 'created_at']
         read_only_fields = ('user', 'created_at')
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = '__all__'
+        read_only_fields = ('id', 'created_at')

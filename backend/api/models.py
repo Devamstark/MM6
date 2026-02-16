@@ -76,6 +76,10 @@ class Product(models.Model):
     marketing_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
     shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0.00)
     
+    # Flash Sale fields
+    flash_sale_start = models.DateTimeField(null=True, blank=True)
+    flash_sale_end = models.DateTimeField(null=True, blank=True)
+    
     display_order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -148,3 +152,15 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review by {self.user.username} on {self.product.name}"
+
+class ContactMessage(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    email = models.EmailField()
+    subject = models.CharField(max_length=255, blank=True, null=True)
+    message = models.TextField()
+    is_read = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message from {self.name} - {self.subject or 'No Subject'}"

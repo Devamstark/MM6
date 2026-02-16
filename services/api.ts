@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats } from '../types';
+import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions } from '../types';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -55,6 +55,8 @@ const mapProduct = (p: any): Product => ({
   cogs: p.cogs ? parseFloat(p.cogs) : undefined,
   marketingCost: p.marketing_cost ? parseFloat(p.marketing_cost) : undefined,
   shippingCost: p.shipping_cost ? parseFloat(p.shipping_cost) : undefined,
+  flashSaleStart: p.flash_sale_start,
+  flashSaleEnd: p.flash_sale_end,
 });
 
 const mapOrder = (o: any): Order => ({
@@ -180,9 +182,13 @@ export const api = {
     if (filters.minPrice !== undefined) params.min_price = filters.minPrice;
     if (filters.maxPrice !== undefined) params.max_price = filters.maxPrice;
 
+    if (filters.isFeatured !== undefined) params.is_featured = filters.isFeatured;
+    if (filters.isPopular !== undefined) params.is_popular = filters.isPopular;
+
     if (filters.sort) {
       if (filters.sort === 'price_asc') params.ordering = 'price';
       else if (filters.sort === 'price_desc') params.ordering = '-price';
+      else if (filters.sort === 'newest') params.ordering = '-created_at';
     }
 
     const response = await client.get('/products/', { params });
@@ -198,7 +204,7 @@ export const api = {
     }
   },
 
-  createProduct: async (product: Omit<Product, 'id'> & { imageFile?: File }): Promise<Product> => {
+  createProduct: async (product: Omit<Product, 'id' | 'additionalImages'> & { imageFile?: File, additionalImages?: (string | File)[] }): Promise<Product> => {
     const formData = new FormData();
     formData.append('name', product.name);
     formData.append('description', product.description);
@@ -236,6 +242,8 @@ export const api = {
     formData.append('cogs', product.cogs?.toString() || '0');
     formData.append('marketing_cost', product.marketingCost?.toString() || '0');
     formData.append('shipping_cost', product.shippingCost?.toString() || '0');
+    if (product.flashSaleStart) formData.append('flash_sale_start', product.flashSaleStart);
+    if (product.flashSaleEnd) formData.append('flash_sale_end', product.flashSaleEnd);
 
     const response = await client.post('/products/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
@@ -243,12 +251,15 @@ export const api = {
     return mapProduct(response.data);
   },
 
-  getSuggestions: async (query: string): Promise<string[]> => {
+  getSuggestions: async (query: string): Promise<SearchSuggestions> => {
     try {
       const response = await client.get(`/products/suggestions/?q=${query}`);
-      return response.data;
+      return {
+        categories: response.data.categories || [],
+        products: (response.data.products || []).map(mapProduct)
+      };
     } catch {
-      return [];
+      return { categories: [], products: [] };
     }
   },
 
@@ -263,7 +274,7 @@ export const api = {
 
   client,
 
-  updateProduct: async (id: string, updates: Partial<Product> & { imageFile?: File }): Promise<Product> => {
+  updateProduct: async (id: string, updates: Partial<Omit<Product, 'additionalImages'>> & { imageFile?: File, additionalImages?: (string | File)[] }): Promise<Product> => {
     const formData = new FormData();
     if (updates.name) formData.append('name', updates.name);
     if (updates.description) formData.append('description', updates.description);
@@ -282,6 +293,8 @@ export const api = {
     if (updates.cogs !== undefined) formData.append('cogs', updates.cogs.toString());
     if (updates.marketingCost !== undefined) formData.append('marketing_cost', updates.marketingCost.toString());
     if (updates.shippingCost !== undefined) formData.append('shipping_cost', updates.shippingCost.toString());
+    if (updates.flashSaleStart !== undefined) formData.append('flash_sale_start', updates.flashSaleStart);
+    if (updates.flashSaleEnd !== undefined) formData.append('flash_sale_end', updates.flashSaleEnd);
 
     // File update
     if (updates.imageFile) {
@@ -496,5 +509,27 @@ export const api = {
     // Returns true if added, false if removed
     const response = await client.post('/wishlist/toggle/', { product_id: productId });
     return response.data.in_wishlist;
+  },
+
+  // --- Contact Messages ---
+  getContactMessages: async (): Promise<ContactMessage[]> => {
+    const response = await client.get('/contact-messages/');
+    return response.data.map((m: any) => ({
+      id: m.id,
+      name: m.name,
+      email: m.email,
+      subject: m.subject,
+      message: m.message,
+      isRead: m.is_read,
+      createdAt: m.created_at
+    }));
+  },
+
+  markMessageAsRead: async (id: string): Promise<void> => {
+    await client.post(`/contact-messages/${id}/mark_as_read/`);
+  },
+
+  deleteContactMessage: async (id: string): Promise<void> => {
+    await client.delete(`/contact-messages/${id}/`);
   }
 };

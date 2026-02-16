@@ -1,6 +1,0 @@
-name,price,description,category,subcategory,brand,stock,image_filename,gender,is_featured,is_popular
-Classic White T-Shirt,19.99,A comfortable classic white cotton t-shirt.,Clothing,T-Shirts,CloudSears,100,white_tshirt.jpg,Unisex,true,true
-Running Shoes,89.50,High-performance running shoes for all terrains.,Footwear,Running,SpeedMaster,50,running_shoes.png,Male,false,true
-Floral Summer Dress,45.00,Light and airy floral dress perfect for summer.,Clothing,Dresses,FashionNova,30,floral_dress.jpg,Female,true,false
-Wireless Headphones,129.99,Noise-cancelling over-ear headphones.,Electronics,Audio,SoundWave,25,headphones.jpg,Unisex,false,false
-Leather Wallet,35.00,Genuine leather wallet with multiple card slots.,Accessories,Wallets,LeatherCo,75,,Male,false,false

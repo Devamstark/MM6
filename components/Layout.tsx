@@ -4,6 +4,10 @@ import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { api } from '../services/api';
+import { SearchSuggestions } from '../types';
+import { Clock, TrendingUp, History } from 'lucide-react';
+import { useAtom } from 'jotai';
+import { searchQueryAtom, isCartOpenAtom } from '../store/atoms';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
@@ -11,37 +15,70 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const [searchQuery, setSearchQuery] = useState(searchParams.get('search') || '');
+  const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<SearchSuggestions>({ categories: [], products: [] });
+  const [recentSearches, setRecentSearches] = useState<string[]>(JSON.parse(localStorage.getItem('cm_recent_searches') || '[]'));
+  const [isTrendingOpen, setIsTrendingOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [cartOpen, setCartOpen] = useState(false);
+  const [cartOpen, setCartOpen] = useAtom(isCartOpenAtom);
+
+  // Sync search query from URL on mount
+  React.useEffect(() => {
+    const query = searchParams.get('search');
+    if (query) {
+      setSearchQuery(query);
+    }
+  }, [searchParams, setSearchQuery]);
 
   // Fetch suggestions when query changes
   React.useEffect(() => {
     const fetchSuggestions = async () => {
-      if (searchQuery.length > 2) {
+      if (searchQuery.trim().length > 1) {
         const results = await api.getSuggestions(searchQuery);
         setSuggestions(results);
       } else {
-        setSuggestions([]);
+        setSuggestions({ categories: [], products: [] });
       }
     };
-    const timeoutId = setTimeout(fetchSuggestions, 300); // Debounce
+    const timeoutId = setTimeout(fetchSuggestions, 300);
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
+
+  // Keyboard shortcut (/) to focus search
+  React.useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === '/' && !searchOpen) {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+      if (e.key === 'Escape' && searchOpen) {
+        setSearchOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [searchOpen]);
 
   const handleLogout = () => {
     logout();
     navigate('/login');
   };
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchQuery)}`);
+  const handleSearch = (e?: React.FormEvent, query?: string) => {
+    if (e) e.preventDefault();
+    const finalQuery = query || searchQuery;
+    if (finalQuery.trim()) {
+      // Save to recent searches
+      const updatedRecent = [finalQuery, ...recentSearches.filter(s => s !== finalQuery)].slice(0, 5);
+      setRecentSearches(updatedRecent);
+      localStorage.setItem('cm_recent_searches', JSON.stringify(updatedRecent));
+
+      navigate(`/products?search=${encodeURIComponent(finalQuery)}`);
+      setSearchOpen(false);
     } else {
       navigate('/products');
+      setSearchOpen(false);
     }
   };
 
@@ -81,8 +118,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
-              <Link to="/products?sort=newest" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
-                New Arrivals
+              <Link to="/products?category=New arrivals" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
+                New arrivals
               </Link>
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
                 <span className="text-sm font-medium text-gray-900 group-hover:text-primary">Women</span>
@@ -259,37 +296,135 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Search Overlay */}
           {searchOpen && (
-            <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-xl p-6 z-40 animate-fade-in">
-              <form onSubmit={(e) => { handleSearch(e); setSearchOpen(false); }} className="relative max-w-3xl mx-auto">
-                <input
-                  autoFocus
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search products, categories, brands..."
-                  className="w-full text-2xl font-bold border-b-2 border-gray-200 py-4 focus:outline-none focus:border-black placeholder:text-gray-300"
-                />
-                <button type="submit" className="absolute right-0 top-4 text-gray-400 hover:text-black">
-                  <ArrowRight className="w-8 h-8" />
-                </button>
+            <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-2xl p-8 z-40 animate-fade-in max-h-[85vh] overflow-y-auto">
+              <div className="max-w-4xl mx-auto">
+                <form onSubmit={handleSearch} className="relative group">
+                  <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black transition-colors" />
+                  <input
+                    autoFocus
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search for items, brands, or categories..."
+                    className="w-full text-3xl font-bold border-none pl-12 py-6 focus:outline-none placeholder:text-gray-200"
+                  />
+                  {searchQuery && (
+                    <button type="button" onClick={() => setSearchQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 rounded-full transition-colors">
+                      <X className="w-5 h-5 text-gray-400" />
+                    </button>
+                  )}
+                  <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-2xl hover:bg-gray-800 transition-all">
+                    <ArrowRight className="w-6 h-6" />
+                  </button>
+                </form>
 
-                {/* Suggestions */}
-                {suggestions.length > 0 && (
-                  <div className="mt-4">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Suggestions</p>
-                    <div className="flex flex-wrap gap-2">
-                      {suggestions.map((s, idx) => (
-                        <span
-                          key={idx}
-                          onClick={() => { setSearchQuery(s); navigate(`/products?search=${encodeURIComponent(s)}`); setSearchOpen(false); }}
-                          className="px-4 py-2 bg-gray-50 rounded-full text-sm font-medium hover:bg-black hover:text-white cursor-pointer transition-colors"
-                        >
-                          {s}
-                        </span>
-                      ))}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8 pt-8 border-t border-gray-50">
+                  {/* Left Column: Recent & Trending */}
+                  <div className="space-y-8">
+                    {recentSearches.length > 0 && (
+                      <div>
+                        <div className="flex items-center justify-between mb-4">
+                          <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <History className="w-3 h-3" /> Recent Searches
+                          </h4>
+                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('cm_recent_searches'); }} className="text-[10px] font-bold text-gray-300 hover:text-red-500 uppercase tracking-tighter">Clear All</button>
+                        </div>
+                        <div className="space-y-2">
+                          {recentSearches.map((s, idx) => (
+                            <button
+                              key={idx}
+                              onClick={() => handleSearch(undefined, s)}
+                              className="flex items-center gap-3 w-full text-left py-2 px-3 hover:bg-gray-50 rounded-xl transition-all group"
+                            >
+                              <Clock className="w-4 h-4 text-gray-300 group-hover:text-black" />
+                              <span className="text-sm font-semibold text-gray-600 group-hover:text-black">{s}</span>
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    <div>
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                        <TrendingUp className="w-3 h-3" /> Trending
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {['New Year Specials', 'Sustainable Fashion', 'Accessories', 'Limited Drop'].map((t) => (
+                          <button
+                            key={t}
+                            onClick={() => handleSearch(undefined, t)}
+                            className="px-4 py-2 bg-gray-50 text-gray-600 text-xs font-bold rounded-full hover:bg-black hover:text-white transition-all shadow-sm border border-gray-100"
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
-                )}
-              </form>
+
+                  {/* Middle Column: Collections (Categories) */}
+                  <div className="space-y-8">
+                    <div>
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Quick Collections</h4>
+                      <div className="grid grid-cols-1 gap-1">
+                        {suggestions.categories.length > 0 ? (
+                          suggestions.categories.map((c) => (
+                            <Link
+                              key={c}
+                              to={`/products?category=${encodeURIComponent(c)}`}
+                              onClick={() => setSearchOpen(false)}
+                              className="py-3 px-4 hover:bg-primary/5 text-gray-600 hover:text-primary font-bold rounded-xl transition-all flex items-center justify-between group"
+                            >
+                              {c}
+                              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
+                            </Link>
+                          ))
+                        ) : (
+                          ['Women', 'Men', 'Accessories', 'New arrivals'].map((c) => (
+                            <Link
+                              key={c}
+                              to={`/products?category=${c}`}
+                              onClick={() => setSearchOpen(false)}
+                              className="py-3 px-4 hover:bg-gray-50 text-gray-600 hover:text-black font-bold rounded-xl transition-all flex items-center justify-between group"
+                            >
+                              {c}
+                              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
+                            </Link>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Column: Featured Products */}
+                  <div className="md:col-span-1">
+                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+                      {suggestions.products.length > 0 ? 'Top Results' : 'Featured Products'}
+                    </h4>
+                    <div className="space-y-4">
+                      {suggestions.products.length > 0 ? (
+                        suggestions.products.map((p) => (
+                          <Link
+                            key={p.id}
+                            to={`/product/${p.id}`}
+                            onClick={() => setSearchOpen(false)}
+                            className="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded-2xl transition-all"
+                          >
+                            <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                              <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                            </div>
+                            <div className="flex flex-col min-w-0">
+                              <span className="text-sm font-bold text-gray-900 truncate group-hover:text-primary">{p.name}</span>
+                              <span className="text-xs text-gray-500 font-bold">${p.price}</span>
+                            </div>
+                          </Link>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-400 font-medium italic">Start typing to see product matches...</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -313,7 +448,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </form>
             </div>
             <div className="px-4 py-4 space-y-1">
-              <Link to="/products?sort=newest" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">New Arrivals</Link>
+              <Link to="/products?category=New arrivals" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">New arrivals</Link>
               <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Women</Link>
               <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Men</Link>
               <Link to="/products?category=Accessories" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Accessories</Link>

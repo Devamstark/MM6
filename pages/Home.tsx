@@ -5,6 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, ArrowRight, Zap, Clock } from 'lucide-react';
+import { CountdownTimer } from '../components/CountdownTimer';
 
 export const Home = () => {
   const { user } = useAuth();
@@ -12,6 +13,8 @@ export const Home = () => {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
+  const [flashSaleProducts, setFlashSaleProducts] = useState<Product[]>([]);
+  const [closestFlashSaleEnd, setClosestFlashSaleEnd] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +31,29 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featured, popular, cats] = await Promise.all([
+        const [featured, popular, cats, allProducts] = await Promise.all([
           api.getProducts({ isFeatured: true }),
           api.getProducts({ isPopular: true }),
-          api.getCategories()
+          api.getCategories(),
+          api.getProducts({}) // Fetch all to find flash sales
         ]);
         setFeaturedProducts(featured.slice(0, 8)); // Show more items
         setPopularProducts(popular.slice(0, 4));
         setCategories(cats);
+
+        // Flash Sale Logic: Find products with active future end time
+        const now = new Date();
+        const flashSales = allProducts.filter(p =>
+          p.flashSaleEnd && new Date(p.flashSaleEnd) > now
+        );
+        setFlashSaleProducts(flashSales);
+
+        if (flashSales.length > 0) {
+          // Find earliest end time among active flash sales
+          const ends = flashSales.map(p => new Date(p.flashSaleEnd!).getTime());
+          const earliestEnd = new Date(Math.min(...ends));
+          setClosestFlashSaleEnd(earliestEnd.toISOString());
+        }
       } catch (err) {
         console.error('Failed to fetch data:', err);
         setError('Failed to connect to the server. Please ensure the backend is running.');
@@ -115,34 +133,40 @@ export const Home = () => {
         </div>
       </div>
 
-      {/* Flash Sale Banner */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">
-        <div className="bg-primary/5 border border-primary/20 rounded-xl p-6 md:p-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center text-white animate-pulse">
-              <Zap className="w-8 h-8 fill-current" />
-            </div>
-            <div>
-              <h2 className="text-3xl font-black uppercase text-primary italic font-heading">Flash Sale</h2>
-              <p className="text-gray-600 font-medium">Limited time offer on selected items</p>
-            </div>
-          </div>
+      {/* Flash Sale Banner - Only show if active sales exist */}
+      {flashSaleProducts.length > 0 && closestFlashSaleEnd && (
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16 animate-fade-up">
+          <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group">
+            {/* Background Decorations */}
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
+            <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
 
-          {/* Timer Mock */}
-          <div className="flex gap-4">
-            {['02', '14', '35', '12'].map((t, i) => (
-              <div key={i} className="flex flex-col items-center">
-                <div className="w-12 h-12 bg-black text-white rounded-lg flex items-center justify-center font-bold text-xl">{t}</div>
-                <span className="text-[10px] uppercase font-bold text-gray-500 mt-1">{['Days', 'Hrs', 'Mins', 'Secs'][i]}</span>
+            <div className="flex items-center gap-8 z-10">
+              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary/40 rotate-12 group-hover:rotate-0 transition-transform duration-500">
+                <Zap className="w-10 h-10 fill-current" />
               </div>
-            ))}
-          </div>
+              <div>
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="px-3 py-1 bg-primary text-white text-[10px] font-black uppercase rounded-full tracking-tighter">Limited Time</span>
+                  <h2 className="text-4xl font-black uppercase text-primary italic font-heading tracking-tighter">Flash Sale</h2>
+                </div>
+                <p className="text-gray-500 font-bold text-lg uppercase tracking-tight">Up to <span className="text-black">60% OFF</span> on {flashSaleProducts.length} curated items</p>
+              </div>
+            </div>
 
-          <Link to="/products" className="px-8 py-3 bg-primary text-white font-bold uppercase rounded hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
-            View All
-          </Link>
+            <div className="z-10 bg-white/50 backdrop-blur-md p-6 rounded-3xl border border-white/50 shadow-xl">
+              <CountdownTimer endTime={closestFlashSaleEnd} onExpire={() => setFlashSaleProducts([])} />
+            </div>
+
+            <Link
+              to="/products"
+              className="px-12 py-5 bg-black text-white font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition-all shadow-2xl hover:shadow-black/20 hover:-translate-y-1 z-10 group-hover:scale-105"
+            >
+              Shop the Drop
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Featured Grid */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16">

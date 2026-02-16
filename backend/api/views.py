@@ -1,4 +1,6 @@
 from rest_framework import viewsets, permissions, status, filters, parsers
+from django.db.models import Sum
+from django.db.models.functions import ExtractMonth
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -10,8 +12,8 @@ import resend
 from django.conf import settings
 import random
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer
 
 # ...
 
@@ -19,17 +21,11 @@ class SubmitInquiryView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        name = request.data.get('name')
-        email = request.data.get('email')
-        subject = request.data.get('subject')
-        message = request.data.get('message')
-
-        if not all([name, email, subject, message]):
-             return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Mock success for now
-        print(f"New Inquiry from {name} <{email}>: {subject}\n{message}")
-        return Response({'message': 'Inquiry received (Mock mode).'}, status=status.HTTP_200_OK)
+        serializer = ContactMessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Inquiry received and saved.'}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class WishlistViewSet(viewsets.ModelViewSet):
     serializer_class = WishlistSerializer
@@ -183,16 +179,23 @@ class ProductViewSet(viewsets.ModelViewSet):
     def suggestions(self, request):
         query = request.query_params.get('q', '')
         if not query:
-            return Response([])
+            return Response({"categories": [], "products": []})
         
-        # Simple suggestions based on name and category
-        # Using icontains for SQLite compatibility (instead of postgres triggers)
-        names = Product.objects.filter(name__icontains=query).values_list('name', flat=True).distinct()[:5]
+        # Categories matching the query
         cats = Product.objects.filter(category__icontains=query).values_list('category', flat=True).distinct()[:3]
         
-        # Combine and unique
-        suggestions = list(set(list(names) + list(cats)))
-        return Response(suggestions)
+        # Products matching the query (rich results)
+        products = Product.objects.filter(
+            Q(name__icontains=query) | 
+            Q(brand__icontains=query)
+        ).distinct()[:5]
+        
+        product_serializer = self.get_serializer(products, many=True)
+        
+        return Response({
+            "categories": list(cats),
+            "products": product_serializer.data
+        })
 
     def create(self, request, *args, **kwargs):
         try:
@@ -332,17 +335,31 @@ class DashboardStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        # Mock aggregation for dashboard
-        total_revenue = 0 # Calculate from orders
+        # Calculate real data for dashboard
+        total_revenue_data = Order.objects.aggregate(total=Sum('total_amount'))
+        total_revenue = float(total_revenue_data['total'] or 0)
+        
         total_orders = Order.objects.count()
         total_products = Product.objects.count()
         total_users = User.objects.count()
+
+        # Monthly Trend (Last 12 months)
+        # Using a dictionary to store month-wise revenue
+        monthly_trend = [0] * 12
+        sales_by_month = Order.objects.annotate(month=ExtractMonth('created_at')).values('month').annotate(revenue=Sum('total_amount'))
+        
+        for entry in sales_by_month:
+            # Month is 1-indexed (Jan=1)
+            month_idx = entry['month'] - 1
+            if 0 <= month_idx < 12:
+                monthly_trend[month_idx] = float(entry['revenue'] or 0)
         
         return Response({
             "totalRevenue": total_revenue,
             "totalOrders": total_orders,
             "totalProducts": total_products,
-            "totalUsers": total_users
+            "totalUsers": total_users,
+            "monthlyTrend": monthly_trend
         })
 
 class RequestPasswordResetView(APIView):
@@ -567,18 +584,20 @@ class BulkProductUploadView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class SubmitInquiryView(APIView):
-    permission_classes = [permissions.AllowAny]
+class ContactMessageViewSet(viewsets.ModelViewSet):
+    queryset = ContactMessage.objects.all().order_by('-created_at')
+    serializer_class = ContactMessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
-    def post(self, request):
-        name = request.data.get('name')
-        email = request.data.get('email')
-        subject = request.data.get('subject')
-        message = request.data.get('message')
+    def get_queryset(self):
+        # Only admins should see contact messages
+        if self.request.user.role == 'admin':
+            return super().get_queryset()
+        return ContactMessage.objects.none()
 
-        if not all([name, email, subject, message]):
-             return Response({'error': 'All fields are required.'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Mock success for now
-        print(f"New Inquiry from {name} <{email}>: {subject}\n{message}")
-        return Response({'message': 'Inquiry received (Mock mode).'}, status=status.HTTP_200_OK)
+    @action(detail=True, methods=['post'])
+    def mark_as_read(self, request, pk=None):
+        message = self.get_object()
+        message.is_read = True
+        message.save()
+        return Response({'status': 'message marked as read'})

@@ -1,8 +1,8 @@
 {
-    "rewrites": [
-        {
-            "source": "/(.*)",
-            "destination": "/index.html"
-        }
-    ]
+    "buildCommand": "vite build",
+    "outputDirectory": "dist",
+    "ignoreCommand": "git diff HEAD^ HEAD --quiet .",
+    "devCommand": "vite",
+    "installCommand": "npm install",
+    "framework": "vite"
 }

@@ -2,18 +2,19 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload, Image as Images } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
 
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
+  const [messages, setMessages] = useState<import('../types').ContactMessage[]>([]);
 
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -47,12 +48,13 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, productsData, usersData, ordersData, categoriesData] = await Promise.all([
+      const [statsData, productsData, usersData, ordersData, categoriesData, messagesData] = await Promise.all([
         api.getDashboardStats(),
         api.getProducts(),
         api.getUsers(),
         api.getRecentOrders(),
         api.getCategories(),
+        api.getContactMessages(),
       ]);
       setStats(statsData);
       // Sort products by display_order
@@ -60,6 +62,7 @@ export const AdminDashboard = () => {
       setUsers(usersData);
       setOrders(ordersData);
       setCategories(categoriesData);
+      setMessages(messagesData);
     } catch (e) {
       console.error(e);
     } finally {
@@ -115,6 +118,18 @@ export const AdminDashboard = () => {
     }
   };
 
+  const handleMarkRead = async (id: string) => {
+    await api.markMessageAsRead(id);
+    loadData();
+  };
+
+  const handleDeleteMessage = async (id: string) => {
+    if (window.confirm('Delete this message?')) {
+      await api.deleteContactMessage(id);
+      loadData();
+    }
+  };
+
   const openForm = (product?: Product) => {
     setEditingProduct(product || null);
     setIsFormOpen(true);
@@ -161,22 +176,34 @@ export const AdminDashboard = () => {
   if (loading) return <div className="p-10 flex justify-center"><Loader2 className="w-10 h-10 animate-spin text-indigo-600" /></div>;
 
   return (
-    <div className="bg-[#f0f4f8] min-h-screen pb-12">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8 animate-fade-up">
-          <h1 className="text-4xl font-bold text-gray-900 tracking-tight">Admin Dashboard</h1>
-          <p className="text-gray-500 mt-2">Overview of store performance and management.</p>
+    <div className="bg-[#f8fafc] min-h-screen pb-20 font-sans">
+      <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
+        <div className="mb-12 animate-fade-up flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <span className="text-indigo-600 font-black text-xs uppercase tracking-[0.3em] mb-3 block">Management Portal</span>
+            <h1 className="text-5xl font-black text-gray-900 tracking-tight">Admin Dashboard</h1>
+            <p className="text-gray-400 font-medium mt-3 text-lg">Real-time insights and product management console.</p>
+          </div>
+          <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
+            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 font-black">
+              <CheckCircle className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Status</p>
+              <p className="text-sm font-bold text-gray-900">System Healthy</p>
+            </div>
+          </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-4 mb-8 w-full animate-fade-up delay-100">
-          {['overview', 'products', 'sellers', 'users', 'orders'].map((tab) => (
+        <div className="flex flex-wrap gap-3 mb-12 w-full animate-fade-up delay-100">
+          {['overview', 'products', 'sellers', 'users', 'orders', 'messages'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-6 py-3 rounded-2xl text-sm font-bold capitalize transition-all duration-300 whitespace-nowrap ${activeTab === tab
-                ? 'bg-black text-white shadow-lg transform -translate-y-1'
-                : 'bg-white text-gray-500 hover:text-gray-900 hover:bg-gray-50 shadow-sm hover:shadow-md border border-gray-100'
+              className={`px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === tab
+                ? 'bg-black text-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] transform -translate-y-1'
+                : 'bg-white text-gray-400 hover:text-black hover:bg-gray-50 border border-gray-100'
                 }`}
             >
               {tab}
@@ -191,7 +218,7 @@ export const AdminDashboard = () => {
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <StatCard
                   title="Total Revenue"
-                  value={`$${orders.reduce((sum, o) => sum + o.totalPrice, 0).toLocaleString()} `}
+                  value={`$${(stats?.totalRevenue ?? 0).toLocaleString()} `}
                   icon={DollarSign}
                   color="text-green-600"
                   bg="bg-green-50"
@@ -227,14 +254,18 @@ export const AdminDashboard = () => {
               <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
                 <h3 className="font-bold text-gray-900 mb-6 text-lg">Monthly Sales Trend</h3>
                 <div className="h-40 flex items-end gap-3 justify-between">
-                  {[65, 59, 80, 81, 56, 55, 40, 70, 90, 100, 85, 120].map((h, i) => (
-                    <div key={i} className="w-full bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
-                      <div style={{ height: `${(h / 150) * 100}% ` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
-                      <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg">
-                        ${h * 100}
+                  {(stats?.monthlyTrend || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).map((h, i) => {
+                    const maxVal = Math.max(...(stats?.monthlyTrend || [1]));
+                    const heightPercent = maxVal > 0 ? (h / maxVal) * 100 : 0;
+                    return (
+                      <div key={i} className="w-full bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
+                        <div style={{ height: `${heightPercent}% ` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
+                        <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg whitespace-nowrap z-10">
+                          ${typeof h === 'number' ? h.toLocaleString() : h}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 <div className="flex justify-between mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
                   <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
@@ -261,7 +292,7 @@ export const AdminDashboard = () => {
                           {order.items?.length || 0} items
                         </td>
                         <td className="px-6 py-4">
-                          <span className={`px - 3 py - 1 rounded - full text - xs font - bold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'} `}>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold ${order.status === 'delivered' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
                             {order.status}
                           </span>
                         </td>
@@ -319,52 +350,71 @@ export const AdminDashboard = () => {
                     saving={savingReorder}
                   />
                 ) : (
-                  <table className="min-w-full divide-y divide-gray-100">
-                    <thead className="bg-white">
-                      <tr>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Product</th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller</th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Price</th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Discount</th>
-                        <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Stock</th>
-                        <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-50">
-                      {products.map(p => {
-                        const seller = users.find(u => u.id === p.userId);
-                        return (
-                          <tr key={p.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <img className="h-12 w-12 rounded-xl object-cover border border-gray-100" src={p.imageUrl} alt="" />
-                                <div className="ml-4">
-                                  <div className="text-sm font-bold text-gray-900">{p.name}</div>
-                                  <div className="text-xs text-gray-500 font-medium">{p.brand}</div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-100">
+                      <thead className="bg-[#fcfcfd]">
+                        <tr>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Product Details</th>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Vendor</th>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Valuation</th>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Campaign</th>
+                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Stock</th>
+                          <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Command</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-50">
+                        {products.map(p => {
+                          const seller = users.find(u => u.id === p.userId);
+                          return (
+                            <tr key={p.id} className="hover:bg-gray-50/80 transition-all group">
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="h-14 w-14 rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+                                    <img className="h-full w-full object-cover" src={p.imageUrl} alt="" />
+                                  </div>
+                                  <div className="ml-5">
+                                    <div className="text-sm font-black text-gray-900 group-hover:text-indigo-600 transition-colors">{p.name}</div>
+                                    <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-0.5">{p.brand}</div>
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">
-                              {seller ? seller.name : 'Unknown (ID: ' + p.userId + ')'}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">
-                              ${p.price}
-                              {p.salePrice && <div className="text-xs text-red-600 line-through">${p.price}</div>}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-green-600">
-                              {p.discountPercentage ? p.discountPercentage + '%' : '-'}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-600">{p.stock} units</td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <button onClick={() => setDiscountProduct(p)} className="text-green-600 hover:bg-green-50 p-2 rounded-full mr-1 transition-colors" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
-                              <button onClick={() => openForm(p)} className="text-indigo-600 hover:bg-indigo-50 p-2 rounded-full mr-1 transition-colors"><Edit2 className="w-4 h-4" /></button>
-                              <button onClick={() => handleProductDelete(p.id)} className="text-red-600 hover:bg-red-50 p-2 rounded-full transition-colors"><Trash2 className="w-4 h-4" /></button>
-                            </td>
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <span className="text-xs font-bold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                                  {seller ? seller.name : 'ID: ' + p.userId}
+                                </span>
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <div className="text-sm font-black text-gray-900">${p.price}</div>
+                                {p.salePrice && <div className="text-[10px] text-red-500 font-bold line-through ml-0.5">${p.price}</div>}
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                {p.discountPercentage ? (
+                                  <span className="px-3 py-1 rounded-full text-[10px] font-black bg-green-50 text-green-600 border border-green-100">
+                                    {p.discountPercentage}% OFF
+                                  </span>
+                                ) : (
+                                  <span className="text-gray-300 font-bold text-[10px]">NO SALE</span>
+                                )}
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap">
+                                <div className="flex items-center gap-2">
+                                  <div className={`w-1.5 h-1.5 rounded-full ${p.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+                                  <span className="text-xs font-black text-gray-600 uppercase tracking-wider">{p.stock} Units</span>
+                                </div>
+                              </td>
+                              <td className="px-8 py-6 whitespace-nowrap text-right text-xs font-medium">
+                                <div className="flex justify-end gap-2">
+                                  <button onClick={() => setDiscountProduct(p)} className="w-9 h-9 flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
+                                  <button onClick={() => openForm(p)} className="w-9 h-9 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm"><Edit2 className="w-4 h-4" /></button>
+                                  <button onClick={() => handleProductDelete(p.id)} className="w-9 h-9 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"><Trash2 className="w-4 h-4" /></button>
+                                </div>
+                              </td>
+                            </tr>
+                          )
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </div>
 
@@ -392,84 +442,106 @@ export const AdminDashboard = () => {
                 <h3 className="font-bold text-lg text-gray-800">Seller Management</h3>
                 <p className="text-sm text-gray-500 mt-1">Enable or disable seller accounts and view their inventory size.</p>
               </div>
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-white">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Seller Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Email</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Products</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-50">
-                  {sellers.map(s => (
-                    <tr key={s.id} className={`hover: bg - gray - 50 transition - colors ${s.isActive === false ? 'bg-gray-50/80 opacity-75' : ''} `}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">{s.name}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{s.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-bold">{getSellerProductCount(s.id)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
-                               ${s.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'} `}>
-                          {s.isActive !== false ? 'Active' : 'Disabled'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <button
-                          className={`flex items - center gap - 1.5 ml - auto px - 4 py - 2 rounded - full border transition - all text - xs font - bold ${s.isActive !== false
-                            ? 'text-red-600 border-red-100 hover:bg-red-50'
-                            : 'text-green-600 border-green-100 hover:bg-green-50'
-                            } `}
-                          onClick={() => toggleUserStatus(s.id, s.isActive)}
-                        >
-                          {s.isActive !== false ? <><Ban className="w-3 h-3" /> Disable</> : <><CheckCircle className="w-3 h-3" /> Enable</>}
-                        </button>
-                      </td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-[#fcfcfd]">
+                    <tr>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Seller Identity</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Contact</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Inventory</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
+                      <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Control</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {sellers.map(s => (
+                      <tr key={s.id} className={`hover:bg-gray-50/80 transition-all group ${s.isActive === false ? 'bg-gray-50/50 opacity-75' : ''}`}>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-black text-xs mr-3 border border-indigo-100 group-hover:scale-110 transition-transform">
+                              {s.name.charAt(0)}
+                            </div>
+                            <div className="text-sm font-black text-gray-900">{s.name}</div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap text-sm text-gray-500 font-medium">{s.email}</td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className="text-sm font-black text-gray-900 bg-gray-50 px-3 py-1.5 rounded-lg border border-gray-100">
+                            {getSellerProductCount(s.id)} SKU Details
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
+                                ${s.isActive !== false ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
+                            {s.isActive !== false ? 'Verified Active' : 'Account Disabled'}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium">
+                          <button
+                            className={`flex items-center gap-2 ml-auto px-5 py-2.5 rounded-xl border transition-all text-[10px] font-black uppercase tracking-widest shadow-sm ${s.isActive !== false
+                              ? 'text-red-600 border-red-100 bg-red-50 hover:bg-red-600 hover:text-white'
+                              : 'text-green-600 border-green-100 bg-green-50 hover:bg-green-600 hover:text-white'
+                              }`}
+                            onClick={() => toggleUserStatus(s.id, s.isActive)}
+                          >
+                            {s.isActive !== false ? <><Ban className="w-3.5 h-3.5" /> Disable Access</> : <><CheckCircle className="w-3.5 h-3.5" /> Restore Access</>}
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               {sellers.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No sellers found.</div>}
             </div>
           )}
 
           {activeTab === 'users' && (
             <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-white">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">User</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-50">
-                  {users.map(u => (
-                    <tr key={u.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-bold text-gray-900">{u.name}</div>
-                        <div className="text-xs text-gray-500 font-medium">{u.email}</div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
-                               ${u.role === 'admin' ? 'bg-purple-100 text-purple-700' :
-                            u.role === 'seller' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
-                          } `}>
-                          {u.role.toUpperCase()}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
-                               ${u.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'} `}>
-                          {u.isActive !== false ? 'Active' : 'Disabled'}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{u.createdAt || 'N/A'}</td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-[#fcfcfd]">
+                    <tr>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">User Account</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Security Role</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Activity Status</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Registration</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {users.map(u => (
+                      <tr key={u.id} className="hover:bg-gray-50/80 transition-all group">
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-black text-xs mr-3 border border-slate-200 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
+                              {u.name.charAt(0)}
+                            </div>
+                            <div>
+                              <div className="text-sm font-black text-gray-900">{u.name}</div>
+                              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{u.email}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
+                                 ${u.role === 'admin' ? 'bg-purple-50 text-purple-600 border border-purple-100' :
+                              u.role === 'seller' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-50 text-gray-600 border border-gray-100'
+                            }`}>
+                            {u.role.toUpperCase()}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
+                                 ${u.isActive !== false ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
+                            {u.isActive !== false ? 'Verified Online' : 'Access Restricted'}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap text-xs font-bold text-gray-500">{u.createdAt || 'N/A'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
 
@@ -491,59 +563,151 @@ export const AdminDashboard = () => {
                   ))}
                 </select>
               </div>
-              <table className="min-w-full divide-y divide-gray-100">
-                <thead className="bg-white">
-                  <tr>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Order ID</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Customer</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Items & Fulfillment</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Total</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                    <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-50">
-                  {filteredOrders.map(order => (
-                    <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600">#{order.id}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{order.customerName}</td>
-                      <td className="px-6 py-4 text-sm text-gray-500">
-                        <div className="space-y-2">
-                          {order.items?.map((item, idx) => {
-                            const seller = users.find(u => u.id === item.userId);
-                            return (
-                              <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50 border border-gray-100 hover:border-indigo-100 transition-colors">
-                                <div className="h-10 w-10 rounded-lg bg-white flex-shrink-0 overflow-hidden border border-gray-200">
-                                  <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
-                                </div>
-                                <div className="flex flex-col">
-                                  <span className="font-bold text-gray-900 text-xs">{item.name}</span>
-                                  <span className="text-indigo-500 font-medium text-[10px]">Seller: {seller?.name || 'Unknown'}</span>
-                                  <span className="text-gray-400 text-[10px]">Qty: {item.quantity || 1}</span>
-                                </div>
-                              </div>
-                            )
-                          })}
-                          {(!order.items || order.items.length === 0) && <span className="text-gray-400 italic">No items details</span>}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">${order.totalPrice.toFixed(2)}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px - 3 py - 1 inline - flex text - xs leading - 5 font - bold rounded - full 
-                               ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
-                            order.status === 'shipped' ? 'bg-blue-100 text-blue-700' : 'bg-yellow-100 text-yellow-700'
-                          } `}>
-                          {order.status}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-medium">{order.createdAt}</td>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-[#fcfcfd]">
+                    <tr>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction ID</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Consumer</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Fulfillment Portfolio</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Gross Total</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Logistics Status</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Timestamp</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {filteredOrders.map(order => (
+                      <tr key={order.id} className="hover:bg-gray-50/80 transition-colors group">
+                        <td className="px-8 py-6 whitespace-nowrap text-sm font-black text-indigo-600">#{order.id}</td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="text-sm font-black text-gray-900">{order.customerName}</div>
+                          <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Buyer</div>
+                        </td>
+                        <td className="px-8 py-6 text-sm text-gray-500">
+                          <div className="space-y-3">
+                            {order.items?.map((item, idx) => {
+                              const seller = users.find(u => u.id === item.userId);
+                              return (
+                                <div key={idx} className="flex items-center gap-4 p-3 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] group-hover:border-indigo-100 transition-colors">
+                                  <div className="h-12 w-12 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
+                                    <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
+                                  </div>
+                                  <div className="flex flex-col">
+                                    <span className="font-black text-gray-900 text-[11px] leading-tight">{item.name}</span>
+                                    <div className="flex items-center gap-2 mt-1">
+                                      <span className="text-indigo-500 font-bold text-[9px] uppercase tracking-wider">BY: {seller?.name || 'ID ' + item.userId}</span>
+                                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
+                                      <span className="text-gray-400 font-bold text-[9px] uppercase tracking-wider">Qty: {item.quantity || 1}</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              )
+                            })}
+                            {(!order.items || order.items.length === 0) && <span className="text-gray-400 italic text-xs font-bold uppercase tracking-widest">Digital Asset / No Item Data</span>}
+                          </div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <div className="text-sm font-black text-gray-900">${order.totalPrice.toFixed(2)}</div>
+                          <div className="text-[9px] font-black text-green-500 uppercase tracking-widest">Paid In Full</div>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap">
+                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
+                                 ${order.status === 'delivered' ? 'bg-green-50 text-green-600 border border-green-100' :
+                              order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-yellow-50 text-yellow-600 border border-yellow-100'
+                            }`}>
+                            {order.status}
+                          </span>
+                        </td>
+                        <td className="px-8 py-6 whitespace-nowrap text-[11px] font-bold text-gray-500">{order.createdAt}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
               {filteredOrders.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No orders found.</div>}
             </div>
           )}
+
+          {activeTab === 'messages' && (
+            <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+              <div className="p-6 border-b border-gray-100 bg-gray-50/50">
+                <h3 className="font-bold text-lg text-gray-800">Contact Messages</h3>
+                <p className="text-sm text-gray-500 mt-1">Manage inquiries from users via the contact form.</p>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-100">
+                  <thead className="bg-[#fcfcfd]">
+                    <tr>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transmission Date</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Originator</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Subject Matter</th>
+                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Priority Status</th>
+                      <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Control</th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-50">
+                    {messages.map(msg => (
+                      <React.Fragment key={msg.id}>
+                        <tr className={`hover:bg-gray-50/80 transition-all ${!msg.isRead ? 'bg-indigo-50/20' : ''}`}>
+                          <td className="px-8 py-6 whitespace-nowrap text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                            {new Date(msg.createdAt).toLocaleDateString()}
+                          </td>
+                          <td className="px-8 py-6 whitespace-nowrap">
+                            <div className={`text-sm ${!msg.isRead ? 'font-black text-gray-900' : 'font-bold text-gray-500'}`}>{msg.name}</div>
+                            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{msg.email}</div>
+                          </td>
+                          <td className={`px-8 py-6 whitespace-nowrap text-sm ${!msg.isRead ? 'font-black text-indigo-600' : 'font-medium text-gray-600'}`}>
+                            {msg.subject || '(No Subject Provided)'}
+                          </td>
+                          <td className="px-8 py-6 whitespace-nowrap">
+                            <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${msg.isRead ? 'bg-gray-50 text-gray-400 border border-gray-100' : 'bg-indigo-600 text-white border border-indigo-700'}`}>
+                              {msg.isRead ? 'Archived' : 'High Priority'}
+                            </span>
+                          </td>
+                          <td className="px-8 py-6 whitespace-nowrap text-right text-sm font-medium">
+                            <div className="flex justify-end gap-2">
+                              {!msg.isRead && (
+                                <button
+                                  onClick={() => handleMarkRead(msg.id)}
+                                  className="w-9 h-9 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                  title="Mark as Read"
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                              )}
+                              <button
+                                onClick={() => handleDeleteMessage(msg.id)}
+                                className="w-9 h-9 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"
+                                title="Delete Permanent"
+                              >
+                                <Trash className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                        <tr className={!msg.isRead ? 'bg-indigo-50/10' : ''}>
+                          <td colSpan={5} className="px-8 py-6 border-b border-gray-50">
+                            <div className="bg-[#fcfcfd] p-6 rounded-[1.5rem] text-sm text-gray-600 border border-gray-100 shadow-sm italic leading-relaxed">
+                              <div className="flex items-center gap-2 mb-3">
+                                <div className="w-1 h-3 bg-indigo-600 rounded-full"></div>
+                                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Message Disclosure</span>
+                              </div>
+                              "{msg.message}"
+                              <div className="mt-6 pt-6 border-t border-gray-50">
+                                <a href={`mailto:${msg.email}`} className="text-indigo-600 text-[10px] font-black uppercase tracking-widest hover:text-indigo-800 transition-colors">Generate Direct Response &rarr;</a>
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              {messages.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No messages found.</div>}
+            </div>
+          )}
+
 
         </div>
 
@@ -597,18 +761,18 @@ export const AdminDashboard = () => {
         </div>
       )}
 
-    </div >
+    </div>
   );
 };
 
 const StatCard = ({ title, value, icon: Icon, color, bg, delay }: any) => (
-  <div className="bg-white overflow-hidden rounded-[2rem] shadow-sm border border-gray-100 p-6 flex items-center animate-fade-up" style={{ animationDelay: `${delay} ms` }}>
-    <div className={`p - 4 rounded - 2xl ${bg} ${color} mr - 5`}>
-      <Icon className="h-8 w-8" />
+  <div className="bg-white overflow-hidden rounded-[2.5rem] shadow-sm hover:shadow-xl transition-all duration-500 border border-gray-100 p-8 flex items-center group animate-fade-up" style={{ animationDelay: `${delay}ms` }}>
+    <div className={`w-16 h-16 rounded-[1.5rem] ${bg} ${color} flex items-center justify-center transition-transform group-hover:scale-110 duration-500 shadow-sm`}>
+      <Icon className="h-7 w-7" />
     </div>
-    <div>
-      <p className="text-sm font-bold text-gray-400 uppercase tracking-wide">{title}</p>
-      <p className="text-3xl font-bold text-gray-900 mt-1">{value}</p>
+    <div className="ml-6">
+      <p className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1">{title}</p>
+      <p className="text-3xl font-black text-gray-900 tracking-tight">{value}</p>
     </div>
   </div>
 );

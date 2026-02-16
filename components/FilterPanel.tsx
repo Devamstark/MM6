@@ -12,6 +12,9 @@ interface FilterPanelProps {
     minPrice: string;
     maxPrice: string;
     sort: string;
+    isFeatured?: boolean;
+    isPopular?: boolean;
+    onSale?: boolean;
   };
   onFilterChange: (key: string, value: string) => void;
   onClearFilters: () => void;
@@ -149,6 +152,40 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
               {brand}
             </div>
           ))}
+        </div>
+      </div>
+
+      {/* Visibility Filters */}
+      <div className="pt-4 border-t border-gray-100">
+        <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1">Other</h3>
+        <div className="space-y-3">
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-gray-300 transition-all cursor-pointer"
+              checked={!!filters.isFeatured}
+              onChange={(e) => onFilterChange('isFeatured', e.target.checked ? 'true' : '')}
+            />
+            <span className="text-sm font-semibold text-gray-600 group-hover:text-black transition-colors">Featured Only</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500 border-gray-300 transition-all cursor-pointer"
+              checked={!!filters.isPopular}
+              onChange={(e) => onFilterChange('isPopular', e.target.checked ? 'true' : '')}
+            />
+            <span className="text-sm font-semibold text-gray-600 group-hover:text-black transition-colors">Trending (Popular)</span>
+          </label>
+          <label className="flex items-center gap-3 cursor-pointer group">
+            <input
+              type="checkbox"
+              className="w-4 h-4 rounded text-red-600 focus:ring-red-500 border-gray-300 transition-all cursor-pointer"
+              checked={!!filters.onSale}
+              onChange={(e) => onFilterChange('on_sale', e.target.checked ? 'true' : '')}
+            />
+            <span className="text-sm font-semibold text-gray-600 group-hover:text-red-600 transition-colors">On Sale</span>
+          </label>
         </div>
       </div>
     </div>

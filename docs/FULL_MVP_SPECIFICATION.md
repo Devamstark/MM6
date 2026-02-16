@@ -2,18 +2,18 @@
 
 ## 📋 Executive Summary
 
-**CloudMart** is a modern, full-stack e-commerce platform built with a decoupled architecture. This MVP delivers a complete B2C marketplace with multi-role support (Buyers, Sellers, Admins), real-time inventory management, secure authentication, and a premium user experience.
+**CloudMart** is a modern, full-stack e-commerce platform built with a decoupled architecture. This MVP delivers a complete B2C marketplace with multi-role support (Buyers, Sellers, Admins), real-time inventory management, secure authentication, and a premium user experience using the latest web technologies.
 
 ---
 
 ## 🏗️ Technology Stack
 
 ### **Frontend**
-- **Framework**: React 18 with TypeScript
+- **Framework**: React 19.x with TypeScript
 - **Build Tool**: Vite 6.x (Fast HMR, optimized builds)
-- **Styling**: Tailwind CSS 4.x (Utility-first, responsive design)
+- **Styling**: Tailwind CSS 4.x (Utility-first, responsive design, v4 engine)
 - **Routing**: React Router DOM v7
-- **State Management**: React Context API (Auth, Cart)
+- **State Management**: Jotai (Atomic state management for Cart, User, UI)
 - **HTTP Client**: Axios (REST API communication)
 - **Icons**: Lucide React (Modern, lightweight icons)
 - **Deployment**: Vercel (Edge network, automatic HTTPS)
@@ -55,7 +55,7 @@
 
 #### Technical Implementation:
 - **Backend**: Custom `User` model extending `AbstractUser` with `role` field
-- **Frontend**: `AuthContext` provider with protected routes
+- **Frontend**: `AuthProvider` wrapping Jotai atoms for user state
 - **Security**: HTTP-only cookies (optional), JWT stored in localStorage
 - **Endpoints**:
   - `POST /api/auth/register/`
@@ -103,7 +103,7 @@
 
 #### Features:
 - **Add to Cart**: Select product variants (size, color) and quantity
-- **Cart Persistence**: Stored in localStorage (guest) or backend (logged-in users)
+- **Cart Persistence**: Stored in localStorage (guest) with Jotai atom sync
 - **Stock Validation**: Prevent over-purchasing
 - **Cart Summary**: Real-time total calculation with discounts
 - **Checkout Flow**:
@@ -113,7 +113,7 @@
   4. Order confirmation
 
 #### Technical Implementation:
-- **Frontend**: `CartContext` provider with CRUD operations
+- **Frontend**: `cartAtom` (Jotai) with CRUD operations
 - **Backend**: `Order` and `OrderItem` models
 - **Endpoints**:
   - `POST /api/orders/` (Create order)
@@ -236,7 +236,7 @@
 
 #### Technical Implementation:
 - **Backend**: DRF `django_filters` integration
-- **Frontend**: Filter sidebar with controlled inputs
+- **Frontend**: Filter sidebar with controlled inputs, Jotai atoms for filter state
 - **Endpoints**:
   - `GET /api/products/?search=shirt&category=clothing&min_price=10&max_price=50&sort=price_asc`
 
@@ -270,7 +270,7 @@
 #### Technical Implementation:
 - **Tailwind CSS**: Responsive utility classes (`sm:`, `md:`, `lg:`)
 - **Flexbox/Grid**: Adaptive layouts
-- **Mobile Menu**: Hamburger navigation
+- **Mobile Menu**: Hamburger navigation with smooth transition
 
 ---
 
@@ -341,9 +341,12 @@ cloudmart-e-commerce/
 │   │   ├── AdminDashboard.tsx
 │   │   └── OrderHistory.tsx
 │   │
-│   ├── context/               # Global state
+│   ├── context/               # Global state (Legacy/Wrappers)
 │   │   ├── AuthContext.tsx
 │   │   └── CartContext.tsx
+│   │
+│   ├── store/                 # Jotai Atoms (New State)
+│   │   └── atoms.ts
 │   │
 │   ├── services/              # API integration
 │   │   └── api.ts             # Axios instance + endpoints
@@ -435,7 +438,7 @@ cloudmart-e-commerce/
 ## 🚀 Setup & Installation
 
 ### **Prerequisites**
-- Node.js 16+ and npm
+- Node.js 18+ and npm
 - Python 3.10+
 - PostgreSQL (for production) or SQLite (for development)
 - Git
@@ -659,5 +662,5 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 4, 2026
-**Version**: 1.0.0 (MVP)
+**Last Updated**: February 16, 2026
+**Version**: 1.1.0 (MVP + Modern Stack)
