@@ -20,15 +20,7 @@ import { Affiliate } from './pages/Affiliate';
 import { StaticPage } from './pages/StaticPage';
 
 // Simple placeholder for pages we mapped but files were missing or renamed
-const OrderHistory = () => (
-    <div className="p-10 max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Order History</h1>
-        <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 text-center py-12">
-            <p className="text-gray-500">Your order history is empty or loading...</p>
-            <p className="text-xs text-gray-400 mt-2">Implementation pending backend integration.</p>
-        </div>
-    </div>
-);
+import { OrderHistory } from './pages/OrderHistory';
 
 function App() {
     return (

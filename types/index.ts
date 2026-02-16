@@ -76,8 +76,11 @@ export interface Order {
     id: string;
     userId: string;
     customerName: string;
+    email?: string; // Contact email
+    shippingAddress?: string; // Formatted address
+    paymentMethod?: string;
     totalPrice: number;
-    status: 'pending' | 'shipped' | 'delivered' | 'cancelled';
+    status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
     createdAt: string;
     items?: Array<{
         id: string;

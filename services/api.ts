@@ -62,16 +62,20 @@ const mapProduct = (p: any): Product => ({
 const mapOrder = (o: any): Order => ({
   id: o.id,
   userId: o.user,
-  customerName: o.customer_name,
+  customerName: o.customer_name || 'Unknown Guest',
+  email: o.user_email || o.shipping_info?.email || 'N/A', // Try to infer email
+  shippingAddress: o.shipping_address || 'No address provided',
+  paymentMethod: o.payment_method || 'Credit Card',
   totalPrice: parseFloat(o.total_amount),
   status: o.status,
   createdAt: o.created_at,
-  items: o.items.map((i: any) => ({
-    id: i.product?.id,
-    name: i.product?.name || 'Unknown Product',
-    price: parseFloat(i.price_at_purchase),
+  items: (o.items || []).map((i: any) => ({
+    id: i.product?.id || i.product,
+    name: i.product?.name || i.product_name || 'Unknown Product',
+    price: parseFloat(i.price_at_purchase || i.price || 0),
     quantity: i.quantity,
-    imageUrl: i.product?.image_url,
+    imageUrl: i.product?.image_url || i.product_image,
+    userId: i.seller_id // If relevant
   })),
 });
 
@@ -418,6 +422,21 @@ export const api = {
   getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
     const response = await client.get('/orders/');
     return response.data.map(mapOrder);
+  },
+
+  getMyOrders: async (): Promise<Order[]> => {
+    const response = await client.get('/orders/my_orders/');
+    return response.data.map(mapOrder);
+  },
+
+  getOrderDetails: async (id: string): Promise<Order> => {
+    const response = await client.get(`/orders/${id}/`);
+    return mapOrder(response.data);
+  },
+
+  updateOrderStatus: async (id: string, status: string): Promise<Order> => {
+    const response = await client.patch(`/orders/${id}/`, { status });
+    return mapOrder(response.data);
   },
 
   processPayment: async (paymentData: { orderId: string, userId: string, amount: number, paymentMethod: string }): Promise<any> => {

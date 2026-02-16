@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, XCircle, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
@@ -15,6 +15,7 @@ export const AdminDashboard = () => {
   const [users, setUsers] = useState<UserType[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [messages, setMessages] = useState<import('../types').ContactMessage[]>([]);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
@@ -74,6 +75,19 @@ export const AdminDashboard = () => {
     if (window.confirm('Delete this product?')) {
       await api.deleteProduct(id);
       loadData();
+    }
+  };
+
+  const handleStatusUpdate = async (orderId: string, status: string) => {
+    try {
+      await api.updateOrderStatus(orderId, status);
+      // Update local state
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: status as any } : o));
+      setSelectedOrder(prev => prev ? { ...prev, status: status as any } : null);
+      alert(`Order status updated to ${status}`);
+    } catch (e) {
+      console.error(e);
+      alert('Failed to update status');
     }
   };
 
@@ -567,58 +581,47 @@ export const AdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-100">
                   <thead className="bg-[#fcfcfd]">
                     <tr>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transaction ID</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Consumer</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Fulfillment Portfolio</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Gross Total</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Logistics Status</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Timestamp</th>
+                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Order ID</th>
+                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Customer</th>
+                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Items</th>
+                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Total</th>
+                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-8 py-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-50">
                     {filteredOrders.map(order => (
                       <tr key={order.id} className="hover:bg-gray-50/80 transition-colors group">
-                        <td className="px-8 py-6 whitespace-nowrap text-sm font-black text-indigo-600">#{order.id}</td>
+                        <td className="px-8 py-6 whitespace-nowrap text-sm font-bold text-indigo-600">#{order.id}</td>
                         <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="text-sm font-black text-gray-900">{order.customerName}</div>
-                          <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Verified Buyer</div>
+                          <div className="text-sm font-medium text-gray-900">{order.customerName}</div>
+                          <div className="text-xs text-gray-500">{order.email}</div>
                         </td>
                         <td className="px-8 py-6 text-sm text-gray-500">
-                          <div className="space-y-3">
-                            {order.items?.map((item, idx) => {
-                              const seller = users.find(u => u.id === item.userId);
-                              return (
-                                <div key={idx} className="flex items-center gap-4 p-3 rounded-2xl bg-white border border-gray-100 shadow-[0_4px_12px_rgba(0,0,0,0.03)] group-hover:border-indigo-100 transition-colors">
-                                  <div className="h-12 w-12 rounded-xl bg-gray-50 flex-shrink-0 overflow-hidden border border-gray-100">
-                                    <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
-                                  </div>
-                                  <div className="flex flex-col">
-                                    <span className="font-black text-gray-900 text-[11px] leading-tight">{item.name}</span>
-                                    <div className="flex items-center gap-2 mt-1">
-                                      <span className="text-indigo-500 font-bold text-[9px] uppercase tracking-wider">BY: {seller?.name || 'ID ' + item.userId}</span>
-                                      <span className="w-1 h-1 rounded-full bg-gray-300"></span>
-                                      <span className="text-gray-400 font-bold text-[9px] uppercase tracking-wider">Qty: {item.quantity || 1}</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                            {(!order.items || order.items.length === 0) && <span className="text-gray-400 italic text-xs font-bold uppercase tracking-widest">Digital Asset / No Item Data</span>}
-                          </div>
+                          <div className="text-sm text-gray-900 font-medium">{order.items?.length || 0} Items</div>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="text-sm font-black text-gray-900">${order.totalPrice.toFixed(2)}</div>
-                          <div className="text-[9px] font-black text-green-500 uppercase tracking-widest">Paid In Full</div>
+                          <div className="text-sm font-bold text-gray-900">${order.totalPrice.toFixed(2)}</div>
+                          <div className="text-xs font-medium text-green-600">Paid</div>
                         </td>
                         <td className="px-8 py-6 whitespace-nowrap">
-                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
-                                 ${order.status === 'delivered' ? 'bg-green-50 text-green-600 border border-green-100' :
-                              order.status === 'shipped' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-yellow-50 text-yellow-600 border border-yellow-100'
+                          <span className={`px-3 py-1 inline-flex text-xs font-semibold rounded-full capitalize
+                                 ${order.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                              order.status === 'shipped' ? 'bg-blue-100 text-blue-700' :
+                                order.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                                  'bg-yellow-100 text-yellow-700'
                             }`}>
                             {order.status}
                           </span>
                         </td>
-                        <td className="px-8 py-6 whitespace-nowrap text-[11px] font-bold text-gray-500">{order.createdAt}</td>
+                        <td className="px-8 py-6 whitespace-nowrap text-right">
+                          <button
+                            onClick={() => setSelectedOrder(order)}
+                            className="text-indigo-600 hover:text-indigo-900 text-sm font-medium hover:underline"
+                          >
+                            View Details
+                          </button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -757,6 +760,107 @@ export const AdminDashboard = () => {
             >
               Cancel
             </button>
+          </div>
+        </div>
+      )}
+
+      {selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-fade-in shadow-2xl">
+            <div className="flex justify-between items-start mb-6 border-b border-gray-100 pb-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Order #{selectedOrder.id}</h2>
+                <p className="text-sm text-gray-500">Placed on {new Date(selectedOrder.createdAt).toLocaleString()}</p>
+              </div>
+              <button onClick={() => setSelectedOrder(null)} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+                <XCircle className="w-6 h-6 text-gray-400" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Customer Details</h3>
+                <p className="font-bold text-gray-900">{selectedOrder.customerName}</p>
+                <p className="text-sm text-gray-600">{selectedOrder.email}</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Shipping Address</h3>
+                <p className="text-sm text-gray-600 whitespace-pre-line">{selectedOrder.shippingAddress || 'No address provided'}</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Payment Info</h3>
+                <p className="text-sm text-gray-600">{selectedOrder.paymentMethod || 'Credit Card'}</p>
+                <p className="text-xs text-green-600 font-bold mt-1">Paid in Full</p>
+              </div>
+              <div>
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Current Status</h3>
+                <span className={`px-3 py-1 inline-flex text-xs font-bold rounded-full capitalize
+                                ${selectedOrder.status === 'delivered' ? 'bg-green-100 text-green-700' :
+                    selectedOrder.status === 'shipped' ? 'bg-blue-100 text-blue-700' :
+                      selectedOrder.status === 'cancelled' ? 'bg-red-100 text-red-700' :
+                        'bg-yellow-100 text-yellow-700'
+                  }`}>
+                  {selectedOrder.status}
+                </span>
+              </div>
+            </div>
+
+            <div className="mb-8">
+              <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider mb-4">Order Items</h3>
+              <div className="space-y-4">
+                {selectedOrder.items?.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-4 p-3 bg-gray-50 rounded-xl border border-gray-100">
+                    <div className="w-12 h-12 bg-white rounded-lg flex-shrink-0 overflow-hidden border border-gray-200">
+                      <img src={item.imageUrl} alt="" className="w-full h-full object-cover" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-bold text-sm text-gray-900">{item.name}</p>
+                      <p className="text-xs text-gray-500">Qty: {item.quantity}</p>
+                    </div>
+                    <p className="font-bold text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-100">
+                <span className="font-bold text-gray-900">Total Amount</span>
+                <span className="text-xl font-bold text-indigo-600">${selectedOrder.totalPrice.toFixed(2)}</span>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap gap-3 pt-6 border-t border-gray-100">
+              <button
+                onClick={() => handleStatusUpdate(selectedOrder.id, 'processing')}
+                disabled={selectedOrder.status === 'processing' || selectedOrder.status === 'cancelled' || selectedOrder.status === 'delivered'}
+                className="flex-1 bg-yellow-100 text-yellow-700 py-3 rounded-xl font-bold hover:bg-yellow-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Accept Order
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(selectedOrder.id, 'shipped')}
+                disabled={selectedOrder.status === 'shipped' || selectedOrder.status === 'cancelled' || selectedOrder.status === 'delivered'}
+                className="flex-1 bg-blue-100 text-blue-700 py-3 rounded-xl font-bold hover:bg-blue-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Dispatch / Ship
+              </button>
+              <button
+                onClick={() => handleStatusUpdate(selectedOrder.id, 'delivered')}
+                disabled={selectedOrder.status === 'delivered' || selectedOrder.status === 'cancelled'}
+                className="flex-1 bg-green-100 text-green-700 py-3 rounded-xl font-bold hover:bg-green-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Mark Delivered
+              </button>
+              <button
+                onClick={() => {
+                  if (confirm('Are you sure you want to cancel this order?')) {
+                    handleStatusUpdate(selectedOrder.id, 'cancelled');
+                  }
+                }}
+                disabled={selectedOrder.status === 'cancelled' || selectedOrder.status === 'delivered'}
+                className="flex-1 bg-red-100 text-red-700 py-3 rounded-xl font-bold hover:bg-red-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Cancel Order
+              </button>
+            </div>
           </div>
         </div>
       )}
