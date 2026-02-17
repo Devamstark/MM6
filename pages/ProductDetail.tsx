@@ -262,10 +262,8 @@ export const ProductDetail = () => {
                         {/* Stock Status */}
                         {(() => {
                             const variant = product.variants?.find(v => v.size === selectedSize && v.color === selectedColor);
-                            const realStock = variant ? variant.stock : product.stock;
-                            // Requirement: Display at least 1 instead of 0
-                            const currentStock = Math.max(1, realStock);
-                            const isOutOfStock = currentStock <= 0; // Should act effectively false
+                            const currentStock = variant ? variant.stock : product.stock;
+                            const isOutOfStock = currentStock <= 0;
 
                             return (
                                 <div className="mb-8">
