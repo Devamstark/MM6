@@ -98,6 +98,7 @@ export const UserProfile = () => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             setProfileImage(file);
+            // Create a temporary URL for preview
             setImagePreview(URL.createObjectURL(file));
         }
     };
@@ -183,8 +184,8 @@ export const UserProfile = () => {
                             key={item.id}
                             onClick={() => setActiveTab(item.id)}
                             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-colors font-medium ${activeTab === item.id
-                                    ? 'bg-black text-white dark:bg-white dark:text-black'
-                                    : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
+                                ? 'bg-black text-white dark:bg-white dark:text-black'
+                                : 'text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-800'
                                 }`}
                         >
                             <item.icon className="w-5 h-5" />
@@ -436,8 +437,8 @@ export const UserProfile = () => {
                                         </div>
                                         <div className="ml-auto">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :
-                                                    order.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
-                                                        'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                                                order.status === 'cancelled' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                                                    'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
                                                 }`}>
                                                 {order.status}
                                             </span>
