@@ -274,12 +274,18 @@ export const ProductDetail = () => {
                                     {/* Actions */}
                                     <div className="flex gap-4">
                                         {isOutOfStock ? (
-                                            <button
-                                                onClick={() => alert("Restock request sent! We'll notify you when available.")}
-                                                className="flex-1 bg-gray-200 text-gray-900 px-8 py-4 rounded-full font-bold uppercase tracking-wider hover:bg-gray-300 transition-all flex items-center justify-center gap-2"
-                                            >
-                                                <Heart className="w-5 h-5" /> Join Waitlist
-                                            </button>
+                                            (user?.role === 'admin' || user?.role === 'seller') ? (
+                                                <div className="flex-1 bg-gray-100 text-gray-400 px-8 py-4 rounded-full font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-not-allowed">
+                                                    Out of Stock
+                                                </div>
+                                            ) : (
+                                                <button
+                                                    onClick={() => alert("Restock request sent! We'll notify you when available.")}
+                                                    className="flex-1 bg-gray-200 text-gray-900 px-8 py-4 rounded-full font-bold uppercase tracking-wider hover:bg-gray-300 transition-all flex items-center justify-center gap-2 dark:bg-gray-700 dark:text-white dark:hover:bg-gray-600"
+                                                >
+                                                    <Heart className="w-5 h-5" /> Join Waitlist
+                                                </button>
+                                            )
                                         ) : (
                                             <>
                                                 <button
