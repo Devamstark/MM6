@@ -5,6 +5,7 @@ import { Product } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { Star, ShoppingBag, ArrowLeft, Truck, RotateCcw, ShieldCheck, Heart, Share2 } from 'lucide-react';
+import { CountdownTimer } from '../components/CountdownTimer';
 
 export const ProductDetail = () => {
     const { id } = useParams<{ id: string }>();
@@ -175,7 +176,17 @@ export const ProductDetail = () => {
 
                     {/* Right: Details */}
                     <div className="flex flex-col">
-                        <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-tight mb-2">{product.name}</h1>
+                        <h1 className="text-4xl font-black text-gray-900 tracking-tight leading-tight mb-2 dark:text-white">{product.name}</h1>
+
+                        {/* Flash Sale Timer */}
+                        {product.flashSaleEnd && new Date(product.flashSaleEnd) > new Date() && (
+                            <div className="mb-4 inline-flex items-center gap-2 bg-red-50 px-4 py-2 rounded-lg border border-red-100 dark:bg-red-900/20 dark:border-red-800">
+                                <div className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></div>
+                                <span className="text-sm font-bold text-red-700 dark:text-red-400 uppercase tracking-wider">
+                                    Flash Sale Ends in: <CountdownTimer endTime={product.flashSaleEnd} />
+                                </span>
+                            </div>
+                        )}
 
                         {/* Real Ratings */}
                         <div className="flex items-center gap-4 mb-6">

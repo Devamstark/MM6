@@ -22,11 +22,14 @@ import { StaticPage } from './pages/StaticPage';
 // Simple placeholder for pages we mapped but files were missing or renamed
 import { OrderHistory } from './pages/OrderHistory';
 
+import ScrollToTop from './components/ScrollToTop';
+
 function App() {
     return (
         <AuthProvider>
             <CartProvider>
                 <BrowserRouter>
+                    <ScrollToTop />
                     <Routes>
                         {/* Public Routes with Layout */}
                         <Route path="/" element={<Layout><Outlet /></Layout>}>
