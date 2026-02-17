@@ -10,8 +10,28 @@ export const NotificationCenter = () => {
     const { user, isAdmin } = useAuth();
     const { items: cartItems } = useCart();
     const [isOpen, setIsOpen] = useState(false);
-    const [notifications, setNotifications] = useState<Notification[]>([]);
+    // Initialize from LocalStorage
+    const [notifications, setNotifications] = useState<Notification[]>(() => {
+        const saved = localStorage.getItem('cm_notifications');
+        return saved ? JSON.parse(saved) : [];
+    });
     const wrapperRef = useRef<HTMLDivElement>(null);
+
+    // Persist to LocalStorage whenever notifications change
+    useEffect(() => {
+        localStorage.setItem('cm_notifications', JSON.stringify(notifications));
+    }, [notifications]);
+
+    // Initialize dismissed IDs from LocalStorage to prevent reappearance
+    const [dismissedIds, setDismissedIds] = useState<string[]>(() => {
+        const saved = localStorage.getItem('cm_dismissed_ids');
+        return saved ? JSON.parse(saved) : [];
+    });
+
+    // Persist dismissed IDs
+    useEffect(() => {
+        localStorage.setItem('cm_dismissed_ids', JSON.stringify(dismissedIds));
+    }, [dismissedIds]);
 
     // Track when cart was last updated to trigger abandonment notification
     useEffect(() => {
@@ -30,16 +50,13 @@ export const NotificationCenter = () => {
             const now = Date.now();
             const minutesSinceUpdate = (now - lastActive) / 1000 / 60;
 
-            // Trigger if cart has items and it's been > 5 minutes (simulated for demo as > 0.5 min to verify quickly, 
-            // but user asked for 5 mins. I'll use 5 mins logic but maybe shorter for their testing if they want. 
-            // User explicit request: "in 5 mins". I will use 5 mins.)
-
+            // Trigger if cart has items and it's been > 5 minutes
             if (cartItems.length > 0 && minutesSinceUpdate >= 5) {
                 // Check if we already showed this notification recently to avoid spam
                 const lastNotified = parseInt(localStorage.getItem('cm_cart_notified_at') || '0');
                 if (now - lastNotified > 30 * 60 * 1000) { // Don't notify more than once every 30 mins
                     const notif: Notification = {
-                        id: `cart-abandon-${Date.now()}`,
+                        id: 'cart-abandon', // Stable ID to prevent duplicates if already present
                         type: 'announcement',
                         title: 'Items waiting for you!',
                         message: `You have ${cartItems.length} items in your cart. Complete your purchase now!`,
@@ -48,7 +65,6 @@ export const NotificationCenter = () => {
                         link: '/checkout'
                     };
                     newNotifications.push(notif);
-                    localStorage.setItem('cm_cart_notified_at', Date.now().toString());
                 }
             }
 
@@ -122,7 +138,27 @@ export const NotificationCenter = () => {
             }
 
             if (newNotifications.length > 0) {
-                setNotifications(prev => [...newNotifications, ...prev]);
+                setNotifications(prev => {
+                    // Update 'lastNotified' for cart abandon ONLY if we are actually adding it
+                    if (newNotifications.some(n => n.id === 'cart-abandon')) {
+                        // Only update timestamp if we are adding it (it's not already there)
+                        // OR if we are re-adding it (it was there but user dismissed it?)
+                        // Actually, logic is: if we decided to push 'cart-abandon' (based on time check),
+                        // update the timestamp now.
+                        localStorage.setItem('cm_cart_notified_at', Date.now().toString());
+                    }
+
+                    // Filter out already existing IDs AND dismissed IDs
+                    const existingIds = new Set(prev.map(n => n.id));
+                    const dismissedIdSet = new Set(dismissedIds);
+
+                    const uniqueNew = newNotifications.filter(n =>
+                        !existingIds.has(n.id) && !dismissedIdSet.has(n.id)
+                    );
+
+                    if (uniqueNew.length === 0) return prev;
+                    return [...uniqueNew, ...prev];
+                });
             }
         };
 
@@ -133,7 +169,7 @@ export const NotificationCenter = () => {
         const interval = setInterval(checkNotifications, 60 * 1000);
         return () => clearInterval(interval);
 
-    }, [cartItems, isAdmin, user]);
+    }, [cartItems, isAdmin, user, dismissedIds]);
 
 
     // Click outside handler
@@ -160,6 +196,7 @@ export const NotificationCenter = () => {
     const deleteNotification = (e: React.MouseEvent, id: string) => {
         e.stopPropagation();
         setNotifications(prev => prev.filter(n => n.id !== id));
+        setDismissedIds(prev => [...prev, id]);
     };
 
     const getIcon = (type: Notification['type']) => {
