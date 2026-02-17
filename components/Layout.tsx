@@ -51,7 +51,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       blue: '#4f46e5',   // Indigo-600
       purple: '#7c3aed', // Violet-600
       green: '#10b981',  // Emerald-500
-      orange: '#f97316'  // Orange-500
+      orange: '#f97316', // Orange-500
+      red: '#ef4444',    // Red-500
+      teal: '#14b8a6',   // Teal-500
+      pink: '#ec4899'    // Pink-500
     };
     // Set the CSS variable that Tailwind (v4) might use if configured, 
     // or we use it for custom styles
@@ -127,7 +130,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="min-h-screen bg-background flex flex-col font-sans text-slate-900">
+    <div className="min-h-screen bg-background flex flex-col font-sans text-slate-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300">
       <style>{`
         @keyframes slideInRight {
           from { transform: translateX(100%); opacity: 0; }
@@ -144,7 +147,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-40 bg-white border-b border-gray-100">
+      <nav className="sticky top-0 z-40 bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 
@@ -155,11 +158,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
-              <Link to="/products?category=New arrivals" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
+              <Link to="/products?category=New arrivals" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200 dark:hover:text-primary">
                 New arrivals
               </Link>
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <span className="text-sm font-medium text-gray-900 group-hover:text-primary">Women</span>
+                <span className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Women</span>
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Women's Mega Menu */}
@@ -206,7 +209,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-primary">Men</Link>
+                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Men</Link>
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Men's Mega Menu */}
@@ -251,7 +254,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 </div>
               </div>
-              <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors">
+              <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200">
                 Accessories
               </Link>
               <Link to="/products?on_sale=true" className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors">
@@ -265,7 +268,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="flex items-center gap-4 lg:gap-6">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
-                className="text-gray-900 hover:text-primary transition-colors"
+                className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200"
                 title="Search"
               >
                 {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
@@ -278,11 +281,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {isAuthenticated ? (
                 <div className="relative group">
                   {isAdmin ? (
-                    <div className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer">
+                    <div className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer dark:text-gray-200">
                       <UserIcon className="w-5 h-5" />
                     </div>
                   ) : (
-                    <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center">
+                    <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center dark:text-gray-200">
                       <UserIcon className="w-5 h-5" />
                     </Link>
                   )}
@@ -305,7 +308,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </div>
                 </div>
               ) : (
-                <Link to="/login" className="text-gray-900 hover:text-primary transition-colors">
+                <Link to="/login" className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200">
                   <UserIcon className="w-5 h-5" />
                 </Link>
               )}
@@ -313,14 +316,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <ThemeCustomizer isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)} />
 
               {/* Wishlist */}
-              <Link to="/wishlist" className="text-gray-900 hover:text-primary transition-colors relative">
+              <Link to="/wishlist" className="text-gray-900 hover:text-primary transition-colors relative dark:text-gray-200">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
               </Link>
 
               {/* Shopping Bag */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="text-gray-900 hover:text-primary transition-colors relative"
+                className="text-gray-900 hover:text-primary transition-colors relative dark:text-gray-200"
               >
                 <div className="relative">
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
@@ -334,7 +337,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               {/* Mobile Menu Toggle */}
               <div className="flex items-center lg:hidden">
-                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1 text-gray-900 rounded-md">
+                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1 text-gray-900 rounded-md dark:text-gray-200">
                   <Menu className="w-6 h-6" />
                 </button>
               </div>
@@ -515,10 +518,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           ></div>
           <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
             <div className="w-screen max-w-md animate-slide-in-right">
-              <div className="h-full flex flex-col bg-white shadow-2xl rounded-l-3xl overflow-hidden border-l border-white/50">
+              <div className="h-full flex flex-col bg-white shadow-2xl rounded-l-3xl overflow-hidden border-l border-white/50 dark:bg-gray-900 dark:border-gray-800">
                 {/* Header */}
-                <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50">
-                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
+                <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
+                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3 dark:text-white">
                     <div className="bg-primary/10 p-2 rounded-full text-primary">
                       <ShoppingCart className="w-5 h-5" />
                     </div>
@@ -596,7 +599,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
                 {/* Footer - Fixed at Bottom */}
                 {items.length > 0 && (
-                  <div className="border-t border-gray-100 p-6 bg-white z-10">
+                  <div className="border-t border-gray-100 p-6 bg-white z-10 dark:bg-gray-900 dark:border-gray-800">
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-base font-medium text-gray-500">
                         <p>Subtotal</p>
@@ -629,45 +632,45 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
 
-      <footer className="bg-white border-t border-gray-100 mt-auto">
+      <footer className="bg-white border-t border-gray-100 mt-auto dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto py-16 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
 
             {/* Column 1: Company Info */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Company Info</h3>
+              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Company Info</h3>
               <ul className="space-y-3">
-                <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-primary transition-colors">About Us</Link></li>
-                {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors">Affiliate</Link></li>}
-                <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-primary transition-colors">Fashion Blogger</Link></li>
+                <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">About Us</Link></li>
+                {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Affiliate</Link></li>}
+                <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Fashion Blogger</Link></li>
               </ul>
             </div>
 
             {/* Column 2: Help & Support */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Help & Support</h3>
+              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Help & Support</h3>
               <ul className="space-y-3">
-                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-primary transition-colors">Shipping Info</Link></li>
-                <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-primary transition-colors">Returns</Link></li>
-                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-primary transition-colors">How to Order</Link></li>
-                <li><Link to="/page/size-guide" className="text-sm text-gray-500 hover:text-primary transition-colors">Size Guide</Link></li>
+                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Shipping Info</Link></li>
+                <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Returns</Link></li>
+                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">How to Order</Link></li>
+                <li><Link to="/page/size-guide" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Size Guide</Link></li>
               </ul>
             </div>
 
             {/* Column 3: Customer Care */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Customer Care</h3>
+              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Customer Care</h3>
               <ul className="space-y-3">
-                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-primary transition-colors">Contact Us</Link></li>
-                <li><Link to="/page/payment-method" className="text-sm text-gray-500 hover:text-primary transition-colors">Payment Method</Link></li>
-                {!isAdmin && <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-primary transition-colors">Bonus Point System</Link></li>}
+                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Contact Us</Link></li>
+                <li><Link to="/page/payment-method" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Payment Method</Link></li>
+                {!isAdmin && <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Bonus Point System</Link></li>}
               </ul>
             </div>
 
             {/* Column 4: Newsletter / Socials (Optional but good for aesthetic) */}
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase">Stay Connected</h3>
-              <p className="text-sm text-gray-500">Sign up for our newsletter to get updates on new arrivals and special offers.</p>
+              <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Stay Connected</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Sign up for our newsletter to get updates on new arrivals and special offers.</p>
               <div className="flex space-x-4 pt-2">
                 {/* Social Icons Placeholder */}
                 <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">

@@ -47,8 +47,8 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                             <button
                                 onClick={() => setIsDarkMode(false)}
                                 className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all font-medium ${!isDarkMode
-                                        ? 'border-black bg-gray-50 text-black dark:border-white'
-                                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                                    ? 'border-black bg-gray-50 text-black dark:border-white'
+                                    : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
                                     }`}
                             >
                                 <Sun className="w-4 h-4" /> Light
@@ -56,8 +56,8 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                             <button
                                 onClick={() => setIsDarkMode(true)}
                                 className={`flex items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all font-medium ${isDarkMode
-                                        ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500'
-                                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                                    ? 'border-indigo-600 bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-500'
+                                    : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
                                     }`}
                             >
                                 <Moon className="w-4 h-4" /> Dark
@@ -72,7 +72,7 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                             Accent Color
                         </div>
                         <div className="grid grid-cols-4 gap-3">
-                            {['blue', 'purple', 'green', 'orange'].map((color) => (
+                            {['blue', 'purple', 'green', 'orange', 'red', 'teal', 'pink'].map((color) => (
                                 <button
                                     key={color}
                                     onClick={() => setThemeColor(color)}
@@ -83,7 +83,10 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                                             color === 'blue' ? '#3b82f6' :
                                                 color === 'purple' ? '#8b5cf6' :
                                                     color === 'green' ? '#10b981' :
-                                                        '#f97316'
+                                                        color === 'orange' ? '#f97316' :
+                                                            color === 'red' ? '#ef4444' :
+                                                                color === 'teal' ? '#14b8a6' :
+                                                                    '#ec4899' // pink
                                     }}
                                     title={color.charAt(0).toUpperCase() + color.slice(1)}
                                 >
@@ -124,8 +127,8 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                             <button
                                 onClick={() => setDensity('comfortable')}
                                 className={`p-3 rounded-xl border-2 transition-all font-medium text-sm ${density === 'comfortable'
-                                        ? 'border-black bg-white text-black dark:border-white dark:bg-gray-800 dark:text-white'
-                                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                                    ? 'border-black bg-white text-black dark:border-white dark:bg-gray-800 dark:text-white'
+                                    : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
                                     }`}
                             >
                                 Comfortable
@@ -133,8 +136,8 @@ export const ThemeCustomizer = ({ isOpen, onClose }: ThemeCustomizerProps) => {
                             <button
                                 onClick={() => setDensity('compact')}
                                 className={`p-3 rounded-xl border-2 transition-all font-medium text-sm ${density === 'compact'
-                                        ? 'border-black bg-white text-black dark:border-white dark:bg-gray-800 dark:text-white'
-                                        : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
+                                    ? 'border-black bg-white text-black dark:border-white dark:bg-gray-800 dark:text-white'
+                                    : 'border-transparent bg-gray-50 text-gray-500 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400'
                                     }`}
                             >
                                 Compact
