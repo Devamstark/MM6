@@ -36,5 +36,11 @@
             "destination": "https://mm6-backend.onrender.com/api/:path*",
             "permanent": false
         }
+    ],
+    "rewrites": [
+        {
+            "source": "/(.*)",
+            "destination": "/index.html"
+        }
     ]
 }
