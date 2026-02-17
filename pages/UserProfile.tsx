@@ -80,8 +80,17 @@ export const UserProfile = () => {
             data.append('email', formData.email);
             data.append('phone_number', formData.phoneNumber);
             data.append('bio', formData.bio);
+
             if (profileImage) {
-                data.append('profile_picture', profileImage);
+                // Convert to Base64
+                const reader = new FileReader();
+                reader.readAsDataURL(profileImage);
+                await new Promise((resolve) => {
+                    reader.onloadend = () => {
+                        data.append('profile_picture', reader.result as string);
+                        resolve(null);
+                    };
+                });
             }
 
             const updatedUser = await api.updateProfile(data);

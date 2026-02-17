@@ -25,6 +25,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
     bio = models.TextField(blank=True, null=True)
     bonus_points = models.IntegerField(default=0)
+    profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
 
     def __str__(self):
         return self.username

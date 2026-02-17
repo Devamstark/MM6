@@ -139,7 +139,7 @@ const mapUser = (u: any): User => ({
   lastName: u.last_name,
   email: u.email,
   phoneNumber: u.phone_number,
-  profilePicture: u.profile_picture ? getAbsoluteUrl(u.profile_picture) : undefined,
+  profilePicture: u.profile_picture && u.profile_picture.startsWith('data:') ? u.profile_picture : (u.profile_picture ? getAbsoluteUrl(u.profile_picture) : undefined),
   role: u.role,
   bio: u.bio,
   bonusPoints: u.bonus_points || 0,
