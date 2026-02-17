@@ -152,7 +152,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex justify-between items-center h-16">
 
             {/* Left: Logo */}
-            <Link to="/" className="flex-shrink-0 text-2xl font-bold tracking-widest text-black uppercase">
+            <Link to="/" className="flex-shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
               CLOUDMART
             </Link>
 

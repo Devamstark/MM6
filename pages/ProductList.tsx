@@ -76,7 +76,7 @@ export const ProductList = () => {
 
         {/* Sidebar Filters */}
         <aside className="w-full md:w-72 flex-shrink-0 animate-fade-up delay-100">
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 sticky top-24">
+          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 sticky top-24 dark:bg-gray-800 dark:border-gray-700">
             <FilterPanel
               filters={{
                 ...filters,
@@ -91,12 +91,12 @@ export const ProductList = () => {
 
         {/* Main Content */}
         <div className="flex-grow animate-fade-up delay-200">
-          <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
-            <div className="text-sm font-medium text-gray-600 px-2">
+          <div className="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+            <div className="text-sm font-medium text-gray-600 px-2 dark:text-gray-300">
               {products.length} {products.length === 1 ? 'item' : 'items'} found {filters.search && `for "${filters.search}"`}
             </div>
             <select
-              className="border-none bg-gray-50 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-100 cursor-pointer hover:bg-gray-100 transition-colors"
+              className="border-none bg-gray-50 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-100 cursor-pointer hover:bg-gray-100 transition-colors dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600"
               value={filters.sort}
               onChange={(e) => updateFilter('sort', e.target.value)}
             >
@@ -120,13 +120,13 @@ export const ProductList = () => {
               ))}
             </div>
           ) : (
-            <div className="bg-white p-16 text-center rounded-[2rem] shadow-sm border border-gray-100">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Loader2 className="w-8 h-8 text-gray-400" />
+            <div className="bg-white p-16 text-center rounded-[2rem] shadow-sm border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4 dark:bg-gray-700">
+                <Loader2 className="w-8 h-8 text-gray-400 dark:text-gray-500" />
               </div>
-              <h3 className="text-xl font-bold text-gray-900">No products found</h3>
-              <p className="text-gray-500 mt-2">Try adjusting your filters or search terms.</p>
-              <button onClick={clearFilters} className="mt-6 px-6 py-2 bg-indigo-50 text-indigo-600 rounded-full text-sm font-bold hover:bg-indigo-100 transition-colors">Clear all filters</button>
+              <h3 className="text-xl font-bold text-gray-900 dark:text-white">No products found</h3>
+              <p className="text-gray-500 mt-2 dark:text-gray-400">Try adjusting your filters or search terms.</p>
+              <button onClick={clearFilters} className="mt-6 px-6 py-2 bg-indigo-50 text-indigo-600 rounded-full text-sm font-bold hover:bg-indigo-100 transition-colors dark:bg-indigo-900/30 dark:text-indigo-300 dark:hover:bg-indigo-900/50">Clear all filters</button>
             </div>
           )}
         </div>
