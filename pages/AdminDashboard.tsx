@@ -6,10 +6,11 @@ import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, 
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
+import { AdminAnalytics } from '../components/AdminAnalytics';
 
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -152,10 +153,10 @@ export const AdminDashboard = () => {
 
   // derived state
   const sellers = users.filter(u => u.role === 'seller');
-  const getSellerProductCount = (sellerId: number) => products.filter(p => p.userId === sellerId).length;
+  const getSellerProductCount = (sellerId: string) => products.filter(p => p.userId === sellerId).length;
 
   const filteredOrders = sellerFilter
-    ? orders.filter(order => order.items?.some(item => item.userId === parseInt(sellerFilter)))
+    ? orders.filter(order => order.items?.some(item => item.userId === sellerFilter))
     : orders;
 
   const [isUploading, setIsUploading] = useState(false);
@@ -211,7 +212,7 @@ export const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-3 mb-12 w-full animate-fade-up delay-100">
-          {['overview', 'products', 'sellers', 'users', 'orders', 'messages'].map((tab) => (
+          {['overview', 'products', 'sellers', 'users', 'orders', 'messages', 'analytics'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -709,6 +710,10 @@ export const AdminDashboard = () => {
               </div>
               {messages.length === 0 && <div className="p-12 text-center text-gray-500 font-medium">No messages found.</div>}
             </div>
+          )}
+
+          {activeTab === 'analytics' && (
+            <AdminAnalytics orders={orders} products={products} />
           )}
 
 
