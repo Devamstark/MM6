@@ -135,17 +135,34 @@ const mapOrder = (o: any): Order => ({
 const mapUser = (u: any): User => ({
   id: u.id,
   name: u.first_name ? `${u.first_name} ${u.last_name}`.trim() : (u.username || u.email),
+  firstName: u.first_name,
+  lastName: u.last_name,
   email: u.email,
+  phoneNumber: u.phone_number,
+  profilePicture: u.profile_picture ? getAbsoluteUrl(u.profile_picture) : undefined,
   role: u.role,
   bio: u.bio,
   bonusPoints: u.bonus_points || 0,
   isActive: u.is_active,
   createdAt: u.date_joined,
-  token: u.token // preserved if exists
+  lastLogin: u.last_login,
+  token: u.token, // preserved if exists
+  addresses: (u.addresses || []).map((a: any) => ({
+    id: a.id,
+    fullName: a.full_name,
+    street: a.street,
+    city: a.city,
+    state: a.state,
+    postalCode: a.postal_code,
+    country: a.country,
+    phone: a.phone,
+    isDefault: a.is_default,
+    type: a.type
+  }))
 });
 
 export const api = {
-  // --- Auth ---
+  // --- Auth & User Profile ---
   login: async (email: string, password: string): Promise<AuthResponse> => {
     try {
       const response = await client.post('/auth/login/', { username: email, password });
@@ -166,6 +183,95 @@ export const api = {
     } catch (error) {
       throw new Error('Invalid credentials');
     }
+  },
+
+  updateProfile: async (data: FormData): Promise<User> => {
+    const response = await client.patch('/users/me/', data, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    const user = mapUser(response.data);
+    localStorage.setItem('cm_user_data', JSON.stringify(user));
+    return user;
+  },
+
+  changePassword: async (oldPassword: string, newPassword: string): Promise<void> => {
+    await client.post('/users/change_password/', {
+      old_password: oldPassword,
+      new_password: newPassword
+    });
+  },
+
+  // --- Addresses ---
+  getAddresses: async (): Promise<import('../types').Address[]> => {
+    const response = await client.get('/users/addresses/');
+    return response.data.map((a: any) => ({
+      id: a.id,
+      fullName: a.full_name,
+      street: a.street,
+      city: a.city,
+      state: a.state,
+      postalCode: a.postal_code,
+      country: a.country,
+      phone: a.phone,
+      isDefault: a.is_default,
+      type: a.type
+    }));
+  },
+
+  addAddress: async (address: Omit<import('../types').Address, 'id'>): Promise<import('../types').Address> => {
+    const response = await client.post('/users/addresses/', {
+      full_name: address.fullName,
+      street: address.street,
+      city: address.city,
+      state: address.state,
+      postal_code: address.postalCode,
+      country: address.country,
+      phone: address.phone,
+      is_default: address.isDefault,
+      type: address.type
+    });
+    return {
+      id: response.data.id,
+      ...address
+    };
+  },
+
+  updateAddress: async (id: string, address: Partial<import('../types').Address>): Promise<import('../types').Address> => {
+    const payload: any = {};
+    if (address.fullName) payload.full_name = address.fullName;
+    if (address.street) payload.street = address.street;
+    if (address.city) payload.city = address.city;
+    if (address.state) payload.state = address.state;
+    if (address.postalCode) payload.postal_code = address.postalCode;
+    if (address.country) payload.country = address.country;
+    if (address.phone) payload.phone = address.phone;
+    if (address.isDefault !== undefined) payload.is_default = address.isDefault;
+    if (address.type) payload.type = address.type;
+
+    const response = await client.patch(`/users/addresses/${id}/`, payload);
+    return {
+      id: response.data.id,
+      ...address
+    } as import('../types').Address;
+  },
+
+  deleteAddress: async (id: string): Promise<void> => {
+    await client.delete(`/users/addresses/${id}/`);
+  },
+
+  getUserReviews: async (): Promise<import('../types').Review[]> => {
+    const response = await client.get('/reviews/my_reviews/'); // Assuming endpoint
+    return response.data.map((r: any) => ({
+      id: r.id,
+      productId: r.product.id || r.product, // Handle populated or ID
+      productName: r.product.name, // If populated
+      productImage: r.product.image, // If populated
+      userId: r.user,
+      userName: r.user_name,
+      rating: r.rating,
+      comment: r.comment,
+      createdAt: r.created_at
+    }));
   },
 
   register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {

@@ -18,6 +18,7 @@ import { ResetPassword } from './pages/ResetPassword';
 import { BonusPoints } from './pages/BonusPoints';
 import { Affiliate } from './pages/Affiliate';
 import { StaticPage } from './pages/StaticPage';
+import { UserProfile } from './pages/UserProfile';
 
 // Simple placeholder for pages we mapped but files were missing or renamed
 import { OrderHistory } from './pages/OrderHistory';
@@ -57,6 +58,7 @@ function App() {
                                 <Route path="wishlist" element={<Wishlist />} />
                                 <Route path="points" element={<BonusPoints />} />
                                 <Route path="affiliate" element={<Affiliate />} />
+                                <Route path="profile" element={<UserProfile />} />
                             </Route>
 
                             {/* Protected Seller Routes */}

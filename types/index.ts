@@ -1,13 +1,33 @@
+export interface Address {
+    id: string;
+    fullName: string;
+    street: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+    phone: string;
+    isDefault: boolean;
+    type: 'shipping' | 'billing';
+}
+
 export interface User {
     id: string;
     name: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
+    phoneNumber?: string;
+    profilePicture?: string;
     role: 'user' | 'seller' | 'admin';
     bio?: string;
     bonusPoints?: number;
     isActive?: boolean;
     createdAt?: string;
+    lastLogin?: string;
     token?: string;
+    addresses?: Address[];
+    isAffiliate?: boolean;
 }
 
 export interface AuthResponse {
@@ -56,6 +76,8 @@ export interface Review {
     rating: number;
     comment: string;
     createdAt: string;
+    productName?: string;
+    productImage?: string;
 }
 
 export interface ProductFilter {

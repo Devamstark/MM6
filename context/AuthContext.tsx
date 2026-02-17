@@ -10,6 +10,7 @@ interface AuthContextType {
   isSeller: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,7 +24,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const token = localStorage.getItem('cm_token');
     if (storedUser && token) {
       try {
-        setUser(JSON.parse(storedUser));
+        const u = JSON.parse(storedUser);
+        setUser(u);
       } catch (e) {
         console.error("Failed to parse user data", e);
         // If parse fails, clear storage to avoid loop
@@ -51,7 +53,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAdmin: user?.role === 'admin',
       isSeller: user?.role === 'seller',
       login,
-      logout
+      logout,
+      setUser
     }}>
       {children}
     </AuthContext.Provider>

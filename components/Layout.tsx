@@ -285,7 +285,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       <UserIcon className="w-5 h-5" />
                     </div>
                   ) : (
-                    <Link to="/bonus-points" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center dark:text-gray-200">
+                    <Link to="/profile" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center dark:text-gray-200">
                       <UserIcon className="w-5 h-5" />
                     </Link>
                   )}
@@ -296,6 +296,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         <p className="text-xs font-bold text-gray-900 truncate">{user?.name}</p>
                         <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
                       </div>
+                      <Link to="/profile" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">My Profile</Link>
                       {isAdmin && <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Admin Dashboard</Link>}
                       {isSeller && <Link to="/seller" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Seller Dashboard</Link>}
                       {!isAdmin && <Link to="/affiliate" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Affiliate</Link>}
