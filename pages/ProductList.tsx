@@ -73,6 +73,16 @@ export const ProductList = () => {
   return (
     <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-up">
       <div className="flex flex-col md:flex-row gap-8">
+        {/* Dynamic Page Title */}
+        <div className="w-full mb-8 px-2 md:hidden">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white capitalize">
+            {filters.search ? `Results for "${filters.search}"` :
+              filters.category ? filters.category :
+                filters.sort === 'newest' ? 'New Arrivals' :
+                  filters.onSale ? 'Sale Items' :
+                    'All Products'}
+          </h1>
+        </div>
 
         {/* Sidebar Filters */}
         <aside className="w-full md:w-72 flex-shrink-0 animate-fade-up delay-100">

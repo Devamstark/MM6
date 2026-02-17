@@ -158,8 +158,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
-              <Link to="/products?category=New arrivals" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200 dark:hover:text-primary">
-                New arrivals
+              <Link to="/products?sort=newest" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200 dark:hover:text-primary">
+                New Arrivals
               </Link>
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
                 <span className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Women</span>
@@ -430,14 +430,19 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                             </Link>
                           ))
                         ) : (
-                          ['Women', 'Men', 'Accessories', 'New arrivals'].map((c) => (
+                          [
+                            { name: 'New Arrivals', to: '/products?sort=newest' },
+                            { name: 'Women', to: '/products?category=Women' },
+                            { name: 'Men', to: '/products?category=Men' },
+                            { name: 'Accessories', to: '/products?category=Accessories' }
+                          ].map((item) => (
                             <Link
-                              key={c}
-                              to={`/products?category=${c}`}
+                              key={item.name}
+                              to={item.to}
                               onClick={() => setSearchOpen(false)}
                               className="py-3 px-4 hover:bg-gray-50 text-gray-600 hover:text-black font-bold rounded-xl transition-all flex items-center justify-between group"
                             >
-                              {c}
+                              {item.name}
                               <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
                             </Link>
                           ))
@@ -499,7 +504,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </form>
             </div>
             <div className="px-4 py-4 space-y-1">
-              <Link to="/products?category=New arrivals" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">New arrivals</Link>
+              <Link to="/products?sort=newest" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">New Arrivals</Link>
               <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Women</Link>
               <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Men</Link>
               <Link to="/products?category=Accessories" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Accessories</Link>
