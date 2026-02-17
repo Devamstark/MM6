@@ -22,7 +22,9 @@ export const ProductList = () => {
     search: searchParams.get('search') || '',
     isFeatured: searchParams.get('isFeatured'),
     isPopular: searchParams.get('isPopular'),
-    onSale: searchParams.get('on_sale') === 'true'
+    onSale: searchParams.get('on_sale') === 'true',
+    flashSale: searchParams.get('flash_sale') === 'true',
+    isNew: searchParams.get('sort') === 'newest'
   };
 
   useEffect(() => {
@@ -47,8 +49,17 @@ export const ProductList = () => {
         sort,
       };
 
-      const data = await api.getProducts(apiFilters);
-      setProducts(data);
+      let productsData = await api.getProducts(apiFilters);
+
+      // Client-side filtering for Flash Sales
+      if (filters.flashSale) {
+        const now = new Date();
+        productsData = productsData.filter(p =>
+          p.flashSaleEnd && new Date(p.flashSaleEnd) > now
+        );
+      }
+
+      setProducts(productsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -78,9 +89,10 @@ export const ProductList = () => {
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white capitalize">
             {filters.search ? `Results for "${filters.search}"` :
               filters.category ? filters.category :
-                filters.sort === 'newest' ? 'New Arrivals' :
-                  filters.onSale ? 'Sale Items' :
-                    'All Products'}
+                filters.flashSale ? 'Flash Sale' :
+                  filters.sort === 'newest' ? 'New Arrivals' :
+                    filters.onSale ? 'Sale Items' :
+                      'All Products'}
           </h1>
         </div>
 

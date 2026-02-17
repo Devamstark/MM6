@@ -159,7 +159,7 @@ export const Home = () => {
             </div>
 
             <Link
-              to="/products"
+              to="/products?flash_sale=true"
               className="px-12 py-5 bg-black text-white font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition-all shadow-2xl hover:shadow-black/20 hover:-translate-y-1 z-10 group-hover:scale-105 dark:bg-white dark:text-black dark:hover:bg-gray-200 dark:hover:shadow-white/20"
             >
               Shop the Drop
