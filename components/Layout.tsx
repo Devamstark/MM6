@@ -8,6 +8,7 @@ import { SearchSuggestions } from '../types';
 import { Clock, TrendingUp, History } from 'lucide-react';
 import { useAtom } from 'jotai';
 import { searchQueryAtom, isCartOpenAtom } from '../store/atoms';
+import { NotificationCenter } from './NotificationCenter';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
@@ -222,8 +223,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </Link>
             </div>
 
+
+
             {/* Right: Icons */}
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 lg:gap-6">
               <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="text-gray-900 hover:text-primary transition-colors"
@@ -231,6 +234,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               >
                 {searchOpen ? <X className="w-5 h-5" /> : <Search className="w-5 h-5" />}
               </button>
+
+              <NotificationCenter />
+
 
               {/* User Account */}
               {isAuthenticated ? (

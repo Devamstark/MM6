@@ -133,3 +133,13 @@ export interface SearchSuggestions {
     categories: string[];
     products: Product[];
 }
+
+export interface Notification {
+    id: string;
+    type: 'order_update' | 'price_drop' | 'restock' | 'announcement';
+    title: string;
+    message: string;
+    date: string;
+    read: boolean;
+    link?: string;
+}
