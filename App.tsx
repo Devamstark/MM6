@@ -48,19 +48,23 @@ function App() {
                             <Route path="privacy" element={<StaticPage page="privacy" />} />
 
                             {/* Protected User Routes */}
-                            {/* Note: ProtectedRoute likely expects Outlet or children */}
-                            {/* Assuming simple auth check */}
-                            <Route path="checkout" element={<Checkout />} />
-                            <Route path="orders" element={<OrderHistory />} />
-                            <Route path="wishlist" element={<Wishlist />} />
-                            <Route path="points" element={<BonusPoints />} />
-                            <Route path="affiliate" element={<Affiliate />} />
+                            <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
+                                <Route path="checkout" element={<Checkout />} />
+                                <Route path="orders" element={<OrderHistory />} />
+                                <Route path="wishlist" element={<Wishlist />} />
+                                <Route path="points" element={<BonusPoints />} />
+                                <Route path="affiliate" element={<Affiliate />} />
+                            </Route>
 
                             {/* Protected Seller Routes */}
-                            <Route path="seller" element={<SellerDashboard />} />
+                            <Route element={<ProtectedRoute allowedRoles={['seller', 'admin']} />}>
+                                <Route path="seller" element={<SellerDashboard />} />
+                            </Route>
 
                             {/* Protected Admin Routes */}
-                            <Route path="admin" element={<AdminDashboard />} />
+                            <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                                <Route path="admin" element={<AdminDashboard />} />
+                            </Route>
 
                             {/* Catch-all for 404 */}
                             <Route path="*" element={<Navigate to="/" replace />} />

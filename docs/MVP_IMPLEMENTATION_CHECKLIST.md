@@ -313,7 +313,7 @@ This checklist tracks the implementation status of all MVP features for the Clou
 
 ### Low Priority (Nice to Have)
 10. [ ] Create user onboarding guide
-11. [ ] Add dark mode toggle
+11. [x] Add dark mode toggle
 12. [ ] Implement email notifications
 
 ---

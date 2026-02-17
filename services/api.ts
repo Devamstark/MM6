@@ -10,14 +10,66 @@ const client = axios.create({
   },
 });
 
-// Add JWT to headers
+// Helper to get cookie by name
+const getCookie = (name: string) => {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
+    }
+  }
+  return cookieValue;
+};
+
+// Request Interceptor: Auth & CSRF
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('cm_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Add CSRF Token for mutation methods
+  if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase() || '')) {
+    const csrfToken = getCookie('csrftoken'); // Django default name
+    if (csrfToken) {
+      config.headers['X-CSRFToken'] = csrfToken;
+    }
+  }
+
   return config;
 });
+
+// Response Interceptor: Error Logging
+client.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const { config, response } = error;
+    const url = config?.url;
+    const method = config?.method?.toUpperCase();
+
+    if (response) {
+      // Server responded with error status
+      console.error(`[API Error] ${method} ${url}`, {
+        status: response.status,
+        data: response.data,
+        headers: response.headers,
+      });
+    } else if (error.request) {
+      // Request made but no response
+      console.error(`[API Network Error] ${method} ${url}`, error.request);
+    } else {
+      // Setup error
+      console.error(`[API Setup Error] ${error.message}`);
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 // Helper to ensure absolute URL
 const getAbsoluteUrl = (url: string | null | undefined) => {
