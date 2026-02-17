@@ -29,3 +29,9 @@ export const cartTotalAtom = atom((get) => {
 export const isCartOpenAtom = atom(false);
 export const isMobileMenuOpenAtom = atom(false);
 export const searchQueryAtom = atom('');
+
+// Theme State
+export const isDarkModeAtom = atom<boolean>(localStorage.getItem('cm_theme_mode') === 'dark');
+export const themeColorAtom = atom<string>(localStorage.getItem('cm_theme_color') || 'blue');
+export const fontScaleAtom = atom<number>(parseFloat(localStorage.getItem('cm_font_scale') || '1'));
+export const densityAtom = atom<string>(localStorage.getItem('cm_density') || 'comfortable');

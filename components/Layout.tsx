@@ -7,8 +7,9 @@ import { api } from '../services/api';
 import { SearchSuggestions } from '../types';
 import { Clock, TrendingUp, History } from 'lucide-react';
 import { useAtom } from 'jotai';
-import { searchQueryAtom, isCartOpenAtom } from '../store/atoms';
+import { searchQueryAtom, isCartOpenAtom, isDarkModeAtom, themeColorAtom, fontScaleAtom, densityAtom } from '../store/atoms';
 import { NotificationCenter } from './NotificationCenter';
+import { ThemeCustomizer } from './ThemeCustomizer';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
@@ -23,6 +24,41 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [isTrendingOpen, setIsTrendingOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useAtom(isCartOpenAtom);
+  const [isThemeOpen, setIsThemeOpen] = useState(false);
+  const [isDarkMode] = useAtom(isDarkModeAtom);
+  const [themeColor] = useAtom(themeColorAtom);
+  const [fontScale] = useAtom(fontScaleAtom);
+  const [density] = useAtom(densityAtom);
+
+  // Apply Theme Settings
+  React.useEffect(() => {
+    // 1. Dark Mode
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
+    // 2. Font Scale
+    // We set a CSS variable that can be used or just set root font-size percentage
+    document.documentElement.style.fontSize = `${fontScale * 100}%`;
+
+    // 3. Density
+    document.body.setAttribute('data-density', density);
+
+    // 4. Theme Color
+    const colors: Record<string, string> = {
+      blue: '#4f46e5',   // Indigo-600
+      purple: '#7c3aed', // Violet-600
+      green: '#10b981',  // Emerald-500
+      orange: '#f97316'  // Orange-500
+    };
+    // Set the CSS variable that Tailwind (v4) might use if configured, 
+    // or we use it for custom styles
+    document.documentElement.style.setProperty('--primary-color', colors[themeColor]);
+
+    // Also try to set a text color for immediate feedback if using inline styles somewhere
+  }, [isDarkMode, themeColor, fontScale, density]);
 
   // Sync search query from URL on mount
   React.useEffect(() => {
@@ -260,6 +296,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       {isAdmin && <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Admin Dashboard</Link>}
                       {isSeller && <Link to="/seller" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Seller Dashboard</Link>}
                       {!isAdmin && <Link to="/affiliate" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Affiliate</Link>}
+                      <button onClick={() => setIsThemeOpen(true)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between">
+                        Theme & Display
+                        <div className="w-2 h-2 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500"></div>
+                      </button>
                       <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 mt-1">Sign out</button>
                     </div>
                   </div>
@@ -269,6 +309,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   <UserIcon className="w-5 h-5" />
                 </Link>
               )}
+
+              <ThemeCustomizer isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)} />
 
               {/* Wishlist */}
               <Link to="/wishlist" className="text-gray-900 hover:text-primary transition-colors relative">

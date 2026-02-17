@@ -1,10 +1,14 @@
 @import "tailwindcss";
 
+:root {
+    --primary-color: #4F46E5;
+}
+
 @theme {
     --font-display: "Outfit", "sans-serif";
     --font-body: "Inter", "sans-serif";
 
-    --color-primary: #4F46E5;
+    --color-primary: var(--primary-color);
     --color-primary-foreground: #FFFFFF;
 
     --color-secondary: #1F2937;
@@ -61,7 +65,7 @@
 /* Base Styles */
 @layer base {
     body {
-        @apply antialiased text-gray-900 bg-gray-50;
+        @apply antialiased text-gray-900 bg-gray-50 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-300;
         font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     }
 }
