@@ -106,6 +106,14 @@ export const ProductDetail = () => {
                     setMainImage(data.imageUrl);
                     if (data.sizes && data.sizes.length > 0) setSelectedSize(data.sizes[0]);
                     if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0]);
+
+                    // Track OOS visits for Back-in-Stock Notifications
+                    if (data.stock <= 0) {
+                        const visitedOoS = JSON.parse(localStorage.getItem('cm_visited_oos') || '[]');
+                        if (!visitedOoS.includes(data.id)) {
+                            localStorage.setItem('cm_visited_oos', JSON.stringify([...visitedOoS, data.id]));
+                        }
+                    }
                 }
             } catch (err) {
                 console.error(err);

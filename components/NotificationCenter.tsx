@@ -1,90 +1,140 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, Package, Tag, RefreshCw, Info, Check, Trash2, X } from 'lucide-react';
+import { Bell, Package, Tag, RefreshCw, Info, Check, Trash2, X, ShoppingCart } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { Notification } from '../types';
+import { useCart } from '../context/CartContext';
+import { Notification, Product } from '../types';
 import { Link } from 'react-router-dom';
+import { api } from '../services/api';
 
 export const NotificationCenter = () => {
     const { user, isAdmin } = useAuth();
+    const { items: cartItems } = useCart();
     const [isOpen, setIsOpen] = useState(false);
     const [notifications, setNotifications] = useState<Notification[]>([]);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
-    // Mock Notification Generator
+    // Track when cart was last updated to trigger abandonment notification
     useEffect(() => {
-        const generateNotifications = () => {
+        if (cartItems.length > 0) {
+            localStorage.setItem('cm_cart_last_active', Date.now().toString());
+        }
+    }, [cartItems]);
+
+    // Generate REAL-TIME Notifications
+    useEffect(() => {
+        const checkNotifications = async () => {
             const newNotifications: Notification[] = [];
 
-            if (isAdmin) {
-                newNotifications.push({
-                    id: '1',
-                    type: 'order_update',
-                    title: 'New Order Received',
-                    message: 'Order #3029 by John Doe ($129.00)',
-                    date: '2 mins ago',
-                    read: false,
-                    link: '/admin',
-                });
-                newNotifications.push({
-                    id: '2',
-                    type: 'restock',
-                    title: 'Low Stock Alert',
-                    message: 'Premium Cotton T-Shirt (L) is below 5 units.',
-                    date: '1 hour ago',
-                    read: false,
-                    link: '/admin',
-                });
-                newNotifications.push({
-                    id: '3',
-                    type: 'announcement',
-                    title: 'System Update',
-                    message: 'Maintenance scheduled for tonight at 2 AM.',
-                    date: '5 hours ago',
-                    read: true,
-                });
-            } else {
-                newNotifications.push({
-                    id: '4',
-                    type: 'order_update',
-                    title: 'Order Shipped!',
-                    message: 'Your order #2045 is on its way.',
-                    date: 'Just now',
-                    read: false,
-                    link: '/orders',
-                });
-                newNotifications.push({
-                    id: '5',
-                    type: 'price_drop',
-                    title: 'Price Drop Alert',
-                    message: 'An item in your wishlist is now on sale!',
-                    date: '30 mins ago',
-                    read: false,
-                    link: '/wishlist',
-                });
-                newNotifications.push({
-                    id: '6',
-                    type: 'restock',
-                    title: 'Back in Stock',
-                    message: 'The "Vintage Denim Jacket" is back!',
-                    date: '2 hours ago',
-                    read: true,
-                    link: '/products',
-                });
-                newNotifications.push({
-                    id: '7',
-                    type: 'announcement',
-                    title: 'Flash Sale',
-                    message: 'Winter Sale starts in 24 hours. Get ready!',
-                    date: '1 day ago',
-                    read: true,
-                    link: '/products?sort=price_asc',
-                });
+            // 1. Cart Abandonment (Real-time check)
+            const lastActive = parseInt(localStorage.getItem('cm_cart_last_active') || '0');
+            const now = Date.now();
+            const minutesSinceUpdate = (now - lastActive) / 1000 / 60;
+
+            // Trigger if cart has items and it's been > 5 minutes (simulated for demo as > 0.5 min to verify quickly, 
+            // but user asked for 5 mins. I'll use 5 mins logic but maybe shorter for their testing if they want. 
+            // User explicit request: "in 5 mins". I will use 5 mins.)
+
+            if (cartItems.length > 0 && minutesSinceUpdate >= 5) {
+                // Check if we already showed this notification recently to avoid spam
+                const lastNotified = parseInt(localStorage.getItem('cm_cart_notified_at') || '0');
+                if (now - lastNotified > 30 * 60 * 1000) { // Don't notify more than once every 30 mins
+                    const notif: Notification = {
+                        id: `cart-abandon-${Date.now()}`,
+                        type: 'announcement',
+                        title: 'Items waiting for you!',
+                        message: `You have ${cartItems.length} items in your cart. Complete your purchase now!`,
+                        date: 'Just now',
+                        read: false,
+                        link: '/checkout'
+                    };
+                    newNotifications.push(notif);
+                    localStorage.setItem('cm_cart_notified_at', Date.now().toString());
+                }
             }
-            setNotifications(newNotifications);
+
+            // 2. Back in Stock (Real-time check based on visited OOS history)
+            const visitedOoSIds = JSON.parse(localStorage.getItem('cm_visited_oos') || '[]');
+            if (visitedOoSIds.length > 0) {
+                try {
+                    const allProducts = await api.getProducts(); // Fetch latest stock
+                    const backInStock = allProducts.filter(p => visitedOoSIds.includes(p.id) && p.stock > 0);
+
+                    backInStock.forEach(p => {
+                        newNotifications.push({
+                            id: `restock-${p.id}`,
+                            type: 'restock',
+                            title: 'Back in Stock!',
+                            message: `Good news! ${p.name} is now available.`,
+                            date: 'Just now',
+                            read: false,
+                            link: `/product/${p.id}`
+                        });
+                        // Remove from tracking so we don't notify again
+                        const newVisited = visitedOoSIds.filter((id: string) => id !== p.id);
+                        localStorage.setItem('cm_visited_oos', JSON.stringify(newVisited));
+                    });
+                } catch (e) {
+                    console.error("Failed to check stock", e);
+                }
+            }
+
+            // 3. Admin: Low Stock Alerts (Real-time)
+            if (isAdmin) {
+                try {
+                    const allProducts = await api.getProducts();
+                    const lowStock = allProducts.filter(p => p.stock < 5 && p.stock > 0);
+                    lowStock.forEach(p => {
+                        newNotifications.push({
+                            id: `low-stock-${p.id}`,
+                            type: 'restock', // Reusing restock type for stock alerts
+                            title: 'Low Stock Alert',
+                            message: `${p.name} has only ${p.stock} units left.`,
+                            date: 'Action needed',
+                            read: false,
+                            link: '/admin'
+                        });
+                    });
+                    // Admin: New Orders (Simulated by checking recent orders vs last checked time)
+                    // For MVP without backend sockets, we can just show the latest pending order if it's "new"
+                    const orders = await api.getRecentOrders();
+                    const pendingOrders = orders.filter(o => o.status === 'pending');
+                    if (pendingOrders.length > 0) {
+                        const latest = pendingOrders[0];
+                        // Simple dedup by ID
+                        const notifiedOrders = JSON.parse(localStorage.getItem('cm_notified_orders') || '[]');
+                        if (!notifiedOrders.includes(latest.id)) {
+                            newNotifications.push({
+                                id: `order-${latest.id}`,
+                                type: 'order_update',
+                                title: 'New Order Received',
+                                message: `Order #${latest.id} from ${latest.customerName} ($${latest.totalPrice})`,
+                                date: 'New',
+                                read: false,
+                                link: '/admin'
+                            });
+                            localStorage.setItem('cm_notified_orders', JSON.stringify([...notifiedOrders, latest.id]));
+                        }
+                    }
+
+                } catch (e) {
+                    console.error("Admin check failed", e);
+                }
+            }
+
+            if (newNotifications.length > 0) {
+                setNotifications(prev => [...newNotifications, ...prev]);
+            }
         };
 
-        generateNotifications();
-    }, [isAdmin, user]);
+        // Initial check
+        checkNotifications();
+
+        // Poll every minute for "Real Time" feel
+        const interval = setInterval(checkNotifications, 60 * 1000);
+        return () => clearInterval(interval);
+
+    }, [cartItems, isAdmin, user]);
+
 
     // Click outside handler
     useEffect(() => {
@@ -151,11 +201,13 @@ export const NotificationCenter = () => {
                     <div className="p-5 border-b border-gray-100 bg-white/80 backdrop-blur-md flex justify-between items-center sticky top-0 z-10">
                         <div>
                             <h3 className="font-black text-gray-900 text-lg tracking-tight">Updates</h3>
-                            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-                                {unreadCount} Unread
-                            </p>
+                            {user && (
+                                <p className="text-xs font-bold text-gray-400 uppercase tracking-wider">
+                                    {unreadCount} Unread
+                                </p>
+                            )}
                         </div>
-                        {unreadCount > 0 && (
+                        {user && unreadCount > 0 && (
                             <button
                                 onClick={markAllRead}
                                 className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-full transition-colors"
@@ -165,66 +217,78 @@ export const NotificationCenter = () => {
                         )}
                     </div>
 
-                    <div className="max-h-[400px] overflow-y-auto p-2 space-y-1">
-                        {notifications.length > 0 ? (
-                            notifications.map((n, i) => (
-                                <div
-                                    key={n.id}
-                                    onClick={() => markAsRead(n.id)}
-                                    className={`relative group p-4 rounded-2xl transition-all duration-300 cursor-pointer border border-transparent
-                                        ${n.read ? 'hover:bg-gray-50 bg-white' : 'bg-blue-50/30 hover:bg-blue-50 border-blue-100 shadow-sm'}
-                                    `}
-                                    style={{ animationDelay: `${i * 50}ms` }}
-                                >
-                                    {n.link ? (
-                                        <Link to={n.link} className="absolute inset-0 z-0" onClick={() => setIsOpen(false)} />
-                                    ) : (
-                                        <div className="absolute inset-0 z-0" />
-                                    )}
-
-                                    <div className="relative z-10 flex gap-4">
-                                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${getBgColor(n.type)} shadow-sm border border-white`}>
-                                            {getIcon(n.type)}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start">
-                                                <h4 className={`text-sm font-bold truncate pr-6 ${n.read ? 'text-gray-700' : 'text-gray-900'}`}>
-                                                    {n.title}
-                                                </h4>
-                                                <span className="text-[10px] font-bold text-gray-400 whitespace-nowrap bg-white px-2 py-0.5 rounded-full border border-gray-100 shadow-sm">
-                                                    {n.date}
-                                                </span>
-                                            </div>
-                                            <p className={`text-xs mt-1 line-clamp-2 ${n.read ? 'text-gray-500' : 'text-gray-600 font-medium'}`}>
-                                                {n.message}
-                                            </p>
-                                        </div>
-
-                                        <button
-                                            onClick={(e) => deleteNotification(e, n.id)}
-                                            className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-all p-1.5 bg-white text-gray-400 hover:text-red-500 rounded-full shadow-md border border-gray-100 z-20 hover:scale-110"
-                                            title="Dismiss"
-                                        >
-                                            <X className="w-3 h-3" />
-                                        </button>
-                                    </div>
-                                    {!n.read && (
-                                        <div className="absolute top-1/2 -left-1 w-2 h-2 bg-indigo-500 rounded-full transform -translate-y-1/2 ring-4 ring-white shadow-sm" />
-                                    )}
-                                </div>
-                            ))
-                        ) : (
-                            <div className="py-12 text-center text-gray-500">
-                                <Bell className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-                                <p className="text-sm font-medium">No new notifications</p>
+                    {!user ? (
+                        <div className="p-8 text-center flex flex-col items-center justify-center space-y-4">
+                            <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-2">
+                                <Bell className="w-8 h-8 text-gray-300" />
                             </div>
-                        )}
-                    </div>
-                    {notifications.length > 0 && (
-                        <div className="p-3 bg-gray-50 border-t border-gray-100 text-center">
-                            <button className="text-xs font-bold text-gray-500 hover:text-indigo-600 transition-colors">
-                                View History
-                            </button>
+                            <div>
+                                <h4 className="font-bold text-gray-900 mb-1">Login Required</h4>
+                                <p className="text-sm text-gray-500 mb-4">Please login to view your notifications.</p>
+                                <Link
+                                    to="/login"
+                                    onClick={() => setIsOpen(false)}
+                                    className="inline-block px-6 py-2 bg-black text-white text-sm font-bold rounded-full hover:bg-gray-800 transition-colors"
+                                >
+                                    Login Now
+                                </Link>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="max-h-[400px] overflow-y-auto p-2 space-y-1">
+                            {notifications.length > 0 ? (
+                                notifications.map((n, i) => (
+                                    <div
+                                        key={n.id}
+                                        onClick={() => markAsRead(n.id)}
+                                        className={`relative group p-4 rounded-2xl transition-all duration-300 cursor-pointer border border-transparent
+                                            ${n.read ? 'hover:bg-gray-50 bg-white' : 'bg-blue-50/30 hover:bg-blue-50 border-blue-100 shadow-sm'}
+                                        `}
+                                        style={{ animationDelay: `${i * 50}ms` }}
+                                    >
+                                        {n.link ? (
+                                            <Link to={n.link} className="absolute inset-0 z-0" onClick={() => setIsOpen(false)} />
+                                        ) : (
+                                            <div className="absolute inset-0 z-0" />
+                                        )}
+
+                                        <div className="relative z-10 flex gap-4">
+                                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 ${getBgColor(n.type)} shadow-sm border border-white`}>
+                                                {getIcon(n.type)}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex justify-between items-start">
+                                                    <h4 className={`text-sm font-bold truncate pr-6 ${n.read ? 'text-gray-700' : 'text-gray-900'}`}>
+                                                        {n.title}
+                                                    </h4>
+                                                    <span className="text-[10px] font-bold text-gray-400 whitespace-nowrap bg-white px-2 py-0.5 rounded-full border border-gray-100 shadow-sm">
+                                                        {n.date}
+                                                    </span>
+                                                </div>
+                                                <p className={`text-xs mt-1 line-clamp-2 ${n.read ? 'text-gray-500' : 'text-gray-600 font-medium'}`}>
+                                                    {n.message}
+                                                </p>
+                                            </div>
+
+                                            <button
+                                                onClick={(e) => deleteNotification(e, n.id)}
+                                                className="absolute -right-2 -top-2 opacity-0 group-hover:opacity-100 transition-all p-1.5 bg-white text-gray-400 hover:text-red-500 rounded-full shadow-md border border-gray-100 z-20 hover:scale-110"
+                                                title="Dismiss"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
+                                        {!n.read && (
+                                            <div className="absolute top-1/2 -left-1 w-2 h-2 bg-indigo-500 rounded-full transform -translate-y-1/2 ring-4 ring-white shadow-sm" />
+                                        )}
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="py-12 text-center text-gray-500">
+                                    <Bell className="w-12 h-12 mx-auto text-gray-300 mb-3" />
+                                    <p className="text-sm font-medium">No new notifications</p>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>
