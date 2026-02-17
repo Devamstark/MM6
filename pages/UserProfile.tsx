@@ -185,8 +185,8 @@ export const UserProfile = () => {
                         { id: 'profile', icon: UserIcon, label: 'Profile Info' },
                         { id: 'addresses', icon: MapPin, label: 'Addresses' },
                         { id: 'security', icon: Shield, label: 'Security' },
-                        { id: 'orders', icon: ShoppingBag, label: 'My Orders' },
-                        { id: 'reviews', icon: Star, label: 'My Reviews' },
+                        user?.role !== 'admin' ? { id: 'orders', icon: ShoppingBag, label: 'My Orders' } : null,
+                        user?.role !== 'admin' ? { id: 'reviews', icon: Star, label: 'My Reviews' } : null,
                         user?.isAffiliate ? { id: 'affiliate', icon: DollarSign, label: 'Affiliate Dashboard' } : null,
                     ].filter(Boolean).map((item: any) => (
                         <button

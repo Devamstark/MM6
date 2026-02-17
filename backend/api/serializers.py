@@ -1,20 +1,22 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage
-
-# ... (existing imports)
-
-
-# ... (existing imports)
-
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address
 
 User = get_user_model()
 
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Address
+        fields = ['id', 'full_name', 'street', 'city', 'state', 'postal_code', 'country', 'phone', 'is_default', 'type']
+        read_only_fields = ('user', 'created_at')
+
 class UserSerializer(serializers.ModelSerializer):
+    addresses = AddressSerializer(many=True, read_only=True)
+    
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'bio', 'bonus_points', 'profile_picture', 'date_joined')
-        read_only_fields = ('id', 'date_joined', 'bonus_points')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'bio', 'bonus_points', 'profile_picture', 'date_joined', 'last_login', 'addresses')
+        read_only_fields = ('id', 'date_joined', 'bonus_points', 'last_login')
 
 class PageContentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,11 +32,13 @@ class AffiliateSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'earnings', 'clicks', 'created_at')
 
 class ProductSerializer(serializers.ModelSerializer):
+    image_url = serializers.ImageField(source='image', read_only=True)
+
     class Meta:
         model = Product
         fields = [
             'id', 'name', 'description', 'price', 'category', 'subcategory', 'brand',
-            'image', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
+            'image', 'image_url', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
             'is_featured', 'is_popular', 'variants', 'seller', 'created_at',
             'discount_percentage', 'sale_price',
             'cogs', 'marketing_cost', 'shipping_cost',

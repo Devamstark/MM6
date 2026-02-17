@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions } from '../types';
 
+// @ts-ignore
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 const client = axios.create({
@@ -203,7 +204,7 @@ export const api = {
 
   // --- Addresses ---
   getAddresses: async (): Promise<import('../types').Address[]> => {
-    const response = await client.get('/users/addresses/');
+    const response = await client.get('/addresses/');
     return response.data.map((a: any) => ({
       id: a.id,
       fullName: a.full_name,
@@ -219,7 +220,7 @@ export const api = {
   },
 
   addAddress: async (address: Omit<import('../types').Address, 'id'>): Promise<import('../types').Address> => {
-    const response = await client.post('/users/addresses/', {
+    const response = await client.post('/addresses/', {
       full_name: address.fullName,
       street: address.street,
       city: address.city,
@@ -248,7 +249,7 @@ export const api = {
     if (address.isDefault !== undefined) payload.is_default = address.isDefault;
     if (address.type) payload.type = address.type;
 
-    const response = await client.patch(`/users/addresses/${id}/`, payload);
+    const response = await client.patch(`/addresses/${id}/`, payload);
     return {
       id: response.data.id,
       ...address
@@ -256,7 +257,7 @@ export const api = {
   },
 
   deleteAddress: async (id: string): Promise<void> => {
-    await client.delete(`/users/addresses/${id}/`);
+    await client.delete(`/addresses/${id}/`);
   },
 
   getUserReviews: async (): Promise<import('../types').Review[]> => {

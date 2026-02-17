@@ -30,6 +30,29 @@ class User(AbstractUser):
     def __str__(self):
         return self.username
 
+class Address(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='addresses')
+    full_name = models.CharField(max_length=255)
+    street = models.CharField(max_length=255)
+    city = models.CharField(max_length=100)
+    state = models.CharField(max_length=100)
+    postal_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=100)
+    phone = models.CharField(max_length=20)
+    is_default = models.BooleanField(default=False)
+    type = models.CharField(max_length=20, default='shipping') # 'shipping' or 'billing'
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.is_default:
+            # Set other addresses of this user to not default
+            Address.objects.filter(user=self.user, is_default=True).exclude(id=self.id).update(is_default=False)
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.full_name}, {self.city}"
+
 class PageContent(models.Model):
     slug = models.SlugField(unique=True)
     title = models.CharField(max_length=200)
@@ -118,6 +141,9 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
+    
+    # Add shipping address snapshot to Order (optional but good practice)
+    # For now, simplistic approach as requested.
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -129,7 +155,9 @@ class OrderItem(models.Model):
     price_at_purchase = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.name}"
+        if self.product:
+            return f"{self.quantity} x {self.product.name}"
+        return f"{self.quantity} x Unknown Product"
 
 class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
