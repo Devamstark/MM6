@@ -48,10 +48,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
   return (
     <div ref={cardRef} className="opacity-0">
       <Link to={`/product/${product.id}`} className="group cursor-pointer block h-full">
-        <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col border border-gray-100">
+        <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
 
           {/* Image Container */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
+          <div className="relative aspect-[3/4] overflow-hidden bg-secondary dark:bg-gray-700">
             <img
               src={product.imageUrl}
               alt={product.name}
@@ -64,7 +64,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             {/* Badges */}
             <div className="absolute top-3 left-3 flex flex-col gap-2">
               {(product.isFeatured || product.isPopular) && (
-                <div className="bg-white/90 backdrop-blur-sm text-zinc-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm">
+                <div className="bg-white/90 backdrop-blur-sm text-zinc-900 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-sm dark:bg-black/80 dark:text-white">
                   {product.isFeatured ? 'Hot' : 'Popular'}
                 </div>
               )}
@@ -79,7 +79,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             <div className="absolute bottom-4 right-4 flex flex-col gap-2 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
               <button
                 onClick={handleBuy}
-                className="bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white p-3 rounded-full shadow-lg transition-colors duration-200"
+                className="bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white p-3 rounded-full shadow-lg transition-colors duration-200 dark:bg-gray-700 dark:text-white dark:hover:bg-primary"
                 title="Add to Cart"
               >
                 <ShoppingBag className="w-5 h-5" />
@@ -96,28 +96,28 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
 
           {/* Content */}
           <div className="p-4 flex flex-col flex-grow">
-            <div className="mb-1 text-xs text-zinc-500 font-medium uppercase tracking-wider font-sans">
+            <div className="mb-1 text-xs text-zinc-500 font-medium uppercase tracking-wider font-sans dark:text-gray-400">
               {product.category}
             </div>
-            <h3 className="text-zinc-900 font-heading font-semibold text-lg leading-tight mb-2 group-hover:text-primary transition-colors">
+            <h3 className="text-zinc-900 font-heading font-semibold text-lg leading-tight mb-2 group-hover:text-primary transition-colors dark:text-white dark:group-hover:text-primary">
               {product.name}
             </h3>
 
             {/* Rating Placeholder (if reviews exist) */}
             <div className="flex items-center gap-1 mb-2">
               <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
-              <span className="text-xs text-zinc-500 font-medium">4.8 (120)</span>
+              <span className="text-xs text-zinc-500 font-medium dark:text-gray-400">4.8 (120)</span>
             </div>
 
-            <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-50">
+            <div className="mt-auto pt-3 flex items-center justify-between border-t border-gray-50 dark:border-gray-700">
               <div className="flex flex-col">
                 {product.salePrice && product.salePrice < product.price ? (
                   <div className="flex items-baseline gap-2">
                     <span className="text-lg font-bold text-primary">${product.salePrice.toFixed(2)}</span>
-                    <span className="text-xs text-zinc-400 line-through">${product.price.toFixed(2)}</span>
+                    <span className="text-xs text-zinc-400 line-through dark:text-gray-500">${product.price.toFixed(2)}</span>
                   </div>
                 ) : (
-                  <span className="text-lg font-bold text-zinc-900">${product.price.toFixed(2)}</span>
+                  <span className="text-lg font-bold text-zinc-900 dark:text-white">${product.price.toFixed(2)}</span>
                 )}
               </div>
 
@@ -126,12 +126,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
                 <div className="flex -space-x-2">
                   {product.colors?.slice(0, 3).map((c, i) => (
                     <div key={i}
-                      className="w-5 h-5 rounded-full border-2 border-white shadow-sm"
+                      className="w-5 h-5 rounded-full border-2 border-white shadow-sm dark:border-gray-800"
                       style={{ backgroundColor: c.toLowerCase() }}
                     />
                   ))}
                   {product.colors?.length > 3 && (
-                    <div className="w-5 h-5 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-500">
+                    <div className="w-5 h-5 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-500 dark:border-gray-800 dark:bg-gray-700 dark:text-gray-300">
                       +{product.colors.length - 3}
                     </div>
                   )}

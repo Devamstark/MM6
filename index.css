@@ -1,4 +1,8 @@
 @import "tailwindcss";
+@config "./tailwind.config.js";
+
+/* Force class-based dark mode for v4 */
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
     --primary-color: #4F46E5;
