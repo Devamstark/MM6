@@ -208,7 +208,7 @@ export const api = {
     }
   },
 
-  createProduct: async (product: Omit<Product, 'id' | 'additionalImages'> & { imageFile?: File, additionalImages?: (string | File)[] }): Promise<Product> => {
+  createProduct: async (product: Omit<Product, 'id' | 'additionalImages' | 'userId' | 'createdAt'> & { imageFile?: File, additionalImages?: (string | File)[] }): Promise<Product> => {
     const formData = new FormData();
     formData.append('name', product.name);
     formData.append('description', product.description);

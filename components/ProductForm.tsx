@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Product } from '../types';
-import { Upload, Trash2, Plus, Image as ImageIcon, X, Package, Check, ShoppingBag } from 'lucide-react';
+import { Upload, Trash2, Plus, Image as ImageIcon, X, Package, Check, ShoppingBag, Timer } from 'lucide-react';
 import { CATEGORIES, MAIN_CATEGORIES } from '../utils/categories';
 
 interface ProductFormProps {
@@ -38,6 +38,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         shipping_cost: string;
         flashSaleStart: string;
         flashSaleEnd: string;
+        variants: { size: string; color: string; stock: number }[];
     }>({
         name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
         gender: 'Unisex', sizes: '', colors: '', additionalImages: [], isFeatured: false, isPopular: false,
@@ -382,6 +383,36 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                             />
                             <span className="text-sm font-bold text-gray-700">Mark as Trending</span>
                         </label>
+                    </div>
+                </section>
+
+                <section className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+                    <div className="flex items-center gap-3 border-b border-gray-50 pb-2">
+                        <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
+                            <Timer className="w-4 h-4" />
+                        </div>
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest">Flash Sale Timer</h4>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="space-y-1">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Start Time</label>
+                            <input
+                                type="datetime-local"
+                                className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-100 outline-none font-mono text-xs shadow-sm text-gray-600"
+                                value={formData.flashSaleStart}
+                                onChange={e => setFormData({ ...formData, flashSaleStart: e.target.value })}
+                            />
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">End Time</label>
+                            <input
+                                type="datetime-local"
+                                className="w-full bg-white border border-gray-200 rounded-xl p-3 focus:ring-2 focus:ring-indigo-100 outline-none font-mono text-xs shadow-sm text-gray-600"
+                                value={formData.flashSaleEnd}
+                                onChange={e => setFormData({ ...formData, flashSaleEnd: e.target.value })}
+                            />
+                        </div>
                     </div>
                 </section>
 
