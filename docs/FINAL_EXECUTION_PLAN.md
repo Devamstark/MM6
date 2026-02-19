@@ -6,7 +6,7 @@ This guide replaces all previous manual setups. We will use **Docker** to deploy
 
 ## 📋 1. Prerequisites
 *   **VPS IP Address**: `157.90.149.223`
-*   **Domain**: `smartshop.net` (Not yet propagated, so we will test via IP first)
+*   **Domain**: `smartshop1.us` (Not yet propagated, so we will test via IP first)
 *   **SSH Access**: Log in as `root`.
 
 ---
@@ -89,7 +89,7 @@ docker compose exec backend python manage.py createsuperuser
 ---
 
 ## ✅ 6. Verification
-Since your DNS (`smartshop.net`) is still propagating, **test using your IP address**:
+Since your DNS (`smartshop1.us`) is still propagating, **test using your IP address**:
 
 1.  **Frontend**: Visit `http://157.90.149.223` -> Should see the store.
 2.  **Backend Admin**: Visit `http://157.90.149.223/admin` -> Login with your new superuser.
@@ -109,7 +109,7 @@ docker compose up -d --build
 ---
 
 ## 🔒 8. SSL (HTTPS) - *Do this AFTER DNS propagates*
-**Only do this step once `smartshop.net` correctly points to your IP `157.90.149.223`.**
+**Only do this step once `smartshop1.us` correctly points to your IP `157.90.149.223`.**
 
 We will run Certbot on the host to get certificates, then map them to the container. But for now, since you are waiting for DNS, **HTTP via IP** is the best way to test.
 

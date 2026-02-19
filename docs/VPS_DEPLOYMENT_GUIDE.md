@@ -5,7 +5,7 @@ This guide is designed for your **Budget VPS 1** plan (2 Core, 4GB RAM, 20GB NVM
 ## Prerequisites
 - **VPS IP Address**: The IP address HostAsia emailed you (e.g., `123.45.67.89`).
 - **Root Password**: The password sent by HostAsia.
-- **Domain Name**: Your purchased domain (e.g., `smartshop.net`).
+- **Domain Name**: Your purchased domain (e.g., `smartshop1.us`).
 
 ---
 
@@ -322,15 +322,15 @@ You currently use cPanel (IP `51.83.161.4`) for your email. Moving to a VPS will
 
 #### Step 1: Prepare "Mail" Record (Do this NOW in cPanel)
 1.  Log in to cPanel Zone Editor.
-2.  Find the record `mail.smartshop.net`. It is currently a **CNAME**.
-3.  **Delete** the `mail.smartshop.net` CNAME record.
+2.  Find the record `mail.smartshop1.us`. It is currently a **CNAME**.
+3.  **Delete** the `mail.smartshop1.us` CNAME record.
 4.  **Create a New Record**:
-    *   **Name**: `mail.smartshop.net`
+    *   **Name**: `mail.smartshop1.us`
     *   **Type**: **A**
     *   **Record/Value**: `51.83.161.4` (This is your current cPanel IP)
     *   **TTL**: 14400
 5.  **Edit the MX Record**:
-    *   Make sure the MX record points to `mail.smartshop.net` (Priority 0).
+    *   Make sure the MX record points to `mail.smartshop1.us` (Priority 0).
 
 *Why? This "pins" your email to the old server. Now, even if we move the main domain, email stays put.*
 
@@ -338,19 +338,19 @@ You currently use cPanel (IP `51.83.161.4`) for your email. Moving to a VPS will
 Once you buy the VPS, HostAsia will give you a **NEW IP ADDRESS** (e.g., `xxx.xxx.xxx.xxx`).
 
 1.  In cPanel Zone Editor (or your Domain Registrar if they are different):
-2.  Find the **A Record** for `smartshop.net`.
+2.  Find the **A Record** for `smartshop1.us`.
 3.  **Edit** it:
     *   **Old Value**: `51.83.161.4`
     *   **New Value**: `157.90.149.223`
-4.  Find the **CNAME** for `www.smartshop.net`.
-    *   Ensure it points to `smartshop.net`.
+4.  Find the **CNAME** for `www.smartshop1.us`.
+    *   Ensure it points to `smartshop1.us`.
 
 #### Step 3: Secure with HTTPS (SSL) on VPS
 SSH into your **157.90.149.223** and run:
 
 ```bash
 sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d smartshop.net -d www.smartshop.net
+sudo certbot --nginx -d smartshop1.us -d www.smartshop1.us
 ```
 *Select "Redirect" (2) when asked.*
 

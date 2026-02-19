@@ -6,7 +6,7 @@ This guide documents the complete process to set up the **SmartShop** applicatio
 
 ## 📋 Prerequisites
 *   **VPS IP**: `157.90.149.223`
-*   **Domain**: `smartshop.net`
+*   **Domain**: `smartshop1.us`
 *   **SSH Access**: Root password for the VPS.
 
 ---
@@ -93,9 +93,9 @@ nano .env
 DEBUG=False
 SECRET_KEY=django-insecure-prod-key-12345
 DATABASE_URL=postgres://smartshop_user:smartshop123@127.0.0.1:5432/smartshop_db
-ALLOWED_HOSTS=smartshop.net,www.smartshop.net,157.90.149.223,localhost
-CORS_ALLOWED_ORIGINS=https://smartshop.net,https://www.smartshop.net,http://157.90.149.223
-CSRF_TRUSTED_ORIGINS=https://smartshop.net,https://www.smartshop.net,http://157.90.149.223
+ALLOWED_HOSTS=smartshop1.us,www.smartshop1.us,157.90.149.223,localhost
+CORS_ALLOWED_ORIGINS=https://smartshop1.us,https://www.smartshop1.us,http://157.90.149.223
+CSRF_TRUSTED_ORIGINS=https://smartshop1.us,https://www.smartshop1.us,http://157.90.149.223
 ```
 *Save: Ctrl+O, Enter, Ctrl+X*
 
@@ -117,7 +117,7 @@ nano .env
 ```
 **Add the API URL:**
 ```ini
-VITE_API_URL=https://smartshop.net/api
+VITE_API_URL=https://smartshop1.us/api
 ```
 *Save: Ctrl+O, Enter, Ctrl+X*
 
@@ -156,7 +156,7 @@ Group=www-data
 WorkingDirectory=/home/devam/smartshop-app/backend
 Environment="PATH=/home/devam/smartshop-app/backend/venv/bin"
 Environment="DATABASE_URL=postgres://smartshop_user:smartshop123@127.0.0.1:5432/smartshop_db"
-Environment="ALLOWED_HOSTS=smartshop.net,www.smartshop.net,157.90.149.223"
+Environment="ALLOWED_HOSTS=smartshop1.us,www.smartshop1.us,157.90.149.223"
 ExecStart=/home/devam/smartshop-app/backend/venv/bin/gunicorn \
           --workers 3 \
           --bind unix:/home/devam/smartshop-app/backend/smartshop.sock \
@@ -185,7 +185,7 @@ sudo nano /etc/nginx/sites-available/smartshop
 ```nginx
 server {
     listen 80;
-    server_name smartshop.net www.smartshop.net 157.90.149.223;
+    server_name smartshop1.us www.smartshop1.us 157.90.149.223;
 
     location = /favicon.ico { access_log off; log_not_found off; }
 
@@ -228,14 +228,14 @@ sudo systemctl restart nginx
 Finally, secure the site.
 ```bash
 sudo apt install -y certbot python3-certbot-nginx
-sudo certbot --nginx -d smartshop.net -d www.smartshop.net
+sudo certbot --nginx -d smartshop1.us -d www.smartshop1.us
 ```
 *Follow the prompts (enter email, agree to TOS).*
 
 ---
 
 ## 🎉 Verification
-Visit **https://smartshop.net**.
+Visit **https://smartshop1.us**.
 1.  **Frontend**: Should load the shop.
 2.  **Backend**: Go to `/admin`. Styles should work.
 3.  **Login**: Try logging in with the superuser you created.

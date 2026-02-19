@@ -30,7 +30,7 @@
 }
 
 # Domain Access (HTTPS) - Will work once DNS propagates
-smartshop.net, www.smartshop.net {
+smartshop1.us, www.smartshop1.us {
     handle /api/* {
         reverse_proxy backend:8000
     }
