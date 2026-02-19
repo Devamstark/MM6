@@ -1,0 +1,55 @@
+{
+    email mycloudmartcontact@gmail.com
+}
+
+smartshop.net, www.smartshop.net {
+    handle_path /api/* {
+        reverse_proxy backend:8000
+    }
+
+    handle_path /admin/* {
+        reverse_proxy backend:8000
+    }
+
+    handle_path /static/* {
+        root * /srv/staticfiles
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /srv/media
+        file_server
+    }
+
+    handle_path /* {
+        root * /srv
+        file_server
+        try_files {path} {path}/ /index.html
+    }
+}
+
+:80 {
+    handle_path /api/* {
+        reverse_proxy backend:8000
+    }
+
+    handle_path /admin/* {
+        reverse_proxy backend:8000
+    }
+
+    handle_path /static/* {
+        root * /srv/staticfiles
+        file_server
+    }
+
+    handle_path /media/* {
+        root * /srv/media
+        file_server
+    }
+
+    handle_path /* {
+        root * /srv
+        file_server
+        try_files {path} {path}/ /index.html
+    }
+}
