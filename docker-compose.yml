@@ -40,7 +40,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       args:
-        - VITE_API_URL=https://smartshop.net/api
+        - VITE_API_URL=http://157.90.149.223/api
     restart: always
     ports:
       - "80:80"
