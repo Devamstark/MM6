@@ -1,8 +1,8 @@
-# 📚 CloudMart MVP - Documentation Index
+# 📚 SmartShop MVP - Documentation Index
 
 ## 🎯 Welcome!
 
-This is your complete documentation package for the **CloudMart E-Commerce Platform MVP** (Version 1.1.0). This index will help you navigate through all the documentation files and understand what each one contains.
+This is your complete documentation package for the **SmartShop E-Commerce Platform MVP** (Version 1.1.0). This index will help you navigate through all the documentation files and understand what each one contains.
 
 ---
 
@@ -356,7 +356,7 @@ You now have:
 - ✅ Feature catalog
 - ✅ Progress tracking
 
-**Everything you need to understand, run, deploy, and present your CloudMart MVP!**
+**Everything you need to understand, run, deploy, and present your SmartShop MVP!**
 
 ---
 
@@ -376,7 +376,7 @@ You now have:
 
 **Happy Coding! 🚀**
 
-Start with `MVP_SUMMARY.md` and enjoy exploring your complete CloudMart MVP!
+Start with `MVP_SUMMARY.md` and enjoy exploring your complete SmartShop MVP!
 
 ---
 

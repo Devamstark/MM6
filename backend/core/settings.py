@@ -9,9 +9,9 @@ load_dotenv(BASE_DIR.parent / '.env')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-for-production')
 
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [host for host in os.environ.get('ALLOWED_HOSTS', '*').split(',') if host]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -128,13 +128,14 @@ SIMPLE_JWT = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True 
-CORS_ALLOWED_ORIGINS = [
-    "https://mm-6.vercel.app",
+CORS_ALLOWED_ORIGINS = [origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin] + [
+    "https://smartshop.net",
+    "https://www.smartshop.net",
     "http://localhost:5173",
 ]
-CSRF_TRUSTED_ORIGINS = [
-    "https://mm6-backend.onrender.com",
-    "https://mm-6.vercel.app",
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin] + [
+    "https://smartshop.net",
+    "https://www.smartshop.net",
 ]
 
 # Email Configuration

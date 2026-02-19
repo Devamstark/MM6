@@ -1,4 +1,4 @@
-# 🏗️ CloudMart - System Architecture
+# 🏗️ SmartShop - System Architecture
 
 ## 📐 High-Level Architecture
 
@@ -51,10 +51,10 @@
 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    EXTERNAL SERVICES                             │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐          │
-│  │  Cloudinary  │  │    Vercel    │  │    Render    │          │
-│  │   (Images)   │  │  (Frontend)  │  │  (Backend)   │          │
-│  └──────────────┘  └──────────────┘  └──────────────┘          │
+│  ┌──────────────┐  ┌──────────────┐                            │
+│  │    VPS       │  │   Cloudinary  │                            │
+│  │ (Full Stack) │  │    (Images)   │                            │
+│  └──────────────┘  └──────────────┘                            │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -387,32 +387,31 @@ Some contexts remain as wrappers or for specific logic not yet fully migrated, b
 
 ### Production Environment
 
-```
 ┌─────────────────────────────────────────────────────────────┐
-│                      PRODUCTION                              │
+│                      PRODUCTION (VPS)                        │
+│               (HostAsia - Ubuntu 22.04 LTS)                  │
 └─────────────────────────────────────────────────────────────┘
 
-┌──────────────────┐         ┌──────────────────┐
-│   Vercel CDN     │         │   Render.com     │
-│  (Frontend Host) │         │  (Backend Host)  │
-├──────────────────┤         ├──────────────────┤
-│ • React Build    │◄───────►│ • Django API     │
-│ • Static Assets  │  HTTPS  │ • Gunicorn       │
-│ • Edge Network   │         │ • WhiteNoise     │
-│ • Auto HTTPS     │         │ • Auto Deploy    │
-└──────────────────┘         └────────┬─────────┘
-                                      │
-                                      │ PostgreSQL
-                                      ▼
-                             ┌──────────────────┐
-                             │   Neon.tech      │
-                             │  (Database)      │
-                             ├──────────────────┤
-                             │ • PostgreSQL 15  │
-                             │ • Serverless     │
-                             │ • Auto Scaling   │
-                             │ • Backups        │
-                             └──────────────────┘
+┌──────────────────────────────────────────────────┐
+│                  VPS Server                      │
+│                                                  │
+│  ┌──────────────┐       ┌────────────────────┐   │
+│  │    Nginx     │◄─────►│      Gunicorn      │   │
+│  │ (Web Server) │       │   (App Server)     │   │
+│  └──────┬───────┘       └─────────┬──────────┘   │
+│         │                         │              │
+│         ▼                         ▼              │
+│  ┌──────────────┐       ┌────────────────────┐   │
+│  │ React Build  │       │     Django App     │   │
+│  │ (Static Files)       │     (Backend)      │   │
+│  └──────────────┘       └─────────┬──────────┘   │
+│                                   │              │
+│                                   ▼              │
+│                         ┌────────────────────┐   │
+│                         │   PostgreSQL DB    │   │
+│                         │    (Local)         │   │
+│                         └────────────────────┘   │
+└──────────────────────────────────────────────────┘
 
 ┌──────────────────┐
 │  Cloudinary      │
@@ -422,7 +421,6 @@ Some contexts remain as wrappers or for specific logic not yet fully migrated, b
 │ • Optimization   │
 │ • Transformations│
 └──────────────────┘
-```
 
 ---
 

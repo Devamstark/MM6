@@ -6,7 +6,7 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 
 def root_view(request):
-    return JsonResponse({"message": "Welcome to CloudMart API"})
+    return JsonResponse({"message": "Welcome to SmartShop API"})
 
 urlpatterns = [
     path('', root_view),

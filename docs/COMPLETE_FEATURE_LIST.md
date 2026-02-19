@@ -1,4 +1,4 @@
-# 🎯 CloudMart MVP - Complete Feature List
+# 🎯 SmartShop MVP - Complete Feature List
 
 ## 📋 Table of Contents
 1. [User Roles](#user-roles)

@@ -114,8 +114,8 @@ export const Login = () => {
           </button>
 
           <div className="text-center text-xs text-gray-400 mt-6 pt-6 border-t border-gray-100">
-            <p>Demo Admin: admin@cloudmart.com / admin</p>
-            <p className="mt-1">Demo User: user@cloudmart.com / password</p>
+            <p>Demo Admin: admin@smartshop.com / admin</p>
+            <p className="mt-1">Demo User: user@smartshop.com / password</p>
           </div>
         </form>
       </div>

@@ -1,8 +1,8 @@
-# 🚀 CloudMart - Full Stack MVP Specification
+# 🚀 SmartShop - Full Stack MVP Specification
 
 ## 📋 Executive Summary
 
-**CloudMart** is a modern, full-stack e-commerce platform built with a decoupled architecture. This MVP delivers a complete B2C marketplace with multi-role support (Buyers, Sellers, Admins), real-time inventory management, secure authentication, and a premium user experience using the latest web technologies.
+**SmartShop** is a modern, full-stack e-commerce platform built with a decoupled architecture. This MVP delivers a complete B2C marketplace with multi-role support (Buyers, Sellers, Admins), real-time inventory management, secure authentication, and a premium user experience using the latest web technologies.
 
 ---
 
@@ -312,7 +312,7 @@
 ## 📂 Project Structure
 
 ```
-cloudmart-e-commerce/
+smartshop-e-commerce/
 ├── frontend/ (Root - Vite React App)
 │   ├── index.html
 │   ├── index.tsx              # App entry point
@@ -445,8 +445,8 @@ cloudmart-e-commerce/
 
 ### **1. Clone Repository**
 ```bash
-git clone <repository-url>
-cd cloudmart-e-commerce
+git clone https://github.com/Devamstark/MM6.git
+cd smartshop-e-commerce
 ```
 
 ### **2. Backend Setup**
@@ -647,18 +647,17 @@ This project is created for academic purposes as part of a senior capstone proje
 
 ## 👥 Team
 
-- **Developer**: [Your Name]
-- **Course**: IT495 Senior Seminar
-- **Institution**: [Your University]
-- **Semester**: [Current Semester]
-
----
+- **Abdul Choudhary** - Project Manager
+- **Aqveena Manoj** - Backend Developer
+- **Vrushika Gajjar** - Designer
+- **Abdul Munshi** - Security & Network
+- **Devam Trivedi** - Full Stack Developer & DevOps
 
 ## 📞 Support
 
 For questions or issues:
-- Email: [your-email@university.edu]
-- GitHub Issues: [repository-url]/issues
+- Email: smartshop@example.com
+- GitHub Issues: https://github.com/Devamstark/MM6/issues
 
 ---
 

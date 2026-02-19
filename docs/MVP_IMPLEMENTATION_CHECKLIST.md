@@ -1,7 +1,7 @@
-# ✅ CloudMart MVP - Implementation Checklist
+# ✅ SmartShop MVP - Implementation Checklist
 
 ## 🎯 Overview
-This checklist tracks the implementation status of all MVP features for the CloudMart e-commerce platform.
+This checklist tracks the implementation status of all MVP features for the SmartShop e-commerce platform.
 
 ---
 

@@ -48,7 +48,7 @@ export const Affiliate = () => {
                     <div className="relative z-10">
                         <h1 className="text-4xl font-bold mb-4">Affiliate Program</h1>
                         <p className="text-indigo-100 text-lg max-w-2xl">
-                            Partner with CloudMart and earn money by sharing your favorite products. Get up to 10% commission on every sale.
+                            Partner with SmartShop and earn money by sharing your favorite products. Get up to 10% commission on every sale.
                         </p>
                     </div>
                     <div className="absolute top-0 right-0 -mt-20 -mr-20 w-96 h-96 bg-white opacity-10 rounded-full blur-3xl"></div>
@@ -94,7 +94,7 @@ export const Affiliate = () => {
                     <div className="bg-white rounded-3xl p-12 text-center border border-gray-100 shadow-lg">
                         <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready to start earning?</h2>
                         <p className="text-gray-500 mb-8 max-w-lg mx-auto">
-                            Join thousands of influencers and content creators who are monetizing their audience with CloudMart.
+                            Join thousands of influencers and content creators who are monetizing their audience with SmartShop.
                         </p>
                         <button
                             onClick={handleJoinProgram}

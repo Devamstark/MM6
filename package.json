@@ -1,7 +1,7 @@
 {
-  "name": "cloudmart-e-commerce",
+  "name": "smartshop-e-commerce",
   "version": "1.0.0",
-  "description": "Welcome to the CloudMart repository. This project is a comprehensive MVP E-Commerce platform.",
+  "description": "Welcome to the SmartShop repository. This project is a comprehensive MVP E-Commerce platform.",
   "main": "index.js",
   "directories": {
     "doc": "docs"

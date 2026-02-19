@@ -6,7 +6,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'about-us': {
     title: 'About Us',
     content: `
-      <p class="mb-4">CloudMart started in January 2026 by team MM6 from class IT 495. We are dedicated to providing the best e-commerce experience.</p>
+      <p class="mb-4">SmartShop started in January 2026 by team MM6 from class IT 495. We are dedicated to providing the best e-commerce experience.</p>
       <p class="mb-4">Our mission is to bring high-quality products to customers worldwide with exceptional service and speed.</p>
       <h3 class="text-xl font-bold mt-6 mb-3">Our Team</h3>
       <p>Team MM6 consists of passionate developers and designers working together to build next-generation shopping platforms.</p>
@@ -53,7 +53,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
     title: 'Fashion Blogger Program',
     content: `
       <p class="mb-4">Are you a fashion enthusiast? Join our blogger program and get exclusive perks!</p>
-      <p>Contact us at bloggers@cloudmart.com for more info.</p>
+      <p>Contact us at bloggers@smartshop.com for more info.</p>
     `
   },
   'payment-method': {

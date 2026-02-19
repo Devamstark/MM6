@@ -1,6 +1,6 @@
-﻿# CloudMart E-Commerce Platform
+﻿# SmartShop E-Commerce Platform
 
-CloudMart is a modern, full-stack e-commerce marketplace built with **React**, **Jotai**, and **Django REST Framework**. It features a decoupled architecture, role-based access control (Admin, Seller, User), and a premium responsive UI.
+SmartShop is a modern, full-stack e-commerce marketplace built with **React**, **Jotai**, and **Django REST Framework**. It features a decoupled architecture, role-based access control (Admin, Seller, User), and a premium responsive UI.
 
 ---
 
@@ -83,7 +83,7 @@ The backend API will be available at `http://localhost:8000`
 ## 📁 Project Structure
 
 ```
-cloudmart-e-commerce/
+smartshop-e-commerce/
 ├── frontend/                 # React frontend application
 │   ├── src/
 │   │   ├── components/      # Reusable UI components
@@ -100,7 +100,7 @@ cloudmart-e-commerce/
 │   │   ├── views.py         # API views
 │   │   ├── serializers.py   # DRF serializers
 │   │   └── urls.py          # API routing
-│   ├── cloudmart/           # Project settings
+│   ├── core/                # Project settings
 │   └── requirements.txt
 │
 └── docs/                    # Project documentation
@@ -119,7 +119,7 @@ VITE_API_URL=http://localhost:8000/api
 ```env
 SECRET_KEY=your-secret-key-here
 DEBUG=True
-DATABASE_URL=postgresql://user:password@localhost:5432/cloudmart
+DATABASE_URL=postgresql://user:password@localhost:5432/smartshop
 ALLOWED_HOSTS=localhost,127.0.0.1
 CORS_ALLOWED_ORIGINS=http://localhost:5173
 ```
@@ -155,18 +155,8 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 
 ## 🚀 Deployment
 
-### Frontend (Vercel)
-1. Push code to GitHub
-2. Connect repository to Vercel
-3. Set environment variables
-4. Deploy automatically on push
-
-### Backend (Render)
-1. Create new Web Service on Render
-2. Connect GitHub repository
-3. Set build command: `pip install -r requirements.txt`
-4. Set start command: `gunicorn cloudmart.wsgi:application`
-5. Add environment variables
+### Deployment (VPS)
+Please refer to the **[VPS Deployment Guide](./docs/VPS_DEPLOYMENT_GUIDE.md)** for detailed instructions on deploying to HostAsia VPS.
 
 ---
 

@@ -1,8 +1,8 @@
-# 🎉 CloudMart - Full Stack MVP Summary
+# 🎉 SmartShop - Full Stack MVP Summary
 
 ## 📌 Project Overview
 
-**CloudMart** is a production-ready, full-stack e-commerce platform built with modern web technologies. This MVP demonstrates enterprise-level architecture, clean code practices, and comprehensive feature implementation suitable for academic presentation and real-world deployment.
+**SmartShop** is a production-ready, full-stack e-commerce platform built with modern web technologies. This MVP demonstrates enterprise-level architecture, clean code practices, and comprehensive feature implementation suitable for academic presentation and real-world deployment.
 
 ---
 
@@ -614,7 +614,7 @@ For any questions, refer to the documentation files or the inline code comments.
 
 ---
 
-**Project**: CloudMart E-Commerce Platform  
+**Project**: SmartShop E-Commerce Platform  
 **Version**: 1.1.0 (MVP + Modern Stack)  
 **Last Updated**: February 16, 2026  
 **Status**: ✅ Production Ready  

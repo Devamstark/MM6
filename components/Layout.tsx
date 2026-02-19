@@ -20,7 +20,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [searchQuery, setSearchQuery] = useAtom(searchQueryAtom);
   const [searchOpen, setSearchOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<SearchSuggestions>({ categories: [], products: [] });
-  const [recentSearches, setRecentSearches] = useState<string[]>(JSON.parse(localStorage.getItem('cm_recent_searches') || '[]'));
+  const [recentSearches, setRecentSearches] = useState<string[]>(JSON.parse(localStorage.getItem('ss_recent_searches') || '[]'));
   const [isTrendingOpen, setIsTrendingOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [cartOpen, setCartOpen] = useAtom(isCartOpenAtom);
@@ -112,7 +112,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       // Save to recent searches
       const updatedRecent = [finalQuery, ...recentSearches.filter(s => s !== finalQuery)].slice(0, 5);
       setRecentSearches(updatedRecent);
-      localStorage.setItem('cm_recent_searches', JSON.stringify(updatedRecent));
+      localStorage.setItem('ss_recent_searches', JSON.stringify(updatedRecent));
 
       navigate(`/products?search=${encodeURIComponent(finalQuery)}`);
       setSearchOpen(false);
@@ -153,7 +153,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Left: Logo */}
             <Link to="/" className="flex-shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
-              CLOUDMART
+              SMARTSHOP
             </Link>
 
             {/* Center: Navigation Links */}
@@ -378,7 +378,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                           <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
                             <History className="w-3 h-3" /> Recent Searches
                           </h4>
-                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('cm_recent_searches'); }} className="text-[10px] font-bold text-gray-300 hover:text-red-500 uppercase tracking-tighter">Clear All</button>
+                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('ss_recent_searches'); }} className="text-[10px] font-bold text-gray-300 hover:text-red-500 uppercase tracking-tighter">Clear All</button>
                         </div>
                         <div className="space-y-2">
                           {recentSearches.map((s, idx) => (
@@ -695,7 +695,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400">
-              &copy; 2026 CloudMart Inc. All rights reserved.
+              &copy; 2026 SmartShop Inc. All rights reserved.
             </p>
             <div className="flex gap-4 mt-4 md:mt-0">
               <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-4 opacity-50 grayscale hover:grayscale-0 transition-all" />
