@@ -1,14 +1,6 @@
-{
-    email mycloudmartcontact@gmail.com
-}
-
-# Redirect bare IP (HTTP) to the domain
+# Caddy now runs behind Traefik (Dokploy handles SSL & ports 80/443)
+# Caddy only handles internal routing on port 80
 :80 {
-    redir https://smartshop1.us{uri} permanent
-}
-
-# Main Site - HTTPS with Auto SSL (Let's Encrypt)
-smartshop1.us, www.smartshop1.us {
     handle /api/* {
         reverse_proxy backend:8000
     }

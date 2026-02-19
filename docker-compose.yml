@@ -48,16 +48,22 @@ services:
   caddy:
     image: caddy:2-alpine
     restart: always
-    ports:
-      - "80:80"
-      - "443:443"
+    # No port bindings - Traefik (Dokploy) handles ports 80 and 443
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.smartshop.rule=Host(`smartshop1.us`) || Host(`www.smartshop1.us`)"
+      - "traefik.http.routers.smartshop.entrypoints=websecure"
+      - "traefik.http.routers.smartshop.tls.certresolver=letsencrypt"
+      - "traefik.http.services.smartshop.loadbalancer.server.port=80"
+      - "traefik.docker.network=dokploy-network"
+    networks:
+      - dokploy-network
+      - default
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile
       - backend_static:/srv/staticfiles
       - backend_media:/srv/media
       - frontend_build:/srv
-      - caddy_data:/data
-      - caddy_config:/config
     depends_on:
       - backend
       - frontend
@@ -67,5 +73,10 @@ volumes:
   backend_static:
   backend_media:
   frontend_build:
-  caddy_data:
-  caddy_config:
+
+
+networks:
+  dokploy-network:
+    external: true
+  default:
+    driver: bridge
