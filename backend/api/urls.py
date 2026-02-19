@@ -14,10 +14,7 @@ from .views import (
 from rest_framework.routers import SimpleRouter, DefaultRouter
 from django.conf import settings
 
-if settings.DEBUG:
-    router = DefaultRouter()
-else:
-    router = SimpleRouter()
+router = DefaultRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'payments', PaymentViewSet)
