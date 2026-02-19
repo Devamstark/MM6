@@ -118,16 +118,14 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True 
+CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin] + [
     "https://smartshop1.us",
     "https://www.smartshop1.us",
-    "http://157.90.149.223",
 ]
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin] + [
     "https://smartshop1.us",
     "https://www.smartshop1.us",
-    "http://157.90.149.223",
 ]
 
 # Email Configuration

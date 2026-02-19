@@ -2,34 +2,12 @@
     email mycloudmartcontact@gmail.com
 }
 
-# IP Address Access (HTTP) - PRIMARY FOR NOW
+# Redirect bare IP (HTTP) to the domain
 :80 {
-    handle /api/* {
-        reverse_proxy backend:8000
-    }
-
-    handle /admin/* {
-        reverse_proxy backend:8000
-    }
-
-    handle_path /static/* {
-        root * /srv/staticfiles
-        file_server
-    }
-
-    handle_path /media/* {
-        root * /srv/media
-        file_server
-    }
-
-    handle_path /* {
-        root * /srv
-        file_server
-        try_files {path} {path}/ /index.html
-    }
+    redir https://smartshop1.us{uri} permanent
 }
 
-# Domain Access (HTTPS) - Will work once DNS propagates
+# Main Site - HTTPS with Auto SSL (Let's Encrypt)
 smartshop1.us, www.smartshop1.us {
     handle /api/* {
         reverse_proxy backend:8000
