@@ -2,7 +2,8 @@
     email mycloudmartcontact@gmail.com
 }
 
-smartshop.net, www.smartshop.net {
+# IP Address Access (HTTP) - PRIMARY FOR NOW
+:80 {
     handle_path /api/* {
         reverse_proxy backend:8000
     }
@@ -28,7 +29,8 @@ smartshop.net, www.smartshop.net {
     }
 }
 
-:80 {
+# Domain Access (HTTPS) - Will work once DNS propagates
+smartshop.net, www.smartshop.net {
     handle_path /api/* {
         reverse_proxy backend:8000
     }
