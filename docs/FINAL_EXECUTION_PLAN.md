@@ -108,10 +108,17 @@ docker compose up -d --build
 
 ---
 
-## 🔒 8. SSL (HTTPS) - *Do this AFTER DNS propagates*
-**Only do this step once `smartshop1.us` correctly points to your IP `157.90.149.223`.**
+## 🔒 8. SSL (HTTPS)
+**Great news!** You do **NOT** need to run any manual commands for SSL. 
 
-We will run Certbot on the host to get certificates, then map them to the container. But for now, since you are waiting for DNS, **HTTP via IP** is the best way to test.
+Since we are using **Caddy** as our web server (in the Docker setup), it will **automatically** obtain and renew free SSL certificates for `smartshop1.us` and `www.smartshop1.us`.
+
+**Requirements for this to work:**
+1.  **DNS Propagated**: Your domain must correctly point to `157.90.149.223`.
+2.  **Ports Open**: Ports 80 and 443 must be open (we did this in the "Prerequisites" or "Firewall" steps).
+
+**How to verify:**
+Once your DNS is propagated (can take 1-24 hours), simply visit **https://smartshop1.us** in your browser. Caddy will handle the rest in the background.
 
 ---
 
