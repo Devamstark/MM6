@@ -1,173 +1,134 @@
-# 🚀 FINAL EXECUTION PLAN: SmartShop Deployment
+# 🚀 Final Execution Plan: Docker Deployment (Easiest & Best)
 
-**Target VPS IP**: `157.90.149.223`
-**Domain**: `smartshop.net`
-**Email Server IP**: `51.83.161.4` (Old cPanel)
+This guide replaces all previous manual setups. We will use **Docker** to deploy the entire SmartShop stack (Frontend, Backend, Database) with a single command. This ensures it works exactly as intended, regardless of server configuration.
 
 ---
 
-## 1. cPanel Actions (DNS Configuration)
-
-**Goal**: Keep email working on the old server, point the website to the new VPS.
-
-### 🛑 ACTION 1: Run NOW (Before moving domain)
-*Go to cPanel -> Zone Editor -> Manage*
-
-1.  **Delete** the existing `CNAME` record for `mail.smartshop.net`.
-2.  **Create** a new **A Record**:
-    *   **Name**: `mail.smartshop.net`
-    *   **Record**: `51.83.161.4`
-3.  **Verify** the **MX Record**:
-    *   **Priority**: `0`
-    *   **Destination**: `mail.smartshop.net`
-
-### 🚀 ACTION 2: Run AFTER VPS Setup is Complete
-*Go to cPanel -> Zone Editor -> Manage*
-
-1.  **Edit** the **A Record** for `smartshop.net` (Root domain):
-    *   **Change IP From**: `51.83.161.4`
-    *   **Change IP To**: `157.90.149.223`
-2.  **Verify** `www.smartshop.net` is a CNAME pointing to `smartshop.net`.
+## 📋 1. Prerequisites
+*   **VPS IP Address**: `157.90.149.223`
+*   **Domain**: `smartshop.net` (Not yet propagated, so we will test via IP first)
+*   **SSH Access**: Log in as `root`.
 
 ---
 
-## 2. VPS Configuration (SSH)
+## 🧼 2. Clean Up Old Manual Setup (Important!)
+Since we are switching to Docker, we need to stop the old manually installed services to free up Port 80.
 
-**Goal**: Prepare the Ubuntu server to host the application.
-
-### Step 1: Login & Update
 ```bash
-# Login
-ssh root@157.90.149.223
+# Stop and disable Host Nginx
+systemctl stop nginx
+systemctl disable nginx
 
-# Update System
+# Stop and disable Host Backend Service
+systemctl stop smartshop-backend
+systemctl disable smartshop-backend
+
+# (Optional) You can delete the old files if you want, but stopping them is enough.
+```
+
+---
+
+## 🐳 3. Install Docker & Git
+Install the Docker engine and Git on your VPS.
+
+```bash
+# Update system
 apt update && apt upgrade -y
-```
 
-### Step 2: Create User & Secure
-```bash
-# Create User
-adduser smartshop
-usermod -aG sudo smartshop
+# Install Git and Curl
+apt install -y git curl
 
-# Setup Firewall
-ufw allow OpenSSH
-ufw allow 'Nginx Full'
-ufw enable
-```
+# Install Docker
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
 
-### Step 3: Install Software Stack
-```bash
-# Install Python, PostgreSQ, Nginx, Git, Node.js
-sudo apt install python3-pip python3-venv libpq-dev postgresql postgresql-contrib nginx git curl -y
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt install -y nodejs
-sudo npm install -g pm2
-```
-
-### Step 4: Database Setup
-```bash
-sudo -u postgres psql
-
-# In SQL Prompt:
-CREATE DATABASE smartshop_db;
-CREATE USER smartshop_user WITH PASSWORD 'YOUR_STRONG_PASSWORD';
-ALTER ROLE smartshop_user SET client_encoding TO 'utf8';
-ALTER ROLE smartshop_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE smartshop_user SET timezone TO 'UTC';
-GRANT ALL PRIVILEGES ON DATABASE smartshop_db TO smartshop_user;
-\q
+# Install Docker Compose (if not included)
+apt install -y docker-compose-plugin
 ```
 
 ---
 
-## 3. Deployment Commands (Shell)
+## 🚀 4. Deploy SmartShop with Docker
 
-**Goal**: Deploy the code and start the application.
+### A. Clone the Repository
+We use your new repository `MM6`.
 
-### Step 1: Clone & Setup Backend
 ```bash
-# Switch to user
-su - smartshop
-
-# Clone
-git clone https://github.com/Devamstark/MM6.git smartshop-app
-cd smartshop-app/backend
-
-# Virtual Env
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-pip install gunicorn psycopg2-binary
-
-# Migrations & Static
-python manage.py migrate
-python manage.py collectstatic
+cd ~
+rm -rf smartshop-app  # Remove old folder if it exists
+git clone https://github.com/Devamstark/MM6 smartshop-app
+cd smartshop-app
 ```
 
-### Step 2: Configure Gunicorn (Backend Server)
-*Create file: `/etc/systemd/system/gunicorn.service`*
+### B. Launch Everything
+The magic command. This builds the frontend, backend, and sets up the database automatically.
 
-```ini
-[Unit]
-Description=gunicorn daemon
-After=network.target
-
-[Service]
-User=smartshop
-Group=www-data
-WorkingDirectory=/home/smartshop/smartshop-app/backend
-ExecStart=/home/smartshop/smartshop-app/backend/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/smartshop/smartshop-app/backend/smartshop.sock core.wsgi:application
-
-[Install]
-WantedBy=multi-user.target
-```
-*Run:* `sudo systemctl start gunicorn && sudo systemctl enable gunicorn`
-
-### Step 3: Configure Nginx (Web Server)
-*Create file: `/etc/nginx/sites-available/smartshop`*
-
-```nginx
-server {
-    listen 80;
-    server_name smartshop.net www.smartshop.net;
-
-    location = /favicon.ico { access_log off; log_not_found off; }
-    
-    # Backend API
-    location /api/ {
-        include proxy_params;
-        proxy_pass http://unix:/home/smartshop/smartshop-app/backend/smartshop.sock;
-    }
-
-    # Admin Panel
-    location /admin/ {
-        include proxy_params;
-        proxy_pass http://unix:/home/smartshop/smartshop-app/backend/smartshop.sock;
-    }
-
-    # Static Files (Django)
-    location /static/ {
-        alias /home/smartshop/smartshop-app/backend/staticfiles/;
-    }
-
-    # Frontend (React)
-    location / {
-        root /var/www/smartshop;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-}
-```
-*Run:*
 ```bash
-sudo ln -s /etc/nginx/sites-available/smartshop /etc/nginx/sites-enabled
-sudo nginx -t
-sudo systemctl restart nginx
+docker compose up -d --build
+```
+*(Note: If `docker compose` doesn't work, try `docker-compose up -d --build`)*
+
+**What this does:**
+1.  starts **PostgreSQL** (Database)
+2.  starts **Django Backend** (API)
+3.  starts **Nginx + React Frontend** (Web Server)
+
+---
+
+## 🛠️ 5. Post-Deployment Steps
+
+### A. Create Superuser (Admin)
+Since the database is fresh in Docker, you need to create your admin account again.
+
+```bash
+# Run the command inside the 'backend' container
+docker compose exec backend python manage.py createsuperuser
+```
+*(Follow the prompts to set username and password)*
+
+---
+
+## ✅ 6. Verification
+Since your DNS (`smartshop.net`) is still propagating, **test using your IP address**:
+
+1.  **Frontend**: Visit `http://157.90.149.223` -> Should see the store.
+2.  **Backend Admin**: Visit `http://157.90.149.223/admin` -> Login with your new superuser.
+3.  **API**: Visit `http://157.90.149.223/api/` -> Should respond.
+
+---
+
+## 🔄 7. Updating the App
+If you make code changes and push to GitHub, here is how to update the VPS:
+
+```bash
+cd ~/smartshop-app
+git pull origin main
+docker compose up -d --build
 ```
 
-### Step 4: Final SSL (HTTPS)
+---
+
+## 🔒 8. SSL (HTTPS) - *Do this AFTER DNS propagates*
+**Only do this step once `smartshop.net` correctly points to your IP `157.90.149.223`.**
+
+We will run Certbot on the host to get certificates, then map them to the container. But for now, since you are waiting for DNS, **HTTP via IP** is the best way to test.
+
+---
+
+### 🆘 Troubleshooting
+
+**View Logs:**
 ```bash
-sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d smartshop.net -d www.smartshop.net
+docker compose logs -f
+```
+
+**Restart Containers:**
+```bash
+docker compose restart
+```
+
+**Reset Database (Danger!):**
+```bash
+docker compose down -v
+docker compose up -d
 ```
