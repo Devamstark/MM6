@@ -68,8 +68,8 @@ services:
     restart: always
     command: server /data --console-address ":9001"
     environment:
-      - MINIO_ROOT_USER=${MINIO_USER:-smartshop}
-      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD:-smartshop@minio123}
+      - MINIO_ROOT_USER=${MINIO_USER}
+      - MINIO_ROOT_PASSWORD=${MINIO_PASSWORD}
       - MINIO_BROWSER_REDIRECT_URL=https://minio.smartshop1.us
       - MINIO_SERVER_URL=https://s3.smartshop1.us
     volumes:
