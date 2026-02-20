@@ -68,6 +68,12 @@ services:
     restart: always
     volumes:
       - backend_media:/srv
+      - filebrowser_data:/database
+    environment:
+      - FB_DATABASE=/database/filebrowser.db
+      - FB_ROOT=/srv
+      - FB_LOG=stdout
+      - FB_NOAUTH=false
     networks:
       - dokploy-network
     labels:
@@ -96,6 +102,7 @@ volumes:
   backend_static:
   backend_media:
   frontend_build:
+  filebrowser_data:
 
 
 networks:
