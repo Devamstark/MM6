@@ -7,11 +7,11 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=smartshop_db
-      - POSTGRES_USER=smartshop_user
-      - POSTGRES_PASSWORD=smartshop123
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U smartshop_user -d smartshop_db" ]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,11 +27,11 @@ services:
       - backend_static:/app/staticfiles
       - backend_media:/app/media
     environment:
-      - SECRET_KEY=django-insecure-prod-key-12345
-      - DEBUG=False
-      - ALLOWED_HOSTS=smartshop1.us,www.smartshop1.us,backend
-      - DATABASE_URL=postgres://smartshop_user:smartshop123@db:5432/smartshop_db
-      - CORS_ALLOWED_ORIGINS=https://smartshop1.us,https://www.smartshop1.us
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
+      - DATABASE_URL=${DATABASE_URL}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     depends_on:
       db:
         condition: service_healthy
