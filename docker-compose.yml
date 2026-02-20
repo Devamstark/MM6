@@ -32,6 +32,7 @@ services:
       - ALLOWED_HOSTS=${ALLOWED_HOSTS}
       - DATABASE_URL=${DATABASE_URL}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
     depends_on:
       - db
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3"
@@ -49,7 +50,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       args:
-        - VITE_API_URL=https://api.smartshop1.us
+        - VITE_API_URL=https://api.smartshop1.us/api
     restart: always
     volumes:
       - frontend_build:/data
