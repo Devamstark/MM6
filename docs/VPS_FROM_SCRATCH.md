@@ -22,7 +22,7 @@ Create the `devam` user and give it sudo privileges.
 ```bash
 apt update && apt upgrade -y
 adduser devam
-# Enter password (e.g., smartshop123) and skip other details by pressing Enter
+# Enter password (e.g., YOUR_STRONG_PASSWORD) and skip other details by pressing Enter
 usermod -aG sudo devam
 ```
 
@@ -46,7 +46,7 @@ su - devam
 ---
 
 ## 2️⃣ Part 2: Database Setup
-We will set a specific password (`smartshop123`) to avoid authentication errors later.
+We will set a specific password (`YOUR_STRONG_PASSWORD`) to avoid authentication errors later.
 
 ```bash
 sudo -u postgres psql
@@ -55,7 +55,7 @@ sudo -u postgres psql
 **Run these SQL commands:**
 ```sql
 CREATE DATABASE smartshop_db;
-CREATE USER smartshop_user WITH PASSWORD 'smartshop123';
+CREATE USER smartshop_user WITH PASSWORD 'YOUR_STRONG_PASSWORD';
 ALTER ROLE smartshop_user SET client_encoding TO 'utf8';
 ALTER ROLE smartshop_user SET default_transaction_isolation TO 'read committed';
 ALTER ROLE smartshop_user SET timezone TO 'UTC';
@@ -91,8 +91,8 @@ nano .env
 **Paste this exactly:**
 ```ini
 DEBUG=False
-SECRET_KEY=django-insecure-prod-key-12345
-DATABASE_URL=postgres://smartshop_user:smartshop123@127.0.0.1:5432/smartshop_db
+SECRET_KEY=django-insecure-CHANGE_ME_IMMEDIATELY
+DATABASE_URL=postgres://smartshop_user:YOUR_STRONG_PASSWORD@127.0.0.1:5432/smartshop_db
 ALLOWED_HOSTS=smartshop1.us,www.smartshop1.us,157.90.149.223,localhost
 CORS_ALLOWED_ORIGINS=https://smartshop1.us,https://www.smartshop1.us,http://157.90.149.223
 CSRF_TRUSTED_ORIGINS=https://smartshop1.us,https://www.smartshop1.us,http://157.90.149.223
@@ -155,7 +155,7 @@ User=devam
 Group=www-data
 WorkingDirectory=/home/devam/smartshop-app/backend
 Environment="PATH=/home/devam/smartshop-app/backend/venv/bin"
-Environment="DATABASE_URL=postgres://smartshop_user:smartshop123@127.0.0.1:5432/smartshop_db"
+Environment="DATABASE_URL=postgres://smartshop_user:YOUR_STRONG_PASSWORD@127.0.0.1:5432/smartshop_db"
 Environment="ALLOWED_HOSTS=smartshop1.us,www.smartshop1.us,157.90.149.223"
 ExecStart=/home/devam/smartshop-app/backend/venv/bin/gunicorn \
           --workers 3 \
