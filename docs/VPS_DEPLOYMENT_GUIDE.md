@@ -1,426 +1,200 @@
-# HostAsia VPS Deployment Guide (Step-by-Step)
+# SmartShop — VPS Deployment Guide (Docker + Dokploy)
 
-This guide is designed for your **Budget VPS 1** plan (2 Core, 4GB RAM, 20GB NVMe). It provides detailed explanations for every command so you understand exactly what is happening.
-
-## Prerequisites
-- **VPS IP Address**: The IP address HostAsia emailed you (e.g., `123.45.67.89`).
-- **Root Password**: The password sent by HostAsia.
-- **Domain Name**: Your purchased domain (e.g., `smartshop1.us`).
+> ⚠️ This document contains **no passwords, API keys, or internal ports**.
+> All credentials are stored securely in Dokploy's environment variable manager.
 
 ---
 
-## 🛑 Essential Architecture Change: Replacing SaaS
-By moving to this VPS, you are becoming **fully independent**. You no longer need the following services:
+## Overview
 
-| Service | Old Role | New Replacement on VPS |
-| :--- | :--- | :--- |
-| **Vercel** | Frontend Hosting | **Nginx** (Web Server) |
-| **Render** | Backend Hosting | **Gunicorn** + **Systemd** |
-| **Neon** | Database | **Local PostgreSQL** (Installed in Phase 3) |
-| **Cloudinary** | Image Storage | **Local NVMe Storage** (Served via Nginx) |
+SmartShop is deployed on a **HostAsia VPS** using **Dokploy** — an open-source, self-hosted deployment platform. Dokploy manages Docker containers, automatic SSL certificates (via Traefik + Let's Encrypt), and GitHub-based deployments.
 
-**Note**: To "turn off" Cloudinary and use your VPS storage, simply **do not** add the Cloudinary API keys to your `.env` file in Phase 4.
+This replaced the previous manual approach (Nginx + Gunicorn + systemd), making the deployment simpler, repeatable, and fully containerized.
 
 ---
 
-## Phase 1: Accessing & Securing Your Server
+## Infrastructure Summary
 
-### Step 1: Login via SSH
-**Why?** SSH (Secure Shell) is how you remotely control your Linux server. Think of it as opening a command prompt on a computer that is miles away.
-Open your terminal (Command Prompt or PowerShell on Windows) and type:
-
-```bash
-ssh root@157.90.149.223
-```
-*Replace `157.90.149.223` with your actual IP address.*
-*When asked "Are you sure you want to continue connecting?", type `yes` and press Enter.*
-*Enter your password (typing will be invisible) and press Enter.*
-
-### Step 2: Update Your System
-**Why?** Essential for security and stability. This installs the latest security patches and software updates available for your Ubuntu system.
-
-```bash
-apt update && apt upgrade -y
-```
-
-### Step 3: Create a Dedicated User
-**Why?** Running as `root` (super user) is dangerous. If you make a mistake as root, you could break the entire server. We create a regular user named `smartshop` with sudo (admin) privileges for safer management.
-
-```bash
-# Create the user
-adduser smartshop
-
-# Add user to the 'sudo' group so they can run admin commands
-usermod -aG sudo smartshop
-
-# Switch to this new user
-su - smartshop
-```
-
-### Step 4: Configure a Firewall
-**Why?** We want to block all ports except the ones we need (SSH, HTTP, HTTPS). This prevents hackers from accessing unused services.
-
-```bash
-# Allow OpenSSH so you don't lock yourself out
-sudo ufw allow OpenSSH
-
-# Allow standard web traffic (HTTP/HTTPS)
-sudo ufw allow 'Nginx Full'
-
-# Enable the firewall
-sudo ufw enable
-```
-*Type `y` and Enter to confirm.*
+| Component | Technology |
+|:---|:---|
+| VPS Provider | HostAsia (Budget VPS 1 — 2 Core, 4GB RAM, 20GB NVMe) |
+| OS | Ubuntu Linux |
+| Deployment Platform | Dokploy |
+| Reverse Proxy + SSL | Traefik (managed by Dokploy) |
+| Container Runtime | Docker + Docker Compose |
+| Frontend Server | Nginx (inside Docker container) |
+| Backend Server | Gunicorn (inside Docker container) |
+| Database | PostgreSQL 15 (Docker container) |
+| Storage | Docker named volumes (persistent on VPS disk) |
 
 ---
 
-## Phase 2: Installing Software (The Stack)
+## DNS Records Required
 
-### Step 1: Install Python, PostgreSQL, Nginx, and Git
-**Why?**
-- **Python**: To run your Django backend.
-- **PostgreSQL**: A robust database for your products and users.
-- **Nginx**: A high-performance web server to serve your site to the world.
-- **Git**: To download your code from GitHub.
+All of these A records must point to the VPS IP address:
 
-```bash
-sudo apt install python3-pip python3-venv python3-dev libpq-dev postgresql postgresql-contrib nginx curl git -y
-```
-
-### Step 2: Install Node.js
-**Why?** Required to build your React frontend. We use Node.js version 20 (LTS).
-
-```bash
-# Download the setup script for Node.js 20
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-
-# Install Node.js
-sudo apt install -y nodejs
-```
+| Subdomain | Purpose |
+|:---|:---|
+| `smartshop1.us` | Main storefront |
+| `www.smartshop1.us` | WWW redirect |
+| `api.smartshop1.us` | Django backend API & Admin |
+| `db.smartshop1.us` | Adminer database browser |
+| `minio.smartshop1.us` | MinIO storage web console |
+| `s3.smartshop1.us` | MinIO S3-compatible API |
 
 ---
 
-## Phase 3: Setting Up the Database
+## Services Defined in docker-compose.yml
 
-### Step 1: Configure PostgreSQL
-**Why?** We need to create a "room" (database) and a "key" (user) for your app to store and access data securely.
+### `db` — PostgreSQL Database
+- Stores all application data (products, orders, users, etc.)
+- Uses a persistent Docker volume so data survives container restarts
+- Has a healthcheck to ensure it's ready before the backend starts
 
-```bash
-# Start the PostgreSQL service
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
+### `backend` — Django API (Gunicorn)
+- Runs database migrations and static file collection on startup
+- Serves the REST API at `api.smartshop1.us/api/`
+- Serves the Django admin panel at `api.smartshop1.us/admin/`
+- Serves uploaded media files (product images) at `api.smartshop1.us/media/`
+- Uses **WhiteNoise** middleware to serve admin CSS/JS static files
 
-# Log in to the database system
-sudo -u postgres psql
-```
+### `frontend` — React App (Nginx)
+- React app is built at Docker image build time (not at runtime)
+- The API URL is baked in during the build via `VITE_API_URL` build argument
+- Nginx serves the built static files and handles SPA routing (all 404s → `index.html`)
 
-**Inside the SQL prompt (looks like `postgres=#`), run these lines one by one:**
+### `adminer` — Database Browser
+- Lightweight web UI for browsing and querying the PostgreSQL database
+- Accessible at `https://db.smartshop1.us`
+- Protected by your database credentials
 
-```sql
--- Create the database
-CREATE DATABASE smartshop_db;
-
--- Create the user (Replace 'strong_password' with a REAL secure password)
-CREATE USER smartshop_user WITH PASSWORD 'strong_password';
-
--- Configure recommended settings for Django
-ALTER ROLE smartshop_user SET client_encoding TO 'utf8';
-ALTER ROLE smartshop_user SET default_transaction_isolation TO 'read committed';
-ALTER ROLE smartshop_user SET timezone TO 'UTC';
-
--- Give the user permission to use the database
-GRANT ALL PRIVILEGES ON DATABASE smartshop_db TO smartshop_user;
-
--- Exit the SQL prompt
-\q
-```
+### `minio` — Self-Hosted S3 Storage
+- S3-compatible object storage running on the VPS
+- Web console at `https://minio.smartshop1.us`
+- S3 API at `https://s3.smartshop1.us`
+- Used by Dokploy's backup system to store database backups
 
 ---
 
-## Phase 4: Deploying the Backend (Django)
+## Environment Variables
 
-### Step 1: Download Your Code
-**Why?** We need to get your code from GitHub onto the server.
+All environment variables are managed in the **Dokploy Dashboard → Environment tab**. Never commit them to Git.
 
-```bash
-cd /home/smartshop
-git clone https://github.com/Devamstark/MM6.git smartshop-app
-cd smartshop-app/backend
-```
-
-### Step 2: Set Up Python Environment
-**Why?** Virtual environments keep your project libraries separate from the system libraries. This prevents version conflicts.
-
-```bash
-# Create virtual environment
-python3 -m venv venv
-
-# Activate it
-source venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-pip install gunicorn psycopg2-binary
-```
-
-### Step 3: Configure Environment Variables
-**Why?** We keep secrets (passwords, keys) out of the code and in a secure file. This is best practice for security.
-
-```bash
-nano core/.env
-```
-**Paste this inside (Right-click to paste):**
-
-```env
-DEBUG=False
-SECRET_KEY='<GENERATE_A_RANDOM_SECRET_KEY>'
-ALLOWED_HOSTS=<YOUR_DOMAIN_NAME>,157.90.149.223
-CSRF_TRUSTED_ORIGINS=https://<YOUR_DOMAIN_NAME>,https://www.<YOUR_DOMAIN_NAME>
-CORS_ALLOWED_ORIGINS=https://<YOUR_DOMAIN_NAME>,https://www.<YOUR_DOMAIN_NAME>
-DATABASE_URL=postgres://smartshop_user:strong_password@localhost:5432/smartshop_db
-```
-*Press `Ctrl+O`, `Enter` to save, then `Ctrl+X` to exit.*
-
-### Step 4: Initialize the Application
-**Why?** We need to apply the database structure (tables) and collect static files (CSS/JS for admin) into one folder.
-
-```bash
-python manage.py makemigrations
-python manage.py migrate
-python manage.py collectstatic --noinput
-```
-
-### Step 5: Keep Django Running (Gunicorn & Systemd)
-**Why?** If you just run `python manage.py runserver`, it stops when you close SSH. Systemd is a Linux tool that keeps programs running in the background and restarts them if the server reboots.
-
-1. **Create the service file:**
-   ```bash
-   sudo nano /etc/systemd/system/gunicorn.service
-   ```
-
-2. **Paste this content:**
-   ```ini
-   [Unit]
-   Description=gunicorn daemon
-   After=network.target
-
-   [Service]
-   User=smartshop
-   Group=www-data
-   WorkingDirectory=/home/smartshop/smartshop-app/backend
-   ExecStart=/home/smartshop/smartshop-app/backend/venv/bin/gunicorn --workers 3 --bind unix:/home/smartshop/smartshop-app/backend/core.sock core.wsgi:application
-
-   [Install]
-   WantedBy=multi-user.target
-   ```
-
-3. **Start the service:**
-   ```bash
-   sudo systemctl start gunicorn
-   sudo systemctl enable gunicorn
-   ```
+| Variable | Used By | Description |
+|:---|:---|:---|
+| `SECRET_KEY` | Backend | Django cryptographic secret key |
+| `DEBUG` | Backend | Set to `False` in production |
+| `ALLOWED_HOSTS` | Backend | Comma-separated list of allowed hostnames |
+| `DATABASE_URL` | Backend | Full PostgreSQL connection string |
+| `CORS_ALLOWED_ORIGINS` | Backend | Frontend origins allowed to call the API |
+| `CSRF_TRUSTED_ORIGINS` | Backend | Origins trusted for CSRF (admin login) |
+| `POSTGRES_DB` | Database | Database name |
+| `POSTGRES_USER` | Database | Database username |
+| `POSTGRES_PASSWORD` | Database | Database password |
+| `MINIO_ROOT_USER` | MinIO | MinIO admin username |
+| `MINIO_ROOT_PASSWORD` | MinIO | MinIO admin password |
 
 ---
 
-## Phase 5: Deploying the Frontend (React)
+## How to Redeploy
 
-### Step 1: Build the App
-**Why?** Browsers cannot read React code directly. We must "build" it into standard HTML, CSS, and JavaScript.
+1. Push code changes to the `main` branch on GitHub
+2. Log in to Dokploy Dashboard
+3. Navigate to the SmartShop service
+4. Click **Redeploy**
+5. Dokploy pulls the latest code, rebuilds Docker images, and restarts containers
+
+> If you changed a `Dockerfile` or `docker-compose.yml`, make sure to check **Rebuild Images** before deploying.
+
+---
+
+## How to Add a Django Superuser
+
+After first deployment, create an admin account by running this on the VPS:
 
 ```bash
-cd /home/smartshop/smartshop-app
-
-# Install Node dependencies
-npm install
-
-# Build for production (Replace URL with your domain)
-export VITE_API_URL=https://<YOUR_DOMAIN_NAME>/api
-npm run build
+docker exec -it <backend-container-name> python manage.py createsuperuser
 ```
-*This creates a `dist` folder containing your ready-to-serve website.*
 
-### Step 2: Deploy Files
-**Why?** We move the finished files to `/var/www/`, the standard folder for web servers to read from.
+Follow the prompts to set email and password. Then log in at `https://api.smartshop1.us/admin/`.
+
+---
+
+## Checking Logs
 
 ```bash
-sudo mkdir -p /var/www/smartshop
-sudo cp -r dist/* /var/www/smartshop/
-sudo chown -R www-data:www-data /var/www/smartshop
+# View backend logs (Django + Gunicorn)
+docker logs <backend-container-name> --tail=50
+
+# View frontend logs (Nginx)
+docker logs <frontend-container-name> --tail=20
+
+# List all running containers
+docker ps
+```
+
+Replace `<backend-container-name>` with the actual name from `docker ps`.
+
+---
+
+## Backup & Recovery
+
+### Configure Automatic Backups (Dokploy)
+1. Dokploy Dashboard → **Backups** tab
+2. Set S3 endpoint to `https://s3.smartshop1.us`
+3. Enter MinIO credentials (from Dokploy environment)
+4. Create a bucket called `backups` in MinIO first
+5. Set a backup schedule (e.g., daily at 2am)
+
+### Manual Database Backup
+```bash
+docker exec <db-container-name> \
+  pg_dump -U <db_user> <db_name> > backup_$(date +%F).sql
+```
+
+### Manual Media File Backup
+```bash
+tar -czf media_backup_$(date +%F).tar.gz \
+  /var/lib/docker/volumes/<project>_backend_media/_data/
 ```
 
 ---
 
-## Phase 6: Connecting with Nginx
+## Key Architectural Decisions
 
-### Step 1: Configure Nginx
-**Why?** Nginx acts as the traffic controller. It sends website visitors to your React files and API requests (like login or checkout) to your Django backend.
+### Why Docker?
+- Consistent environment between development and production
+- Easy to update individual services without affecting others
+- All dependencies isolated — no conflicts between Python, Node, Postgres versions
 
-```bash
-sudo nano /etc/nginx/sites-available/smartshop
-```
+### Why Dokploy?
+- Free and open-source
+- Provides GitHub-based deployments without complex CI/CD setup
+- Includes Traefik for automatic SSL and routing
+- Visual dashboard for managing containers and environment vars
 
-**Paste this content (Replace `your_domain.com` with your actual domain):**
+### Why Traefik?
+- Automatic HTTPS via Let's Encrypt with zero configuration
+- Routes traffic to the correct container based on hostname
+- Integrated with Docker — reads container labels automatically
 
-```nginx
-server {
-    listen 80;
-    server_name your_domain.com www.your_domain.com;
+### Why WhiteNoise?
+- Allows Django/Gunicorn to serve its own static files (admin CSS/JS)
+- Eliminates the need for a separate Nginx config for static file serving
 
-    # Serve React Frontend
-    location / {
-        root /var/www/smartshop;
-        index index.html;
-        try_files $uri $uri/ /index.html;
-    }
-
-    # Proxy API requests to Django
-    location /api/ {
-        include proxy_params;
-        proxy_pass http://unix:/home/smartshop/smartshop-app/backend/core.sock;
-    }
-
-    # Proxy Admin requests to Django
-    location /admin/ {
-        include proxy_params;
-        proxy_pass http://unix:/home/smartshop/smartshop-app/backend/core.sock;
-    }
-
-    # Serve Django Static Media (Images uploaded by users)
-    location /media/ {
-        alias /home/smartshop/smartshop-app/backend/media/;
-    }
-
-    # Serve Django Admin Styles (CSS for admin panel)
-    location /static/ {
-        alias /home/smartshop/smartshop-app/backend/staticfiles/;
-    }
-}
-```
-
-### Step 2: Activate the Site
-**Why?** We link the configuration file to the "enabled" folder to tell Nginx to use it.
-
-```bash
-# Link the config
-sudo ln -s /etc/nginx/sites-available/smartshop /etc/nginx/sites-enabled/
-
-# Test for errors
-sudo nginx -t
-
-# Restart Nginx to apply changes
-sudo systemctl restart nginx
-```
+### Why `serve` view for media?
+- Django's default `static()` helper only serves media when `DEBUG=True`
+- Using Django's `serve` view makes media files accessible in production without a CDN or extra Nginx config
 
 ---
 
-## Phase 7: Go Live (DNS & Email Preservation)
+## Troubleshooting
 
-**CRITICAL: Read this before changing anything!**
-You currently use cPanel (IP `51.83.161.4`) for your email. Moving to a VPS will **BREAK YOUR EMAIL** if you don't follow these steps. We will set up a "Split Configuration":
-- **Website** -> Goes to **New VPS**.
-- **Email** -> Stays on **Old cPanel Hosting** (so you don't lose emails).
-
-#### Step 1: Prepare "Mail" Record (Do this NOW in cPanel)
-1.  Log in to cPanel Zone Editor.
-2.  Find the record `mail.smartshop1.us`. It is currently a **CNAME**.
-3.  **Delete** the `mail.smartshop1.us` CNAME record.
-4.  **Create a New Record**:
-    *   **Name**: `mail.smartshop1.us`
-    *   **Type**: **A**
-    *   **Record/Value**: `51.83.161.4` (This is your current cPanel IP)
-    *   **TTL**: 14400
-5.  **Edit the MX Record**:
-    *   Make sure the MX record points to `mail.smartshop1.us` (Priority 0).
-
-*Why? This "pins" your email to the old server. Now, even if we move the main domain, email stays put.*
-
-#### Step 2: Point Domain to VPS (Do this AFTER buying VPS)
-Once you buy the VPS, HostAsia will give you a **NEW IP ADDRESS** (e.g., `xxx.xxx.xxx.xxx`).
-
-1.  In cPanel Zone Editor (or your Domain Registrar if they are different):
-2.  Find the **A Record** for `smartshop1.us`.
-3.  **Edit** it:
-    *   **Old Value**: `51.83.161.4`
-    *   **New Value**: `157.90.149.223`
-4.  Find the **CNAME** for `www.smartshop1.us`.
-    *   Ensure it points to `smartshop1.us`.
-
-#### Step 3: Secure with HTTPS (SSL) on VPS
-SSH into your **157.90.149.223** and run:
-
-```bash
-sudo apt install certbot python3-certbot-nginx -y
-sudo certbot --nginx -d smartshop1.us -d www.smartshop1.us
-```
-*Select "Redirect" (2) when asked.*
-
----
-
-## Phase 8: Automating Updates (CI/CD Pipeline)
-
-**Why?** Without automation, every time you fix a bug or add a feature, you have to SSH into the server, run `git pull`, restart services, build the frontend, etc. A CI/CD pipeline does this automatically whenever you push code to GitHub.
-
-### Step 1: Get Your SSH Key
-You need to give GitHub permission to access your VPS.
-On your **local computer**, run:
-```bash
-cat ~/.ssh/id_rsa
-```
-*(If you don't have one, generate one with `ssh-keygen -t rsa -b 4096` and add the public key `~/.ssh/id_rsa.pub` to your VPS's `~/.ssh/authorized_keys`)*.
-
-Copy the entire block of text starting with `-----BEGIN OPENSSH PRIVATE KEY-----` and ending with `-----END OPENSSH PRIVATE KEY-----`.
-
-### Step 2: Configure GitHub Secrets
-1. Go to your GitHub Repository page.
-2. Click **Settings** > **Secrets and variables** > **Actions**.
-3. Click **New repository secret**.
-4. Add the following secrets:
-   - **Name**: `VPS_HOST`
-     - **Value**: Your VPS IP address (e.g., `123.45.67.89`)
-   - **Name**: `VPS_USERNAME`
-     - **Value**: `root` (or `smartshop` if you created a user with key access)
-   - **Name**: `SSH_PRIVATE_KEY`
-     - **Value**: The private key you copied in Step 1.
-
-### Step 3: Trigger a Deployment
-I have already created a file for you at `.github/workflows/deploy.yml`.
-Now, simply make a change to your code, commit, and push:
-```bash
-git add .
-git commit -m "Setup CI/CD pipeline"
-git push origin main
-```
-Go to the **Actions** tab on GitHub to watch your deployment run automatically!
-
----
-
-## Phase 9: FAQ & Maintenance
-
-### 1. If I delete my GitHub repository, will my website stop working?
-**Answer: NO.**
-Your website runs from the code stored on your VPS hard drive. GitHub is just a place to store a *copy* of your code for development.
-- **If you delete the repo**: Your site stays online safely.
-- **The downside**: You lose your backup and history. You won't be able to push new updates easily until you create a new one.
-- **Recommendation**: Always keep your GitHub repo as a backup.
-
-### 2. How do I update my website manually?
-If you don't want to set up CI/CD, simply SSH into your server and run:
-```bash
-cd /home/smartshop/smartshop-app
-git pull
-# If backend changes:
-sudo systemctl restart gunicorn
-# If frontend changes:
-npm run build && sudo cp -r dist/* /var/www/smartshop/
-```
-
-### 3. How do I check logs if something breaks?
-- **Nginx (Web Server) Logs**: `sudo tail -f /var/log/nginx/error.log`
-- **Django (Backend) Logs**: `sudo journalctl -u gunicorn -f`
-
----
-
-## Conclusion
-You have now deployed a professional, high-performance e-commerce platform on your own **HostAsia VPS**. You have full control, lower costs, and no dependencies on third-party cloud platforms like Vercel or Render.
-
-**Enjoy your new site!**
+| Problem | Likely Cause | Fix |
+|:---|:---|:---|
+| Site shows 502 Bad Gateway | Backend container crashed | Check backend logs |
+| Images not loading | Media URL misconfigured | Verify `MEDIA_URL` and `urls.py` config |
+| CORS errors in browser | Origin not in `CORS_ALLOWED_ORIGINS` | Update env var and redeploy |
+| Admin login fails (CSRF) | `CSRF_TRUSTED_ORIGINS` missing | Add to Dokploy environment |
+| Changes not reflected | Old image cached | Force rebuild in Dokploy |
+| Database connection error | Wrong `DATABASE_URL` | Verify credentials in Dokploy env |
