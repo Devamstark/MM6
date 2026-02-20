@@ -468,7 +468,7 @@ cloudmart-e-commerce/
     ├── vite.config.ts
     ├── tailwind.config.js
     ├── tsconfig.json
-    ├── vercel.json
+    ├── docker-compose.yml
     └── Dockerfile
 ```
 
@@ -608,7 +608,7 @@ cloudmart-e-commerce/
 ✅ **Comprehensive documentation** (5 detailed files)  
 ✅ **Professional design** (Responsive, accessible)  
 ✅ **Security best practices** (JWT, RBAC, validation)  
-✅ **Cloud deployment ready** (Vercel, Render, Neon)  
+✅ **Self-hosted VPS deployment** (Docker + Dokploy + Traefik)  
 ✅ **Academic presentation ready** (Diagrams, metrics)  
 
 **This MVP demonstrates enterprise-level full-stack development skills and is suitable for:**

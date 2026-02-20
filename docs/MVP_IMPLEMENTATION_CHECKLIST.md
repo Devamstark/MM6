@@ -42,8 +42,8 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Token expiration handling
 
 ### ✅ File Handling (100% Complete)
-- [x] Cloudinary integration for image uploads
-- [x] Media file serving configured
+- [x] Local Docker volume for image uploads
+- [x] Media file serving via Django `serve` view
 - [x] Image validation (size, format)
 
 ---
@@ -194,28 +194,19 @@ This checklist tracks the implementation status of all MVP features for the Smar
 
 ---
 
-## 🚀 Deployment
-
-### ✅ Backend Deployment (Render) (100% Complete)
-- [x] build.sh script created
-- [x] requirements.txt up to date
-- [x] Gunicorn configured
-- [x] WhiteNoise for static files
-- [x] Environment variables documented
-- [x] PostgreSQL (Neon) connection configured
-- [x] CORS settings for production
-
-### ✅ Frontend Deployment (Vercel) (100% Complete)
-- [x] Build configuration (vite.config.ts)
-- [x] Environment variables setup
-- [x] vercel.json created
-- [x] API URL configured for production
-- [x] Static asset optimization
-
-### ✅ Database (Neon PostgreSQL) (100% Complete)
-- [x] Database created
-- [x] Connection string configured
-- [x] Migrations run successfully
+### ✅ Deployment — VPS (Docker + Dokploy) (100% Complete)
+- [x] `Dockerfile.backend` for Django/Gunicorn
+- [x] `Dockerfile.frontend` for React/Nginx
+- [x] `docker-compose.yml` with all services
+- [x] Traefik reverse proxy with auto SSL (Let's Encrypt)
+- [x] Environment variables in Dokploy dashboard
+- [x] PostgreSQL with persistent Docker volume
+- [x] WhiteNoise for Django static files
+- [x] Media file serving via Django `serve` view
+- [x] Adminer at `https://db.smartshop1.us`
+- [x] MinIO self-hosted S3 at `https://minio.smartshop1.us`
+- [x] FileBrowser for media management (VPS internal)
+- [x] CORS and CSRF configured for production domains
 
 ---
 
@@ -224,7 +215,10 @@ This checklist tracks the implementation status of all MVP features for the Smar
 ### ✅ Technical Documentation (100% Complete)
 - [x] README.md with setup instructions
 - [x] FULL_MVP_SPECIFICATION.md (comprehensive spec)
-- [x] DEPLOYMENT_GUIDE.md
+- [x] VPS_DEPLOYMENT_GUIDE.md (Docker/Dokploy)
+- [x] NETWORK_ARCHITECTURE.md
+- [x] SSL_SECURITY_SETUP.md
+- [x] WORK_DONE.md (deployment summary)
 - [x] API endpoint documentation
 - [x] Environment variables guide
 
@@ -264,7 +258,7 @@ This checklist tracks the implementation status of all MVP features for the Smar
 
 ### ✅ Frontend Performance (90% Complete)
 - [x] Code splitting (React.lazy)
-- [x] Image optimization (Cloudinary)
+- [x] Image optimization (Pillow + Django)
 - [x] Lazy loading for images
 - [x] Minified production build
 - [ ] Service worker for caching (PWA)
@@ -326,14 +320,14 @@ All of the following must be ✅ before launch:
 - [x] Authentication working end-to-end
 - [x] Payment flow complete (mock for MVP)
 - [x] Responsive on all devices
-- [x] Deployed to production (Vercel + Render)
+- [x] Deployed to production (Docker + Dokploy on VPS)
 - [x] Database migrations applied
 - [x] Environment variables configured
 - [x] HTTPS enabled
 - [x] Manual testing completed (100% done)
 - [x] Documentation complete
 
-**Status**: 🟢 **READY FOR LAUNCH (v1.1.0)**
+**Status**: 🟢 **LIVE IN PRODUCTION (v1.2.0)** — [https://smartshop1.us](https://smartshop1.us)
 
 ---
 
@@ -342,7 +336,13 @@ All of the following must be ✅ before launch:
 ### Known Issues
 - Financial fields (`cogs`, `marketing_cost`, `shipping_cost`) are present in the database but currently defaulted to 0 in the UI for simplicity. Admin can edit these if features are enabled later.
 
-### Recent Updates (v1.1.0)
+### Recent Updates (v1.2.0)
+- **Deployment**: Migrated from Vercel/Render/Neon to self-hosted VPS using Docker + Dokploy.
+- **SSL**: Traefik + Let's Encrypt (auto-renewed certificates).
+- **Storage**: MinIO self-hosted S3 for backups; local Docker volumes for media.
+- **Media serving**: Fixed production media serving via Django `serve` view.
+
+### Previous Updates (v1.1.0)
 - **State Management**: Migrated from Context API to **Jotai** for atomic state updates (Cart, User, UI).
 - **Frontend Stack**: Upgraded to React 19, Vite 6, and Tailwind CSS 4.
 - **UI Refresh**: Modernized Admin Dashboard and general UI aesthetics.
@@ -357,6 +357,6 @@ All of the following must be ✅ before launch:
 
 ---
 
-**Last Updated**: February 16, 2026  
-**Reviewed By**: Development Team  
-**Next Review**: Before production launch
+**Last Updated**: February 2026  
+**Status**: ✅ Live in Production  
+**URL**: https://smartshop1.us

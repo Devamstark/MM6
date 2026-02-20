@@ -243,7 +243,7 @@
 │                                                          │
 │  Layer 1: HTTPS/TLS                                     │
 │  ├─ All traffic encrypted in transit                    │
-│  └─ SSL certificates (Vercel/Render automatic)          │
+│  └─ SSL certificates (Traefik + Let's Encrypt, auto-renewed) │
 │                                                          │
 │  Layer 2: CORS Protection                               │
 │  ├─ Whitelist allowed origins                           │
@@ -469,7 +469,7 @@ UI Error Display (Toast/Alert)
 ### Horizontal Scaling
 ```
 ┌─────────────────────────────────────────────────────────┐
-│  Load Balancer (Render/Vercel automatic)                │
+│  Load Balancer (Traefik — managed by Dokploy)                │
 └────────────────────┬────────────────────────────────────┘
                      │
         ┌────────────┼────────────┐
@@ -493,7 +493,7 @@ UI Error Display (Toast/Alert)
 │                    Cache Layers                          │
 ├─────────────────────────────────────────────────────────┤
 │  L1: Browser Cache (Static Assets)                      │
-│  L2: CDN Cache (Vercel Edge, Cloudinary)                │
+│  L2: CDN Cache (Nginx static files, Traefik edge)       │
 │  L3: Redis Cache (API Responses) [Future]               │
 │  L4: Database Query Cache (PostgreSQL)                  │
 └─────────────────────────────────────────────────────────┘

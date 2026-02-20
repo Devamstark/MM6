@@ -2,7 +2,7 @@
 
 ## 🎯 Welcome!
 
-This is your complete documentation package for the **SmartShop E-Commerce Platform MVP** (Version 1.1.0). This index will help you navigate through all the documentation files and understand what each one contains.
+This is your complete documentation package for the **SmartShop E-Commerce Platform** (Version 1.2.0). Live at [https://smartshop1.us](https://smartshop1.us). This index helps you navigate all documentation files.
 
 ---
 
@@ -116,18 +116,17 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 
 ### 🌐 **DEPLOYMENT**
 
-#### 7. **DEPLOYMENT_GUIDE.md** 🚀 **[DEPLOY TO PRODUCTION]**
-**Purpose**: Production deployment instructions  
-**Best For**: Deploying to Vercel, Render, and Neon  
+#### 7. **VPS_DEPLOYMENT_GUIDE.md** 🚀 **[DEPLOY TO PRODUCTION]**
+**Purpose**: Production deployment instructions (current)
+**Best For**: Understanding how the app is deployed on VPS
 **Contains**:
-- Vercel deployment (Frontend)
-- Render deployment (Backend)
-- Neon PostgreSQL setup
+- Docker + Dokploy setup
+- Traefik reverse proxy + SSL
 - Environment variables
-- Domain configuration
-- Troubleshooting deployment issues
+- PostgreSQL + MinIO configuration
+- Redeployment and troubleshooting
 
-**When to Read**: When ready to deploy to production
+**When to Read**: When working with the production deployment
 
 ---
 
@@ -364,13 +363,16 @@ You now have:
 
 | Document | Version | Last Updated | Status |
 |----------|---------|--------------|--------|
-| MVP_SUMMARY.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
-| QUICK_START_GUIDE.md | 1.0.0 | Feb 4, 2026 | ✅ Complete |
-| FULL_MVP_SPECIFICATION.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
+| MVP_SUMMARY.md | 1.2.0 | Feb 2026 | ✅ Updated |
+| QUICK_START_GUIDE.md | 1.1.0 | Feb 2026 | ✅ Updated |
+| FULL_MVP_SPECIFICATION.md | 1.2.0 | Feb 2026 | ✅ Updated |
 | COMPLETE_FEATURE_LIST.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
-| SYSTEM_ARCHITECTURE.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
-| MVP_IMPLEMENTATION_CHECKLIST.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
-| DEPLOYMENT_GUIDE.md | 1.0.0 | Feb 4, 2026 | ✅ Complete |
+| SYSTEM_ARCHITECTURE.md | 1.2.0 | Feb 2026 | ✅ Updated |
+| NETWORK_ARCHITECTURE.md | 1.0.0 | Feb 2026 | ✅ New |
+| MVP_IMPLEMENTATION_CHECKLIST.md | 1.2.0 | Feb 2026 | ✅ Updated |
+| VPS_DEPLOYMENT_GUIDE.md | 1.0.0 | Feb 2026 | ✅ New |
+| SSL_SECURITY_SETUP.md | 1.0.0 | Feb 2026 | ✅ New |
+| WORK_DONE.md | 1.0.0 | Feb 2026 | ✅ New |
 
 ---
 
@@ -380,6 +382,6 @@ Start with `MVP_SUMMARY.md` and enjoy exploring your complete SmartShop MVP!
 
 ---
 
-**Last Updated**: February 16, 2026  
-**Documentation Package Version**: 1.1.0  
-**Total Documentation**: 6 files, ~27,300 words
+**Last Updated**: February 2026
+**Documentation Package Version**: 1.2.0
+**Total Documentation**: 12 files

@@ -16,27 +16,31 @@
 - **State Management**: Jotai (Atomic state management for Cart, User, UI)
 - **HTTP Client**: Axios (REST API communication)
 - **Icons**: Lucide React (Modern, lightweight icons)
-- **Deployment**: Vercel (Edge network, automatic HTTPS)
+- **Deployment**: Docker + Nginx (self-hosted VPS via Dokploy)
 
 ### **Backend**
 - **Language**: Python 3.10+
 - **Framework**: Django 4.2 + Django REST Framework (DRF)
 - **Authentication**: JWT (djangorestframework-simplejwt)
 - **Database ORM**: Django ORM
-- **File Storage**: Cloudinary (Image hosting)
+- **File Storage**: Local Docker volume (`backend_media`)
 - **CORS**: django-cors-headers
 - **Static Files**: WhiteNoise (Production static serving)
-- **Deployment**: Render (Managed containers)
+- **Deployment**: Docker + Gunicorn (self-hosted VPS via Dokploy)
 
 ### **Database**
 - **Development**: SQLite3 (Local testing)
-- **Production**: PostgreSQL 15 (Neon serverless)
+- **Production**: PostgreSQL 15 (Docker, persistent named volume)
 
 ### **DevOps & Tools**
 - **Version Control**: Git
 - **Package Managers**: npm (frontend), pip (backend)
-- **Environment Variables**: python-dotenv
+- **Environment Variables**: python-dotenv + Dokploy env manager
 - **Process Manager**: Gunicorn (WSGI server)
+- **Orchestrator**: Dokploy (self-hosted)
+- **Containerization**: Docker + Docker Compose
+- **Reverse Proxy**: Traefik (auto SSL via Let's Encrypt)
+- **Backup Storage**: MinIO (self-hosted S3)
 
 ---
 
@@ -78,7 +82,7 @@
 
 #### Seller Capabilities:
 - Create, edit, delete own products
-- Upload images (Cloudinary integration)
+- Upload images (stored in Docker volume)
 - Set pricing, stock, and variants
 - View product performance metrics
 
@@ -552,30 +556,22 @@ Frontend will run at `http://localhost:5173`
 
 ## 🌐 Deployment
 
-### **Frontend (Vercel)**
+> The application is live on a self-hosted VPS. See **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)** for full details.
+
+### **Current Stack (VPS + Docker + Dokploy)**
 1. Push code to GitHub
-2. Connect repository to Vercel
-3. Set environment variables:
-   - `VITE_API_URL=https://your-backend.onrender.com`
-4. Deploy
+2. Dokploy detects the push and triggers rebuild
+3. Docker builds `Dockerfile.frontend` and `Dockerfile.backend`
+4. `docker-compose.yml` spins up all services
+5. Traefik routes traffic and issues SSL certificates automatically
 
-### **Backend (Render)**
-1. Create new Web Service on Render
-2. Connect GitHub repository
-3. Set build command: `./build.sh`
-4. Set start command: `gunicorn core.wsgi:application`
-5. Add environment variables:
-   - `SECRET_KEY`
-   - `DATABASE_URL` (Neon PostgreSQL)
-   - `CLOUDINARY_URL`
-   - `ALLOWED_HOSTS`
-   - `CORS_ALLOWED_ORIGINS`
-6. Deploy
-
-### **Database (Neon)**
-1. Create Neon project
-2. Copy connection string
-3. Add to Render environment variables
+### **Environment Variables (set in Dokploy)**
+- `SECRET_KEY`
+- `DATABASE_URL`
+- `ALLOWED_HOSTS`
+- `CORS_ALLOWED_ORIGINS`
+- `CSRF_TRUSTED_ORIGINS`
+- `DEBUG=False`
 
 ---
 
@@ -661,5 +657,5 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 16, 2026
-**Version**: 1.1.0 (MVP + Modern Stack)
+**Last Updated**: February 2026
+**Version**: 1.2.0 (VPS Deployment)
