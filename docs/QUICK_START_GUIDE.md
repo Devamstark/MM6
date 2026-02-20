@@ -1,4 +1,23 @@
-# 🚀 CloudMart - Quick Start Guide
+# 🚀 SmartShop - Quick Start Guide
+
+> 🌐 **Already live in production at [https://smartshop1.us](https://smartshop1.us)**
+> This guide covers running the app **locally for development**.
+
+---
+
+## 🌐 Production URLs (Already Deployed)
+
+| Service | URL |
+|:---|:---|
+| Store | [https://smartshop1.us](https://smartshop1.us) |
+| Django Admin | [https://api.smartshop1.us/admin/](https://api.smartshop1.us/admin/) |
+| Database Browser | [https://db.smartshop1.us](https://db.smartshop1.us) |
+| MinIO Storage | [https://minio.smartshop1.us](https://minio.smartshop1.us) |
+
+See **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)** for deployment details.
+
+---
+
 
 ## 📋 Prerequisites Checklist
 

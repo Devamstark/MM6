@@ -1,147 +1,130 @@
-# SSL/HTTPS Security Setup Guide
+# SSL / HTTPS Security Setup Guide
 
-## ✅ Current Security Status
+## ✅ Current SSL Status (Production)
 
-### Frontend (Vercel)
-- **SSL Certificate**: ✅ Automatically provided by Vercel (Let's Encrypt)
-- **HTTPS**: ✅ All Vercel deployments use HTTPS by default
-- **Your URL**: `https://mm-6.vercel.app` or your custom domain
+SmartShop is deployed on a VPS with SSL managed automatically by **Traefik** and **Let's Encrypt**. No manual certificate management is needed.
 
-### Backend (Render)
-- **SSL Certificate**: ✅ Automatically provided by Render (Let's Encrypt)
-- **HTTPS**: ✅ All Render services use HTTPS by default
-- **Your URL**: `https://mm6-backend.onrender.com` (or your actual backend URL)
+| Domain | SSL | Provider | Status |
+|:---|:---|:---|:---|
+| `https://smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
+| `https://www.smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
+| `https://api.smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
+| `https://db.smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
+| `https://minio.smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
+| `https://s3.smartshop1.us` | ✅ Auto-renewed | Let's Encrypt via Traefik | Live |
 
-## 🔧 Required Configuration
+---
 
-### 1. Vercel Environment Variables
+## 🔧 How SSL Works in This Deployment
 
-Go to: https://vercel.com/dashboard → Your Project → Settings → Environment Variables
+### Traefik + Let's Encrypt
 
-Add the following:
+Dokploy installs and manages **Traefik** as a reverse proxy. Traefik handles:
+- Automatic certificate issuance from Let's Encrypt
+- Certificate renewal (before expiry, automatically)
+- HTTP → HTTPS redirect for all domains
+- SSL termination (decrypts HTTPS, forwards HTTP internally to containers)
 
+Each service is assigned a domain via Docker labels in `docker-compose.yml`:
+```yaml
+labels:
+  - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
 ```
-Name: VITE_API_URL
-Value: https://your-backend-url.onrender.com/api
-Environments: Production, Preview, Development
-```
 
-⚠️ **CRITICAL**: The URL MUST start with `https://` not `http://`
+### HTTPS Behind Traefik (Django Configuration)
 
-### 2. Render Backend Configuration
-
-Ensure your backend is deployed and accessible via HTTPS:
-
-1. Go to your Render dashboard
-2. Check your service URL - it should be `https://...`
-3. Verify the service is running
-
-### 3. CORS Configuration (Backend)
-
-Your Django backend should allow requests from your Vercel domain:
+Since Django runs behind Traefik, it receives requests over internal HTTP. Django needs to know it's actually serving HTTPS. This is configured in `settings.py`:
 
 ```python
-# backend/cloudmart/settings.py
-CORS_ALLOWED_ORIGINS = [
-    "https://mm-6.vercel.app",
-    "https://your-custom-domain.com",  # if you have one
-]
-
-# For development
-if DEBUG:
-    CORS_ALLOWED_ORIGINS += ["http://localhost:5173", "http://localhost:5174"]
+# Trust Traefik's forwarded proto header
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
 ```
+
+Traefik forwards the `X-Forwarded-Proto: https` header, which Django uses to determine the actual protocol.
+
+---
+
+## 🔐 Security Configuration in Django
+
+### CORS (Cross-Origin Resource Sharing)
+Controls which domains can call the API:
+```python
+CORS_ALLOWED_ORIGINS = [
+    "https://smartshop1.us",
+    "https://www.smartshop1.us",
+]
+```
+Prevents unauthorized websites from using your API.
+
+### CSRF (Cross-Site Request Forgery)
+Required for Django admin login and form submissions:
+```python
+CSRF_TRUSTED_ORIGINS = [
+    "https://smartshop1.us",
+    "https://www.smartshop1.us",
+    "https://api.smartshop1.us",
+]
+```
+
+### ALLOWED_HOSTS
+Prevents HTTP Host header attacks:
+```python
+ALLOWED_HOSTS = ["smartshop1.us", "api.smartshop1.us", "www.smartshop1.us"]
+```
+
+---
 
 ## 🚨 Common SSL Issues & Solutions
 
-### Issue 1: "Mixed Content" Warning
-**Cause**: Frontend (HTTPS) calling backend over HTTP
-**Solution**: Ensure `VITE_API_URL` uses `https://`
+| Issue | Cause | Fix |
+|:---|:---|:---|
+| Certificate not issued | DNS record missing | Add A record for the domain and redeploy |
+| `CORS header missing` error | Origin not in `CORS_ALLOWED_ORIGINS` | Update env var and redeploy backend |
+| Django CSRF error on admin | `CSRF_TRUSTED_ORIGINS` missing | Add to Dokploy environment and redeploy |
+| Mixed content warning | API URL uses `http://` | Ensure `VITE_API_URL` starts with `https://` |
+| `Bad Gateway` after SSL | Backend container crashed | Check backend logs via `docker logs` |
 
-### Issue 2: "NET::ERR_CERT_AUTHORITY_INVALID"
-**Cause**: Using self-signed certificate
-**Solution**: Both Vercel and Render provide valid certificates - no action needed
+---
 
-### Issue 3: Browser Shows "Not Secure"
-**Causes**:
-- Accessing via `http://` instead of `https://`
-- Mixed content (loading resources over HTTP)
-- Expired certificate (shouldn't happen with Vercel/Render)
+## 📋 SSL Deployment Checklist
 
-**Solution**: 
-- Always use `https://` URLs
-- Check all external resources use HTTPS
-- Redeploy if needed
+- [x] DNS A records pointing to VPS for all subdomains
+- [x] Traefik configured as reverse proxy (managed by Dokploy)
+- [x] `certresolver=letsencrypt` label on all service routers
+- [x] `SECURE_PROXY_SSL_HEADER` set in Django settings
+- [x] `CORS_ALLOWED_ORIGINS` includes `https://smartshop1.us`
+- [x] `CSRF_TRUSTED_ORIGINS` includes all app domains
+- [x] `VITE_API_URL` uses `https://api.smartshop1.us/api`
+- [x] All services accessible over HTTPS
 
-## 📋 Deployment Checklist
+---
 
-- [ ] Vercel environment variable `VITE_API_URL` set to HTTPS backend URL
-- [ ] Backend deployed on Render with HTTPS
-- [ ] CORS configured to allow Vercel domain
-- [ ] Test the deployed site at `https://mm-6.vercel.app`
-- [ ] Verify no mixed content warnings in browser console
-- [ ] Check that login/payment forms work over HTTPS
+## 🔒 Additional Security Best Practices Applied
 
-## 🔐 Additional Security Recommendations
+| Practice | Status | How |
+|:---|:---|:---|
+| HTTPS everywhere | ✅ | Traefik auto-redirect HTTP → HTTPS |
+| JWT Authentication | ✅ | djangorestframework-simplejwt |
+| Password hashing | ✅ | Django default (PBKDF2) |
+| CORS protection | ✅ | django-cors-headers |
+| SQL injection prevention | ✅ | Django ORM |
+| XSS protection | ✅ | React auto-escaping + Django |
+| Secrets in env vars | ✅ | Dokploy environment manager |
+| Role-based access | ✅ | Django permissions + DRF |
+| Input validation | ✅ | DRF serializers + frontend forms |
 
-### 1. Force HTTPS Redirect
-Vercel automatically redirects HTTP to HTTPS - no configuration needed.
-
-### 2. Security Headers
-Add to `vercel.json`:
-
-```json
-{
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "X-Content-Type-Options",
-          "value": "nosniff"
-        },
-        {
-          "key": "X-Frame-Options",
-          "value": "DENY"
-        },
-        {
-          "key": "X-XSS-Protection",
-          "value": "1; mode=block"
-        },
-        {
-          "key": "Strict-Transport-Security",
-          "value": "max-age=31536000; includeSubDomains"
-        }
-      ]
-    }
-  ]
-}
-```
-
-### 3. Content Security Policy (CSP)
-Consider adding CSP headers to prevent XSS attacks.
-
-### 4. Environment Variables Security
-- ✅ Never commit `.env` files to Git
-- ✅ Use Vercel's environment variables for secrets
-- ✅ Rotate API keys regularly
+---
 
 ## 🧪 Testing SSL
 
-### Test Your Deployment:
-1. Visit: `https://www.ssllabs.com/ssltest/`
-2. Enter your Vercel URL
-3. Check for A+ rating
+Visit your live site and verify:
+1. **Browser padlock** shows 🔒 on all pages
+2. **No mixed content** warnings in browser console (F12)
+3. **HTTP redirects** — visiting `http://smartshop1.us` should redirect to `https://`
+4. Test your SSL grade: [https://www.ssllabs.com/ssltest/](https://www.ssllabs.com/ssltest/)
 
-### Browser Console Check:
-1. Open your site in Chrome
-2. Press F12 → Console tab
-3. Look for any "Mixed Content" warnings
-4. All requests should be HTTPS
+---
 
-## 📞 Support
-
-If issues persist:
-- **Vercel Support**: https://vercel.com/support
-- **Render Support**: https://render.com/docs/support
-- Check browser console for specific error messages
+**SSL is fully automated. No manual renewal or configuration is ever needed.**

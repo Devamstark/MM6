@@ -1,5 +1,7 @@
 # 🎉 SmartShop - Full Stack MVP Summary
 
+> ✅ **Live at [https://smartshop1.us](https://smartshop1.us)** — Fully deployed on VPS using Docker + Dokploy
+
 ## 📌 Project Overview
 
 **SmartShop** is a production-ready, full-stack e-commerce platform built with modern web technologies. This MVP demonstrates enterprise-level architecture, clean code practices, and comprehensive feature implementation suitable for academic presentation and real-world deployment.
@@ -207,10 +209,14 @@ Production: PostgreSQL 15 (Neon)
 
 ### **Deployment**
 ```
-Frontend: Vercel (Edge CDN)
-Backend: Render (Managed containers)
-Database: Neon (Serverless PostgreSQL)
-Images: Cloudinary (CDN)
+Platform:  Dokploy (Self-hosted, open-source)
+Proxy:     Traefik (Reverse proxy + automatic SSL)
+Frontend:  Nginx (inside Docker container)
+Backend:   Gunicorn (inside Docker container)
+Database:  PostgreSQL 15 (Docker, persistent volume)
+Images:    VPS local storage (served via Django)
+Storage:   MinIO (Self-hosted S3 for backups)
+Certs:     Let's Encrypt (auto-renewed by Traefik)
 ```
 
 ---
@@ -267,27 +273,32 @@ See `QUICK_START_GUIDE.md` for detailed instructions including:
 
 ---
 
-## 🌐 Deployment Ready
+## 🌐 Deployment — Live on VPS
 
-### **Frontend (Vercel)**
-- ✅ Build script configured
-- ✅ Environment variables documented
-- ✅ vercel.json created
-- ✅ Production optimizations enabled
+### **Frontend (Docker + Nginx)**
+- ✅ React app built at Docker image build time
+- ✅ Served by Nginx with SPA routing
+- ✅ API URL baked in via `VITE_API_URL` build arg
+- ✅ Live at `https://smartshop1.us`
 
-### **Backend (Render)**
-- ✅ build.sh deployment script
-- ✅ Gunicorn WSGI server
-- ✅ WhiteNoise static file serving
-- ✅ PostgreSQL connection ready
-- ✅ CORS configured for production
+### **Backend (Docker + Gunicorn)**
+- ✅ Django REST API running via Gunicorn
+- ✅ WhiteNoise for Django admin static files
+- ✅ Media files served via Django's `serve` view
+- ✅ Auto-runs migrations on container start
+- ✅ Live at `https://api.smartshop1.us`
 
-### **Database (Neon)**
-- ✅ PostgreSQL 15 compatible
-- ✅ Connection string format ready
-- ✅ Migrations prepared
+### **Database (PostgreSQL on VPS)**
+- ✅ PostgreSQL 15 in Docker with persistent volume
+- ✅ Adminer browser UI at `https://db.smartshop1.us`
+- ✅ Automated backups via Dokploy → MinIO
 
-**Deployment Guide**: See `DEPLOYMENT_GUIDE.md`
+### **Infrastructure**
+- ✅ Traefik reverse proxy with auto-SSL (Let's Encrypt)
+- ✅ All subdomains on HTTPS
+- ✅ MinIO self-hosted S3 at `https://minio.smartshop1.us`
+
+**Full Deployment Guide**: See `VPS_DEPLOYMENT_GUIDE.md`
 
 ---
 
@@ -313,10 +324,11 @@ See `QUICK_START_GUIDE.md` for detailed instructions including:
    - XSS protection
 
 4. **Modern DevOps**
-   - Cloud deployment (Vercel, Render, Neon)
-   - Environment configuration
-   - Static file serving
-   - Database migrations
+   - Self-hosted VPS deployment (Dokploy + Docker)
+   - Traefik reverse proxy + automatic SSL
+   - Environment variable management
+   - Containerized services with Docker Compose
+   - Self-hosted S3 storage (MinIO)
 
 5. **Professional Development**
    - TypeScript for type safety
@@ -615,10 +627,11 @@ For any questions, refer to the documentation files or the inline code comments.
 ---
 
 **Project**: SmartShop E-Commerce Platform  
-**Version**: 1.1.0 (MVP + Modern Stack)  
-**Last Updated**: February 16, 2026  
-**Status**: ✅ Production Ready  
-**Completion**: 98%  
+**Version**: 1.2.0 (MVP + VPS Deployment)  
+**Last Updated**: February 2026  
+**Status**: ✅ Live in Production  
+**URL**: [https://smartshop1.us](https://smartshop1.us)  
+**Completion**: 100%  
 
 ---
 

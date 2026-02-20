@@ -385,42 +385,34 @@ Some contexts remain as wrappers or for specific logic not yet fully migrated, b
 
 ## 🚀 Deployment Architecture
 
-### Production Environment
+### Production Environment (Docker + Dokploy)
 
+```
 ┌─────────────────────────────────────────────────────────────┐
-│                      PRODUCTION (VPS)                        │
-│               (HostAsia - Ubuntu 22.04 LTS)                  │
+│             PRODUCTION — HostAsia VPS (Ubuntu)               │
+│                 Managed by Dokploy                           │
+├─────────────────────────────────────────────────────────────┤
+│                                                              │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │              Traefik (Reverse Proxy)                    │ │
+│  │         SSL via Let's Encrypt (Auto-renewed)           │ │
+│  └───┬─────────────┬──────────────┬────────────┬──────────┘ │
+│      │             │              │            │            │
+│      ▼             ▼              ▼            ▼            │
+│  ┌───────┐    ┌────────┐   ┌──────────┐  ┌────────┐       │
+│  │ Nginx │    │Gunicorn│   │ Adminer  │  │ MinIO  │       │
+│  │(React)│    │(Django)│   │(DB View) │  │ (S3)   │       │
+│  └───────┘    └────┬───┘   └──────────┘  └────────┘       │
+│                    │                                        │
+│                    ▼                                        │
+│             ┌────────────┐                                  │
+│             │ PostgreSQL │                                  │
+│             │  (Docker)  │                                  │
+│             └────────────┘                                  │
+│                                                              │
+│  All services connected via: dokploy-network (Docker bridge) │
 └─────────────────────────────────────────────────────────────┘
-
-┌──────────────────────────────────────────────────┐
-│                  VPS Server                      │
-│                                                  │
-│  ┌──────────────┐       ┌────────────────────┐   │
-│  │    Nginx     │◄─────►│      Gunicorn      │   │
-│  │ (Web Server) │       │   (App Server)     │   │
-│  └──────┬───────┘       └─────────┬──────────┘   │
-│         │                         │              │
-│         ▼                         ▼              │
-│  ┌──────────────┐       ┌────────────────────┐   │
-│  │ React Build  │       │     Django App     │   │
-│  │ (Static Files)       │     (Backend)      │   │
-│  └──────────────┘       └─────────┬──────────┘   │
-│                                   │              │
-│                                   ▼              │
-│                         ┌────────────────────┐   │
-│                         │   PostgreSQL DB    │   │
-│                         │    (Local)         │   │
-│                         └────────────────────┘   │
-└──────────────────────────────────────────────────┘
-
-┌──────────────────┐
-│  Cloudinary      │
-│  (Image CDN)     │
-├──────────────────┤
-│ • Image Storage  │
-│ • Optimization   │
-│ • Transformations│
-└──────────────────┘
+```
 
 ---
 
@@ -465,11 +457,10 @@ UI Error Display (Toast/Alert)
 - **Migrations**: Django migrations system
 - **Pooling**: Database connection pooling
 
-### Backend ↔ Cloudinary
-- **SDK**: cloudinary Python library
-- **Upload**: Direct upload from Django
-- **Storage**: django-cloudinary-storage
-- **URLs**: Cloudinary CDN URLs in responses
+### Backend ↔ Storage
+- **Media Files**: Stored in Docker named volume (`backend_media`)
+- **Serving**: Django `serve` view at `/media/` endpoint
+- **Backups**: MinIO S3-compatible storage via Dokploy
 
 ---
 
@@ -540,5 +531,96 @@ UI Error Display (Toast/Alert)
 
 ---
 
-**Last Updated**: February 16, 2026  
-**Version**: 1.1.0
+**Last Updated**: February 2026
+**Version**: 1.2.0
+
+---
+
+## 🌐 Network Architecture
+
+### Full Network Diagram (Production)
+
+```
+                    ┌─────────────────┐
+                    │    Internet     │
+                    │  (HTTPS only)   │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────┐
+                    │   DNS Records   │
+                    │  smartshop1.us  │
+                    │  → VPS IP       │
+                    └────────┬────────┘
+                             │
+                    ┌────────▼────────────────────────────────┐
+                    │        Traefik (port 80 / 443)           │
+                    │   Reverse Proxy + SSL Termination        │
+                    │   Certificates: Let's Encrypt (auto)     │
+                    └──┬──────┬────────┬──────────┬───────────┘
+                       │      │        │          │
+          ┌────────────▼┐  ┌──▼──────┐ │  ┌───────▼──────┐
+          │  Frontend   │  │ Backend │ │  │   Adminer    │
+          │  (Nginx)    │  │(Gunicorn│ │  │  (DB Browser)│
+          │ port 80     │  │ port8000│ │  │  port 8080   │
+          │             │  │         │ │  └──────────────┘
+          │ smartshop   │  │api.smart│ │
+          │ 1.us        │  │shop1.us │ │  ┌───────▼──────┐
+          └─────────────┘  └────┬────┘ │  │    MinIO     │
+                                │      │  │  Console UI  │
+                         ┌──────▼────┐ └─►│  + S3 API    │
+                         │PostgreSQL │    │  port 9000/  │
+                         │  port5432 │    │  9001        │
+                         │(internal) │    └──────────────┘
+                         └───────────┘
+
+  FileBrowser (internal, IP:port only — not via Traefik)
+     Mounted directly to backend_media Docker volume
+```
+
+### Docker Network
+
+```
+┌─────────────────────────────────────────────────┐
+│           dokploy-network (bridge)               │
+│                                                  │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│   │ frontend │  │ backend  │  │    db    │     │
+│   └──────────┘  └──────────┘  └──────────┘     │
+│                                                  │
+│   ┌──────────┐  ┌──────────┐  ┌──────────┐     │
+│   │ adminer  │  │  minio   │  │ traefik  │     │
+│   └──────────┘  └──────────┘  └──────────┘     │
+│                                                  │
+│  All containers talk to each other by service    │
+│  name (e.g. backend → db:5432)                  │
+│  External access only via Traefik on 80/443      │
+└─────────────────────────────────────────────────┘
+```
+
+### Docker Volumes (Persistent Storage)
+
+```
+┌─────────────────────────────────────────────────┐
+│              Docker Named Volumes                │
+├──────────────────┬──────────────────────────────┤
+│ postgres_data    │ PostgreSQL database files      │
+│ backend_static   │ Django admin CSS/JS files      │
+│ backend_media    │ Uploaded product images        │
+│ frontend_build   │ React production build         │
+│ minio_data       │ MinIO backup storage           │
+└──────────────────┴──────────────────────────────┘
+```
+
+### Traffic Flow (HTTPS Request)
+
+```
+Browser → DNS resolve smartshop1.us → VPS IP
+       → Traefik (port 443, SSL terminate)
+       → Docker internal HTTP to Nginx container
+       → Nginx serves React index.html
+       → React loads, calls api.smartshop1.us/api/...
+       → Traefik routes to backend container
+       → Gunicorn → Django processes request
+       → Returns JSON response
+       → React renders UI
+```
