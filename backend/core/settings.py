@@ -119,14 +119,23 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
 }
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Security & Proxy Handling
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+USE_X_FORWARDED_PORT = True
+
+# CORS and CSRF Settings
+CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all in DEBUG mode
 CORS_ALLOWED_ORIGINS = [origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin] + [
     "https://smartshop1.us",
     "https://www.smartshop1.us",
+    "https://api.smartshop1.us",
 ]
+
 CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin] + [
     "https://smartshop1.us",
     "https://www.smartshop1.us",
+    "https://api.smartshop1.us",
 ]
 
 # Email Configuration
