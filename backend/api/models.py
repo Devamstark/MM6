@@ -26,9 +26,20 @@ class User(AbstractUser):
     bio = models.TextField(blank=True, null=True)
     bonus_points = models.IntegerField(default=0)
     profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
+    referral_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return self.username
+
+
+class ReferralSignup(models.Model):
+    """Records each new user who signed up via a referral link."""
+    referrer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='referred_users')
+    referred_user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='referred_by')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.referred_user.username} referred by {self.referrer.username}"
 
 class Address(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)

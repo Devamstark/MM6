@@ -30,3 +30,6 @@ build/
 # media/
 .coverage
 htmlcov/
+
+# Nested repo (duplicate folder — ignore)
+MM6/

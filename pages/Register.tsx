@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
-import { UserPlus, Store, ArrowRight, Loader2 } from 'lucide-react';
+import { UserPlus, Store, ArrowRight, Loader2, Gift } from 'lucide-react';
 
 export const Register = () => {
   const [name, setName] = useState('');
@@ -14,12 +14,16 @@ export const Register = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Capture the referral code from the URL, e.g. /register?ref=ABC1234
+  const searchParams = new URLSearchParams(location.search);
+  const refCode = searchParams.get('ref') || '';
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     try {
       const role = isSeller ? 'seller' : 'user';
-      const { user, token } = await api.register(name, email, password, role);
+      const { user, token } = await api.register(name, email, password, role, refCode || undefined);
       login(user, token);
 
       const from = location.state?.from?.pathname;
@@ -51,6 +55,19 @@ export const Register = () => {
             Start your journey with SmartShop today.
           </p>
         </div>
+
+        {/* Referral Banner */}
+        {refCode && (
+          <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 animate-fade-in">
+            <div className="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
+              <Gift className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-emerald-800">You were referred!</p>
+              <p className="text-xs text-emerald-600">Your friend will earn a <strong>$1 bonus</strong> when you sign up.</p>
+            </div>
+          </div>
+        )}
 
         <form className="mt-8 space-y-5" onSubmit={handleSubmit}>
           <div>

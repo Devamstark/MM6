@@ -22,6 +22,8 @@ export interface User {
     role: 'user' | 'seller' | 'admin';
     bio?: string;
     bonusPoints?: number;
+    referralEarnings?: number;   // Accumulated referral bonus in dollars
+    canRedeemEarnings?: boolean; // True when referralEarnings >= $10
     isActive?: boolean;
     createdAt?: string;
     lastLogin?: string;

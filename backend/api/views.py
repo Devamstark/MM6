@@ -11,8 +11,9 @@ from django.utils import timezone
 import resend
 from django.conf import settings
 import random
+from decimal import Decimal
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup
 from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer
 
 # ...
@@ -70,11 +71,13 @@ class RegisterView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        from django.db import transaction
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
         role = request.data.get('role', 'user')
         name = request.data.get('name', '')
+        ref_code = request.data.get('ref_code', '').strip()
 
         if not email or not password:
             return Response({'error': 'Email and Password are required'}, status=status.HTTP_400_BAD_REQUEST)
@@ -93,15 +96,31 @@ class RegisterView(APIView):
             first_name = parts[0]
             last_name = parts[1] if len(parts) > 1 else ""
 
-        user = User.objects.create_user(
-            username=username,
-            email=email,
-            password=password,
-            first_name=first_name,
-            last_name=last_name,
-            role='user' # Force role to be user for public registration
-        )
-        
+        with transaction.atomic():
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                password=password,
+                first_name=first_name,
+                last_name=last_name,
+                role='user'  # Force role to be user for public registration
+            )
+
+            # --- Referral Bonus ---
+            if ref_code:
+                try:
+                    affiliate = Affiliate.objects.select_related('user').get(referral_code=ref_code)
+                    referrer = affiliate.user
+                    # Guard: cannot self-refer, and each new user can only be referred once
+                    if referrer != user and not ReferralSignup.objects.filter(referred_user=user).exists():
+                        # Credit referrer $1
+                        referrer.referral_earnings = referrer.referral_earnings + Decimal('1.00')
+                        referrer.save(update_fields=['referral_earnings'])
+                        # Record the signup so we never double-credit
+                        ReferralSignup.objects.create(referrer=referrer, referred_user=user)
+                except Affiliate.DoesNotExist:
+                    pass  # Invalid code – silently ignore
+
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
@@ -250,28 +269,43 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         # Custom creation logic to handle items transactionally
-        # Expects: { items: [{id, quantity, price}...], total_amount: 100, shipping_address: {...} }
+        # Expects: { items: [{id, quantity, price}...], total_amount: 100, shipping_address: {...}, use_earnings: bool }
         data = request.data
         if not data.get('items'):
             return Response({"error": "No items provided"}, status=status.HTTP_400_BAD_REQUEST)
 
         from django.db import transaction
+        EARNINGS_MINIMUM = Decimal('10.00')  # Minimum balance required to redeem
         try:
             with transaction.atomic():
+                user = request.user
+                raw_total = Decimal(str(data.get('totalPrice', 0)))
+                earnings_applied = Decimal('0.00')
+
+                # --- Apply referral earnings as a discount ---
+                use_earnings = data.get('use_earnings', False)
+                if use_earnings and user.referral_earnings >= EARNINGS_MINIMUM:
+                    # Apply up to the full balance, but never more than the order total
+                    earnings_applied = min(user.referral_earnings, raw_total)
+                    raw_total = raw_total - earnings_applied
+                    # Deduct from user's balance
+                    user.referral_earnings = user.referral_earnings - earnings_applied
+                    user.save(update_fields=['referral_earnings'])
+
                 order = Order.objects.create(
-                    user=request.user,
-                    customer_name=data.get('customerName') or request.user.get_full_name(),
-                    total_amount=data.get('totalPrice'),
+                    user=user,
+                    customer_name=data.get('customerName') or user.get_full_name(),
+                    total_amount=raw_total,
                     status='pending'
                 )
 
                 for item in data.get('items'):
                     product = Product.objects.select_for_update().get(id=item['id'])
-                    
+
                     quantity = int(item['quantity'])
                     if product.stock_quantity < quantity:
                         raise ValueError(f"Insufficient stock for {product.name}. Available: {product.stock_quantity}")
-                    
+
                     # Decrement stock
                     product.stock_quantity -= quantity
                     product.save(update_fields=['stock_quantity'])
@@ -284,7 +318,9 @@ class OrderViewSet(viewsets.ModelViewSet):
                     )
 
                 serializer = self.get_serializer(order)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
+                response_data = serializer.data
+                response_data['earnings_applied'] = str(earnings_applied)
+                return Response(response_data, status=status.HTTP_201_CREATED)
         except Product.DoesNotExist:
             return Response({"error": "One or more products not found"}, status=status.HTTP_404_NOT_FOUND)
         except ValueError as e:
@@ -330,6 +366,17 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='my_earnings')
+    def my_earnings(self, request):
+        """Returns the current referral earnings balance and eligibility."""
+        EARNINGS_MINIMUM = Decimal('10.00')
+        earnings = request.user.referral_earnings
+        return Response({
+            'referral_earnings': str(earnings),
+            'can_redeem': earnings >= EARNINGS_MINIMUM,
+            'minimum_to_redeem': str(EARNINGS_MINIMUM),
+        })
 
 class DashboardStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]

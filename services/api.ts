@@ -144,6 +144,8 @@ const mapUser = (u: any): User => ({
   role: u.role,
   bio: u.bio,
   bonusPoints: u.bonus_points || 0,
+  referralEarnings: u.referral_earnings !== undefined ? parseFloat(u.referral_earnings) : 0,
+  canRedeemEarnings: u.referral_earnings !== undefined ? parseFloat(u.referral_earnings) >= 10 : false,
   isActive: u.is_active,
   createdAt: u.date_joined,
   lastLogin: u.last_login,
@@ -275,17 +277,13 @@ export const api = {
     }));
   },
 
-  register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user'): Promise<AuthResponse> => {
+  register: async (name: string, email: string, password: string, role: 'user' | 'seller' = 'user', refCode?: string): Promise<AuthResponse> => {
     // Call Django Register View
-    const response = await client.post('/auth/register/', {
-      email,
-      password,
-      role,
-      name
-    });
+    const payload: any = { email, password, role, name };
+    if (refCode) payload.ref_code = refCode;
+    await client.post('/auth/register/', payload);
 
-    // Auto-login after register (optional, but typical UX) to get tokens
-    // Since RegisterView returns User (not token), we need to call login
+    // Auto-login after register to get tokens
     return api.login(email, password);
   },
 
@@ -558,11 +556,12 @@ export const api = {
   },
 
   // --- Orders ---
-  createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails: any, totalPrice: number }): Promise<Order> => {
+  createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails: any, totalPrice: number, useEarnings?: boolean }): Promise<Order> => {
     const payload = {
       items: orderData.items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
       totalPrice: orderData.totalPrice,
       customerName: orderData.shippingAddress.name,
+      use_earnings: orderData.useEarnings || false,
     };
 
     const response = await client.post('/orders/', payload);
@@ -636,6 +635,19 @@ export const api = {
 
   updateUserStatus: async (userId: string, isActive: boolean): Promise<void> => {
     // Not implemented in backend MVP
+  },
+
+  getMyEarnings: async (): Promise<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number }> => {
+    try {
+      const response = await client.get('/users/my_earnings/');
+      return {
+        referralEarnings: parseFloat(response.data.referral_earnings),
+        canRedeem: response.data.can_redeem,
+        minimumToRedeem: parseFloat(response.data.minimum_to_redeem),
+      };
+    } catch {
+      return { referralEarnings: 0, canRedeem: false, minimumToRedeem: 10 };
+    }
   },
 
 

@@ -4,7 +4,7 @@ import { Address } from '../types';
 import { api } from '../services/api';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus } from 'lucide-react';
+import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag } from 'lucide-react';
 
 export const Checkout = () => {
   const { items, cartTotal, clearCart } = useCart();
@@ -14,6 +14,8 @@ export const Checkout = () => {
 
   const [step, setStep] = useState<'shipping' | 'payment' | 'success'>('shipping');
   const [loading, setLoading] = useState(false);
+  const [useEarnings, setUseEarnings] = useState(false);
+  const [earnings, setEarnings] = useState<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number } | null>(null);
 
   const [shippingData, setShippingData] = useState({
     name: user?.name || '',
@@ -36,8 +38,13 @@ export const Checkout = () => {
   useEffect(() => {
     if (isAuthenticated) {
       api.getAddresses().then(setSavedAddresses).catch(console.error);
+      api.getMyEarnings().then(setEarnings).catch(console.error);
     }
   }, [isAuthenticated]);
+
+  // Calculate totals
+  const earningsDiscount = useEarnings && earnings?.canRedeem ? Math.min(earnings.referralEarnings, cartTotal) : 0;
+  const finalTotal = Math.max(0, cartTotal - earningsDiscount);
 
   // 1. Empty Cart Check
   if (items.length === 0 && step !== 'success') {
@@ -78,7 +85,8 @@ export const Checkout = () => {
         items: items,
         shippingAddress: shippingData,
         paymentDetails: paymentData,
-        totalPrice: cartTotal
+        totalPrice: finalTotal,
+        useEarnings: useEarnings && earnings?.canRedeem,
       });
 
       clearCart();
@@ -269,7 +277,8 @@ export const Checkout = () => {
                           disabled={loading}
                           className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
                         >
-                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${cartTotal.toFixed(2)}</>}
+                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${finalTotal.toFixed(2)}</>}
+
                         </button>
                       </div>
                     </form>
@@ -295,6 +304,44 @@ export const Checkout = () => {
                   </li>
                 ))}
               </ul>
+
+              {/* Referral Earnings Redemption */}
+              {isAuthenticated && earnings && earnings.referralEarnings > 0 && (
+                <div className={`mb-4 p-4 rounded-xl border transition-all ${earnings.canRedeem
+                  ? 'bg-emerald-50 border-emerald-200'
+                  : 'bg-gray-50 border-gray-200'
+                  }`}>
+                  <div className="flex items-center gap-2 mb-1">
+                    <DollarSign className={`w-4 h-4 ${earnings.canRedeem ? 'text-emerald-600' : 'text-gray-400'}`} />
+                    <p className={`text-sm font-semibold ${earnings.canRedeem ? 'text-emerald-800' : 'text-gray-500'}`}>
+                      Referral Earnings: <span className="font-bold">${earnings.referralEarnings.toFixed(2)}</span>
+                    </p>
+                  </div>
+                  {earnings.canRedeem ? (
+                    <>
+                      <p className="text-xs text-emerald-600 mb-3">You can apply your earnings as a discount!</p>
+                      <label className="flex items-center gap-3 cursor-pointer group">
+                        <div
+                          onClick={() => setUseEarnings(!useEarnings)}
+                          className={`relative w-11 h-6 rounded-full transition-colors ${useEarnings ? 'bg-emerald-500' : 'bg-gray-300'
+                            }`}
+                        >
+                          <div className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${useEarnings ? 'translate-x-5' : 'translate-x-0'
+                            }`} />
+                        </div>
+                        <span className="text-sm font-medium text-gray-700 group-hover:text-emerald-700 transition-colors">
+                          Apply ${Math.min(earnings.referralEarnings, cartTotal).toFixed(2)} credit
+                        </span>
+                      </label>
+                    </>
+                  ) : (
+                    <p className="text-xs text-gray-400">
+                      Earn <strong>${(earnings.minimumToRedeem - earnings.referralEarnings).toFixed(2)}</strong> more in referrals to unlock redemption (min. ${earnings.minimumToRedeem.toFixed(2)})
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="border-t border-gray-200 pt-4 space-y-2">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
@@ -304,9 +351,15 @@ export const Checkout = () => {
                   <span>Shipping</span>
                   <span>Free</span>
                 </div>
+                {earningsDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1"><Tag className="w-4 h-4" /> Referral Credit</span>
+                    <span>-${earningsDiscount.toFixed(2)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-100">
                   <span>Total</span>
-                  <span>${cartTotal.toFixed(2)}</span>
+                  <span>${finalTotal.toFixed(2)}</span>
                 </div>
               </div>
             </div>
