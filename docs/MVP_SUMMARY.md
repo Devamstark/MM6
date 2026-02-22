@@ -59,7 +59,7 @@ You now have **5 comprehensive documentation files**:
 - Launch criteria
 - Known issues and improvements
 
-### 3. **QUICK_START_GUIDE.md** (Getting Started)
+### 3. **setup/QUICK_START_GUIDE.md** (Getting Started)
 - 5-minute setup instructions
 - Step-by-step backend setup
 - Step-by-step frontend setup
@@ -265,7 +265,7 @@ npm run dev
 ✅ Frontend runs at `http://localhost:5173`
 
 ### **First Time Setup**
-See `QUICK_START_GUIDE.md` for detailed instructions including:
+See `setup/QUICK_START_GUIDE.md` for detailed instructions including:
 - Virtual environment creation
 - Dependency installation
 - Database migrations
@@ -298,7 +298,7 @@ See `QUICK_START_GUIDE.md` for detailed instructions including:
 - ✅ All subdomains on HTTPS
 - ✅ MinIO self-hosted S3 at `https://minio.smartshop1.us`
 
-**Full Deployment Guide**: See `VPS_DEPLOYMENT_GUIDE.md`
+**Full Deployment Guide**: See `setup/VPS_DEPLOYMENT_GUIDE.md`
 
 ---
 
@@ -436,7 +436,7 @@ cloudmart-e-commerce/
 ├── 📄 Documentation (5 files)
 │   ├── FULL_MVP_SPECIFICATION.md
 │   ├── MVP_IMPLEMENTATION_CHECKLIST.md
-│   ├── QUICK_START_GUIDE.md
+│   ├── setup/QUICK_START_GUIDE.md
 │   ├── SYSTEM_ARCHITECTURE.md
 │   └── COMPLETE_FEATURE_LIST.md
 │
@@ -584,11 +584,11 @@ cloudmart-e-commerce/
 
 ### **Documentation Files:**
 - `FULL_MVP_SPECIFICATION.md` - Complete feature spec
-- `QUICK_START_GUIDE.md` - Setup instructions
+- `setup/QUICK_START_GUIDE.md` - Setup instructions
 - `SYSTEM_ARCHITECTURE.md` - Technical architecture
 - `COMPLETE_FEATURE_LIST.md` - All 42 features
 - `MVP_IMPLEMENTATION_CHECKLIST.md` - Progress tracker
-- `DEPLOYMENT_GUIDE.md` - Production deployment
+- `setup/DEPLOYMENT_GUIDE.md` - Production deployment
 
 ### **External Resources:**
 - [Django Documentation](https://docs.djangoproject.com/)

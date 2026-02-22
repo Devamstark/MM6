@@ -378,7 +378,7 @@ smartshop-e-commerce/
 │
 ├── .gitignore
 ├── README.md
-├── DEPLOYMENT_GUIDE.md
+├── setup/DEPLOYMENT_GUIDE.md
 └── MVP_SPECIFICATION.md (this file)
 ```
 
@@ -556,7 +556,7 @@ Frontend will run at `http://localhost:5173`
 
 ## 🌐 Deployment
 
-> The application is live on a self-hosted VPS. See **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)** for full details.
+> The application is live on a self-hosted VPS. See **[setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md)** for full details.
 
 ### **Current Stack (VPS + Docker + Dokploy)**
 1. Push code to GitHub

@@ -24,14 +24,14 @@ Welcome to the SmartShop documentation. This folder contains all project documen
 #### **[WORK_DONE.md](./WORK_DONE.md)** ⭐ NEW
 Complete summary of everything deployed — services, URLs, architecture, what was built and why.
 
-#### **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)**
+#### **[setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md)**
 Full guide to the Docker + Dokploy deployment setup. Covers environment variables, redeployment, logging, and backup.
 
-#### **[SSL_SECURITY_SETUP.md](./SSL_SECURITY_SETUP.md)**
+#### **[setup/SSL_SECURITY_SETUP.md](./setup/SSL_SECURITY_SETUP.md)**
 How SSL/HTTPS is managed via Traefik + Let's Encrypt. Covers CORS, CSRF, and Django proxy configuration.
 
-#### **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)**
-Original deployment reference (legacy — see VPS_DEPLOYMENT_GUIDE.md for current setup).
+#### **[setup/DEPLOYMENT_GUIDE.md](./setup/DEPLOYMENT_GUIDE.md)**
+Original deployment reference (legacy — see setup/VPS_DEPLOYMENT_GUIDE.md for current setup).
 
 ---
 
@@ -60,7 +60,7 @@ Technical architecture diagrams — request flow, database ERD, security archite
 
 ### ⚡ Getting Started
 
-#### **[QUICK_START_GUIDE.md](./QUICK_START_GUIDE.md)**
+#### **[setup/QUICK_START_GUIDE.md](./setup/QUICK_START_GUIDE.md)**
 Local development setup in 5 minutes — backend + frontend, testing guide, and troubleshooting.
 
 ---
@@ -70,9 +70,9 @@ Local development setup in 5 minutes — backend + frontend, testing guide, and 
 | I want to... | Go to |
 |:---|:---|
 | See what's deployed and where | [WORK_DONE.md](./WORK_DONE.md) |
-| Understand the deployment setup | [VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md) |
-| Run the app locally | [QUICK_START_GUIDE.md](./QUICK_START_GUIDE.md) |
-| Understand SSL/security | [SSL_SECURITY_SETUP.md](./SSL_SECURITY_SETUP.md) |
+| Understand the deployment setup | [setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md) |
+| Run the app locally | [setup/QUICK_START_GUIDE.md](./setup/QUICK_START_GUIDE.md) |
+| Understand SSL/security | [setup/SSL_SECURITY_SETUP.md](./setup/SSL_SECURITY_SETUP.md) |
 | See all features | [COMPLETE_FEATURE_LIST.md](./COMPLETE_FEATURE_LIST.md) |
 | Understand the architecture | [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) |
 | See the tech stack | [MVP_SUMMARY.md](./MVP_SUMMARY.md) |

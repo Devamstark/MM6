@@ -215,9 +215,9 @@ This checklist tracks the implementation status of all MVP features for the Smar
 ### ✅ Technical Documentation (100% Complete)
 - [x] README.md with setup instructions
 - [x] FULL_MVP_SPECIFICATION.md (comprehensive spec)
-- [x] VPS_DEPLOYMENT_GUIDE.md (Docker/Dokploy)
+- [x] setup/VPS_DEPLOYMENT_GUIDE.md (Docker/Dokploy)
 - [x] NETWORK_ARCHITECTURE.md
-- [x] SSL_SECURITY_SETUP.md
+- [x] setup/SSL_SECURITY_SETUP.md
 - [x] WORK_DONE.md (deployment summary)
 - [x] API endpoint documentation
 - [x] Environment variables guide

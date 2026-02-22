@@ -27,7 +27,7 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 
 ### 🚀 **GETTING STARTED**
 
-#### 2. **QUICK_START_GUIDE.md** ⚡ **[FOR SETUP]**
+#### 2. **setup/QUICK_START_GUIDE.md** ⚡ **[FOR SETUP]**
 **Purpose**: Step-by-step setup instructions  
 **Best For**: First-time setup, troubleshooting  
 **Contains**:
@@ -116,7 +116,7 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 
 ### 🌐 **DEPLOYMENT**
 
-#### 7. **VPS_DEPLOYMENT_GUIDE.md** 🚀 **[DEPLOY TO PRODUCTION]**
+#### 7. **setup/VPS_DEPLOYMENT_GUIDE.md** 🚀 **[DEPLOY TO PRODUCTION]**
 **Purpose**: Production deployment instructions (current)
 **Best For**: Understanding how the app is deployed on VPS
 **Contains**:
@@ -142,7 +142,7 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 ---
 
 ### **Goal: Set Up and Run Locally**
-1. ✅ QUICK_START_GUIDE.md (Follow step-by-step)
+1. ✅ setup/QUICK_START_GUIDE.md (Follow step-by-step)
 2. ✅ Troubleshooting section if issues arise
 
 **Total Time**: ~15-30 minutes
@@ -160,7 +160,7 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 ---
 
 ### **Goal: Deploy to Production**
-1. ✅ DEPLOYMENT_GUIDE.md (Step-by-step)
+1. ✅ setup/DEPLOYMENT_GUIDE.md (Step-by-step)
 2. ✅ FULL_MVP_SPECIFICATION.md (Environment variables)
 
 **Total Time**: ~1-2 hours
@@ -190,12 +190,12 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 | Document | Pages | Words | Purpose |
 |----------|-------|-------|---------|
 | MVP_SUMMARY.md | ~15 | ~3,500 | Overview |
-| QUICK_START_GUIDE.md | ~12 | ~2,800 | Setup |
+| setup/QUICK_START_GUIDE.md | ~12 | ~2,800 | Setup |
 | FULL_MVP_SPECIFICATION.md | ~25 | ~5,500 | Complete Spec |
 | COMPLETE_FEATURE_LIST.md | ~30 | ~6,000 | Features |
 | SYSTEM_ARCHITECTURE.md | ~20 | ~4,000 | Architecture |
 | MVP_IMPLEMENTATION_CHECKLIST.md | ~15 | ~3,000 | Progress |
-| DEPLOYMENT_GUIDE.md | ~10 | ~2,500 | Deployment |
+| setup/DEPLOYMENT_GUIDE.md | ~10 | ~2,500 | Deployment |
 
 **Total**: ~127 pages, ~27,300 words
 
@@ -216,9 +216,9 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 - Show completion status from **MVP_IMPLEMENTATION_CHECKLIST.md**
 
 ### **For Your Demo:**
-- Follow **QUICK_START_GUIDE.md** to set up
+- Follow **setup/QUICK_START_GUIDE.md** to set up
 - Reference **COMPLETE_FEATURE_LIST.md** for demo script
-- Use **DEPLOYMENT_GUIDE.md** for live demo
+- Use **setup/DEPLOYMENT_GUIDE.md** for live demo
 
 ---
 
@@ -233,13 +233,13 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 → SYSTEM_ARCHITECTURE.md (Database Schema section)
 
 **Setup Instructions?**  
-→ QUICK_START_GUIDE.md (Quick Start section)
+→ setup/QUICK_START_GUIDE.md (Quick Start section)
 
 **Feature Details?**  
 → COMPLETE_FEATURE_LIST.md (Search by feature name)
 
 **Deployment Steps?**  
-→ DEPLOYMENT_GUIDE.md (Step-by-step guides)
+→ setup/DEPLOYMENT_GUIDE.md (Step-by-step guides)
 
 **Project Status?**  
 → MVP_IMPLEMENTATION_CHECKLIST.md (Completion status)
@@ -305,7 +305,7 @@ These docs are formatted for easy printing and PDF conversion.
 
 ### **If you're new to the project:**
 1. Read `MVP_SUMMARY.md` (10 min)
-2. Follow `QUICK_START_GUIDE.md` to set up (30 min)
+2. Follow `setup/QUICK_START_GUIDE.md` to set up (30 min)
 3. Explore the running application
 4. Read `COMPLETE_FEATURE_LIST.md` to understand features
 
@@ -316,7 +316,7 @@ These docs are formatted for easy printing and PDF conversion.
 4. Practice demo using `COMPLETE_FEATURE_LIST.md`
 
 ### **If you're deploying:**
-1. Follow `DEPLOYMENT_GUIDE.md` step-by-step
+1. Follow `setup/DEPLOYMENT_GUIDE.md` step-by-step
 2. Reference `FULL_MVP_SPECIFICATION.md` for environment variables
 3. Test all features after deployment
 
@@ -364,14 +364,14 @@ You now have:
 | Document | Version | Last Updated | Status |
 |----------|---------|--------------|--------|
 | MVP_SUMMARY.md | 1.2.0 | Feb 2026 | ✅ Updated |
-| QUICK_START_GUIDE.md | 1.1.0 | Feb 2026 | ✅ Updated |
+| setup/QUICK_START_GUIDE.md | 1.1.0 | Feb 2026 | ✅ Updated |
 | FULL_MVP_SPECIFICATION.md | 1.2.0 | Feb 2026 | ✅ Updated |
 | COMPLETE_FEATURE_LIST.md | 1.1.0 | Feb 16, 2026 | ✅ Complete |
 | SYSTEM_ARCHITECTURE.md | 1.2.0 | Feb 2026 | ✅ Updated |
 | NETWORK_ARCHITECTURE.md | 1.0.0 | Feb 2026 | ✅ New |
 | MVP_IMPLEMENTATION_CHECKLIST.md | 1.2.0 | Feb 2026 | ✅ Updated |
-| VPS_DEPLOYMENT_GUIDE.md | 1.0.0 | Feb 2026 | ✅ New |
-| SSL_SECURITY_SETUP.md | 1.0.0 | Feb 2026 | ✅ New |
+| setup/VPS_DEPLOYMENT_GUIDE.md | 1.0.0 | Feb 2026 | ✅ New |
+| setup/SSL_SECURITY_SETUP.md | 1.0.0 | Feb 2026 | ✅ New |
 | WORK_DONE.md | 1.0.0 | Feb 2026 | ✅ New |
 
 ---

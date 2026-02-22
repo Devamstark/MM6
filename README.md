@@ -20,7 +20,7 @@ Please navigate to the docs/ folder for comprehensive documentation:
 
 - **[Start Here: Documentation Index](./docs/DOCUMENTATION_INDEX.md)**
 - **[Project Summary](./docs/MVP_SUMMARY.md)**
-- **[Quick Start Guide](./docs/QUICK_START_GUIDE.md)**
+- **[Quick Start Guide](./docs/setup/QUICK_START_GUIDE.md)**
 - **[Technical Specification](./docs/FULL_MVP_SPECIFICATION.md)**
 - **[System Architecture](./docs/SYSTEM_ARCHITECTURE.md)**
 
@@ -156,7 +156,7 @@ CORS_ALLOWED_ORIGINS=http://localhost:5173
 ## 🚀 Deployment
 
 ### Deployment (VPS)
-Please refer to the **[VPS Deployment Guide](./docs/VPS_DEPLOYMENT_GUIDE.md)** for detailed instructions on deploying to HostAsia VPS.
+Please refer to the **[VPS Deployment Guide](./docs/setup/VPS_DEPLOYMENT_GUIDE.md)** for detailed instructions on deploying to HostAsia VPS.
 
 ---
 
