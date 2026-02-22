@@ -22,8 +22,8 @@ services:
       dockerfile: Dockerfile.backend
     restart: always
     volumes:
-      - backend_static:/app/staticfiles
-      - backend_media:/app/media
+      - backend_static:/app/backend/staticfiles
+      - backend_media:/app/backend/media
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - DEBUG=${DEBUG}
