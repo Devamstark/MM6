@@ -32,10 +32,8 @@ class AffiliateSerializer(serializers.ModelSerializer):
         read_only_fields = ('user', 'earnings', 'clicks', 'created_at')
 
 class ProductSerializer(serializers.ModelSerializer):
-    # 'image' is for uploads (write-only) and not sent back in responses.
-    image = serializers.ImageField(write_only=True, required=False, allow_null=True)
-    # 'image_url' is for responses (read-only).
-    image_url = serializers.SerializerMethodField()
+    image_url = serializers.ImageField(source='image', read_only=True)
+
     class Meta:
         model = Product
         fields = [
@@ -47,13 +45,9 @@ class ProductSerializer(serializers.ModelSerializer):
             'flash_sale_start', 'flash_sale_end'
         ]
         read_only_fields = ('seller', 'created_at', 'sale_price', 'additional_images')
-    def get_image_url(self, instance):
-        if instance.image and hasattr(instance.image, 'url'):
-            request = self.context.get('request')
-            if request:
-                return request.build_absolute_uri(instance.image.url)
-            return instance.image.url
-        return None
+    def update(self, instance, validated_data):
+        if 'image' in validated_data and validated_data['image'] is None:
+            validated_data.pop('image')
         
         return super().update(instance, validated_data)
 class OrderItemSerializer(serializers.ModelSerializer):
