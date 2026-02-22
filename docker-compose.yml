@@ -107,10 +107,11 @@ services:
     user: 0:0 # Run as root to avoid permission issues with the host mount
     restart: always
     ports:
-      - "2025:80"
+      - "2025:8080"
     volumes:
       - .:/srv
       - filebrowser_data:/database
+    command: [ "/filebrowser", "-a", "0.0.0.0", "-p", "8080", "-d", "/database/filebrowser.db", "--root", "/srv" ]
     networks:
       - dokploy-network
 
