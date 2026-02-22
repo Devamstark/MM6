@@ -75,11 +75,28 @@ client.interceptors.response.use(
 // Helper to ensure absolute URL
 const getAbsoluteUrl = (url: string | null | undefined) => {
   if (!url) return '';
+  if (typeof url !== 'string') return '';
   if (url.startsWith('http')) return url;
-  // If it's a relative path starting with /media, prepend the base domain (without /api)
-  const baseUrl = API_URL.replace('/api', '');
-  // Ensure we don't have double slashes or missing slashes
-  const cleanUrl = url.startsWith('/') ? url : `/${url}`;
+
+  // Clean base URL (remove trailing slashes and /api)
+  let baseUrl = API_URL.split('/api')[0];
+  if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+  // Clean the relative URL
+  let cleanUrl = url;
+  if (!cleanUrl.startsWith('/')) cleanUrl = '/' + cleanUrl;
+
+  // If the URL doesn't start with /media/ and doesn't contain it, 
+  // we might need to add it if it's a typical Django upload
+  if (!cleanUrl.startsWith('/media/') && !cleanUrl.includes('/static/')) {
+    // Check if it's likely a media file
+    const extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+    if (extensions.some(ext => cleanUrl.toLowerCase().endsWith(ext))) {
+      cleanUrl = '/media' + cleanUrl;
+    }
+  }
+
+  // Final join, ensuring only one slash between them
   return `${baseUrl}${cleanUrl}`;
 };
 
@@ -93,8 +110,10 @@ const mapProduct = (p: any): Product => ({
   category: p.category,
   subcategory: p.subcategory,
   brand: p.brand,
-  imageUrl: getAbsoluteUrl(p.image || p.image_url), // Handle both keys and ensure absolute
-  additionalImages: (p.additional_images || []).map(getAbsoluteUrl), // Handle additional images too
+  imageUrl: getAbsoluteUrl(p.image_url || p.image),
+  additionalImages: Array.isArray(p.additional_images)
+    ? p.additional_images.map(getAbsoluteUrl)
+    : (typeof p.additional_images === 'string' ? JSON.parse(p.additional_images).map(getAbsoluteUrl) : []),
   stock: p.stock_quantity,
   gender: p.gender,
   sizes: p.sizes || [],
