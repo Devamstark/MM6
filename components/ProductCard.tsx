@@ -51,7 +51,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
         <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
 
           {/* Image Container */}
-          <div className="relative aspect-[3/4] overflow-hidden bg-secondary dark:bg-gray-700">
+          <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-700">
             <img
               src={product.imageUrl}
               alt={product.name}

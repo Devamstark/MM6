@@ -7,7 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import {
     Star, ShoppingBag, ArrowLeft, Truck, RotateCcw,
     ShieldCheck, Heart, Share2, Plus, Minus, Check,
-    CreditCard, Info, MessageSquare, Package
+    CreditCard, Info, MessageSquare, Package, X
 } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 import { ProductCard } from '../components/ProductCard';
@@ -26,6 +26,7 @@ export const ProductDetail = () => {
     const [quantity, setQuantity] = useState(1);
     const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping' | 'reviews'>('description');
     const [mainImage, setMainImage] = useState<string>('');
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
     const [reviews, setReviews] = useState<Review[]>([]);
     const [canReview, setCanReview] = useState(false);
@@ -163,17 +164,15 @@ export const ProductDetail = () => {
 
                     {/* Left: Image Gallery (Span 7) */}
                     <div className="lg:col-span-7 space-y-4">
-                        <div className="aspect-[3/4] bg-gray-50 rounded-3xl overflow-hidden relative group dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm">
+                        <div
+                            className="aspect-square bg-white rounded-3xl overflow-hidden relative group dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm cursor-zoom-in"
+                            onClick={() => setIsLightboxOpen(true)}
+                        >
                             <img
                                 src={mainImage}
                                 alt={product.name}
-                                className={`w-full h-full transition-transform duration-1000 group-hover:scale-105 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
+                                className={`w-full h-full transition-transform duration-700 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
                             />
-
-                            {/* Zoom Indicator */}
-                            <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
-                                <span className="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full text-xs font-bold uppercase tracking-widest text-black shadow-xl">Zoom</span>
-                            </div>
 
                             {/* Flash Sale Badge Overlay */}
                             {product.flashSaleEnd && new Date(product.flashSaleEnd) > new Date() && (
@@ -639,6 +638,31 @@ export const ProductDetail = () => {
                     </div>
                 )}
             </div>
+
+            {/* Lightbox Modal */}
+            {isLightboxOpen && (
+                <div
+                    className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-fade-in"
+                    onClick={() => setIsLightboxOpen(false)}
+                >
+                    <button
+                        className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2"
+                        onClick={() => setIsLightboxOpen(false)}
+                    >
+                        <X className="w-10 h-10" />
+                    </button>
+                    <div
+                        className="max-w-6xl w-full h-[85vh] relative flex items-center justify-center animate-scale-in"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <img
+                            src={mainImage}
+                            alt={product?.name}
+                            className={`w-full h-full ${product?.imageFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-2xl shadow-2xl`}
+                        />
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

@@ -250,13 +250,40 @@ class ProductViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         user = self.request.user
         if user.role not in ['admin', 'seller']:
-            # In a real app we might raise PermissionDenied, but here we just won't save or raise error
-            # Better to use proper Permission classes, but this is a quick fix
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Only sellers and admins can create products.")
         
-        # Allow admins to create products (assign to themselves or handle normally)
-        serializer.save(seller=user)
+        instance = serializer.save(seller=user)
+        self.handle_additional_images(instance)
+
+    def perform_update(self, serializer):
+        instance = serializer.save()
+        self.handle_additional_images(instance)
+
+    def handle_additional_images(self, instance):
+        files = self.request.FILES.getlist('additional_images_files')
+        existing_images = self.request.data.getlist('additional_images')
+        
+        if not files and not existing_images and 'additional_images' not in self.request.data and 'additional_images_files' not in self.request.FILES:
+             # If neither is present, don't overwrite (optional, depending on intended behavior)
+             return
+
+        from django.core.files.storage import default_storage
+        import uuid
+        import os
+
+        new_urls = []
+        for f in files:
+            ext = os.path.splitext(f.name)[1]
+            filename = f"products/{uuid.uuid4()}{ext}"
+            saved_path = default_storage.save(filename, f)
+            # Construct the URL. This depends on your MEDIA_URL setting.
+            # default_storage.url(saved_path) is generally preferred.
+            url = default_storage.url(saved_path)
+            new_urls.append(url)
+            
+        instance.additional_images = existing_images + new_urls
+        instance.save()
 
     @action(detail=False, methods=['post'], url_path='reorder')
     def reorder(self, request):

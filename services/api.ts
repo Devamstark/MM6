@@ -394,8 +394,7 @@ export const api = {
         if (img instanceof File) {
           formData.append('additional_images_files', img);
         } else {
-          // If it's a string (URL), we might want to keep it.
-          // But for now let's focus on uploading new files.
+          formData.append('additional_images', img);
         }
       });
     }
@@ -468,6 +467,8 @@ export const api = {
       updates.additionalImages.forEach((img) => {
         if (img instanceof File) {
           formData.append('additional_images_files', img);
+        } else {
+          formData.append('additional_images', img);
         }
       });
     }
