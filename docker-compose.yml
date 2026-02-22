@@ -109,7 +109,7 @@ services:
     ports:
       - "2025:8080"
     volumes:
-      - .:/srv
+      - backend_media:/srv
       - filebrowser_data:/database
     command: [ "-a", "0.0.0.0", "-p", "8080", "-d", "/database/filebrowser.db", "--root", "/srv" ]
     networks:
