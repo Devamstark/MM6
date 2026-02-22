@@ -155,59 +155,57 @@ export const ProductDetail = () => {
                 {/* Top Section: Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-                    {/* Left: Image Gallery (Span 7) */}
-                    <div className="lg:col-span-7">
-                        <div className="relative group bg-gray-50 rounded-sm overflow-hidden border border-gray-50 dark:bg-gray-800 dark:border-gray-700 aspect-[4/5] flex items-center justify-center">
-                            <img
-                                src={mainImage}
-                                alt={product.name}
-                                className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all duration-500`}
-                            />
-
-                            {/* Navigation Arrows */}
-                            {allImages.length > 1 && (
-                                <>
-                                    <button
-                                        onClick={() => {
-                                            const idx = allImages.indexOf(mainImage);
-                                            setMainImage(allImages[(idx - 1 + allImages.length) % allImages.length]);
-                                        }}
-                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-gray-100"
-                                    >
-                                        <ArrowLeft className="w-4 h-4 text-black" />
-                                    </button>
-                                    <button
-                                        onClick={() => {
-                                            const idx = allImages.indexOf(mainImage);
-                                            setMainImage(allImages[(idx + 1) % allImages.length]);
-                                        }}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-gray-100 rotate-180"
-                                    >
-                                        <ArrowLeft className="w-4 h-4 text-black" />
-                                    </button>
-                                </>
-                            )}
-                        </div>
-
-                        {/* Thumbnails Below */}
+                    {/* Left: Image Gallery (Span 6) - Amazon Style */}
+                    <div className="lg:col-span-6 flex gap-4">
+                        {/* Vertical Thumbnails */}
                         {allImages.length > 1 && (
-                            <div className="flex gap-4 mt-6 justify-center">
+                            <div className="hidden sm:flex flex-col gap-2 w-16">
                                 {allImages.map((img, idx) => (
                                     <button
                                         key={idx}
-                                        onClick={() => setMainImage(img)}
-                                        className={`w-20 h-24 rounded-sm overflow-hidden border transition-all
-                                            ${mainImage === img ? 'border-black' : 'border-gray-100 hover:border-gray-300'}`}
+                                        onMouseEnter={() => setMainImage(img)}
+                                        className={`w-16 h-16 rounded-sm overflow-hidden border transition-all p-0.5 flex-shrink-0
+                                            ${mainImage === img ? 'border-orange-500 ring-1 ring-orange-500' : 'border-gray-100 hover:border-gray-300'}`}
                                     >
-                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                        <img src={img} alt="" className="w-full h-full object-contain" />
                                     </button>
                                 ))}
                             </div>
                         )}
+
+                        {/* Main Image Container */}
+                        <div className="flex-1 min-w-0">
+                            <div className="relative group bg-white rounded-sm overflow-hidden border border-gray-100 dark:bg-gray-800 dark:border-gray-700 aspect-square flex items-center justify-center p-4">
+                                <img
+                                    src={mainImage}
+                                    alt={product.name}
+                                    className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all duration-300`}
+                                />
+
+                                {/* Zoom Placeholder / Hover Effect */}
+                                <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity" />
+                            </div>
+
+                            {/* Mobile Thumbnails (Horizontal) */}
+                            {allImages.length > 1 && (
+                                <div className="flex sm:hidden gap-2 mt-4 overflow-x-auto pb-2 px-1">
+                                    {allImages.map((img, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => setMainImage(img)}
+                                            className={`w-16 h-16 flex-shrink-0 rounded-sm overflow-hidden border transition-all
+                                                ${mainImage === img ? 'border-orange-500' : 'border-gray-100'}`}
+                                        >
+                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Right: Product Info (Span 5) - Sticky */}
-                    <div className="lg:col-span-5 flex flex-col sticky top-24 space-y-6">
+                    {/* Right: Product Info (Span 6) - Sticky */}
+                    <div className="lg:col-span-6 flex flex-col sticky top-24 space-y-6 lg:pl-8">
                         <div>
                             {/* Brand & Category */}
                             <div className="flex items-center gap-2 mb-1">
@@ -335,7 +333,7 @@ export const ProductDetail = () => {
 
                         <div className="space-y-3">
                             {isOutOfStock ? (
-                                <button className="w-full py-4 bg-gray-100 text-gray-400 rounded-sm font-bold uppercase tracking-widest cursor-not-allowed text-[11px]">
+                                <button className="w-full py-4 bg-gray-100 text-gray-400 rounded-sm font-bold uppercase tracking-widest cursor-allowed text-[11px]">
                                     Sold Out
                                 </button>
                             ) : (
