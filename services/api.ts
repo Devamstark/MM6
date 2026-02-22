@@ -168,7 +168,7 @@ export const api = {
   // --- Auth & User Profile ---
   login: async (email: string, password: string): Promise<AuthResponse> => {
     try {
-      const response = await client.post('/auth/login/', { username: email, password });
+      const response = await client.post('auth/login/', { username: email, password });
       const { access, refresh } = response.data;
 
       // Store tokens
@@ -176,7 +176,7 @@ export const api = {
       localStorage.setItem('cm_refresh', refresh);
 
       // Fetch User Profile
-      const userResponse = await client.get('/users/me/');
+      const userResponse = await client.get('users/me/');
       const userData = userResponse.data;
       const user = mapUser(userData);
 
@@ -189,7 +189,7 @@ export const api = {
   },
 
   updateProfile: async (data: FormData): Promise<User> => {
-    const response = await client.patch('/users/me/', data, {
+    const response = await client.patch('users/me/', data, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     const user = mapUser(response.data);
@@ -198,7 +198,7 @@ export const api = {
   },
 
   changePassword: async (oldPassword: string, newPassword: string): Promise<void> => {
-    await client.post('/users/change_password/', {
+    await client.post('users/change_password/', {
       old_password: oldPassword,
       new_password: newPassword
     });
@@ -206,7 +206,7 @@ export const api = {
 
   // --- Addresses ---
   getAddresses: async (): Promise<import('../types').Address[]> => {
-    const response = await client.get('/addresses/');
+    const response = await client.get('addresses/');
     return response.data.map((a: any) => ({
       id: a.id,
       fullName: a.full_name,
@@ -222,7 +222,7 @@ export const api = {
   },
 
   addAddress: async (address: Omit<import('../types').Address, 'id'>): Promise<import('../types').Address> => {
-    const response = await client.post('/addresses/', {
+    const response = await client.post('addresses/', {
       full_name: address.fullName,
       street: address.street,
       city: address.city,
@@ -251,7 +251,7 @@ export const api = {
     if (address.isDefault !== undefined) payload.is_default = address.isDefault;
     if (address.type) payload.type = address.type;
 
-    const response = await client.patch(`/addresses/${id}/`, payload);
+    const response = await client.patch(`addresses/${id}/`, payload);
     return {
       id: response.data.id,
       ...address
@@ -259,11 +259,11 @@ export const api = {
   },
 
   deleteAddress: async (id: string): Promise<void> => {
-    await client.delete(`/addresses/${id}/`);
+    await client.delete(`addresses/${id}/`);
   },
 
   getUserReviews: async (): Promise<import('../types').Review[]> => {
-    const response = await client.get('/reviews/my_reviews/'); // Assuming endpoint
+    const response = await client.get('reviews/my_reviews/'); // Assuming endpoint
     return response.data.map((r: any) => ({
       id: r.id,
       productId: r.product.id || r.product, // Handle populated or ID
@@ -281,7 +281,7 @@ export const api = {
     // Call Django Register View
     const payload: any = { email, password, role, name };
     if (refCode) payload.ref_code = refCode;
-    await client.post('/auth/register/', payload);
+    await client.post('auth/register/', payload);
 
     // Auto-login after register to get tokens
     return api.login(email, password);
@@ -296,7 +296,7 @@ export const api = {
   // --- Password Reset with MFA ---
   requestPasswordReset: async (email: string): Promise<void> => {
     try {
-      await client.post('/auth/password-reset/request/', { email });
+      await client.post('auth/password-reset/request/', { email });
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to send reset code');
     }
@@ -304,7 +304,7 @@ export const api = {
 
   verifyResetCode: async (email: string, code: string): Promise<void> => {
     try {
-      await client.post('/auth/password-reset/verify/', { email, code });
+      await client.post('auth/password-reset/verify/', { email, code });
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Invalid or expired verification code');
     }
@@ -312,7 +312,7 @@ export const api = {
 
   resetPassword: async (email: string, code: string, newPassword: string): Promise<void> => {
     try {
-      await client.post('/auth/password-reset/confirm/', {
+      await client.post('auth/password-reset/confirm/', {
         email,
         code,
         new_password: newPassword
@@ -324,7 +324,7 @@ export const api = {
 
   submitInquiry: async (name: string, email: string, subject: string, message: string): Promise<void> => {
     try {
-      await client.post('/inquiries/', { name, email, subject, message });
+      await client.post('inquiries/', { name, email, subject, message });
     } catch (error: any) {
       throw new Error(error.response?.data?.error || 'Failed to submit inquiry');
     }
@@ -352,13 +352,13 @@ export const api = {
       else if (filters.sort === 'newest') params.ordering = '-created_at';
     }
 
-    const response = await client.get('/products/', { params });
+    const response = await client.get('products/', { params });
     return response.data.map(mapProduct);
   },
 
   getProduct: async (id: string): Promise<Product | undefined> => {
     try {
-      const response = await client.get(`/products/${id}/`);
+      const response = await client.get(`products/${id}/`);
       return mapProduct(response.data);
     } catch (e) {
       return undefined;
@@ -406,7 +406,7 @@ export const api = {
     if (product.flashSaleStart) formData.append('flash_sale_start', product.flashSaleStart);
     if (product.flashSaleEnd) formData.append('flash_sale_end', product.flashSaleEnd);
 
-    const response = await client.post('/products/', formData, {
+    const response = await client.post('products/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return mapProduct(response.data);
@@ -414,7 +414,7 @@ export const api = {
 
   getSuggestions: async (query: string): Promise<SearchSuggestions> => {
     try {
-      const response = await client.get(`/products/suggestions/?q=${query}`);
+      const response = await client.get(`products/suggestions/?q=${query}`);
       return {
         categories: response.data.categories || [],
         products: (response.data.products || []).map(mapProduct)
@@ -427,7 +427,7 @@ export const api = {
   bulkUploadProducts: async (zipFile: File): Promise<{ message: string; errors: string[] }> => {
     const formData = new FormData();
     formData.append('file', zipFile);
-    const response = await client.post('/products/bulk_upload/', formData, {
+    const response = await client.post('products/bulk_upload/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return response.data;
@@ -470,19 +470,19 @@ export const api = {
       });
     }
 
-    const response = await client.patch(`/products/${id}/`, formData, {
+    const response = await client.patch(`products/${id}/`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     });
     return mapProduct(response.data);
   },
 
   reorderProducts: async (items: { id: string; display_order: number }[]) => {
-    const response = await client.post('/products/reorder/', { items });
+    const response = await client.post('products/reorder/', { items });
     return response.data;
   },
 
   deleteProduct: async (id: string): Promise<void> => {
-    await client.delete(`/products/${id}/`);
+    await client.delete(`products/${id}/`);
   },
 
   getCategories: async (): Promise<string[]> => {
@@ -517,7 +517,7 @@ export const api = {
   getReviews: async (productId: string): Promise<import('../types').Review[]> => {
     try {
       // Filter by product
-      const response = await client.get(`/reviews/?product=${productId}`);
+      const response = await client.get(`reviews/?product=${productId}`);
       return response.data.map((r: any) => ({
         id: r.id,
         productId: r.product,
@@ -534,7 +534,7 @@ export const api = {
 
   createReview: async (productId: string, rating: number, comment: string, user: User): Promise<import('../types').Review> => {
     try {
-      const response = await client.post('/reviews/', {
+      const response = await client.post('reviews/', {
         product: productId,
         rating,
         comment
@@ -564,7 +564,7 @@ export const api = {
       use_earnings: orderData.useEarnings || false,
     };
 
-    const response = await client.post('/orders/', payload);
+    const response = await client.post('orders/', payload);
     const newOrder = mapOrder(response.data);
 
     await api.processPayment({
@@ -578,22 +578,22 @@ export const api = {
   },
 
   getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
-    const response = await client.get('/orders/');
+    const response = await client.get('orders/');
     return response.data.map(mapOrder);
   },
 
   getMyOrders: async (): Promise<Order[]> => {
-    const response = await client.get('/orders/my_orders/');
+    const response = await client.get('orders/my_orders/');
     return response.data.map(mapOrder);
   },
 
   getOrderDetails: async (id: string): Promise<Order> => {
-    const response = await client.get(`/orders/${id}/`);
+    const response = await client.get(`orders/${id}/`);
     return mapOrder(response.data);
   },
 
   updateOrderStatus: async (id: string, status: string): Promise<Order> => {
-    const response = await client.patch(`/orders/${id}/`, { status });
+    const response = await client.patch(`orders/${id}/`, { status });
     return mapOrder(response.data);
   },
 
@@ -606,13 +606,13 @@ export const api = {
       transaction_id: `tx_${Date.now()}`,
       status: 'completed'
     };
-    const response = await client.post('/payments/', payload);
+    const response = await client.post('payments/', payload);
     return response.data;
   },
 
   // --- Stats ---
   getDashboardStats: async (): Promise<DashboardStats> => {
-    const response = await client.get('/dashboard/stats/');
+    const response = await client.get('dashboard/stats/');
     return response.data;
   },
 
@@ -629,7 +629,7 @@ export const api = {
   },
 
   getUsers: async (): Promise<User[]> => {
-    const response = await client.get('/users/');
+    const response = await client.get('users/');
     return response.data.map(mapUser);
   },
 
@@ -639,7 +639,7 @@ export const api = {
 
   getMyEarnings: async (): Promise<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number }> => {
     try {
-      const response = await client.get('/users/my_earnings/');
+      const response = await client.get('users/my_earnings/');
       return {
         referralEarnings: parseFloat(response.data.referral_earnings),
         canRedeem: response.data.can_redeem,
@@ -654,10 +654,10 @@ export const api = {
 
   getAffiliate: async (): Promise<import('../types').Affiliate | null> => {
     try {
-      const response = await client.get('/affiliates/');
+      const response = await client.get('affiliates/');
       // Handle both paginated (response.data.results) and non-paginated (response.data) responses
       const results = Array.isArray(response.data) ? response.data : (response.data.results || []);
-      
+
       if (results && results.length > 0) {
         const data = results[0];
         return {
@@ -676,7 +676,7 @@ export const api = {
   },
 
   createAffiliate: async (referralCode: string): Promise<import('../types').Affiliate> => {
-    const response = await client.post('/affiliates/', { referral_code: referralCode });
+    const response = await client.post('affiliates/', { referral_code: referralCode });
     const data = response.data;
     return {
       id: data.id,
@@ -691,7 +691,7 @@ export const api = {
   // --- Wishlist ---
   getWishlist: async (): Promise<Product[]> => {
     try {
-      const response = await client.get('/wishlist/');
+      const response = await client.get('wishlist/');
       return response.data.map((item: any) => mapProduct(item.product));
     } catch (e) {
       return [];
@@ -700,13 +700,13 @@ export const api = {
 
   toggleWishlist: async (productId: string): Promise<boolean> => {
     // Returns true if added, false if removed
-    const response = await client.post('/wishlist/toggle/', { product_id: productId });
+    const response = await client.post('wishlist/toggle/', { product_id: productId });
     return response.data.in_wishlist;
   },
 
   // --- Contact Messages ---
   getContactMessages: async (): Promise<ContactMessage[]> => {
-    const response = await client.get('/contact-messages/');
+    const response = await client.get('contact-messages/');
     return response.data.map((m: any) => ({
       id: m.id,
       name: m.name,
@@ -719,10 +719,10 @@ export const api = {
   },
 
   markMessageAsRead: async (id: string): Promise<void> => {
-    await client.post(`/contact-messages/${id}/mark_as_read/`);
+    await client.post(`contact-messages/${id}/mark_as_read/`);
   },
 
   deleteContactMessage: async (id: string): Promise<void> => {
-    await client.delete(`/contact-messages/${id}/`);
+    await client.delete(`contact-messages/${id}/`);
   }
 };

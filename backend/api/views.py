@@ -340,6 +340,7 @@ class PageContentViewSet(viewsets.ModelViewSet):
     lookup_field = 'slug'
 
 class AffiliateViewSet(viewsets.ModelViewSet):
+    queryset = Affiliate.objects.all()
     serializer_class = AffiliateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
@@ -348,6 +349,14 @@ class AffiliateViewSet(viewsets.ModelViewSet):
         if user.role == 'admin':
             return Affiliate.objects.all()
         return Affiliate.objects.filter(user=user)
+
+    def list(self, request, *args, **kwargs):
+        try:
+            queryset = self.get_queryset()
+            serializer = self.get_serializer(queryset, many=True)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def create(self, request, *args, **kwargs):
         # Check if user already has an affiliate profile
