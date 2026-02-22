@@ -655,8 +655,11 @@ export const api = {
   getAffiliate: async (): Promise<import('../types').Affiliate | null> => {
     try {
       const response = await client.get('/affiliates/');
-      if (response.data.results && response.data.results.length > 0) {
-        const data = response.data.results[0];
+      // Handle both paginated (response.data.results) and non-paginated (response.data) responses
+      const results = Array.isArray(response.data) ? response.data : (response.data.results || []);
+      
+      if (results && results.length > 0) {
+        const data = results[0];
         return {
           id: data.id,
           userName: data.user_name,

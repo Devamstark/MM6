@@ -349,6 +349,22 @@ class AffiliateViewSet(viewsets.ModelViewSet):
             return Affiliate.objects.all()
         return Affiliate.objects.filter(user=user)
 
+    def create(self, request, *args, **kwargs):
+        # Check if user already has an affiliate profile
+        if Affiliate.objects.filter(user=request.user).exists():
+            return Response(
+                {"error": "You already have an affiliate profile."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            return super().create(request, *args, **kwargs)
+        except Exception as e:
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
