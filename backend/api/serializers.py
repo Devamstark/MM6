@@ -55,7 +55,7 @@ class ProductSerializer(serializers.ModelSerializer):
             if request:
                 return request.build_absolute_uri(instance.image.url)
             return instance.image.url
-        return None
+        return 'https://via.placeholder.com/400x400?text=No+Image'
 
     def update(self, instance, validated_data):
         if 'image' in validated_data and validated_data['image'] is None:
