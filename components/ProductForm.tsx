@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../services/api';
+import { api, getAbsoluteUrl } from '../services/api';
 import { Product } from '../types';
 import { Upload, Trash2, Plus, Image as ImageIcon, X, Package, Check, ShoppingBag, Timer } from 'lucide-react';
 import { CATEGORIES, MAIN_CATEGORIES } from '../utils/categories';
@@ -366,9 +366,15 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
-                            {formData.additionalImages.map((img, i) => (
+                            {formData.additionalImages.filter(img => img).map((img, i) => (
                                 <div key={i} className="aspect-square bg-gray-50 rounded-xl overflow-hidden relative group border border-gray-100">
-                                    <img src={img instanceof File ? URL.createObjectURL(img) : img} className="w-full h-full object-cover" />
+                                    <img
+                                        src={img instanceof File ? URL.createObjectURL(img) : getAbsoluteUrl(img as string)}
+                                        className="w-full h-full object-cover"
+                                        onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x200?text=Error';
+                                        }}
+                                    />
                                     <button type="button" className="absolute inset-0 bg-red-600/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onClick={() => {
                                         const imgs = [...formData.additionalImages];
                                         imgs.splice(i, 1);

@@ -73,7 +73,7 @@ client.interceptors.response.use(
 );
 
 // Helper to ensure absolute URL
-const getAbsoluteUrl = (url: string | null | undefined) => {
+export const getAbsoluteUrl = (url: string | null | undefined) => {
   if (!url) return '';
   if (typeof url !== 'string') return '';
   if (url.startsWith('http')) return url;
@@ -409,10 +409,10 @@ export const api = {
     }
 
     if (product.additionalImages) {
-      product.additionalImages.forEach((img) => {
+      product.additionalImages.filter(img => img).forEach((img) => {
         if (img instanceof File) {
           formData.append('additional_images_files', img);
-        } else {
+        } else if (typeof img === 'string' && img.trim() !== '') {
           formData.append('additional_images', img);
         }
       });
@@ -483,10 +483,10 @@ export const api = {
     }
 
     if (updates.additionalImages) {
-      updates.additionalImages.forEach((img) => {
+      updates.additionalImages.filter(img => img).forEach((img) => {
         if (img instanceof File) {
           formData.append('additional_images_files', img);
-        } else {
+        } else if (typeof img === 'string' && img.trim() !== '') {
           formData.append('additional_images', img);
         }
       });

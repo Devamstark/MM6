@@ -262,12 +262,8 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     def handle_additional_images(self, instance):
         files = self.request.FILES.getlist('additional_images_files')
-        existing_images = self.request.data.getlist('additional_images')
+        existing_images = [img for img in self.request.data.getlist('additional_images') if img and isinstance(img, str)]
         
-        if not files and not existing_images and 'additional_images' not in self.request.data and 'additional_images_files' not in self.request.FILES:
-             # If neither is present, don't overwrite (optional, depending on intended behavior)
-             return
-
         from django.core.files.storage import default_storage
         import uuid
         import os
@@ -277,8 +273,6 @@ class ProductViewSet(viewsets.ModelViewSet):
             ext = os.path.splitext(f.name)[1]
             filename = f"products/{uuid.uuid4()}{ext}"
             saved_path = default_storage.save(filename, f)
-            # Construct the URL. This depends on your MEDIA_URL setting.
-            # default_storage.url(saved_path) is generally preferred.
             url = default_storage.url(saved_path)
             new_urls.append(url)
             
