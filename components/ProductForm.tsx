@@ -139,15 +139,12 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setFormData(prev => ({
-                    ...prev,
-                    imageUrl: reader.result as string,
-                    imageFile: file
-                }));
-            };
-            reader.readAsDataURL(file);
+            const previewUrl = URL.createObjectURL(file);
+            setFormData(prev => ({
+                ...prev,
+                imageUrl: previewUrl,
+                imageFile: file
+            }));
         }
     };
 
@@ -366,27 +363,56 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                         </div>
 
                         <div className="grid grid-cols-3 gap-2">
-                            {formData.additionalImages.filter(img => img).map((img, i) => (
-                                <div key={i} className="aspect-square bg-gray-50 rounded-xl overflow-hidden relative group border border-gray-100">
-                                    <img
-                                        src={img instanceof File ? URL.createObjectURL(img) : getAbsoluteUrl(img as string)}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                            (e.target as HTMLImageElement).src = 'https://via.placeholder.com/200x200?text=Error';
-                                        }}
-                                    />
-                                    <button type="button" className="absolute inset-0 bg-red-600/80 text-white opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center" onClick={() => {
-                                        const imgs = [...formData.additionalImages];
-                                        imgs.splice(i, 1);
-                                        setFormData({ ...formData, additionalImages: imgs });
-                                    }}><Trash2 className="w-4 h-4" /></button>
-                                </div>
-                            ))}
-                            <label className="aspect-square border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center cursor-pointer hover:bg-gray-50 transition-colors text-gray-300 hover:text-indigo-500 hover:border-indigo-200">
-                                <Plus className="w-6 h-6" />
-                                <input type="file" multiple className="hidden" onChange={e => {
-                                    if (e.target.files) setFormData({ ...formData, additionalImages: [...formData.additionalImages, ...Array.from(e.target.files)] })
-                                }} />
+                            {formData.additionalImages.filter(img => img).map((img, i) => {
+                                const isFile = img instanceof File;
+                                const previewSrc = isFile ? URL.createObjectURL(img) : getAbsoluteUrl(img as string);
+
+                                return (
+                                    <div key={i} className="aspect-square bg-white rounded-xl overflow-hidden relative group border border-gray-100 shadow-sm">
+                                        <img
+                                            src={previewSrc}
+                                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                if (!target.src.includes('placeholder')) {
+                                                    target.src = 'https://via.placeholder.com/400x400?text=Image+Load+Failed';
+                                                }
+                                            }}
+                                        />
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                            <button
+                                                type="button"
+                                                className="w-8 h-8 bg-red-600 text-white rounded-lg flex items-center justify-center hover:bg-red-700 transition-colors"
+                                                onClick={() => {
+                                                    const imgs = [...formData.additionalImages];
+                                                    imgs.splice(i, 1);
+                                                    setFormData({ ...formData, additionalImages: imgs });
+                                                }}
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+
+                            <label className="aspect-square border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-indigo-50 hover:border-indigo-300 transition-all text-gray-400 hover:text-indigo-600 group">
+                                <Plus className="w-6 h-6 mb-1 group-hover:scale-110 transition-transform" />
+                                <span className="text-[10px] font-black uppercase tracking-widest">Add More</span>
+                                <input
+                                    type="file"
+                                    multiple
+                                    className="hidden"
+                                    onChange={e => {
+                                        if (e.target.files) {
+                                            const newFiles = Array.from(e.target.files);
+                                            setFormData(prev => ({
+                                                ...prev,
+                                                additionalImages: [...prev.additionalImages, ...newFiles]
+                                            }));
+                                        }
+                                    }}
+                                />
                             </label>
                         </div>
                     </div>
