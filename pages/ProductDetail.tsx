@@ -155,26 +155,59 @@ export const ProductDetail = () => {
                 {/* Top Section: Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-                    {/* Left: Image Vertical Stack (Span 7) */}
-                    <div className="lg:col-span-8 space-y-4">
-                        <div className="flex flex-col gap-6">
-                            {allImages.map((img, idx) => (
-                                <div
-                                    key={idx}
-                                    className="bg-gray-50 overflow-hidden rounded-sm border border-gray-50 dark:bg-gray-800 dark:border-gray-700"
-                                >
-                                    <img
-                                        src={img}
-                                        alt={`${product.name} view ${idx + 1}`}
-                                        className={`w-full h-auto ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
-                                    />
-                                </div>
-                            ))}
+                    {/* Left: Image Gallery (Span 7) */}
+                    <div className="lg:col-span-7">
+                        <div className="relative group bg-gray-50 rounded-sm overflow-hidden border border-gray-50 dark:bg-gray-800 dark:border-gray-700 aspect-[4/5] flex items-center justify-center">
+                            <img
+                                src={mainImage}
+                                alt={product.name}
+                                className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all duration-500`}
+                            />
+
+                            {/* Navigation Arrows */}
+                            {allImages.length > 1 && (
+                                <>
+                                    <button
+                                        onClick={() => {
+                                            const idx = allImages.indexOf(mainImage);
+                                            setMainImage(allImages[(idx - 1 + allImages.length) % allImages.length]);
+                                        }}
+                                        className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-gray-100"
+                                    >
+                                        <ArrowLeft className="w-4 h-4 text-black" />
+                                    </button>
+                                    <button
+                                        onClick={() => {
+                                            const idx = allImages.indexOf(mainImage);
+                                            setMainImage(allImages[(idx + 1) % allImages.length]);
+                                        }}
+                                        className="absolute right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-white/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity border border-gray-100 rotate-180"
+                                    >
+                                        <ArrowLeft className="w-4 h-4 text-black" />
+                                    </button>
+                                </>
+                            )}
                         </div>
+
+                        {/* Thumbnails Below */}
+                        {allImages.length > 1 && (
+                            <div className="flex gap-4 mt-6 justify-center">
+                                {allImages.map((img, idx) => (
+                                    <button
+                                        key={idx}
+                                        onClick={() => setMainImage(img)}
+                                        className={`w-20 h-24 rounded-sm overflow-hidden border transition-all
+                                            ${mainImage === img ? 'border-black' : 'border-gray-100 hover:border-gray-300'}`}
+                                    >
+                                        <img src={img} alt="" className="w-full h-full object-cover" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    {/* Right: Product Info (Span 4) - Sticky */}
-                    <div className="lg:col-span-4 flex flex-col sticky top-24 space-y-6">
+                    {/* Right: Product Info (Span 5) - Sticky */}
+                    <div className="lg:col-span-5 flex flex-col sticky top-24 space-y-6">
                         <div>
                             {/* Brand & Category */}
                             <div className="flex items-center gap-2 mb-1">
