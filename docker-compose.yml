@@ -107,7 +107,7 @@ services:
     user: 0:0 # Run as root to avoid permission issues with the host mount
     restart: always
     ports:
-      - "8443:80"
+      - "2025:80"
     volumes:
       - .:/srv
       - filebrowser_data:/database
