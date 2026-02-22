@@ -55,7 +55,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             <img
               src={product.imageUrl}
               alt={product.name}
-              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className={`h-full w-full transition-transform duration-700 group-hover:scale-110 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
             />
 
             {/* Overlay Gradient */}

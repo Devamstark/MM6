@@ -101,6 +101,7 @@ const mapProduct = (p: any): Product => ({
   colors: p.colors || [],
   isFeatured: p.is_featured,
   isPopular: p.is_popular,
+  imageFit: p.image_fit || 'cover',
   variants: p.variants || [],
   userId: p.seller,
   createdAt: p.created_at,

@@ -103,6 +103,7 @@ class Product(models.Model):
     variants = models.JSONField(default=list, blank=True) # List of variants e.g. [{size: "M", color: "Red", stock: 5}]
     is_featured = models.BooleanField(default=False)
     is_popular = models.BooleanField(default=False)
+    image_fit = models.CharField(max_length=10, choices=[('cover', 'Cover'), ('contain', 'Contain')], default='cover')
     
     # Discount fields
     discount_percentage = models.IntegerField(default=0)

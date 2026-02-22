@@ -167,7 +167,7 @@ export const ProductDetail = () => {
                             <img
                                 src={mainImage}
                                 alt={product.name}
-                                className="w-full h-full object-cover object-center transition-transform duration-1000 group-hover:scale-105"
+                                className={`w-full h-full transition-transform duration-1000 group-hover:scale-105 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
                             />
 
                             {/* Zoom Indicator */}

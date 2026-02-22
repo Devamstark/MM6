@@ -38,12 +38,14 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         shipping_cost: string;
         flashSaleStart: string;
         flashSaleEnd: string;
+        imageFit: 'cover' | 'contain';
         variants: { size: string; color: string; stock: number }[];
     }>({
         name: '', description: '', price: '', category: '', subcategory: '', brand: '', imageUrl: '', stock: '',
         gender: 'Unisex', sizes: '', colors: '', additionalImages: [], isFeatured: false, isPopular: false,
         variants: [], cogs: '0', marketing_cost: '0', shipping_cost: '0',
-        flashSaleStart: '', flashSaleEnd: ''
+        flashSaleStart: '', flashSaleEnd: '',
+        imageFit: 'cover'
     });
 
     useEffect(() => {
@@ -69,7 +71,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                 marketing_cost: initialData.marketingCost?.toString() || '0',
                 shipping_cost: initialData.shippingCost?.toString() || '0',
                 flashSaleStart: initialData.flashSaleStart ? new Date(initialData.flashSaleStart).toISOString().slice(0, 16) : '',
-                flashSaleEnd: initialData.flashSaleEnd ? new Date(initialData.flashSaleEnd).toISOString().slice(0, 16) : ''
+                flashSaleEnd: initialData.flashSaleEnd ? new Date(initialData.flashSaleEnd).toISOString().slice(0, 16) : '',
+                imageFit: initialData.imageFit || 'cover'
             });
         }
     }, [initialData]);
@@ -163,7 +166,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
             marketing_cost: parseFloat(formData.marketing_cost),
             shipping_cost: parseFloat(formData.shipping_cost),
             flash_sale_start: formData.flashSaleStart || null,
-            flash_sale_end: formData.flashSaleEnd || null
+            flash_sale_end: formData.flashSaleEnd || null,
+            image_fit: formData.imageFit
         };
 
         try {
@@ -338,6 +342,26 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                                     </div>
                                 )}
                                 <input type="file" className="absolute inset-0 opacity-0 cursor-pointer" onChange={handleImageUpload} accept="image/*" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Image Fit</label>
+                            <div className="flex gap-2">
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, imageFit: 'cover' })}
+                                    className={`flex-1 py-2 px-3 rounded-xl text-[10px] font-black uppercase transition-all border-2 ${formData.imageFit === 'cover' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-indigo-200'}`}
+                                >
+                                    Cover (Crop)
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, imageFit: 'contain' })}
+                                    className={`flex-1 py-2 px-3 rounded-xl text-[10px] font-black uppercase transition-all border-2 ${formData.imageFit === 'contain' ? 'bg-indigo-600 border-indigo-600 text-white' : 'bg-gray-50 border-gray-100 text-gray-400 hover:border-indigo-200'}`}
+                                >
+                                    Contain (Full)
+                                </button>
                             </div>
                         </div>
 

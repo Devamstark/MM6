@@ -55,6 +55,7 @@ export interface Product {
     isFeatured?: boolean;
     isPopular?: boolean;
     variants?: any[];
+    imageFit?: 'cover' | 'contain';
     userId: string; // Seller ID
     createdAt: string;
     discountPercentage?: number;

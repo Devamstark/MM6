@@ -39,7 +39,7 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'name', 'slug', 'description', 'price', 'category', 'subcategory', 'brand',
             'image', 'image_url', 'additional_images', 'stock_quantity', 'gender', 'sizes', 'colors',
-            'is_featured', 'is_popular', 'variants', 'seller', 'created_at',
+            'is_featured', 'is_popular', 'image_fit', 'variants', 'seller', 'created_at',
             'discount_percentage', 'sale_price',
             'cogs', 'marketing_cost', 'shipping_cost',
             'flash_sale_start', 'flash_sale_end'
