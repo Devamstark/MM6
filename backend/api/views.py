@@ -271,9 +271,11 @@ class ProductViewSet(viewsets.ModelViewSet):
         self.handle_additional_images(instance)
 
     def handle_additional_images(self, instance):
-        files = self.request.FILES.getlist('additional_images')
+        # Correctly get new files from 'additional_images_files' field
+        files = self.request.FILES.getlist('additional_images_files')
+        # Get existing image URLs from 'additional_images' field
         existing_images = [img for img in self.request.data.getlist('additional_images') if img and isinstance(img, str)]
-        
+
         from django.core.files.storage import default_storage
         import uuid
         import os
@@ -283,11 +285,19 @@ class ProductViewSet(viewsets.ModelViewSet):
             ext = os.path.splitext(f.name)[1]
             filename = f"products/{uuid.uuid4()}{ext}"
             saved_path = default_storage.save(filename, f)
-            url = default_storage.url(saved_path)
+            # Create an absolute URL for the image
+            url = self.request.build_absolute_uri(default_storage.url(saved_path))
             new_urls.append(url)
-            
-        instance.additional_images = existing_images + new_urls
-        instance.save()
+
+        # If new files are uploaded, existing_images from the form should be used.
+        # If no new files are uploaded and 'additional_images' is not in the form,
+        # we should not wipe the existing images in the database.
+        if files or 'additional_images' in self.request.data:
+            instance.additional_images = existing_images + new_urls
+        
+        # Save the instance only if there are changes.
+        if files or 'additional_images' in self.request.data:
+            instance.save()
 
     @action(detail=False, methods=['post'], url_path='reorder')
     def reorder(self, request):
