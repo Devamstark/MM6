@@ -162,58 +162,35 @@ export const ProductDetail = () => {
                 {/* Top Section: Main Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
 
-                    {/* Left: Image Gallery (Span 7) */}
-                    <div className="lg:col-span-7 space-y-4 sticky top-24">
-                        <div
-                            className="aspect-square bg-white rounded-2xl overflow-hidden relative group dark:bg-gray-800 border border-gray-100 dark:border-gray-700 shadow-sm cursor-zoom-in"
-                            onClick={() => setIsLightboxOpen(true)}
-                        >
-                            <img
-                                src={mainImage}
-                                alt={product.name}
-                                className={`w-full h-full transition-transform duration-700 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center`}
-                            />
-
-                            {/* Flash Sale Badge Overlay */}
-                            {product.flashSaleEnd && new Date(product.flashSaleEnd) > new Date() && (
-                                <div className="absolute top-6 left-6">
-                                    <div className="bg-red-600 text-white px-4 py-2 rounded-2xl shadow-xl flex items-center gap-2 animate-bounce">
-                                        <div className="w-2 h-2 rounded-full bg-white animate-ping"></div>
-                                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">Flash Sale</span>
-                                    </div>
+                    {/* Left: Image Vertical Stack (Span 7) */}
+                    <div className="lg:col-span-7 space-y-4">
+                        <div className="flex flex-col gap-4">
+                            {allImages.map((img, idx) => (
+                                <div
+                                    key={idx}
+                                    className="aspect-square bg-gray-50 overflow-hidden rounded-lg border border-gray-100 dark:bg-gray-800 dark:border-gray-700"
+                                >
+                                    <img
+                                        src={img}
+                                        alt={`${product.name} view ${idx + 1}`}
+                                        className={`w-full h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} object-center transition-transform duration-700 hover:scale-105`}
+                                    />
                                 </div>
-                            )}
+                            ))}
                         </div>
-
-                        {/* Thumbnails */}
-                        {allImages.length > 1 && (
-                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                                {allImages.map((img, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => setMainImage(img)}
-                                        className={`w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all duration-300 transform hover:scale-105
-                                            ${mainImage === img ? 'border-indigo-600 shadow-md' : 'border-transparent hover:border-gray-200'}`}
-                                    >
-                                        <img src={img} alt="" className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
-                            </div>
-                        )}
                     </div>
 
-                    {/* Right: Product Info (Span 5) */}
-                    <div className="lg:col-span-5 flex flex-col">
+                    {/* Right: Product Info (Span 5) - Sticky */}
+                    <div className="lg:col-span-5 flex flex-col sticky top-24">
                         {/* Brand & Category */}
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[11px] font-bold text-indigo-600 uppercase tracking-[0.2em] bg-indigo-50 px-3 py-1 rounded-md dark:bg-indigo-900/30 dark:text-indigo-400 font-display">
+                        <div className="flex items-center gap-2 mb-1">
+                            <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest font-display">
                                 {product.brand}
                             </span>
-                            <span className="text-[11px] font-bold text-gray-400 uppercase tracking-[0.1em] font-display">{product.category}</span>
                         </div>
 
                         {/* Title */}
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight leading-tight mb-2 dark:text-white font-display">
+                        <h1 className="text-xl sm:text-2xl font-medium text-gray-900 tracking-tight leading-tight mb-2 dark:text-white font-display uppercase">
                             {product.name}
                         </h1>
 
@@ -254,14 +231,11 @@ export const ProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Stock Management */}
-                        <div className="mb-8 border-b border-gray-100 dark:border-gray-800 pb-6">
-                            <div className="flex items-center gap-3">
-                                <span className={`w-3 h-3 rounded-full ${isOutOfStock ? 'bg-red-500' : product.stock < 10 ? 'bg-orange-500' : 'bg-green-500'}`}></span>
-                                <span className={`text-sm font-bold uppercase tracking-wider ${isOutOfStock ? 'text-red-600' : product.stock < 10 ? 'text-orange-600' : 'text-green-600'}`}>
-                                    {isOutOfStock ? 'Sold Out' : product.stock < 10 ? `Only ${product.stock} items left!` : 'In Stock'}
-                                </span>
-                            </div>
+                        <div className="mb-6 flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-4">
+                            <span className={`w-2 h-2 rounded-full ${isOutOfStock ? 'bg-red-500' : 'bg-green-500'}`}></span>
+                            <span className={`text-[10px] font-bold uppercase tracking-wider ${isOutOfStock ? 'text-red-500' : 'text-gray-500'}`}>
+                                {isOutOfStock ? 'Sold Out' : 'Available'}
+                            </span>
                         </div>
 
                         {/* Selection Area */}
@@ -269,17 +243,17 @@ export const ProductDetail = () => {
                             {/* Color Selector */}
                             {product.colors && product.colors.length > 0 && (
                                 <div>
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <label className="text-xs font-bold text-gray-900 uppercase tracking-widest dark:text-white">Color:</label>
-                                        <span className="text-xs text-gray-500 font-medium capitalize">{selectedColor}</span>
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em]">Color</label>
+                                        <span className="text-[10px] text-gray-400 uppercase font-medium">{selectedColor}</span>
                                     </div>
-                                    <div className="flex flex-wrap gap-3">
+                                    <div className="flex flex-wrap gap-2">
                                         {product.colors.map(color => (
                                             <button
                                                 key={color}
                                                 onClick={() => setSelectedColor(color)}
-                                                className={`w-10 h-10 rounded-full transition-all duration-200 p-0.5 border-2 
-                                                    ${selectedColor === color ? 'border-indigo-600 scale-110' : 'border-gray-200 hover:border-indigo-200'}`}
+                                                className={`w-7 h-7 rounded-full transition-all p-0.5 border
+                                                    ${selectedColor === color ? 'border-black ring-1 ring-black ring-offset-2' : 'border-gray-200 hover:border-gray-400'}`}
                                                 title={color}
                                             >
                                                 <div
@@ -295,21 +269,21 @@ export const ProductDetail = () => {
                             {/* Size Selector */}
                             {product.sizes && product.sizes.length > 0 && (
                                 <div>
-                                    <div className="flex items-center justify-between mb-4">
-                                        <label className="text-xs font-bold text-gray-900 uppercase tracking-widest dark:text-white">Size:</label>
-                                        <button className="text-[11px] font-bold text-indigo-600 hover:underline flex items-center gap-1">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <label className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em]">Size</label>
+                                        <button className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black">
                                             Size Guide
                                         </button>
                                     </div>
-                                    <div className="flex flex-wrap gap-2">
+                                    <div className="grid grid-cols-4 gap-1.5">
                                         {product.sizes.map(size => (
                                             <button
                                                 key={size}
                                                 onClick={() => setSelectedSize(size)}
-                                                className={`min-w-[50px] px-4 py-2 rounded-md font-bold text-xs transition-all duration-200 border-2 
+                                                className={`py-2 rounded-sm font-bold text-[11px] uppercase transition-all border
                                                     ${selectedSize === size
-                                                        ? 'border-indigo-600 bg-indigo-600 text-white'
-                                                        : 'border-gray-200 hover:border-indigo-200 text-gray-700 dark:border-gray-700 dark:text-gray-300'}`}
+                                                        ? 'bg-black text-white border-black'
+                                                        : 'border-gray-200 text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:text-gray-300'}`}
                                             >
                                                 {size}
                                             </button>
@@ -321,18 +295,18 @@ export const ProductDetail = () => {
                             {/* Quantity Selector */}
                             {!isOutOfStock && (
                                 <div>
-                                    <label className="text-xs font-bold text-gray-900 uppercase tracking-widest dark:text-white mb-4 block">Quantity:</label>
-                                    <div className="flex items-center w-fit border border-gray-200 rounded-md overflow-hidden dark:border-gray-700">
+                                    <label className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.15em] mb-3 block">Quantity</label>
+                                    <div className="flex items-center w-fit border border-gray-200 rounded-sm dark:border-gray-700 overflow-hidden">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-500 transition-colors border-r border-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            className="w-10 h-9 flex items-center justify-center hover:bg-gray-50 text-gray-400 transition-colors border-r border-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
                                         >
                                             <Minus className="w-3 h-3" />
                                         </button>
-                                        <span className="w-12 text-center font-bold text-sm">{quantity}</span>
+                                        <span className="w-10 text-center font-bold text-xs">{quantity}</span>
                                         <button
                                             onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                                            className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-500 transition-colors border-l border-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
+                                            className="w-10 h-9 flex items-center justify-center hover:bg-gray-50 text-gray-400 transition-colors border-l border-gray-200 dark:border-gray-700 dark:hover:bg-gray-800"
                                         >
                                             <Plus className="w-3 h-3" />
                                         </button>
@@ -341,39 +315,37 @@ export const ProductDetail = () => {
                             )}
                         </div>
 
-                        <div className="flex flex-col gap-4 mb-8">
+                        <div className="flex flex-col gap-3 mb-10">
                             {isOutOfStock ? (
-                                <button className="w-full py-4 bg-gray-100 text-gray-400 rounded-md font-bold uppercase tracking-widest cursor-not-allowed">
+                                <button className="w-full py-4 bg-gray-100 text-gray-400 rounded-sm font-bold uppercase tracking-widest cursor-not-allowed text-xs">
                                     Sold Out
                                 </button>
                             ) : (
-                                <div className="flex gap-4">
+                                <div className="flex flex-col gap-3">
                                     <button
                                         onClick={handleAddToCart}
-                                        className="flex-[3] bg-black text-white py-4 rounded-md font-bold uppercase tracking-widest hover:bg-gray-900 transition-all flex items-center justify-center gap-3 active:scale-[0.98] dark:bg-white dark:text-black dark:hover:bg-gray-100"
+                                        className="w-full bg-black text-white py-4 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-800 transition-all flex items-center justify-center gap-3 active:scale-[0.99] dark:bg-white dark:text-black dark:hover:bg-gray-100 text-[11px]"
                                     >
-                                        <ShoppingBag className="w-5 h-5" />
-                                        <span>Add to Cart</span>
+                                        Add to Bag
                                     </button>
 
                                     <button
-                                        onClick={handleWishlistToggle}
-                                        className={`w-14 flex items-center justify-center rounded-md border border-gray-200 transition-all duration-200 
-                                            ${inWishlist ? 'bg-red-50 text-red-600 border-red-100' : 'hover:bg-gray-50 text-gray-400 dark:border-gray-700'}`}
+                                        onClick={handleBuyNow}
+                                        className="w-full py-3.5 border border-black text-black rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all text-[11px] dark:border-white dark:text-white active:scale-[0.99]"
                                     >
-                                        <Heart className={`w-6 h-6 ${inWishlist ? 'fill-current' : ''}`} />
+                                        Buy it now
                                     </button>
                                 </div>
                             )}
 
-                            {!isOutOfStock && (
-                                <button
-                                    onClick={handleBuyNow}
-                                    className="w-full py-4 bg-indigo-600 text-white rounded-md font-bold uppercase tracking-widest hover:bg-indigo-700 transition-all active:scale-[0.98] shadow-lg"
-                                >
-                                    Buy it now
-                                </button>
-                            )}
+                            <button
+                                onClick={handleWishlistToggle}
+                                className={`flex items-center justify-center gap-2 py-3 text-[10px] uppercase font-bold tracking-widest transition-colors
+                                    ${inWishlist ? 'text-red-600' : 'text-gray-400 hover:text-black dark:hover:text-white'}`}
+                            >
+                                <Heart className={`w-3.5 h-3.5 ${inWishlist ? 'fill-current' : ''}`} />
+                                {inWishlist ? 'In Wishlist' : 'Add to Wishlist'}
+                            </button>
                         </div>
 
                         {/* Trust Badges */}
