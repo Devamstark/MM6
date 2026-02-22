@@ -47,7 +47,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'cogs', 'marketing_cost', 'shipping_cost',
             'flash_sale_start', 'flash_sale_end'
         ]
-        read_only_fields = ('seller', 'created_at', 'sale_price')
+        read_only_fields = ('seller', 'created_at', 'sale_price', 'additional_images')
 
     def get_image_url(self, instance):
         if instance.image and hasattr(instance.image, 'url'):
@@ -56,6 +56,12 @@ class ProductSerializer(serializers.ModelSerializer):
                 return request.build_absolute_uri(instance.image.url)
             return instance.image.url
         return None
+
+    def update(self, instance, validated_data):
+        if 'image' in validated_data and validated_data['image'] is None:
+            validated_data.pop('image')
+        
+        return super().update(instance, validated_data)
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
