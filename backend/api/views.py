@@ -257,6 +257,16 @@ class ProductViewSet(viewsets.ModelViewSet):
         self.handle_additional_images(instance)
 
     def perform_update(self, serializer):
+        # If 'image' is present in validated_data and is None, it's because
+        # an empty value was sent for the image field. We want to prevent this
+        # from clearing the existing image. We do this by removing the 'image'
+        # key from the serializer's internal validated data dictionary before saving.
+        if 'image' in serializer.validated_data and serializer.validated_data['image'] is None:
+            # Accessing _validated_data is not ideal, but it's a reliable way
+            # to modify the data before save() is called.
+            if 'image' in serializer._validated_data:
+                 del serializer._validated_data['image']
+
         instance = serializer.save()
         self.handle_additional_images(instance)
 
