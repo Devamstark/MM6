@@ -53,9 +53,12 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
           {/* Image Container */}
           <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-700">
             <img
-              src={product.imageUrl}
+              src={product.imageUrl || 'https://via.placeholder.com/600x600?text=No+Image'}
               alt={product.name}
               className={`h-full w-full transition-transform duration-700 group-hover:scale-110 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x600?text=No+Image';
+              }}
             />
 
             {/* Overlay Gradient */}

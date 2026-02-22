@@ -134,8 +134,14 @@ export const ProductDetail = () => {
 
     if (!product) return <div className="text-center py-20">Product not found</div>;
 
-    const allImages = [product.imageUrl, ...(product.additionalImages || [])];
+    const allImages = Array.from(new Set([product.imageUrl, ...(product.additionalImages || [])])).filter(Boolean);
     const isOutOfStock = product.stock <= 0;
+
+    const PLACEHOLDER_IMAGE = 'https://via.placeholder.com/800x800?text=No+Image+Available';
+
+    const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+        (e.target as HTMLImageElement).src = PLACEHOLDER_IMAGE;
+    };
 
     return (
         <div className="bg-white min-h-screen pb-16 pt-20 dark:bg-gray-900 transition-colors duration-300 font-body">
@@ -167,7 +173,12 @@ export const ProductDetail = () => {
                                         className={`w-16 h-16 rounded-sm overflow-hidden border transition-all p-0.5 flex-shrink-0
                                             ${mainImage === img ? 'border-orange-500 ring-1 ring-orange-500' : 'border-gray-100 hover:border-gray-300'}`}
                                     >
-                                        <img src={img} alt="" className="w-full h-full object-contain" />
+                                        <img
+                                            src={img}
+                                            alt=""
+                                            className="w-full h-full object-contain"
+                                            onError={handleImageError}
+                                        />
                                     </button>
                                 ))}
                             </div>
@@ -177,9 +188,10 @@ export const ProductDetail = () => {
                         <div className="flex-1 min-w-0">
                             <div className="relative group bg-white rounded-sm overflow-hidden border border-gray-100 dark:bg-gray-800 dark:border-gray-700 aspect-square flex items-center justify-center p-4">
                                 <img
-                                    src={mainImage}
+                                    src={mainImage || PLACEHOLDER_IMAGE}
                                     alt={product.name}
                                     className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all duration-300`}
+                                    onError={handleImageError}
                                 />
 
                                 {/* Zoom Placeholder / Hover Effect */}
@@ -196,7 +208,12 @@ export const ProductDetail = () => {
                                             className={`w-16 h-16 flex-shrink-0 rounded-sm overflow-hidden border transition-all
                                                 ${mainImage === img ? 'border-orange-500' : 'border-gray-100'}`}
                                         >
-                                            <img src={img} alt="" className="w-full h-full object-cover" />
+                                            <img
+                                                src={img}
+                                                alt=""
+                                                className="w-full h-full object-cover"
+                                                onError={handleImageError}
+                                            />
                                         </button>
                                     ))}
                                 </div>
@@ -364,25 +381,25 @@ export const ProductDetail = () => {
                             </button>
                         </div>
 
-                        {/* Trust Badges - Integrated */}
-                        <div className="pt-8 space-y-4">
-                            <div className="grid grid-cols-1 gap-4">
-                                <div className="flex items-center gap-4 group">
-                                    <div className="w-8 h-8 flex items-center justify-center text-gray-400">
-                                        <Truck className="w-4 h-4" />
+                        {/* Trust Badges - Improved Layout */}
+                        <div className="pt-8">
+                            <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-6 dark:border-gray-800">
+                                <div className="flex items-center gap-3 group">
+                                    <div className="w-10 h-10 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
+                                        <Truck className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900 mb-0.5">Free Logistic</p>
-                                        <p className="text-[9px] text-gray-400">On orders over $150</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900 mb-0.5 dark:text-white leading-none">Free Delivery</p>
+                                        <p className="text-[9px] text-gray-400 leading-tight">Orders over $150</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-4 group">
-                                    <div className="w-8 h-8 flex items-center justify-center text-gray-400">
-                                        <RotateCcw className="w-4 h-4" />
+                                <div className="flex items-center gap-3 group">
+                                    <div className="w-10 h-10 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
+                                        <RotateCcw className="w-5 h-5" />
                                     </div>
                                     <div>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900 mb-0.5">Easy Returns</p>
-                                        <p className="text-[9px] text-gray-400">30-day hassle-free policy</p>
+                                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-900 mb-0.5 dark:text-white leading-none">Easy Returns</p>
+                                        <p className="text-[9px] text-gray-400 leading-tight">30-day policy</p>
                                     </div>
                                 </div>
                             </div>
@@ -391,7 +408,7 @@ export const ProductDetail = () => {
                 </div>
 
                 {/* Middle Section: Tabbed Experience */}
-                <div className="mt-20 pt-10 border-t border-gray-100">
+                <div className="mt-12 pt-8 border-t border-gray-100">
                     <div className="flex justify-center gap-12 mb-10 border-b border-gray-100">
                         {[
                             { id: 'description', label: 'Description' },
@@ -402,7 +419,7 @@ export const ProductDetail = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`pb-4 text-[11px] font-bold uppercase tracking-widest border-b-[2px] transition-all
+                                className={`pb-4 text-[13px] font-bold uppercase tracking-widest border-b-[2px] transition-all
                                     ${activeTab === tab.id
                                         ? 'border-black text-black'
                                         : 'border-transparent text-gray-400 hover:text-gray-600'}`}
@@ -414,25 +431,25 @@ export const ProductDetail = () => {
 
                     <div className="max-w-4xl mx-auto min-h-[400px] animate-fade-in">
                         {activeTab === 'description' && (
-                            <div className="animate-fade-in">
-                                <p className="text-gray-600 leading-relaxed text-sm max-w-2xl mx-auto text-center italic mb-10">
+                            <div className="animate-fade-in py-6">
+                                <p className="text-gray-600 leading-relaxed text-lg max-w-3xl mx-auto text-center italic mb-12">
                                     "{product.description}"
                                 </p>
                                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-gray-50 p-6 rounded-xl dark:bg-gray-800">
-                                        <h4 className="font-bold text-indigo-600 uppercase tracking-widest text-[10px] mb-3">Core Benefits</h4>
-                                        <ul className="space-y-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" /> High-performance ergonomic design</li>
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" /> Sustainable and durable materials</li>
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-green-500 mt-0.5" /> Certified and tested for extreme conditions</li>
+                                    <div className="bg-gray-50 p-8 rounded-2xl dark:bg-gray-800">
+                                        <h4 className="font-bold text-indigo-600 uppercase tracking-widest text-xs mb-4">Core Benefits</h4>
+                                        <ul className="space-y-4 text-base font-medium text-gray-700 dark:text-gray-300">
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> High-performance ergonomic design</li>
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> Sustainable and durable materials</li>
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> Certified and tested for extreme conditions</li>
                                         </ul>
                                     </div>
-                                    <div className="bg-gray-50 p-6 rounded-xl dark:bg-gray-800">
-                                        <h4 className="font-bold text-purple-600 uppercase tracking-widest text-[10px] mb-3">Craftsmanship</h4>
-                                        <ul className="space-y-3 text-sm font-medium text-gray-700 dark:text-gray-300">
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-purple-500 mt-0.5" /> Hand-finished details</li>
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-purple-500 mt-0.5" /> Precision engineered components</li>
-                                            <li className="flex items-start gap-2"><Check className="w-4 h-4 text-purple-500 mt-0.5" /> Luxury aesthetic and feel</li>
+                                    <div className="bg-gray-50 p-8 rounded-2xl dark:bg-gray-800">
+                                        <h4 className="font-bold text-purple-600 uppercase tracking-widest text-xs mb-4">Craftsmanship</h4>
+                                        <ul className="space-y-4 text-base font-medium text-gray-700 dark:text-gray-300">
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Hand-finished details</li>
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Precision engineered components</li>
+                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Luxury aesthetic and feel</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -450,9 +467,9 @@ export const ProductDetail = () => {
                                         { label: 'Inventory', value: `${product.stock} units` },
                                         { label: 'SKU', value: product.id.slice(0, 12).toUpperCase() }
                                     ].map((spec, i) => (
-                                        <div key={i} className="flex justify-between py-3 border-b border-gray-100 dark:border-gray-800 group px-2 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{spec.label}</span>
-                                            <span className="text-xs font-medium text-gray-900 dark:text-white">{spec.value}</span>
+                                        <div key={i} className="flex justify-between py-4 border-b border-gray-100 dark:border-gray-800 group px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">{spec.label}</span>
+                                            <span className="text-sm font-medium text-gray-900 dark:text-white">{spec.value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -462,24 +479,24 @@ export const ProductDetail = () => {
                         {activeTab === 'shipping' && (
                             <div className="prose prose-lg dark:prose-invert max-w-none">
                                 <div className="flex items-center gap-6 mb-12 p-8 bg-indigo-50 rounded-[2.5rem] dark:bg-indigo-900/10">
-                                    <Truck className="w-12 h-12 text-indigo-600" />
+                                    <Truck className="w-14 h-14 text-indigo-600" />
                                     <div>
-                                        <h3 className="text-xl font-black text-indigo-900 dark:text-white mb-1">Priority Global Logistics</h3>
-                                        <p className="text-sm font-bold text-indigo-600">Free delivery on all orders over $150</p>
+                                        <h3 className="text-2xl font-black text-indigo-900 dark:text-white mb-2">Priority Global Logistics</h3>
+                                        <p className="text-base font-bold text-indigo-600">Free delivery on all orders over $150</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                     <div>
-                                        <h4 className="text-sm font-black uppercase tracking-widest mb-6">Dispatch Times</h4>
-                                        <ul className="space-y-4 text-gray-600 dark:text-gray-400 text-sm font-medium">
+                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 pb-2 inline-block">Dispatch Times</h4>
+                                        <ul className="space-y-4 text-gray-600 dark:text-gray-400 text-base font-medium">
                                             <li>• Standard: 3-5 business days</li>
                                             <li>• Express: 1-2 business days</li>
                                             <li>• International: 7-10 business days</li>
                                         </ul>
                                     </div>
                                     <div>
-                                        <h4 className="text-sm font-black uppercase tracking-widest mb-6">Returns Policy</h4>
-                                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relax font-medium">
+                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 pb-2 inline-block">Returns Policy</h4>
+                                        <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
                                             We offer a hassle-free <strong className="font-black text-black dark:text-white">30-day return policy</strong>. Items must be returned in their original packaging and condition. Return labels are provided for all domestic orders.
                                         </p>
                                     </div>
@@ -561,23 +578,23 @@ export const ProductDetail = () => {
                                     ) : (
                                         reviews.map((rev) => (
                                             <div key={rev.id} className="group p-8 border border-gray-50 rounded-[3rem] hover:border-indigo-100 hover:bg-gray-50/50 transition-all dark:border-gray-800 dark:bg-gray-800/20">
-                                                <div className="flex items-center justify-between mb-6">
-                                                    <div className="flex items-center gap-4">
-                                                        <div className="w-12 h-12 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-sm uppercase">
+                                                <div className="flex items-center justify-between mb-8">
+                                                    <div className="flex items-center gap-5">
+                                                        <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-lg uppercase shadow-lg shadow-indigo-100">
                                                             {rev.userName.slice(0, 2)}
                                                         </div>
                                                         <div>
-                                                            <p className="text-sm font-black text-gray-900 dark:text-white">{rev.userName}</p>
-                                                            <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{new Date(rev.createdAt).toLocaleDateString()}</p>
+                                                            <p className="text-base font-black text-gray-900 dark:text-white">{rev.userName}</p>
+                                                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{new Date(rev.createdAt).toLocaleDateString()}</p>
                                                         </div>
                                                     </div>
-                                                    <div className="flex text-yellow-400">
+                                                    <div className="flex text-yellow-400 scale-110">
                                                         {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} className={`w-3 h-3 ${i < rev.rating ? 'fill-current' : 'text-gray-100 dark:text-gray-700'}`} />
+                                                            <Star key={i} className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-current' : 'text-gray-100 dark:text-gray-700'}`} />
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <p className="text-gray-600 dark:text-gray-400 font-medium leading-relaxed italic border-l-4 border-indigo-600 pl-6 py-1">
+                                                <p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-relaxed italic border-l-4 border-indigo-600 pl-8 py-2 bg-white/50 rounded-r-lg">
                                                     "{rev.comment}"
                                                 </p>
                                             </div>
@@ -591,9 +608,9 @@ export const ProductDetail = () => {
 
                 {/* You Might Also Like */}
                 {relatedProducts.length > 0 && (
-                    <div className="mt-24 border-t border-gray-100 pt-16 dark:border-gray-800">
-                        <div className="flex flex-col items-center mb-12 text-center">
-                            <span className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-3 font-display">Recommendations</span>
+                    <div className="mt-16 border-t border-gray-100 pt-12 dark:border-gray-800">
+                        <div className="flex flex-col items-center mb-10 text-center">
+                            <span className="text-[11px] font-black text-indigo-600 uppercase tracking-[0.2em] mb-4 font-display">Recommendations</span>
                             <h2 className="text-3xl font-black text-gray-900 dark:text-white tracking-tight font-display">You Might Also Like</h2>
                         </div>
                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
