@@ -168,6 +168,25 @@ class ProductViewSet(viewsets.ModelViewSet):
     search_fields = ['name', 'description']
     ordering_fields = ['price', 'created_at']
 
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+        lookup_value = self.kwargs[lookup_url_kwarg]
+        
+        try:
+            # Try UUID first
+            import uuid
+            uuid.UUID(lookup_value)
+            filter_kwargs = {'pk': lookup_value}
+        except (ValueError, TypeError):
+            # Fallback to slug
+            filter_kwargs = {'slug': lookup_value}
+            
+        from django.shortcuts import get_object_or_404
+        obj = get_object_or_404(queryset, **filter_kwargs)
+        self.check_object_permissions(self.request, obj)
+        return obj
+
     def get_queryset(self):
         queryset = super().get_queryset()
         # Explicitly apply manual overrides if needed, BUT

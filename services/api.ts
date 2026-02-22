@@ -87,6 +87,7 @@ const getAbsoluteUrl = (url: string | null | undefined) => {
 const mapProduct = (p: any): Product => ({
   id: p.id,
   name: p.name,
+  slug: p.slug,
   description: p.description,
   price: parseFloat(p.price),
   category: p.category,

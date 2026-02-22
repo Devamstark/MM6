@@ -66,7 +66,7 @@ export const Wishlist = () => {
                                 <div className="mt-4 flex justify-between">
                                     <div>
                                         <h3 className="text-sm font-bold text-gray-900">
-                                            <Link to={`/product/${product.id}`}>
+                                            <Link to={`/product/${product.slug}`}>
                                                 <span aria-hidden="true" className="absolute inset-0" />
                                                 {product.name}
                                             </Link>

@@ -13,7 +13,7 @@ import { CountdownTimer } from '../components/CountdownTimer';
 import { ProductCard } from '../components/ProductCard';
 
 export const ProductDetail = () => {
-    const { id } = useParams<{ id: string }>();
+    const { slug } = useParams<{ slug: string }>();
     const navigate = useNavigate();
     const { addToCart } = useCart();
     const { user } = useAuth();
@@ -35,10 +35,10 @@ export const ProductDetail = () => {
 
     useEffect(() => {
         const loadInitialData = async () => {
-            if (!id) return;
+            if (!slug) return;
             setLoading(true);
             try {
-                const data = await api.getProduct(id);
+                const data = await api.getProduct(slug);
                 if (data) {
                     setProduct(data);
                     setMainImage(data.imageUrl);
@@ -50,7 +50,7 @@ export const ProductDetail = () => {
                     setRelatedProducts(related.filter(p => p.id !== data.id).slice(0, 4));
 
                     // Fetch Reviews
-                    const revs = await api.getReviews(id);
+                    const revs = await api.getReviews(data.id);
                     setReviews(revs);
 
                     // Check Wishlist
@@ -71,7 +71,7 @@ export const ProductDetail = () => {
             }
         };
         loadInitialData();
-    }, [id, user]);
+    }, [slug, user]);
 
     const handleWishlistToggle = async () => {
         if (!user) {

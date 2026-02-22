@@ -47,7 +47,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
 
   return (
     <div ref={cardRef} className="opacity-0">
-      <Link to={`/product/${product.id}`} className="group cursor-pointer block h-full">
+      <Link to={`/product/${product.slug}`} className="group cursor-pointer block h-full">
         <div className="relative bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 h-full flex flex-col border border-gray-100 dark:bg-gray-800 dark:border-gray-700">
 
           {/* Image Container */}
