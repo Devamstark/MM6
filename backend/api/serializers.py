@@ -45,7 +45,11 @@ class ProductSerializer(serializers.ModelSerializer):
             'flash_sale_start', 'flash_sale_end'
         ]
         read_only_fields = ('seller', 'created_at', 'sale_price', 'additional_images')
-
+    def update(self, instance, validated_data):
+        if 'image' in validated_data and validated_data['image'] is None:
+            validated_data.pop('image')
+        
+        return super().update(instance, validated_data)
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
     product_id = serializers.UUIDField(write_only=True)
