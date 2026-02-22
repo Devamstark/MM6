@@ -271,7 +271,7 @@ class ProductViewSet(viewsets.ModelViewSet):
         self.handle_additional_images(instance)
 
     def handle_additional_images(self, instance):
-        files = self.request.FILES.getlist('additional_images_files')
+        files = self.request.FILES.getlist('additional_images')
         existing_images = [img for img in self.request.data.getlist('additional_images') if img and isinstance(img, str)]
         
         from django.core.files.storage import default_storage
