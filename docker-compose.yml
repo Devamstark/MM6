@@ -1,6 +1,28 @@
 version: '3.8'
 
 services:
+  traefik:
+    image: traefik:v3.6.7
+    restart: always
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=devam9131@gmail.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "./letsencrypt:/letsencrypt"
+    networks:
+      - dokploy-network
+
   db:
     image: postgres:15-alpine
     restart: always
@@ -22,6 +44,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    image: smartshop-app-backend:latest
     restart: always
     volumes:
       - backend_static:/app/staticfiles
@@ -33,6 +56,7 @@ services:
       - DATABASE_URL=${DATABASE_URL}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - CSRF_TRUSTED_ORIGINS=${CSRF_TRUSTED_ORIGINS}
+      - SECURE_PROXY_SSL_HEADER=${SECURE_PROXY_SSL_HEADER}
     depends_on:
       - db
     command: sh -c "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn core.wsgi:application --bind 0.0.0.0:8000 --workers 3"
@@ -51,6 +75,7 @@ services:
       dockerfile: Dockerfile.frontend
       args:
         - VITE_API_URL=https://api.smartshop1.us/api
+    image: smartshop-app-frontend:latest
     restart: always
     volumes:
       - frontend_build:/data
@@ -78,13 +103,11 @@ services:
       - dokploy-network
     labels:
       - "traefik.enable=true"
-      # MinIO Console (web UI)
       - "traefik.http.routers.minio-console.rule=Host(`minio.smartshop1.us`)"
       - "traefik.http.routers.minio-console.entrypoints=websecure"
       - "traefik.http.routers.minio-console.tls.certresolver=letsencrypt"
       - "traefik.http.routers.minio-console.service=minio-console"
       - "traefik.http.services.minio-console.loadbalancer.server.port=9001"
-      # MinIO API (S3-compatible endpoint)
       - "traefik.http.routers.minio-api.rule=Host(`s3.smartshop1.us`)"
       - "traefik.http.routers.minio-api.entrypoints=websecure"
       - "traefik.http.routers.minio-api.tls.certresolver=letsencrypt"
@@ -92,7 +115,6 @@ services:
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
 
   adminer:
-
     image: adminer:latest
     restart: always
     networks:
@@ -105,6 +127,22 @@ services:
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
+
+  filebrowser:
+    image: filebrowser/filebrowser:latest
+    restart: always
+    volumes:
+      - .:/srv
+      - ./filebrowser.db:/database/filebrowser.db
+      - ./filebrowser-config.json:/config/settings.json
+    networks:
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.filebrowser.rule=Host(`files.smartshop1.us`)"
+      - "traefik.http.routers.filebrowser.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser.tls.certresolver=letsencrypt"
+      - "traefik.http.services.filebrowser.loadbalancer.server.port=80"
 
 volumes:
   postgres_data:
