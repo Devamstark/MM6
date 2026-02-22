@@ -43,6 +43,17 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
+      # Security Headers
+      - "traefik.http.middlewares.security-headers.headers.framedeny=true"
+      - "traefik.http.middlewares.security-headers.headers.contenttypenosniff=true"
+      - "traefik.http.middlewares.security-headers.headers.browserxssfilter=true"
+      - "traefik.http.middlewares.security-headers.headers.referrerpolicy=same-origin"
+      - "traefik.http.routers.backend.middlewares=security-headers"
+      # HTTPS Redirect
+      - "traefik.http.routers.backend-http.rule=Host(`api.smartshop1.us`)"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+      - "traefik.http.middlewares.redirect-https.redirectscheme.scheme=https"
+      - "traefik.http.routers.backend-http.middlewares=redirect-https"
 
   frontend:
     build:
@@ -61,6 +72,12 @@ services:
       - "traefik.http.routers.frontend.entrypoints=websecure"
       - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
       - "traefik.http.services.frontend.loadbalancer.server.port=80"
+      # Security Headers
+      - "traefik.http.routers.frontend.middlewares=security-headers"
+      # HTTPS Redirect
+      - "traefik.http.routers.frontend-http.rule=Host(`smartshop1.us`) || Host(`www.smartshop1.us`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=redirect-https"
 
   minio:
     image: minio/minio:latest
