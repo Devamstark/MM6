@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 import { Affiliate as AffiliateType } from '../types';
 import { useNavigate } from 'react-router-dom';
-import { DollarSign, CheckCircle, Copy, Check } from 'lucide-react';
+import { DollarSign, CheckCircle, Copy, Check, Share2, MessageCircle, MessageSquare, Mail } from 'lucide-react';
 
 const REDEEM_MINIMUM = 10;
 
@@ -58,6 +58,25 @@ export const Affiliate = () => {
     const referralLink = affiliate ? `${window.location.origin}/register?ref=${affiliate.referralCode}` : '';
     const progressPct = earnings ? Math.min((earnings.referralEarnings / REDEEM_MINIMUM) * 100, 100) : 0;
 
+    const shareData = {
+        title: 'Join SmartShop Affiliate Program',
+        text: `Hey! Sign up for SmartShop using my referral link and we both get rewards!`,
+        url: referralLink,
+    };
+
+    const handleNativeShare = async () => {
+        if (navigator.share) {
+            try {
+                await navigator.share(shareData);
+            } catch (err) {
+                console.log('Error sharing:', err);
+            }
+        } else {
+            handleCopy(referralLink);
+        }
+    };
+
+
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
             <div className="max-w-4xl mx-auto">
@@ -95,8 +114,8 @@ export const Affiliate = () => {
                         {/* Earnings Redemption Card */}
                         {earnings !== null && (
                             <div className={`p-6 rounded-2xl border-2 transition-all ${earnings.canRedeem
-                                    ? 'bg-emerald-50 border-emerald-300 shadow-emerald-100 shadow-lg'
-                                    : 'bg-white border-gray-100 shadow-sm'
+                                ? 'bg-emerald-50 border-emerald-300 shadow-emerald-100 shadow-lg'
+                                : 'bg-white border-gray-100 shadow-sm'
                                 }`}>
                                 <div className="flex items-center justify-between mb-4">
                                     <div className="flex items-center gap-3">
@@ -123,8 +142,8 @@ export const Affiliate = () => {
                                     <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                                         <div
                                             className={`h-3 rounded-full transition-all duration-700 ${earnings.canRedeem
-                                                    ? 'bg-emerald-500'
-                                                    : 'bg-indigo-500'
+                                                ? 'bg-emerald-500'
+                                                : 'bg-indigo-500'
                                                 }`}
                                             style={{ width: `${progressPct}%` }}
                                         />
@@ -146,23 +165,62 @@ export const Affiliate = () => {
 
                         {/* Share Link */}
                         <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Share Your Link</h3>
-                            <div className="flex gap-4">
-                                <input
-                                    type="text"
-                                    readOnly
-                                    value={referralLink}
-                                    className="flex-1 bg-gray-50 border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-3"
-                                />
-                                <button
-                                    onClick={() => handleCopy(referralLink)}
-                                    className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${copied
+                            <h3 className="text-xl font-bold text-gray-900 mb-6">Share Your Link</h3>
+
+                            <div className="flex flex-col gap-6">
+                                <div className="flex gap-4">
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={referralLink}
+                                        className="flex-1 bg-gray-50 border border-gray-200 text-gray-600 text-sm rounded-xl px-4 py-3"
+                                    />
+                                    <button
+                                        onClick={() => handleCopy(referralLink)}
+                                        className={`flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all ${copied
                                             ? 'bg-emerald-500 text-white'
                                             : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                                        }`}
-                                >
-                                    {copied ? <><Check className="w-4 h-4" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
-                                </button>
+                                            }`}
+                                    >
+                                        {copied ? <><Check className="w-4 h-4" /> Copied!</> : <><Copy className="w-4 h-4" /> Copy Link</>}
+                                    </button>
+                                </div>
+
+                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                    <a
+                                        href={`https://wa.me/?text=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-green-50 text-green-700 hover:bg-green-100 transition-colors border border-green-100"
+                                    >
+                                        <MessageCircle className="w-6 h-6" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">WhatsApp</span>
+                                    </a>
+
+                                    <a
+                                        href={`sms:?&body=${encodeURIComponent(shareData.text + ' ' + shareData.url)}`}
+                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors border border-blue-100"
+                                    >
+                                        <MessageSquare className="w-6 h-6" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">SMS</span>
+                                    </a>
+
+                                    <a
+                                        href={`mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(shareData.text + '\n\n' + shareData.url)}`}
+                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition-colors border border-red-100"
+                                    >
+                                        <Mail className="w-6 h-6" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">Email</span>
+                                    </a>
+
+                                    <button
+                                        onClick={handleNativeShare}
+                                        className="flex flex-col items-center justify-center gap-2 p-4 rounded-xl bg-gray-50 text-gray-700 hover:bg-gray-100 transition-colors border border-gray-100"
+                                    >
+                                        <Share2 className="w-6 h-6" />
+                                        <span className="text-xs font-bold uppercase tracking-wider">More</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
