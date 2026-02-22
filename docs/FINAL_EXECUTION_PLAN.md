@@ -5,7 +5,7 @@ This guide replaces all previous manual setups. We will use **Docker** to deploy
 ---
 
 ## 📋 1. Prerequisites
-*   **VPS IP Address**: `157.90.149.223`
+*   **VPS IP Address**: `<VPS_IP>`
 *   **Domain**: `smartshop1.us` (Not yet propagated, so we will test via IP first)
 *   **SSH Access**: Log in as `root`.
 
@@ -91,9 +91,9 @@ docker compose exec backend python manage.py createsuperuser
 ## ✅ 6. Verification
 Since your DNS (`smartshop1.us`) is still propagating, **test using your IP address**:
 
-1.  **Frontend**: Visit `http://157.90.149.223` -> Should see the store.
-2.  **Backend Admin**: Visit `http://157.90.149.223/admin` -> Login with your new superuser.
-3.  **API**: Visit `http://157.90.149.223/api/` -> Should respond.
+1.  **Frontend**: Visit `http://<VPS_IP>` -> Should see the store.
+2.  **Backend Admin**: Visit `http://<VPS_IP>/admin` -> Login with your new superuser.
+3.  **API**: Visit `http://<VPS_IP>/api/` -> Should respond.
 
 ---
 
@@ -114,7 +114,7 @@ docker compose up -d --build
 Since we are using **Caddy** as our web server (in the Docker setup), it will **automatically** obtain and renew free SSL certificates for `smartshop1.us` and `www.smartshop1.us`.
 
 **Requirements for this to work:**
-1.  **DNS Propagated**: Your domain must correctly point to `157.90.149.223`.
+1.  **DNS Propagated**: Your domain must correctly point to `<VPS_IP>`.
 2.  **Ports Open**: Ports 80 and 443 must be open (we did this in the "Prerequisites" or "Firewall" steps).
 
 **How to verify:**

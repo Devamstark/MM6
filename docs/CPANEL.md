@@ -37,7 +37,7 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
     *   Type: **A**
 2.  **EDIT** this record:
     *   **Old Value**: `51.83.161.4`
-    *   **New Value**: `157.90.149.223` (e.g. 123.45.67.89)
+    *   **New Value**: `<VPS_IP>` (e.g. 123.45.67.89)
 
 ### 2. Point "www" to VPS
 1.  Find the record named: `www.smartshop1.us`
@@ -51,6 +51,6 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
 | Name | Type | Value / IP | Purpose |
 | :--- | :--- | :--- | :--- |
 | `mail.smartshop1.us` | **A** | `51.83.161.4` | **Email** stays on cPanel |
-| `smartshop1.us` | **A** | `157.90.149.223` | **Website** goes to VPS |
+| `smartshop1.us` | **A** | `<VPS_IP>` | **Website** goes to VPS |
 | `www.smartshop1.us` | **CNAME** | `smartshop1.us` | **Website** goes to VPS |
 | `MX Record` | **MX** | `mail.smartshop1.us` | Routes email to the mail server |
