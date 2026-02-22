@@ -111,7 +111,7 @@ services:
     volumes:
       - .:/srv
       - filebrowser_data:/database
-    command: [ "/filebrowser", "-a", "0.0.0.0", "-p", "8080", "-d", "/database/filebrowser.db", "--root", "/srv" ]
+    command: [ "-a", "0.0.0.0", "-p", "8080", "-d", "/database/filebrowser.db", "--root", "/srv" ]
     networks:
       - dokploy-network
 
