@@ -44,7 +44,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'cogs', 'marketing_cost', 'shipping_cost',
             'flash_sale_start', 'flash_sale_end'
         ]
-        read_only_fields = ('seller', 'created_at', 'sale_price')
+        read_only_fields = ('seller', 'created_at', 'sale_price', 'additional_images')
 
 class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True)
