@@ -178,9 +178,10 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 
 ### **Goal: Extend the Project**
 1. ✅ SYSTEM_ARCHITECTURE.md (Understand structure)
-2. ✅ [FUTURE_ROADMAP.md](features/FUTURE_ROADMAP.md) (Planned features)
-3. ✅ FULL_MVP_SPECIFICATION.md (Technical gaps)
-4. ✅ Code files (existing patterns)
+2. ✅ [FUTURE_ROADMAP.md](features/FUTURE_ROADMAP.md) (Full Roadmap)
+3. ✅ [TELEGRAM_BOT_ROADMAP.md](features/TELEGRAM_BOT_ROADMAP.md) (Deep Dive: Chat Tech)
+4. ✅ FULL_MVP_SPECIFICATION.md (Technical gaps)
+5. ✅ Code files (existing patterns)
 
 **Total Time**: Varies by feature
 
@@ -375,6 +376,7 @@ You now have:
 | setup/SSL_SECURITY_SETUP.md | 1.0.0 | Feb 2026 | ✅ New |
 | WORK_DONE.md | 1.0.0 | Feb 2026 | ✅ New |
 | features/FUTURE_ROADMAP.md | 1.0.0 | Feb 2026 | ✅ New |
+| features/TELEGRAM_BOT_ROADMAP.md | 1.0.0 | Feb 2026 | ✅ New |
 
 ---
 
