@@ -167,7 +167,8 @@ class Order(models.Model):
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     created_at = models.DateTimeField(auto_now_add=True)
-    
+    coupon_code = models.CharField(max_length=50, blank=True, null=True)
+
     # Add shipping address snapshot to Order (optional but good practice)
     # For now, simplistic approach as requested.
 

@@ -356,7 +356,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                     user=user,
                     customer_name=data.get('customerName') or user.get_full_name(),
                     total_amount=raw_total,
-                    status='pending'
+                    status='pending',
+                    coupon_code=data.get('couponCode')
                 )
 
                 for item in data.get('items'):
@@ -752,3 +753,78 @@ class CouponViewSet(viewsets.ModelViewSet):
         if self.request.user.role == 'admin':
             return super().get_queryset()
         return Coupon.objects.none()
+
+    @action(detail=False, methods=['post'])
+    def validate(self, request):
+        """Validate a coupon code and calculate discount"""
+        from decimal import Decimal
+        from rest_framework.response import Response
+        from rest_framework import status
+
+        code = request.data.get('code', '').strip().upper()
+        cart_total = Decimal(str(request.data.get('cart_total', 0)))
+
+        if not code:
+            return Response(
+                {'error': 'Coupon code is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            coupon = Coupon.objects.get(code=code)
+        except Coupon.DoesNotExist:
+            return Response(
+                {'error': 'Invalid coupon code'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Check if coupon is active
+        if not coupon.is_active:
+            return Response(
+                {'error': 'This coupon has been deactivated'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check date range
+        from django.utils import timezone
+        now = timezone.now()
+        if coupon.start_date and now < coupon.start_date:
+            return Response(
+                {'error': 'This coupon is not yet active'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if coupon.end_date and now > coupon.end_date:
+            return Response(
+                {'error': 'This coupon has expired'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check minimum purchase
+        if cart_total < coupon.min_purchase:
+            return Response(
+                {'error': f'Minimum purchase of ${coupon.min_purchase} required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check usage limit
+        if coupon.usage_limit and coupon.used_count >= coupon.usage_limit:
+            return Response(
+                {'error': 'This coupon has reached its usage limit'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Calculate discount
+        if coupon.discount_type == 'percentage':
+            discount = cart_total * (coupon.discount_value / Decimal('100'))
+        else:
+            discount = min(coupon.discount_value, cart_total)  # Don't exceed cart total
+
+        return Response({
+            'message': 'Coupon applied successfully',
+            'discount': str(discount),
+            'coupon': {
+                'code': coupon.code,
+                'discount_type': coupon.discount_type,
+                'discount_value': str(coupon.discount_value),
+            }
+        })

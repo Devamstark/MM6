@@ -754,6 +754,23 @@ export const api = {
     return response.data;
   },
 
+  validateCoupon: async (code: string, cartTotal: number): Promise<{ valid: boolean; discount: number; message?: string; coupon?: any }> => {
+    try {
+      const response = await client.post('coupons/validate/', { code, cart_total: cartTotal });
+      return {
+        valid: true,
+        discount: parseFloat(response.data.discount),
+        coupon: response.data.coupon
+      };
+    } catch (error: any) {
+      return {
+        valid: false,
+        discount: 0,
+        message: error.response?.data?.message || error.response?.data?.error || 'Invalid coupon code'
+      };
+    }
+  },
+
   createCoupon: async (data: any): Promise<any> => {
     const response = await client.post('coupons/', data);
     return response.data;

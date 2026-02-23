@@ -73,10 +73,10 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
 class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True, read_only=True)
-    
+
     class Meta:
         model = Order
-        fields = ('id', 'user', 'customer_name', 'total_amount', 'status', 'created_at', 'items')
+        fields = ('id', 'user', 'customer_name', 'total_amount', 'status', 'created_at', 'items', 'coupon_code')
         read_only_fields = ('user', 'created_at')
 
 class PaymentSerializer(serializers.ModelSerializer):

@@ -4,7 +4,7 @@ import { Address } from '../types';
 import { api } from '../services/api';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag } from 'lucide-react';
+import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag, Percent, X } from 'lucide-react';
 
 export const Checkout = () => {
   const { items, cartTotal, clearCart } = useCart();
@@ -17,6 +17,12 @@ export const Checkout = () => {
   const [useEarnings, setUseEarnings] = useState(false);
   const [earnings, setEarnings] = useState<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number } | null>(null);
   const [lastOrderId, setLastOrderId] = useState<string | null>(null);
+
+  // Coupon state
+  const [couponCode, setCouponCode] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+  const [couponError, setCouponError] = useState('');
+  const [couponLoading, setCouponLoading] = useState(false);
 
   const [shippingData, setShippingData] = useState({
     name: user?.name || '',
@@ -45,7 +51,8 @@ export const Checkout = () => {
 
   // Calculate totals
   const earningsDiscount = useEarnings && earnings?.canRedeem ? Math.min(earnings.referralEarnings, cartTotal) : 0;
-  const finalTotal = Math.max(0, cartTotal - earningsDiscount);
+  const couponDiscount = appliedCoupon ? appliedCoupon.discount : 0;
+  const finalTotal = Math.max(0, cartTotal - earningsDiscount - couponDiscount);
 
   // 1. Empty Cart Check
   if (items.length === 0 && step !== 'success') {
@@ -103,6 +110,7 @@ export const Checkout = () => {
         paymentDetails: paymentData,
         totalPrice: finalTotal,
         useEarnings: useEarnings && earnings?.canRedeem,
+        couponCode: appliedCoupon?.code,
       });
 
       setLastOrderId(order.id);
@@ -114,6 +122,33 @@ export const Checkout = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+
+    setCouponLoading(true);
+    setCouponError('');
+
+    try {
+      const result = await api.validateCoupon(couponCode.trim(), cartTotal);
+
+      if (result.valid) {
+        setAppliedCoupon({ code: couponCode.trim(), discount: result.discount });
+        setCouponCode('');
+      } else {
+        setCouponError(result.message || 'Invalid coupon code');
+      }
+    } catch (error) {
+      setCouponError('Failed to apply coupon. Please try again.');
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponError('');
   };
 
   return (
@@ -322,6 +357,51 @@ export const Checkout = () => {
                 ))}
               </ul>
 
+              {/* Coupon Code Input */}
+              <div className="mb-4">
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Percent className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                      placeholder="Coupon code"
+                      disabled={!!appliedCoupon || couponLoading}
+                      className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-lg text-sm font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-100"
+                    />
+                  </div>
+                  {appliedCoupon ? (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-bold hover:bg-red-100 transition-colors flex items-center gap-1"
+                    >
+                      <X className="w-4 h-4" /> Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={!couponCode.trim() || couponLoading}
+                      className="px-4 py-2.5 bg-indigo-600 text-white rounded-lg text-sm font-bold hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[80px]"
+                    >
+                      {couponLoading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : 'Apply'}
+                    </button>
+                  )}
+                </div>
+                {couponError && (
+                  <p className="text-xs text-red-600 mt-1.5 flex items-center gap-1">
+                    <X className="w-3 h-3" /> {couponError}
+                  </p>
+                )}
+                {appliedCoupon && (
+                  <p className="text-xs text-emerald-600 mt-1.5 flex items-center gap-1 font-medium">
+                    <CheckCircle className="w-3 h-3" /> Coupon "{appliedCoupon.code}" applied!
+                  </p>
+                )}
+              </div>
+
               {/* Referral Earnings Redemption */}
               {isAuthenticated && earnings && earnings.referralEarnings > 0 && (
                 <div className={`mb-4 p-4 rounded-xl border transition-all ${earnings.canRedeem
@@ -372,6 +452,12 @@ export const Checkout = () => {
                   <div className="flex justify-between text-emerald-600 font-medium">
                     <span className="flex items-center gap-1"><Tag className="w-4 h-4" /> Referral Credit</span>
                     <span>-${earningsDiscount.toFixed(2)}</span>
+                  </div>
+                )}
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-emerald-600 font-medium">
+                    <span className="flex items-center gap-1"><Percent className="w-4 h-4" /> Coupon Discount</span>
+                    <span>-${couponDiscount.toFixed(2)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-100">
