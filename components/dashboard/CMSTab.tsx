@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
 import { 
     Plus, Edit2, Trash2, Image as ImageIcon, Move, Save, X, 
@@ -52,6 +52,10 @@ export const CMSTab = () => {
         image_fit: 'cover',
         image_position: 'center'
     });
+
+    const [isDragging, setIsDragging] = useState(false);
+    const [previewPosition, setPreviewPosition] = useState({ x: 50, y: 50 });
+    const previewRef = useRef<HTMLDivElement>(null);
 
     const [sectionFormData, setSectionFormData] = useState<Partial<HomeSection>>({
         title: '',
@@ -154,6 +158,14 @@ export const CMSTab = () => {
     const handleEditHero = (banner: HeroBanner) => {
         setEditingHero(banner);
         setHeroFormData(banner);
+        // Sync preview position
+        const pos = banner.image_position || 'center';
+        const xMap: Record<string, number> = { left: 0, center: 50, right: 100 };
+        const yMap: Record<string, number> = { top: 0, center: 50, bottom: 100 };
+        const parts = pos.split(' ');
+        const yPos = yMap[parts[0]] ?? 50;
+        const xPos = parts[1] ? xMap[parts[1]] : 50;
+        setPreviewPosition({ x: xPos, y: yPos });
         setIsHeroFormOpen(true);
     };
 
@@ -176,6 +188,34 @@ export const CMSTab = () => {
             };
             reader.readAsDataURL(file);
         }
+    };
+
+    const handlePositionClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!previewRef.current) return;
+        const rect = previewRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setPreviewPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+        
+        // Convert to position string
+        const xPos = x < 33 ? 'left' : x > 66 ? 'right' : 'center';
+        const yPos = y < 33 ? 'top' : y > 66 ? 'bottom' : 'center';
+        const position = `${yPos}${xPos !== 'center' ? ' ' + xPos : ''}`.trim() || 'center';
+        setHeroFormData({ ...heroFormData, image_position: position });
+    };
+
+    const handlePositionMove = (e: React.MouseEvent<HTMLDivElement>) => {
+        if (!isDragging || !previewRef.current) return;
+        const rect = previewRef.current.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        setPreviewPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
+        
+        // Convert to position string
+        const xPos = x < 33 ? 'left' : x > 66 ? 'right' : 'center';
+        const yPos = y < 33 ? 'top' : y > 66 ? 'bottom' : 'center';
+        const position = `${yPos}${xPos !== 'center' ? ' ' + xPos : ''}`.trim() || 'center';
+        setHeroFormData({ ...heroFormData, image_position: position });
     };
 
     const sectionTypes = [
@@ -387,26 +427,81 @@ export const CMSTab = () => {
                                         {heroFormData.image_fit === 'none' && 'Shows at original size'}
                                     </p>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-gray-700 mb-1">Image Position</label>
-                                    <select
-                                        value={heroFormData.image_position}
-                                        onChange={(e) => setHeroFormData({ ...heroFormData, image_position: e.target.value })}
-                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
-                                    >
-                                        <option value="center">Center</option>
-                                        <option value="top">Top</option>
-                                        <option value="bottom">Bottom</option>
-                                        <option value="left">Left</option>
-                                        <option value="right">Right</option>
-                                        <option value="top left">Top Left</option>
-                                        <option value="top right">Top Right</option>
-                                        <option value="bottom left">Bottom Left</option>
-                                        <option value="bottom right">Bottom Right</option>
-                                    </select>
-                                    <p className="text-xs text-gray-500 mt-1">
-                                        Controls which part of the image stays visible when cropped
-                                    </p>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Image Position</label>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {/* Dropdown for quick selection */}
+                                        <div>
+                                            <select
+                                                value={heroFormData.image_position}
+                                                onChange={(e) => {
+                                                    setHeroFormData({ ...heroFormData, image_position: e.target.value });
+                                                    // Update preview position based on selection
+                                                    const pos = e.target.value;
+                                                    const xMap: Record<string, number> = { left: 0, center: 50, right: 100 };
+                                                    const yMap: Record<string, number> = { top: 0, center: 50, bottom: 100 };
+                                                    const parts = pos.split(' ');
+                                                    const yPos = yMap[parts[0]] ?? 50;
+                                                    const xPos = parts[1] ? xMap[parts[1]] : 50;
+                                                    setPreviewPosition({ x: xPos, y: yPos });
+                                                }}
+                                                className="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
+                                            >
+                                                <option value="center">Center</option>
+                                                <option value="top">Top</option>
+                                                <option value="bottom">Bottom</option>
+                                                <option value="left">Left</option>
+                                                <option value="right">Right</option>
+                                                <option value="top left">Top Left</option>
+                                                <option value="top right">Top Right</option>
+                                                <option value="bottom left">Bottom Left</option>
+                                                <option value="bottom right">Bottom Right</option>
+                                            </select>
+                                        </div>
+                                        {/* Interactive Position Picker */}
+                                        <div>
+                                            <div
+                                                ref={previewRef}
+                                                onClick={handlePositionClick}
+                                                onMouseDown={() => setIsDragging(true)}
+                                                onMouseUp={() => setIsDragging(false)}
+                                                onMouseLeave={() => setIsDragging(false)}
+                                                onMouseMove={handlePositionMove}
+                                                className="relative w-full aspect-video bg-gray-100 rounded-lg border-2 border-gray-300 cursor-crosshair overflow-hidden hover:border-indigo-500 transition-colors"
+                                            >
+                                                {heroFormData.image ? (
+                                                    <>
+                                                        <img
+                                                            src={heroFormData.image}
+                                                            alt="Position preview"
+                                                            className="absolute inset-0 w-full h-full opacity-50"
+                                                            style={{
+                                                                objectFit: 'cover',
+                                                                objectPosition: `${previewPosition.y}% ${previewPosition.x}%`
+                                                            }}
+                                                        />
+                                                        <div
+                                                            className="absolute w-4 h-4 border-2 border-red-500 bg-red-500/30 rounded-full transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                                                            style={{
+                                                                left: `${previewPosition.x}%`,
+                                                                top: `${previewPosition.y}%`
+                                                            }}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <div className="absolute inset-0 flex items-center justify-center text-gray-400">
+                                                        <div className="text-center">
+                                                            <ImageIcon className="w-8 h-8 mx-auto mb-2" />
+                                                            <p className="text-xs">Upload image first</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <p className="text-xs text-gray-500 mt-1">
+                                                Click or drag to set focal point
+                                            </p>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="flex items-center gap-2">
