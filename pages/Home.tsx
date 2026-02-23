@@ -165,15 +165,15 @@ export const Home = () => {
                       </span>
                     )}
                     <h1
-                      className="font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white"
-                      style={{ fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 3.75rem)` }}
+                      className="font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white"
+                      style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.75rem)` }}
                     >
                       {banner.title}
                     </h1>
                     {banner.description && (
                       <p
-                        className="text-gray-600 mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3"
-                        style={{ fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem)` }}
+                        className="text-gray-600 mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                        style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
                       >
                         {banner.description}
                       </p>
@@ -182,10 +182,11 @@ export const Home = () => {
                       {banner.cta_text && (
                         <Link
                           to={banner.cta_link || '/products'}
-                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center"
+                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px]"
                           style={{
-                            padding: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem) calc(${banner.content_scale ?? 100}% * 0.01 * 2.5rem)`,
-                            fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 0.875rem)`
+                            height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
+                            padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
+                            fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 0.875rem)`
                           }}
                         >
                           {banner.cta_text}
@@ -193,10 +194,11 @@ export const Home = () => {
                       )}
                       <Link
                         to="/register"
-                        className="bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center"
+                        className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px]"
                         style={{
-                          padding: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem) calc(${banner.content_scale ?? 100}% * 0.01 * 2.5rem)`,
-                          fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 0.875rem)`
+                          height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
+                          padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
+                          fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 0.875rem)`
                         }}
                       >
                         Sell Now
@@ -277,10 +279,10 @@ export const Home = () => {
                 Discover the hottest trends of the season. Shop the collection now before it's gone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
-                <Link to="/products" className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200">
+                <Link to="/products" className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-[3.5rem] px-10">
                   Shop Now
                 </Link>
-                <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
+                <Link to="/register" className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-[3.5rem] px-10">
                   Sell Now
                 </Link>
               </div>
