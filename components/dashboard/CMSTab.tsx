@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
-import { 
-    Plus, Edit2, Trash2, Image as ImageIcon, Move, Save, X, 
+import {
+    Plus, Edit2, Trash2, Image as ImageIcon, Move, Save, X,
     Palette, Link as LinkIcon, Type, Layout, Eye, EyeOff, Upload
 } from 'lucide-react';
 
@@ -15,7 +15,9 @@ interface HeroBanner {
     cta_text: string;
     cta_link: string;
     is_active: boolean;
-    display_order: number;
+    image_fit?: string;
+    image_position?: string;
+    content_scale?: number;
 }
 
 interface HomeSection {
@@ -50,7 +52,8 @@ export const CMSTab = () => {
         is_active: true,
         display_order: 0,
         image_fit: 'cover',
-        image_position: 'center'
+        image_position: 'center',
+        content_scale: 100
     });
 
     const [isDragging, setIsDragging] = useState(false);
@@ -107,7 +110,8 @@ export const CMSTab = () => {
                 is_active: true,
                 display_order: 0,
                 image_fit: 'cover',
-                image_position: 'center'
+                image_position: 'center',
+                content_scale: 100
             });
             loadData();
         } catch (e) {
@@ -196,7 +200,7 @@ export const CMSTab = () => {
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
         setPreviewPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
-        
+
         // Convert to position string
         const xPos = x < 33 ? 'left' : x > 66 ? 'right' : 'center';
         const yPos = y < 33 ? 'top' : y > 66 ? 'bottom' : 'center';
@@ -210,7 +214,7 @@ export const CMSTab = () => {
         const x = ((e.clientX - rect.left) / rect.width) * 100;
         const y = ((e.clientY - rect.top) / rect.height) * 100;
         setPreviewPosition({ x: Math.max(0, Math.min(100, x)), y: Math.max(0, Math.min(100, y)) });
-        
+
         // Convert to position string
         const xPos = x < 33 ? 'left' : x > 66 ? 'right' : 'center';
         const yPos = y < 33 ? 'top' : y > 66 ? 'bottom' : 'center';
@@ -243,21 +247,19 @@ export const CMSTab = () => {
             <div className="flex gap-2 border-b border-gray-200">
                 <button
                     onClick={() => setActiveSubTab('hero')}
-                    className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
-                        activeSubTab === 'hero'
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
+                    className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeSubTab === 'hero'
+                        ? 'border-indigo-600 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
                 >
                     Hero Banners
                 </button>
                 <button
                     onClick={() => setActiveSubTab('sections')}
-                    className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
-                        activeSubTab === 'sections'
-                            ? 'border-indigo-600 text-indigo-600'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
-                    }`}
+                    className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeSubTab === 'sections'
+                        ? 'border-indigo-600 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
+                        }`}
                 >
                     Home Sections
                 </button>
@@ -283,7 +285,8 @@ export const CMSTab = () => {
                                     cta_text: '',
                                     cta_link: '',
                                     is_active: true,
-                                    display_order: heroBanners.length
+                                    display_order: heroBanners.length,
+                                    content_scale: 100
                                 });
                                 setIsHeroFormOpen(true);
                             }}
@@ -503,6 +506,58 @@ export const CMSTab = () => {
                                         </div>
                                     </div>
                                 </div>
+                                <div className="md:col-span-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
+                                                <Type className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-bold text-gray-900">Content Scale</label>
+                                                <p className="text-xs text-gray-500">Adjust title and button sizes ({heroFormData.content_scale ?? 100}%)</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-4">
+                                            <div className="flex items-center bg-white border border-gray-300 rounded-lg overflow-hidden shadow-sm">
+                                                <button
+                                                    onClick={() => setHeroFormData({ ...heroFormData, content_scale: Math.max(50, (heroFormData.content_scale || 100) - 5) })}
+                                                    className="px-4 py-2 hover:bg-gray-100 text-gray-600 font-bold transition-colors"
+                                                >
+                                                    -
+                                                </button>
+                                                <div className="px-4 py-2 border-x border-gray-300 min-w-[60px] text-center font-black text-indigo-600">
+                                                    {heroFormData.content_scale ?? 100}%
+                                                </div>
+                                                <button
+                                                    onClick={() => setHeroFormData({ ...heroFormData, content_scale: Math.min(200, (heroFormData.content_scale || 100) + 5) })}
+                                                    className="px-4 py-2 hover:bg-gray-100 text-gray-600 font-bold transition-colors"
+                                                >
+                                                    +
+                                                </button>
+                                            </div>
+                                            <div className="flex gap-2">
+                                                <button
+                                                    onClick={() => setHeroFormData({ ...heroFormData, content_scale: 85 })}
+                                                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-tighter bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                                                >
+                                                    Small
+                                                </button>
+                                                <button
+                                                    onClick={() => setHeroFormData({ ...heroFormData, content_scale: 100 })}
+                                                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-tighter bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors"
+                                                >
+                                                    Normal
+                                                </button>
+                                                <button
+                                                    onClick={() => setHeroFormData({ ...heroFormData, content_scale: 125 })}
+                                                    className="px-3 py-1.5 text-[10px] font-bold uppercase tracking-tighter bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors"
+                                                >
+                                                    Large
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                                 <div className="md:col-span-2">
                                     <label className="flex items-center gap-2">
                                         <input
@@ -541,11 +596,11 @@ export const CMSTab = () => {
                         {heroBanners.map((banner) => (
                             <div key={banner.id} className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4">
                                 {banner.image ? (
-                                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-200 shrink-0">
                                         <img src={banner.image} alt={banner.title} className="w-full h-full object-cover" />
                                     </div>
                                 ) : (
-                                    <div className="w-24 h-16 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                    <div className="w-24 h-16 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
                                         <ImageIcon className="w-6 h-6 text-gray-400" />
                                     </div>
                                 )}
@@ -742,11 +797,11 @@ export const CMSTab = () => {
                         {homeSections.map((section) => (
                             <div key={section.id} className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-4">
                                 {section.image ? (
-                                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-200 flex-shrink-0">
+                                    <div className="w-24 h-16 rounded-lg overflow-hidden border border-gray-200 shrink-0">
                                         <img src={section.image} alt={section.title} className="w-full h-full object-cover" />
                                     </div>
                                 ) : (
-                                    <div className="w-24 h-16 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center flex-shrink-0">
+                                    <div className="w-24 h-16 rounded-lg bg-gray-100 border border-gray-200 flex items-center justify-center shrink-0">
                                         <Layout className="w-6 h-6 text-gray-400" />
                                     </div>
                                 )}

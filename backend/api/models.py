@@ -267,6 +267,7 @@ class HeroBanner(models.Model):
         ('bottom left', 'Bottom Left'),
         ('bottom right', 'Bottom Right'),
     ])
+    content_scale = models.IntegerField(default=100) # Percentage scaling (75-150)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

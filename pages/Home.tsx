@@ -151,7 +151,7 @@ export const Home = () => {
             {heroBanners.map((banner) => (
               <div
                 key={banner.id}
-                className="relative shrink-0 h-[550px] md:h-[500px] overflow-hidden shadow-sm"
+                className="relative shrink-0 h-[500px] md:h-[420px] overflow-hidden shadow-sm"
                 style={{
                   backgroundColor: banner.background_color || '#f6f6f6',
                   width: '100%'
@@ -164,11 +164,17 @@ export const Home = () => {
                         {banner.subtitle}
                       </span>
                     )}
-                    <h1 className="text-4xl md:text-6xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
+                    <h1
+                      className="font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white"
+                      style={{ fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 3.75rem)` }}
+                    >
                       {banner.title}
                     </h1>
                     {banner.description && (
-                      <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3">
+                      <p
+                        className="text-gray-600 mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                        style={{ fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem)` }}
+                      >
                         {banner.description}
                       </p>
                     )}
@@ -176,12 +182,23 @@ export const Home = () => {
                       {banner.cta_text && (
                         <Link
                           to={banner.cta_link || '/products'}
-                          className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center"
+                          style={{
+                            padding: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem) calc(${banner.content_scale ?? 100}% * 0.01 * 2.5rem)`,
+                            fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 0.875rem)`
+                          }}
                         >
                           {banner.cta_text}
                         </Link>
                       )}
-                      <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
+                      <Link
+                        to="/register"
+                        className="bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center"
+                        style={{
+                          padding: `calc(${banner.content_scale ?? 100}% * 0.01 * 1rem) calc(${banner.content_scale ?? 100}% * 0.01 * 2.5rem)`,
+                          fontSize: `calc(${banner.content_scale ?? 100}% * 0.01 * 0.875rem)`
+                        }}
+                      >
                         Sell Now
                       </Link>
                     </div>
@@ -249,11 +266,11 @@ export const Home = () => {
         </div>
       ) : (
         /* Default Hero Section (if no CMS banners) */
-        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[550px] md:h-[500px] overflow-hidden">
+        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[500px] md:h-[420px] overflow-hidden">
           <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
             <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
               <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
-              <h1 className="text-4xl md:text-6xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
+              <h1 className="text-4xl md:text-5xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
                 UP TO <span className="text-primary">70%</span> OFF
               </h1>
               <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3">
