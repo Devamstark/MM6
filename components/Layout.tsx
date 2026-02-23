@@ -149,12 +149,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-[1000] bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
+      <nav className="sticky top-0 z-1000 bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 
             {/* Left: Logo */}
-            <Link to="/" className="flex-shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
+            <Link to="/" className="shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
               SMARTSHOP
             </Link>
 
@@ -269,6 +269,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* Right: Icons */}
             <div className="flex items-center gap-4 lg:gap-6">
               <button
+                onClick={() => setIsThemeOpen(true)}
+                className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200"
+                title="Theme Settings"
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+
+              <button
                 onClick={() => setSearchOpen(!searchOpen)}
                 className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200"
                 title="Search"
@@ -282,31 +290,45 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               {/* User Account */}
               {isAuthenticated ? (
                 <div className="relative group">
-                  {isAdmin ? (
-                    <div className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer dark:text-gray-200">
-                      <UserIcon className="w-5 h-5" />
-                    </div>
-                  ) : (
-                    <Link to="/profile" className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center dark:text-gray-200">
-                      <UserIcon className="w-5 h-5" />
-                    </Link>
-                  )}
-                  {/* Minimal Dropdown */}
-                  <div className="absolute right-0 top-full pt-2 w-48 hidden group-hover:block z-50">
-                    <div className="bg-white border border-gray-100 shadow-xl rounded-lg py-2">
-                      <div className="px-4 py-2 border-b border-gray-100 mb-1">
-                        <p className="text-xs font-bold text-gray-900 truncate">{user?.name}</p>
-                        <p className="text-[10px] text-gray-500 truncate">{user?.email}</p>
+                  <button
+                    onClick={() => navigate(isAdmin ? '/admin' : '/profile')}
+                    className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer dark:text-gray-200"
+                  >
+                    <UserIcon className="w-5 h-5" />
+                  </button>
+
+                  {/* Dropdown - Visible on Hover */}
+                  <div className="absolute right-0 top-full pt-2 w-56 hidden group-hover:block z-50">
+                    <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 overflow-hidden animate-fade-in dark:bg-gray-800 dark:border-gray-700">
+                      <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700 mb-2">
+                        <p className="text-sm font-black text-gray-900 truncate dark:text-white">{user?.name}</p>
+                        <p className="text-[10px] font-bold text-gray-500 truncate dark:text-gray-400">{user?.email}</p>
                       </div>
-                      <Link to="/profile" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">My Profile</Link>
-                      {isAdmin && <Link to="/admin" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Admin Dashboard</Link>}
-                      {isSeller && <Link to="/seller" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Seller Dashboard</Link>}
-                      {!isAdmin && <Link to="/affiliate" className="block px-4 py-2 text-sm hover:bg-gray-50 text-gray-700">Affiliate</Link>}
-                      <button onClick={() => setIsThemeOpen(true)} className="w-full text-left px-4 py-2 text-sm hover:bg-gray-50 text-gray-700 flex items-center justify-between">
-                        Theme & Display
-                        <div className="w-2 h-2 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500"></div>
-                      </button>
-                      <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 mt-1">Sign out</button>
+
+                      <Link to="/profile" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors">
+                        <UserIcon className="w-4 h-4 text-gray-400" /> My Profile
+                      </Link>
+
+                      {isAdmin && (
+                        <Link to="/admin" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-indigo-600 dark:hover:bg-gray-700 transition-colors">
+                          <LayoutDashboard className="w-4 h-4" /> Admin Portal
+                        </Link>
+                      )}
+
+                      {isSeller && (
+                        <Link to="/seller" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-orange-600 dark:hover:bg-gray-700 transition-colors">
+                          <Store className="w-4 h-4" /> Seller Studio
+                        </Link>
+                      )}
+
+                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-3 px-5 py-3 text-sm font-black text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all uppercase tracking-widest text-[10px]"
+                        >
+                          <LogOut className="w-4 h-4" /> Sign Out
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -319,8 +341,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <ThemeCustomizer isOpen={isThemeOpen} onClose={() => setIsThemeOpen(false)} />
 
               {/* Wishlist */}
-              <Link to="/wishlist" className="text-gray-900 hover:text-primary transition-colors relative dark:text-gray-200">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
+              <Link to="/wishlist" className="text-gray-900 hover:text-primary transition-colors relative dark:text-gray-200 hidden sm:block">
+                <Heart className="w-5 h-5" />
               </Link>
 
               {/* Shopping Bag */}
@@ -329,9 +351,9 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 className="text-gray-900 hover:text-primary transition-colors relative dark:text-gray-200"
               >
                 <div className="relative">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+                  <ShoppingCart className="w-5 h-5" />
                   {itemCount > 0 && (
-                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-3 h-3 text-[8px] font-bold text-white bg-black rounded-full">
+                    <span className="absolute -top-1 -right-1 flex items-center justify-center w-4 h-4 text-[9px] font-black text-white bg-indigo-600 rounded-full border-2 border-white dark:border-gray-900 shadow-sm">
                       {itemCount}
                     </span>
                   )}
@@ -339,7 +361,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </button>
 
               {/* Mobile Menu Toggle */}
-              <div className="flex items-center md:hidden">
+              <div className="flex items-center lg:hidden">
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1 text-gray-900 rounded-md dark:text-gray-200">
                   <Menu className="w-6 h-6" />
                 </button>
@@ -468,7 +490,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                             onClick={() => setSearchOpen(false)}
                             className="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded-2xl transition-all"
                           >
-                            <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                            <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
                               <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
                             </div>
                             <div className="flex flex-col min-w-0">
@@ -498,7 +520,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
         {/* Mobile Navigation Drawer */}
         <div
-          className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-[51] md:hidden shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+          className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-51 md:hidden shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
             }`}
         >
           {/* Drawer Header */}
