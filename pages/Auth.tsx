@@ -80,7 +80,7 @@ export const Auth = () => {
   const transparentBtn = "py-4 px-12 bg-transparent border-2 border-white text-white font-extrabold rounded-full hover:bg-white hover:text-indigo-900 transition-all duration-300 active:scale-[0.97] uppercase tracking-widest text-xs";
 
   return (
-    <div className="min-h-screen bg-slate-100/50 flex items-center justify-center p-6 font-body overflow-hidden">
+    <div className="min-h-[85vh] bg-slate-100/50 flex items-center justify-center p-6 font-body">
       {/* Darker background accents */}
       <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 rounded-full blur-[120px] -z-10"></div>
       <div className="absolute bottom-[-15%] left-[-10%] w-[40%] h-[40%] bg-purple-200/20 rounded-full blur-[120px] -z-10"></div>

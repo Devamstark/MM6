@@ -28,21 +28,22 @@ function App() {
                 <BrowserRouter>
                     <ScrollToTop />
                     <Routes>
-                        {/* Public Routes with Layout */}
                         <Route path="/" element={<Layout><Outlet /></Layout>}>
                             <Route index element={<Home />} />
                             <Route path="products" element={<Shop />} />
                             <Route path="product/:slug" element={<ProductDetail />} />
-                            <Route path="contact" element={<Contact />} />
-                            {/* Static Pages */}
-                            <Route path="page/:slug" element={<StaticPage />} />
 
-                            {/* Explicit Static Page Routes if needed */}
+                            <Route path="login" element={<Auth />} />
+                            <Route path="register" element={<Auth />} />
+                            <Route path="forgot-password" element={<ForgotPassword />} />
+                            <Route path="reset-password" element={<ResetPassword />} />
+
+                            <Route path="contact" element={<Contact />} />
+                            <Route path="page/:slug" element={<StaticPage />} />
                             <Route path="about" element={<StaticPage page="about-us" />} />
                             <Route path="terms" element={<StaticPage page="terms" />} />
                             <Route path="privacy" element={<StaticPage page="privacy" />} />
 
-                            {/* Protected User Routes */}
                             <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
                                 <Route path="checkout" element={<Checkout />} />
                                 <Route path="orders" element={<OrderHistory />} />
@@ -52,25 +53,16 @@ function App() {
                                 <Route path="profile" element={<UserProfile />} />
                             </Route>
 
-                            {/* Protected Seller Routes */}
                             <Route element={<ProtectedRoute allowedRoles={['seller', 'admin']} />}>
                                 <Route path="seller" element={<SellerDashboard />} />
                             </Route>
 
-                            {/* Protected Admin Routes */}
                             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                                 <Route path="admin" element={<AdminDashboard />} />
                             </Route>
 
-                            {/* Catch-all for 404 */}
                             <Route path="*" element={<Navigate to="/" replace />} />
                         </Route>
-
-                        {/* Full Screen Auth Routes (Outside Layout) */}
-                        <Route path="/login" element={<Auth />} />
-                        <Route path="/register" element={<Auth />} />
-                        <Route path="/forgot-password" element={<ForgotPassword />} />
-                        <Route path="/reset-password" element={<ResetPassword />} />
                     </Routes>
                 </BrowserRouter>
             </CartProvider>
