@@ -121,33 +121,31 @@ export const Home = () => {
       {heroBanners.length > 0 ? (
         <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
           {/* Slides Container */}
-          <div
-            className="flex h-full transition-transform duration-700 ease-in-out will-change-transform"
-            style={{ transform: `translateX(-${currentHeroIndex * 100}%)` }}
-          >
-            {heroBanners.map((banner) => (
+          <div className="relative w-full h-full">
+            {heroBanners.map((banner, index) => (
               <div
                 key={banner.id}
-                className="w-full h-full shrink-0 relative overflow-hidden"
+                className={`absolute inset-0 w-full h-full overflow-hidden transition-opacity duration-1000 ease-in-out ${currentHeroIndex === index ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
                 style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
               >
                 <div className="max-w-[1600px] mx-auto h-full px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center">
                   {/* Text Container */}
-                  <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0">
+                  <div className={`w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0 transition-all duration-700 transform ${currentHeroIndex === index ? 'translate-y-0 opacity-100 delay-300' : 'translate-y-4 opacity-0'}`}>
                     {banner.subtitle && (
                       <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">
                         {banner.subtitle}
                       </span>
                     )}
                     <h1
-                      className="font-black text-black leading-tight mb-6 animate-fade-in font-heading dark:text-white"
+                      className="font-black text-black leading-tight mb-6 font-heading dark:text-white"
                       style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.75rem)` }}
                     >
                       {banner.title}
                     </h1>
                     {banner.description && (
                       <p
-                        className="text-gray-600 mb-8 max-w-md animate-fade-in dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                        className="text-gray-600 mb-8 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3"
                         style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
                       >
                         {banner.description}
@@ -182,11 +180,13 @@ export const Home = () => {
                   </div>
 
                   {/* Image Container */}
-                  <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last">
+                  <div className={`w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last transition-all duration-1000 transform ${currentHeroIndex === index ? 'scale-100' : 'scale-105'}`}>
                     {banner.image ? (
                       <img
                         src={banner.image}
                         alt={banner.title}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        fetchPriority={index === 0 ? "high" : "auto"}
                         className="absolute inset-0 w-full h-full"
                         style={{
                           objectFit: (banner.image_fit as any) || 'cover',
