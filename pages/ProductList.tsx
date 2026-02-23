@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { api } from '../services/api';
 import { Product, ProductFilter } from '../types';
 import { ProductCard } from '../components/ProductCard';
+import { SkeletonCard } from '../components/SkeletonCard';
 import { FilterPanel } from '../components/FilterPanel';
 import { Loader2 } from 'lucide-react';
 
@@ -130,8 +131,8 @@ export const ProductList = () => {
           </div>
 
           {loading ? (
-            <div className="flex justify-center h-64 items-center">
-              <Loader2 className="w-10 h-10 animate-spin text-indigo-500" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <SkeletonCard count={8} />
             </div>
           ) : products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
