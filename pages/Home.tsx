@@ -5,7 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, ArrowRight, Zap, Clock } from 'lucide-react';
+import { Loader2, ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 
 export const Home = () => {
@@ -13,6 +13,8 @@ export const Home = () => {
   const navigate = useNavigate();
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -21,6 +23,48 @@ export const Home = () => {
   const [loading, setLoading] = useState(true);
 
   const [error, setError] = useState<string | null>(null);
+
+  // Auto-rotate hero banners every 10 seconds
+  useEffect(() => {
+    if (heroBanners.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+        setIsTransitioning(false);
+      }, 500); // Wait for transition to complete
+    }, 10000); // 10 seconds
+
+    return () => clearInterval(interval);
+  }, [heroBanners.length]);
+
+  const goToPreviousHero = () => {
+    if (heroBanners.length <= 1) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
+      setIsTransitioning(false);
+    }, 500);
+  };
+
+  const goToNextHero = () => {
+    if (heroBanners.length <= 1) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+      setIsTransitioning(false);
+    }, 500);
+  };
+
+  const goToHeroSlide = (index: number) => {
+    if (heroBanners.length <= 1) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentHeroIndex(index);
+      setIsTransitioning(false);
+    }, 500);
+  };
 
   // Redirect Admins and Sellers to their dashboards
   useEffect(() => {
@@ -93,61 +137,113 @@ export const Home = () => {
   return (
     <div className="bg-white pb-20 dark:bg-gray-900 transition-colors duration-300">
 
-      {/* Hero Section - Dynamic from CMS */}
+      {/* Hero Section - Carousel */}
       {heroBanners.length > 0 ? (
-        heroBanners.map((banner) => (
+        <div className="relative overflow-hidden">
+          {/* Slides Container */}
           <div 
-            key={banner.id} 
-            className="relative transition-colors duration-300"
-            style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
+            className="flex transition-transform duration-500 ease-in-out"
+            style={{ 
+              transform: `translateX(-${currentHeroIndex * 100}%)`,
+              width: `${heroBanners.length * 100}%`
+            }}
           >
-            <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
-              <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
-                {banner.subtitle && (
-                  <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">
-                    {banner.subtitle}
-                  </span>
-                )}
-                <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
-                  {banner.title}
-                </h1>
-                {banner.description && (
-                  <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
-                    {banner.description}
-                  </p>
-                )}
-                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
-                  {banner.cta_text && (
-                    <Link 
-                      to={banner.cta_link || '/products'} 
-                      className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
-                    >
-                      {banner.cta_text}
-                    </Link>
-                  )}
-                  <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
-                    Sell Now
-                  </Link>
+            {heroBanners.map((banner) => (
+              <div 
+                key={banner.id} 
+                className="relative flex-shrink-0"
+                style={{ 
+                  backgroundColor: banner.background_color || '#f6f6f6',
+                  width: '100%'
+                }}
+              >
+                <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
+                  <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
+                    {banner.subtitle && (
+                      <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">
+                        {banner.subtitle}
+                      </span>
+                    )}
+                    <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
+                      {banner.title}
+                    </h1>
+                    {banner.description && (
+                      <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
+                        {banner.description}
+                      </p>
+                    )}
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
+                      {banner.cta_text && (
+                        <Link 
+                          to={banner.cta_link || '/products'} 
+                          className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                        >
+                          {banner.cta_text}
+                        </Link>
+                      )}
+                      <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
+                        Sell Now
+                      </Link>
+                    </div>
+                  </div>
+                  <div className="relative h-[400px] md:h-auto overflow-hidden">
+                    {banner.image ? (
+                      <img
+                        src={banner.image}
+                        alt={banner.title}
+                        className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                      />
+                    ) : (
+                      <img
+                        src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
+                        alt="Fashion Model"
+                        className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="relative h-[400px] md:h-auto overflow-hidden">
-                {banner.image ? (
-                  <img
-                    src={banner.image}
-                    alt={banner.title}
-                    className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
-                  />
-                ) : (
-                  <img
-                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
-                    alt="Fashion Model"
-                    className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
-                  />
-                )}
-              </div>
-            </div>
+            ))}
           </div>
-        ))
+
+          {/* Navigation Arrows */}
+          {heroBanners.length > 1 && (
+            <>
+              <button
+                onClick={goToPreviousHero}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 z-20"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft className="w-6 h-6 text-gray-900" />
+              </button>
+              <button
+                onClick={goToNextHero}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110 z-20"
+                aria-label="Next slide"
+              >
+                <ChevronRight className="w-6 h-6 text-gray-900" />
+              </button>
+            </>
+          )}
+
+          {/* Navigation Dots */}
+          {heroBanners.length > 1 && (
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+              {heroBanners.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToHeroSlide(index)}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    currentHeroIndex === index
+                      ? 'bg-black w-8'
+                      : 'bg-black/30 hover:bg-black/50'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       ) : (
         /* Default Hero Section (if no CMS banners) */
         <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300">
