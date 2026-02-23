@@ -269,6 +269,14 @@
 │  ├─ Password strength requirements                      │
 │  └─ Secure password reset flow                          │
 │                                                          │
+│  Layer 7: Hardened Security Headers (A+ Grade)          │
+│  ├─ HSTS: 1 year with subdomains and preload            │
+│  ├─ CSP: upgrade-insecure-requests; block-all-mixed      │
+│  ├─ Permissions-Policy: Restricted hardware access       │
+│  ├─ X-Frame-Options: DENY (Clickjacking protection)      │
+│  ├─ X-Content-Type-Options: nosniff                      │
+│  └─ Referrer-Policy: same-origin                        │
+│                                                          │
 └─────────────────────────────────────────────────────────┘
 ```
 
