@@ -14,14 +14,12 @@ export const Home = () => {
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
   const [flashSaleProducts, setFlashSaleProducts] = useState<Product[]>([]);
   const [closestFlashSaleEnd, setClosestFlashSaleEnd] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-
   const [error, setError] = useState<string | null>(null);
 
   // Auto-rotate hero banners every 10 seconds
@@ -29,41 +27,25 @@ export const Home = () => {
     if (heroBanners.length <= 1) return;
 
     const interval = setInterval(() => {
-      setIsTransitioning(true);
-      setTimeout(() => {
-        setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
-        setIsTransitioning(false);
-      }, 500); // Wait for transition to complete
-    }, 10000); // 10 seconds
+      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+    }, 10000);
 
     return () => clearInterval(interval);
   }, [heroBanners.length]);
 
   const goToPreviousHero = () => {
     if (heroBanners.length <= 1) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
-      setIsTransitioning(false);
-    }, 500);
+    setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
   };
 
   const goToNextHero = () => {
     if (heroBanners.length <= 1) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
-      setIsTransitioning(false);
-    }, 500);
+    setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
   };
 
   const goToHeroSlide = (index: number) => {
     if (heroBanners.length <= 1) return;
-    setIsTransitioning(true);
-    setTimeout(() => {
-      setCurrentHeroIndex(index);
-      setIsTransitioning(false);
-    }, 500);
+    setCurrentHeroIndex(index);
   };
 
   // Redirect Admins and Sellers to their dashboards
@@ -79,20 +61,19 @@ export const Home = () => {
     const fetchData = async () => {
       try {
         const [banners, sections, featured, popular, cats, allProducts] = await Promise.all([
-          api.getHeroBanners().catch(() => []), // Fallback to empty array on error
-          api.getHomeSections().catch(() => []), // Fallback to empty array on error
+          api.getHeroBanners().catch(() => []),
+          api.getHomeSections().catch(() => []),
           api.getProducts({ isFeatured: true }).catch(() => []),
           api.getProducts({ isPopular: true }).catch(() => []),
           api.getCategories().catch(() => []),
-          api.getProducts({}).catch(() => []) // Fetch all to find flash sales
+          api.getProducts({}).catch(() => [])
         ]);
         setHeroBanners(banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
         setHomeSections(sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
-        setFeaturedProducts(featured.slice(0, 8)); // Show more items
+        setFeaturedProducts(featured.slice(0, 8));
         setPopularProducts(popular.slice(0, 4));
         setCategories(cats);
 
-        // Flash Sale Logic: Find products with active future end time
         const now = new Date();
         const flashSales = allProducts.filter(p =>
           p.flashSaleEnd && new Date(p.flashSaleEnd) > now
@@ -100,7 +81,6 @@ export const Home = () => {
         setFlashSaleProducts(flashSales);
 
         if (flashSales.length > 0) {
-          // Find earliest end time among active flash sales
           const ends = flashSales.map(p => new Date(p.flashSaleEnd!).getTime());
           const earliestEnd = new Date(Math.min(...ends));
           setClosestFlashSaleEnd(earliestEnd.toISOString());
@@ -139,50 +119,45 @@ export const Home = () => {
 
       {/* Hero Section - Carousel */}
       {heroBanners.length > 0 ? (
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
           {/* Slides Container */}
           <div
-            className="flex transition-transform duration-500 ease-in-out"
-            style={{
-              transform: `translateX(-${currentHeroIndex * 100}%)`,
-              width: `${heroBanners.length * 100}%`
-            }}
+            className="flex h-full transition-transform duration-700 ease-in-out will-change-transform"
+            style={{ transform: `translateX(-${currentHeroIndex * 100}%)` }}
           >
             {heroBanners.map((banner) => (
               <div
                 key={banner.id}
-                className="relative shrink-0 h-[500px] md:h-[420px] overflow-hidden shadow-sm"
-                style={{
-                  backgroundColor: banner.background_color || '#f6f6f6',
-                  width: '100%'
-                }}
+                className="w-full h-full shrink-0 relative overflow-hidden"
+                style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
               >
-                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
-                  <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
+                <div className="max-w-[1600px] mx-auto h-full px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center">
+                  {/* Text Container */}
+                  <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0">
                     {banner.subtitle && (
-                      <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">
+                      <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">
                         {banner.subtitle}
                       </span>
                     )}
                     <h1
-                      className="font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white"
+                      className="font-black text-black leading-tight mb-6 animate-fade-in font-heading dark:text-white"
                       style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.75rem)` }}
                     >
                       {banner.title}
                     </h1>
                     {banner.description && (
                       <p
-                        className="text-gray-600 mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                        className="text-gray-600 mb-8 max-w-md animate-fade-in dark:text-gray-300 line-clamp-2 md:line-clamp-3"
                         style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
                       >
                         {banner.description}
                       </p>
                     )}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                       {banner.cta_text && (
                         <Link
                           to={banner.cta_link || '/products'}
-                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px]"
+                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-14 px-10"
                           style={{
                             height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
                             padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
@@ -194,7 +169,7 @@ export const Home = () => {
                       )}
                       <Link
                         to="/register"
-                        className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px]"
+                        className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-14 px-10"
                         style={{
                           height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
                           padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
@@ -205,23 +180,23 @@ export const Home = () => {
                       </Link>
                     </div>
                   </div>
-                  <div className="relative h-1/2 md:h-full overflow-hidden order-first md:order-last">
+
+                  {/* Image Container */}
+                  <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last">
                     {banner.image ? (
                       <img
                         src={banner.image}
                         alt={banner.title}
                         className="absolute inset-0 w-full h-full"
                         style={{
-                          objectFit: banner.image_fit || 'cover',
+                          objectFit: (banner.image_fit as any) || 'cover',
                           objectPosition: banner.image_position || 'center'
                         }}
                       />
                     ) : (
-                      <img
-                        src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
-                        alt="Fashion Model"
-                        className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
-                      />
+                      <div className="absolute inset-0 bg-gray-200 flex items-center justify-center transition-colors">
+                        <Loader2 className="animate-spin text-gray-400 w-8 h-8" />
+                      </div>
                     )}
                   </div>
                 </div>
@@ -267,27 +242,27 @@ export const Home = () => {
           )}
         </div>
       ) : (
-        /* Default Hero Section (if no CMS banners) */
+        /* Default Hero Section */
         <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[500px] md:h-[420px] overflow-hidden">
-          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
-            <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
-              <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
-              <h1 className="text-4xl md:text-5xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
+          <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-center h-full px-4 sm:px-8 md:px-16">
+            <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left py-8 md:py-0">
+              <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">Summer Sale</span>
+              <h1 className="text-4xl md:text-5xl font-black text-black leading-tight mb-4 font-heading dark:text-white">
                 UP TO <span className="text-primary">70%</span> OFF
               </h1>
-              <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3">
+              <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3">
                 Discover the hottest trends of the season. Shop the collection now before it's gone.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
-                <Link to="/products" className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-[3.5rem] px-10">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <Link to="/products" className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-14 px-10">
                   Shop Now
                 </Link>
-                <Link to="/register" className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-[3.5rem] px-10">
+                <Link to="/register" className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-14 px-10">
                   Sell Now
                 </Link>
               </div>
             </div>
-            <div className="relative h-1/2 md:h-full overflow-hidden order-first md:order-last">
+            <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last">
               <img
                 src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
                 alt="Fashion Model"
@@ -304,7 +279,6 @@ export const Home = () => {
           {categories.slice(0, 8).map((cat) => (
             <Link key={cat} to={`/products?category=${cat}`} className="group flex flex-col items-center gap-3 cursor-pointer">
               <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden border border-transparent group-hover:border-black transition-all dark:bg-gray-800 dark:group-hover:border-white">
-                {/* Placeholder for category image - usually dynamic */}
                 <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold uppercase dark:bg-gray-700 dark:text-gray-500">
                   {cat.slice(0, 2)}
                 </div>
@@ -315,11 +289,10 @@ export const Home = () => {
         </div>
       </div>
 
-      {/* Flash Sale Banner - Only show if active sales exist */}
+      {/* Flash Sale Banner */}
       {flashSaleProducts.length > 0 && closestFlashSaleEnd && (
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16 animate-fade-up">
           <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group dark:bg-primary/10 dark:border-primary/30">
-            {/* Background Decorations */}
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
 
