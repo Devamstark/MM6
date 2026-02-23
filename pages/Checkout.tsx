@@ -16,6 +16,7 @@ export const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [useEarnings, setUseEarnings] = useState(false);
   const [earnings, setEarnings] = useState<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number } | null>(null);
+  const [lastOrderId, setLastOrderId] = useState<string | null>(null);
 
   const [shippingData, setShippingData] = useState({
     name: user?.name || '',
@@ -65,12 +66,27 @@ export const Checkout = () => {
         </div>
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Order Placed Successfully!</h2>
         <p className="text-gray-600 mb-8">Thank you for your purchase. You will receive an email confirmation shortly.</p>
-        <button
-          onClick={() => navigate('/products')}
-          className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium"
-        >
-          Continue Shopping
-        </button>
+        
+        {lastOrderId && (
+          <p className="text-sm text-gray-500 mb-6">
+            Order #{lastOrderId}
+          </p>
+        )}
+        
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => navigate(`/orders/${lastOrderId}`)}
+            className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium"
+          >
+            View Order Details
+          </button>
+          <button
+            onClick={() => navigate('/products')}
+            className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 font-medium"
+          >
+            Continue Shopping
+          </button>
+        </div>
       </div>
     );
   }
@@ -81,7 +97,7 @@ export const Checkout = () => {
 
     try {
       // Simulate Payment Gateway Interaction
-      await api.createOrder({
+      const order = await api.createOrder({
         items: items,
         shippingAddress: shippingData,
         paymentDetails: paymentData,
@@ -89,6 +105,7 @@ export const Checkout = () => {
         useEarnings: useEarnings && earnings?.canRedeem,
       });
 
+      setLastOrderId(order.id);
       clearCart();
       setStep('success');
     } catch (error) {

@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { Order } from '../types';
-import { Loader2, Package, Truck, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Loader2, Package, Truck, CheckCircle, XCircle, Clock, ArrowRight } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 
 export const OrderHistory = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
-    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         loadOrders();
@@ -74,10 +74,14 @@ export const OrderHistory = () => {
 
             <div className="space-y-6">
                 {orders.map((order) => (
-                    <div key={order.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+                    <div 
+                        key={order.id} 
+                        className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
+                        onClick={() => navigate(`/orders/${order.id}`)}
+                    >
                         <div className="p-6 border-b border-gray-50 flex flex-wrap items-center justify-between gap-4 bg-gray-50/30">
                             <div className="flex items-center gap-4">
-                                <span className="text-lg font-bold text-gray-900">Order #{order.id}</span>
+                                <span className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">Order #{order.id}</span>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
                                     <StatusIcon status={order.status} />
                                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
@@ -139,6 +143,13 @@ export const OrderHistory = () => {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+
+                            {/* View Details Button */}
+                            <div className="mt-6 pt-6 border-t border-gray-100 flex justify-end">
+                                <span className="text-indigo-600 font-bold text-sm flex items-center gap-2 group-hover:gap-3 transition-all">
+                                    View Order Details <ArrowRight className="w-4 h-4" />
+                                </span>
                             </div>
                         </div>
                     </div>

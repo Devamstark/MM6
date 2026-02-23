@@ -19,6 +19,7 @@ import { Affiliate } from './pages/Affiliate';
 import { StaticPage } from './pages/StaticPage';
 import { UserProfile } from './pages/UserProfile';
 import { OrderHistory } from './pages/OrderHistory';
+import { OrderDetail } from './pages/OrderDetail';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
                             <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
                                 <Route path="checkout" element={<Checkout />} />
                                 <Route path="orders" element={<OrderHistory />} />
+                                <Route path="orders/:id" element={<OrderDetail />} />
                                 <Route path="wishlist" element={<Wishlist />} />
                                 <Route path="points" element={<BonusPoints />} />
                                 <Route path="affiliate" element={<Affiliate />} />
