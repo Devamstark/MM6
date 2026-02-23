@@ -48,7 +48,9 @@ export const CMSTab = () => {
         cta_text: '',
         cta_link: '',
         is_active: true,
-        display_order: 0
+        display_order: 0,
+        image_fit: 'cover',
+        image_position: 'center'
     });
 
     const [sectionFormData, setSectionFormData] = useState<Partial<HomeSection>>({
@@ -99,7 +101,9 @@ export const CMSTab = () => {
                 cta_text: '',
                 cta_link: '',
                 is_active: true,
-                display_order: 0
+                display_order: 0,
+                image_fit: 'cover',
+                image_position: 'center'
             });
             loadData();
         } catch (e) {
@@ -363,6 +367,46 @@ export const CMSTab = () => {
                                             </div>
                                         )}
                                     </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Image Fit</label>
+                                    <select
+                                        value={heroFormData.image_fit}
+                                        onChange={(e) => setHeroFormData({ ...heroFormData, image_fit: e.target.value })}
+                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
+                                    >
+                                        <option value="cover">Cover (Fill - May Crop)</option>
+                                        <option value="contain">Contain (Fit - No Crop)</option>
+                                        <option value="fill">Fill (Stretch)</option>
+                                        <option value="none">None (Original Size)</option>
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        {heroFormData.image_fit === 'cover' && 'Fills entire area, may crop edges'}
+                                        {heroFormData.image_fit === 'contain' && 'Shows full image, may have empty space'}
+                                        {heroFormData.image_fit === 'fill' && 'Stretches image, may distort'}
+                                        {heroFormData.image_fit === 'none' && 'Shows at original size'}
+                                    </p>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Image Position</label>
+                                    <select
+                                        value={heroFormData.image_position}
+                                        onChange={(e) => setHeroFormData({ ...heroFormData, image_position: e.target.value })}
+                                        className="w-full border border-gray-300 rounded-lg p-2.5 text-sm"
+                                    >
+                                        <option value="center">Center</option>
+                                        <option value="top">Top</option>
+                                        <option value="bottom">Bottom</option>
+                                        <option value="left">Left</option>
+                                        <option value="right">Right</option>
+                                        <option value="top left">Top Left</option>
+                                        <option value="top right">Top Right</option>
+                                        <option value="bottom left">Bottom Left</option>
+                                        <option value="bottom right">Bottom Right</option>
+                                    </select>
+                                    <p className="text-xs text-gray-500 mt-1">
+                                        Controls which part of the image stays visible when cropped
+                                    </p>
                                 </div>
                                 <div className="md:col-span-2">
                                     <label className="flex items-center gap-2">

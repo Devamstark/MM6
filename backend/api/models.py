@@ -250,6 +250,23 @@ class HeroBanner(models.Model):
     cta_link = models.CharField(max_length=255, blank=True)
     is_active = models.BooleanField(default=True)
     display_order = models.IntegerField(default=0)
+    image_fit = models.CharField(max_length=20, default='cover', choices=[
+        ('cover', 'Cover (Fill)'),
+        ('contain', 'Contain (Fit)'),
+        ('fill', 'Fill (Stretch)'),
+        ('none', 'None (Original Size)'),
+    ])
+    image_position = models.CharField(max_length=20, default='center', choices=[
+        ('center', 'Center'),
+        ('top', 'Top'),
+        ('bottom', 'Bottom'),
+        ('left', 'Left'),
+        ('right', 'Right'),
+        ('top left', 'Top Left'),
+        ('top right', 'Top Right'),
+        ('bottom left', 'Bottom Left'),
+        ('bottom right', 'Bottom Right'),
+    ])
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

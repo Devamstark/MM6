@@ -191,7 +191,11 @@ export const Home = () => {
                       <img
                         src={banner.image}
                         alt={banner.title}
-                        className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                        className="absolute inset-0 w-full h-full"
+                        style={{ 
+                          objectFit: banner.image_fit || 'cover',
+                          objectPosition: banner.image_position || 'center'
+                        }}
                       />
                     ) : (
                       <img
