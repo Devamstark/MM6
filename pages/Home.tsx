@@ -79,12 +79,12 @@ export const Home = () => {
     const fetchData = async () => {
       try {
         const [banners, sections, featured, popular, cats, allProducts] = await Promise.all([
-          api.getHeroBanners(),
-          api.getHomeSections(),
-          api.getProducts({ isFeatured: true }),
-          api.getProducts({ isPopular: true }),
-          api.getCategories(),
-          api.getProducts({}) // Fetch all to find flash sales
+          api.getHeroBanners().catch(() => []), // Fallback to empty array on error
+          api.getHomeSections().catch(() => []), // Fallback to empty array on error
+          api.getProducts({ isFeatured: true }).catch(() => []),
+          api.getProducts({ isPopular: true }).catch(() => []),
+          api.getCategories().catch(() => []),
+          api.getProducts({}).catch(() => []) // Fetch all to find flash sales
         ]);
         setHeroBanners(banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
         setHomeSections(sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
