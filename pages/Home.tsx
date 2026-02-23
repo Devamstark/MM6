@@ -141,24 +141,24 @@ export const Home = () => {
       {heroBanners.length > 0 ? (
         <div className="relative overflow-hidden">
           {/* Slides Container */}
-          <div 
+          <div
             className="flex transition-transform duration-500 ease-in-out"
-            style={{ 
+            style={{
               transform: `translateX(-${currentHeroIndex * 100}%)`,
               width: `${heroBanners.length * 100}%`
             }}
           >
             {heroBanners.map((banner) => (
-              <div 
-                key={banner.id} 
-                className="relative flex-shrink-0"
-                style={{ 
+              <div
+                key={banner.id}
+                className="relative flex-shrink-0 h-[650px] md:h-[600px] overflow-hidden shadow-sm"
+                style={{
                   backgroundColor: banner.background_color || '#f6f6f6',
                   width: '100%'
                 }}
               >
-                <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
-                  <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
+                <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
+                  <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
                     {banner.subtitle && (
                       <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">
                         {banner.subtitle}
@@ -168,14 +168,14 @@ export const Home = () => {
                       {banner.title}
                     </h1>
                     {banner.description && (
-                      <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
+                      <p className="text-gray-600 text-base md:text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-3 md:line-clamp-none">
                         {banner.description}
                       </p>
                     )}
                     <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
                       {banner.cta_text && (
-                        <Link 
-                          to={banner.cta_link || '/products'} 
+                        <Link
+                          to={banner.cta_link || '/products'}
                           className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
                         >
                           {banner.cta_text}
@@ -186,13 +186,13 @@ export const Home = () => {
                       </Link>
                     </div>
                   </div>
-                  <div className="relative h-[400px] md:h-auto overflow-hidden">
+                  <div className="relative h-1/2 md:h-full overflow-hidden order-first md:order-last">
                     {banner.image ? (
                       <img
                         src={banner.image}
                         alt={banner.title}
                         className="absolute inset-0 w-full h-full"
-                        style={{ 
+                        style={{
                           objectFit: banner.image_fit || 'cover',
                           objectPosition: banner.image_position || 'center'
                         }}
@@ -237,11 +237,10 @@ export const Home = () => {
                 <button
                   key={index}
                   onClick={() => goToHeroSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    currentHeroIndex === index
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${currentHeroIndex === index
                       ? 'bg-black w-8'
                       : 'bg-black/30 hover:bg-black/50'
-                  }`}
+                    }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
               ))}
@@ -250,14 +249,14 @@ export const Home = () => {
         </div>
       ) : (
         /* Default Hero Section (if no CMS banners) */
-        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300">
-          <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
-            <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
+        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[650px] md:h-[600px] overflow-hidden">
+          <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
+            <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
               <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
               <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
                 UP TO <span className="text-primary">70%</span> OFF
               </h1>
-              <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
+              <p className="text-gray-600 text-base md:text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-3 md:line-clamp-none">
                 Discover the hottest trends of the season. Shop the collection now before it's gone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
@@ -269,7 +268,7 @@ export const Home = () => {
                 </Link>
               </div>
             </div>
-            <div className="relative h-[400px] md:h-auto overflow-hidden">
+            <div className="relative h-1/2 md:h-full overflow-hidden order-first md:order-last">
               <img
                 src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
                 alt="Fashion Model"
