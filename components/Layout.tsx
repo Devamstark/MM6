@@ -899,6 +899,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Help & Support</h3>
               <ul className="space-y-3">
+                <li><Link to="/faq" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">FAQ</Link></li>
                 <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Shipping Info</Link></li>
                 <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Returns</Link></li>
                 <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">How to Order</Link></li>

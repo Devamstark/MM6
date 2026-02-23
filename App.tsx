@@ -20,6 +20,7 @@ import { StaticPage } from './pages/StaticPage';
 import { UserProfile } from './pages/UserProfile';
 import { OrderHistory } from './pages/OrderHistory';
 import { OrderDetail } from './pages/OrderDetail';
+import { FAQ } from './pages/FAQ';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
                             <Route path="reset-password" element={<ResetPassword />} />
 
                             <Route path="contact" element={<Contact />} />
+                            <Route path="faq" element={<FAQ />} />
                             <Route path="page/:slug" element={<StaticPage />} />
                             <Route path="about" element={<StaticPage page="about-us" />} />
                             <Route path="terms" element={<StaticPage page="terms" />} />
