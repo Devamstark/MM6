@@ -178,7 +178,7 @@ This is your complete documentation package for the **SmartShop E-Commerce Platf
 
 ### **Goal: Extend the Project**
 1. ✅ SYSTEM_ARCHITECTURE.md (Understand structure)
-2. ✅ [FUTURE_ROADMAP.md](../features/FUTURE_ROADMAP.md) (Planned features)
+2. ✅ [FUTURE_ROADMAP.md](features/FUTURE_ROADMAP.md) (Planned features)
 3. ✅ FULL_MVP_SPECIFICATION.md (Technical gaps)
 4. ✅ Code files (existing patterns)
 
@@ -374,7 +374,7 @@ You now have:
 | setup/VPS_DEPLOYMENT_GUIDE.md | 1.0.0 | Feb 2026 | ✅ New |
 | setup/SSL_SECURITY_SETUP.md | 1.0.0 | Feb 2026 | ✅ New |
 | WORK_DONE.md | 1.0.0 | Feb 2026 | ✅ New |
-| ../features/FUTURE_ROADMAP.md | 1.0.0 | Feb 2026 | ✅ New |
+| features/FUTURE_ROADMAP.md | 1.0.0 | Feb 2026 | ✅ New |
 
 ---
 
