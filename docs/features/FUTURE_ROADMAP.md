@@ -17,10 +17,6 @@ This document outlines the planned enhancements and future feature sets for the 
     *   *Implementation*: A new database model `Wishlist` and a dedicated frontend page for users to curate collections.
 *   **Back-in-Stock Notifications**: 
     *   *Implementation*: A subscription service that sends an email or push notification when a product's `stock_quantity` increases from 0.
-*   **Advanced Attribute Filtering**: 
-    *   *Implementation*: Dynamic sidebar filters for **Size**, **Color**, **Material**, and **Brand** using Django's `FilterSet`.
-*   **Dark Mode Support**: 
-    *   *Implementation*: Theme-switching using Tailwind CSS `dark` class and browser `localStorage` persistence.
 
 ## 💳 3. Marketing & Conversion Tools
 *   **Coupon & Promo Code Engine**: 
