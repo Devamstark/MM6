@@ -126,6 +126,20 @@ export const Auth = () => {
                   placeholder="Password"
                 />
               </div>
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500 group-focus-within:text-indigo-700 transition-colors" />
+                <input
+                  type="password"
+                  required
+                  value={registerData.confirmPassword}
+                  onChange={(e) => setRegisterData({ ...registerData, confirmPassword: e.target.value })}
+                  className={`auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900 ${errors.confirmPassword ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                  placeholder="Confirm Password"
+                />
+              </div>
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-xs font-bold mt-1">{errors.confirmPassword}</p>
+              )}
 
               <div
                 className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${registerData.isSeller
