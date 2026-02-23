@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
+import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight, ChevronRight, Home, Heart, FileText, Phone, Settings } from 'lucide-react';
 import { api } from '../services/api';
 import { SearchSuggestions } from '../types';
 import { Clock, TrendingUp, History } from 'lucide-react';
@@ -10,6 +10,7 @@ import { useAtom } from 'jotai';
 import { searchQueryAtom, isCartOpenAtom, isDarkModeAtom, themeColorAtom, fontScaleAtom, densityAtom } from '../store/atoms';
 import { NotificationCenter } from './NotificationCenter';
 import { ThemeCustomizer } from './ThemeCustomizer';
+import { CategoryDrawer } from './CategoryDrawer';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
   const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
@@ -29,6 +30,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [themeColor] = useAtom(themeColorAtom);
   const [fontScale] = useAtom(fontScaleAtom);
   const [density] = useAtom(densityAtom);
+  const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
 
   // Apply Theme Settings
   React.useEffect(() => {
@@ -147,7 +149,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       </div>
 
       {/* Main Navbar */}
-      <nav className="sticky top-0 z-40 bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
+      <nav className="sticky top-0 z-[1000] bg-white border-b border-gray-100 dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 
@@ -337,7 +339,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </button>
 
               {/* Mobile Menu Toggle */}
-              <div className="flex items-center lg:hidden">
+              <div className="flex items-center md:hidden">
                 <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="p-1 text-gray-900 rounded-md dark:text-gray-200">
                   <Menu className="w-6 h-6" />
                 </button>
@@ -486,34 +488,212 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           )}
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Navigation Drawer Overlay */}
         {mobileMenuOpen && (
-          <div className="lg:hidden bg-white border-t border-gray-100 shadow-lg">
-            {/* Mobile Search */}
-            <div className="px-4 pt-4 pb-2">
-              <form onSubmit={handleSearch} className="relative">
-                <input
-                  type="text"
-                  className="w-full bg-gray-100 border-none rounded-md py-2 px-4 text-sm focus:ring-1 focus:ring-black"
-                  placeholder="Search..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit" className="absolute right-3 top-2 text-gray-400">
-                  <Search className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-            <div className="px-4 py-4 space-y-1">
-              <Link to="/products?sort=newest" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">New Arrivals</Link>
-              <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Women</Link>
-              <Link to="/products" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Men</Link>
-              <Link to="/products?category=Accessories" className="block px-3 py-2 text-base font-medium text-gray-900 rounded-md hover:bg-gray-50">Accessories</Link>
-              <Link to="/products?sort=price_asc" className="block px-3 py-2 text-base font-medium text-red-600 rounded-md hover:bg-gray-50">Sale</Link>
-            </div>
-          </div>
+          <div
+            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 md:hidden transition-opacity"
+            onClick={() => setMobileMenuOpen(false)}
+          />
         )}
+
+        {/* Mobile Navigation Drawer */}
+        <div
+          className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-[51] md:hidden shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+        >
+          {/* Drawer Header */}
+          <div className="flex items-center justify-between p-4 border-b border-gray-100 dark:border-gray-800">
+            <Link to="/" className="text-xl font-bold tracking-widest text-black uppercase dark:text-white" onClick={() => setMobileMenuOpen(false)}>
+              SMARTSHOP
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors dark:hover:bg-gray-800 dark:text-gray-400"
+            >
+              <X className="w-6 h-6" />
+            </button>
+          </div>
+
+          {/* Scrollable Navigation Content */}
+          <div className="flex-1 overflow-y-auto h-[calc(100vh-140px)]">
+            {/* User Account Section */}
+            {isAuthenticated ? (
+              <div className="p-4 bg-gray-50 border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-white font-bold">
+                    {user?.name?.charAt(0).toUpperCase() || 'U'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-gray-900 truncate dark:text-white">{user?.name}</p>
+                    <p className="text-xs text-gray-500 truncate dark:text-gray-400">{user?.email}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Link
+                    to="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-white text-xs font-bold text-gray-700 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
+                  >
+                    <UserIcon className="w-3.5 h-3.5" /> Profile
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-primary text-xs font-bold text-white rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                      <Shield className="w-3.5 h-3.5" /> Admin
+                    </Link>
+                  )}
+                  {isSeller && (
+                    <Link
+                      to="/seller"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-black text-xs font-bold text-white rounded-lg hover:bg-gray-800 transition-colors"
+                    >
+                      <Store className="w-3.5 h-3.5" /> Seller
+                    </Link>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="p-4 bg-gray-50 border-b border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+                <div className="flex gap-2">
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 px-4 py-2.5 bg-black text-white text-sm font-bold rounded-lg hover:bg-gray-800 transition-colors text-center dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex-1 px-4 py-2.5 bg-white text-black text-sm font-bold rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors text-center dark:bg-gray-700 dark:text-white dark:border-gray-600 dark:hover:bg-gray-600"
+                  >
+                    Register
+                  </Link>
+                </div>
+              </div>
+            )}
+
+            {/* Main Navigation Links */}
+            <nav className="py-2">
+              <Link
+                to="/products?sort=newest"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <Home className="w-5 h-5 text-gray-400" />
+                New Arrivals
+              </Link>
+
+              {/* Categories Button - Opens Drawer */}
+              <button
+                onClick={() => { setCategoryDrawerOpen(true); setMobileMenuOpen(false); }}
+                className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <span className="flex items-center gap-3">
+                  <span className="text-lg">📂</span> All Categories
+                </span>
+                <ChevronRight className="w-5 h-5 text-gray-400" />
+              </button>
+
+              <Link
+                to="/products?category=Accessories"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <span className="text-lg">👜</span> Accessories
+              </Link>
+
+              <Link
+                to="/products?on_sale=true"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors dark:hover:bg-red-900/20"
+              >
+                <span className="text-lg">🔥</span> Sale
+              </Link>
+            </nav>
+
+            {/* Divider */}
+            <div className="border-t border-gray-100 my-2 dark:border-gray-800" />
+
+            {/* User Links */}
+            <nav className="py-2">
+              {isAuthenticated && (
+                <>
+                  <Link
+                    to="/orders"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                  >
+                    <Package className="w-5 h-5 text-gray-400" />
+                    My Orders
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                  >
+                    <Heart className="w-5 h-5 text-gray-400" />
+                    Wishlist
+                  </Link>
+                  <Link
+                    to="/points"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                  >
+                    <span className="text-lg">⭐</span> Bonus Points
+                  </Link>
+                  <div className="border-t border-gray-100 my-2 dark:border-gray-800" />
+                </>
+              )}
+
+              <Link
+                to="/contact"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <Phone className="w-5 h-5 text-gray-400" />
+                Contact Us
+              </Link>
+
+              <button
+                onClick={() => { setIsThemeOpen(true); setMobileMenuOpen(false); }}
+                className="flex items-center gap-3 w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <Settings className="w-5 h-5 text-gray-400" />
+                Theme & Display
+              </button>
+
+              <Link
+                to="/page/about-us"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <FileText className="w-5 h-5 text-gray-400" />
+                About Us
+              </Link>
+            </nav>
+          </div>
+
+          {/* Footer - Logout */}
+          {isAuthenticated && (
+            <div className="p-4 border-t border-gray-100 dark:border-gray-800">
+              <button
+                onClick={() => { logout(); setMobileMenuOpen(false); navigate('/login'); }}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3 text-sm font-bold text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition-colors dark:bg-red-900/20 dark:text-red-400 dark:hover:bg-red-900/30"
+              >
+                <LogOut className="w-4 h-4" /> Sign Out
+              </button>
+            </div>
+          )}
+        </div>
       </nav>
+
+      {/* Category Drawer */}
+      <CategoryDrawer isOpen={categoryDrawerOpen} onClose={() => setCategoryDrawerOpen(false)} />
 
       {/* Cart Drawer */}
       {cartOpen && (

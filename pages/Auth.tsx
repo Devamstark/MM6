@@ -313,7 +313,7 @@ export const Auth = () => {
                     height: 100%;
                     overflow: hidden;
                     transition: transform 0.7s cubic-bezier(0.7, 0, 0.3, 1);
-                    z-index: 100;
+                    z-index: 10;
                     box-shadow: 0 0 50px rgba(0,0,0,0.1);
                 }
 
