@@ -19,7 +19,7 @@ The SmartShop application has been deployed using a **Defense in Depth** strateg
 We use a proactive firewall strategy to ensure that only intended traffic reaches the server.
 - **UFW (Uncomplicated Firewall)**: Configured with a "Default Deny" policy. Only ports 22 (SSH), 80/443 (Web), 3000 (Dokploy), and 2025 (File Browser) are accessible.
 - **Hidden Services**: Critical infrastructure such as the **PostgreSQL Database** and **Redis** are isolated within a private Docker bridge network. They are not assigned any public ports, making them invisible to external port scanners (Nmap).
-- **Subdomain Obfuscation**: Administrative tools like File Browser are served via direct IP and non-standard ports (2025) rather than public subdomains to prevent discovery via OSINT tools like Spiderfoot or Shodan.
+- **Subdomain Obfuscation**: Administrative tools like **MinIO Console** and **File Browser** are served via direct IP and non-standard ports (9001 and 2025) rather than public subdomains. This prevents discovery via OSINT tools like Spiderfoot or Shodan (DNS Enumeration protection).
 
 ## 🔒 Layer 2: Transport Layer Security (The Vault)
 Encryption is enforced for all data in transit to prevent Interception/Man-in-the-Middle (MITM) attacks.

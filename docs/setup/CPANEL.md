@@ -1,6 +1,6 @@
 # cPanel DNS Migration Guide
 
-**Goal**: Move your website (`smartshop1.us`) to the new VPS while keeping your email on the old cPanel server (`51.83.161.4`).
+**Goal**: Move your website (`smartshop1.us`) to the new VPS while keeping your email on the old cPanel server (`<MAIL_SERVER_IP>`).
 
 ---
 
@@ -17,7 +17,7 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
 3.  **CREATE A NEW RECORD**:
     *   **Name**: `mail.smartshop1.us`
     *   **Type**: **A** (Address)
-    *   **Value/IP**: `51.83.161.4` (Address of your current cPanel)
+    *   **Value/IP**: `<MAIL_SERVER_IP>` (Address of your current cPanel)
     *   **TTL**: `14400`
 
 ### 2. Check the MX Record
@@ -25,7 +25,7 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
 2.  Ensure it points to: `mail.smartshop1.us`
 3.  Priority: `0`
 
-**Result**: Your email is now safe. It is permanently pointed to `51.83.161.4`, regardless of where the website goes.
+**Result**: Your email is now safe. It is permanently pointed to `<MAIL_SERVER_IP>`, regardless of where the website goes.
 
 ---
 
@@ -36,7 +36,7 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
 1.  Find the record named: `smartshop1.us` (The root domain)
     *   Type: **A**
 2.  **EDIT** this record:
-    *   **Old Value**: `51.83.161.4`
+    *   **Old Value**: `<MAIL_SERVER_IP>`
     *   **New Value**: `<VPS_IP>` (e.g. 123.45.67.89)
 
 ### 2. Point "www" to VPS
@@ -50,7 +50,7 @@ Currently, your mail record is a "CNAME" that follows your main domain. If you m
 
 | Name | Type | Value / IP | Purpose |
 | :--- | :--- | :--- | :--- |
-| `mail.smartshop1.us` | **A** | `51.83.161.4` | **Email** stays on cPanel |
+| `mail.smartshop1.us` | **A** | `<MAIL_SERVER_IP>` | **Email** stays on cPanel |
 | `smartshop1.us` | **A** | `<VPS_IP>` | **Website** goes to VPS |
 | `www.smartshop1.us` | **CNAME** | `smartshop1.us` | **Website** goes to VPS |
 | `MX Record` | **MX** | `mail.smartshop1.us` | Routes email to the mail server |
