@@ -109,9 +109,7 @@ services:
       - "traefik.http.routers.minio-api.tls.certresolver=letsencrypt"
       - "traefik.http.routers.minio-api.service=minio-api"
       - "traefik.http.services.minio-api.loadbalancer.server.port=9000"
-      # Security & Auth Gate (User: admin | Pass: admin123)
-      - "traefik.http.middlewares.admin-auth.basicauth.users=admin:$$apr1$$7R.D/D/B$$P.P.P.P.P.P.P.P.P.P.0"
-      - "traefik.http.routers.minio-console.middlewares=admin-auth,security-headers"
+      - "traefik.http.routers.minio-console.middlewares=security-headers"
       - "traefik.http.routers.minio-api.middlewares=security-headers"
 
   adminer:
@@ -127,7 +125,7 @@ services:
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
-      - "traefik.http.routers.adminer.middlewares=admin-auth,security-headers"
+      - "traefik.http.routers.adminer.middlewares=security-headers"
 
   filebrowser:
     image: filebrowser/filebrowser:latest
