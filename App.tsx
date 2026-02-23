@@ -3,12 +3,11 @@ import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
 import { ProductList as Shop } from './pages/ProductList';
 import { ProductDetail } from './pages/ProductDetail';
-import { Login } from './pages/Login';
-import { Register } from './pages/Register';
+import { Auth } from './pages/Auth';
 import { Checkout } from './pages/Checkout';
 import { SellerDashboard } from './pages/SellerDashboard';
 import { AdminDashboard } from './pages/AdminDashboard';
-import { ProtectedRoute } from './components/ProtectedRoute'; // Assuming this exists or will enable simple
+import { ProtectedRoute } from './components/ProtectedRoute';
 import { AuthProvider } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
 import { Wishlist } from './pages/Wishlist';
@@ -19,10 +18,7 @@ import { BonusPoints } from './pages/BonusPoints';
 import { Affiliate } from './pages/Affiliate';
 import { StaticPage } from './pages/StaticPage';
 import { UserProfile } from './pages/UserProfile';
-
-// Simple placeholder for pages we mapped but files were missing or renamed
 import { OrderHistory } from './pages/OrderHistory';
-
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -37,12 +33,7 @@ function App() {
                             <Route index element={<Home />} />
                             <Route path="products" element={<Shop />} />
                             <Route path="product/:slug" element={<ProductDetail />} />
-                            <Route path="login" element={<Login />} />
-                            <Route path="register" element={<Register />} />
                             <Route path="contact" element={<Contact />} />
-                            <Route path="forgot-password" element={<ForgotPassword />} />
-                            <Route path="reset-password" element={<ResetPassword />} />
-
                             {/* Static Pages */}
                             <Route path="page/:slug" element={<StaticPage />} />
 
@@ -74,6 +65,12 @@ function App() {
                             {/* Catch-all for 404 */}
                             <Route path="*" element={<Navigate to="/" replace />} />
                         </Route>
+
+                        {/* Full Screen Auth Routes (Outside Layout) */}
+                        <Route path="/login" element={<Auth />} />
+                        <Route path="/register" element={<Auth />} />
+                        <Route path="/forgot-password" element={<ForgotPassword />} />
+                        <Route path="/reset-password" element={<ResetPassword />} />
                     </Routes>
                 </BrowserRouter>
             </CartProvider>

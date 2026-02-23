@@ -213,7 +213,7 @@ export const Auth = () => {
               {isLoading ? 'Authenticating...' : 'Sign In'}
             </button>
 
-            <div className="mobile-only mt-8 text-sm text-slate-600 font-medium font-medium">
+            <div className="mobile-only mt-8 text-sm text-slate-600 font-medium">
               <p>Don't have an account? <button type="button" onClick={() => handleSwitch(true)} className="font-black text-indigo-700 hover:text-purple-700">Sign Up</button></p>
             </div>
           </form>
