@@ -566,23 +566,10 @@ UI Error Display (Toast/Alert)
                     │   Certificates: Let's Encrypt (auto)     │
                     └──┬──────┬────────┬──────────┬───────────┘
                        │      │        │          │
-          ┌────────────▼┐  ┌──▼──────┐ │  ┌───────▼──────┐
-          │  Frontend   │  │ Backend │ │  │   Adminer    │
-          │  (Nginx)    │  │(Gunicorn│ │  │  (DB Browser)│
-          │ port 80     │  │ port8000│ │  │  port 8080   │
-          │             │  │         │ │  └──────────────┘
-          │ smartshop   │  │api.smart│ │
-          │ 1.us        │  │shop1.us │ │  ┌───────▼──────┐
-          └─────────────┘  └────┬────┘ │  │    MinIO     │
-                                │      │  │  Console UI  │
-                         ┌──────▼────┐ └─►│  + S3 API    │
-                         │PostgreSQL │    │  port 9000/  │
-                         │  port5432 │    │  9001        │
-                         │(internal) │    └──────────────┘
-                         └───────────┘
-
-  FileBrowser (internal, IP:port only — not via Traefik)
-     Mounted directly to backend_media Docker volume
+   FileBrowser (internal, IP:port only — not via Traefik)
+   MinIO Console (internal, IP:9001 only — not via Traefik)
+   MinIO S3 API (internal, IP:9000 only — not via Traefik)
+      Mounted directly to backend_media Docker volume
 ```
 
 ### Docker Network

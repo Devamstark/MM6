@@ -12,7 +12,7 @@
 | Store | [https://smartshop1.us](https://smartshop1.us) |
 | Django Admin | [https://api.smartshop1.us/admin/](https://api.smartshop1.us/admin/) |
 | Database Browser | [https://db.smartshop1.us](https://db.smartshop1.us) |
-| MinIO Storage | [https://minio.smartshop1.us](https://minio.smartshop1.us) |
+| MinIO Storage | *(Internal only at VPS_IP:9001)* |
 
 See **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)** for deployment details.
 

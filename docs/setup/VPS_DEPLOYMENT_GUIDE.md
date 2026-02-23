@@ -33,14 +33,10 @@ This replaced the previous manual approach (Nginx + Gunicorn + systemd), making 
 
 All of these A records must point to the VPS IP address:
 
-| Subdomain | Purpose |
-|:---|:---|
 | `smartshop1.us` | Main storefront |
 | `www.smartshop1.us` | WWW redirect |
 | `api.smartshop1.us` | Django backend API & Admin |
 | `db.smartshop1.us` | Adminer database browser |
-| `minio.smartshop1.us` | MinIO storage web console |
-| `s3.smartshop1.us` | MinIO S3-compatible API |
 
 ---
 
@@ -68,11 +64,11 @@ All of these A records must point to the VPS IP address:
 - Accessible at `https://db.smartshop1.us`
 - Protected by your database credentials
 
-### `minio` — Self-Hosted S3 Storage
+### `minio` — Internal S3 Storage (Hidden)
 - S3-compatible object storage running on the VPS
-- Web console at `https://minio.smartshop1.us`
-- S3 API at `https://s3.smartshop1.us`
-- Used by Dokploy's backup system to store database backups
+- **Web console**: Accessible only via `http://<VPS_IP>:9001`
+- **S3 API**: Accessible internally at `http://<VPS_IP>:9000`
+- Provides secure backup storage and avoids public reconnaissance discovery.
 
 ---
 
@@ -141,7 +137,7 @@ Replace `<backend-container-name>` with the actual name from `docker ps`.
 
 ### Configure Automatic Backups (Dokploy)
 1. Dokploy Dashboard → **Backups** tab
-2. Set S3 endpoint to `https://s3.smartshop1.us`
+2. Set S3 endpoint to `http://<VPS_IP>:9000`
 3. Enter MinIO credentials (from Dokploy environment)
 4. Create a bucket called `backups` in MinIO first
 5. Set a backup schedule (e.g., daily at 2am)

@@ -14,8 +14,8 @@
 | 🔌 **REST API** | [https://api.smartshop1.us/api/](https://api.smartshop1.us/api/) | Backend API consumed by the frontend |
 | 🗄️ **Adminer** | [https://db.smartshop1.us](https://db.smartshop1.us) | Web UI to browse and query the PostgreSQL database |
 | 📁 **FileBrowser** | *(accessible via VPS IP — internal only)* | Browse and manage uploaded product media files |
-| 🪣 **MinIO Console** | [https://minio.smartshop1.us](https://minio.smartshop1.us) | Self-hosted S3-compatible object storage web UI |
-| 🔗 **MinIO S3 API** | [https://s3.smartshop1.us](https://s3.smartshop1.us) | S3-compatible API endpoint used for Dokploy backups |
+| 🪣 **MinIO Console** | *(accessible via VPS IP:9001 — internal only)* | Self-hosted S3-compatible object storage web UI |
+| 🔗 **MinIO S3 API** | *(accessible via VPS IP:9000 — internal only)* | S3-compatible API endpoint used for Dokploy backups |
 
 ---
 
