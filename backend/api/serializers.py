@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address, Coupon
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection
 
 User = get_user_model()
 
@@ -110,5 +110,17 @@ class ContactMessageSerializer(serializers.ModelSerializer):
 class CouponSerializer(serializers.ModelSerializer):
     class Meta:
         model = Coupon
+        fields = '__all__'
+
+
+class HeroBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HeroBanner
+        fields = '__all__'
+
+
+class HomePageSectionSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HomePageSection
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'used_count')

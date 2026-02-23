@@ -779,4 +779,43 @@ export const api = {
   deleteCoupon: async (id: string): Promise<void> => {
     await client.delete(`coupons/${id}/`);
   },
+
+  // --- CMS (Hero Banners & Home Sections) ---
+  getHeroBanners: async (): Promise<any[]> => {
+    const response = await client.get('hero-banners/');
+    return response.data;
+  },
+
+  createHeroBanner: async (data: any): Promise<any> => {
+    const response = await client.post('hero-banners/', data);
+    return response.data;
+  },
+
+  updateHeroBanner: async (id: string, data: any): Promise<any> => {
+    const response = await client.patch(`hero-banners/${id}/`, data);
+    return response.data;
+  },
+
+  deleteHeroBanner: async (id: string): Promise<void> => {
+    await client.delete(`hero-banners/${id}/`);
+  },
+
+  getHomeSections: async (): Promise<any[]> => {
+    const response = await client.get('home-sections/');
+    return response.data;
+  },
+
+  createHomeSection: async (data: any): Promise<any> => {
+    const response = await client.post('home-sections/', data);
+    return response.data;
+  },
+
+  updateHomeSection: async (id: string, data: any): Promise<any> => {
+    const response = await client.patch(`home-sections/${id}/`, data);
+    return response.data;
+  },
+
+  deleteHomeSection: async (id: string): Promise<void> => {
+    await client.delete(`home-sections/${id}/`);
+  },
 };

@@ -11,6 +11,8 @@ import { CountdownTimer } from '../components/CountdownTimer';
 export const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [heroBanners, setHeroBanners] = useState<any[]>([]);
+  const [homeSections, setHomeSections] = useState<any[]>([]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -32,12 +34,16 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [featured, popular, cats, allProducts] = await Promise.all([
+        const [banners, sections, featured, popular, cats, allProducts] = await Promise.all([
+          api.getHeroBanners(),
+          api.getHomeSections(),
           api.getProducts({ isFeatured: true }),
           api.getProducts({ isPopular: true }),
           api.getCategories(),
           api.getProducts({}) // Fetch all to find flash sales
         ]);
+        setHeroBanners(banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
+        setHomeSections(sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
         setFeaturedProducts(featured.slice(0, 8)); // Show more items
         setPopularProducts(popular.slice(0, 4));
         setCategories(cats);
@@ -87,35 +93,92 @@ export const Home = () => {
   return (
     <div className="bg-white pb-20 dark:bg-gray-900 transition-colors duration-300">
 
-      {/* Hero Section */}
-      <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300">
-        <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
-          <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
-            <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
-            <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
-              UP TO <span className="text-primary">70%</span> OFF
-            </h1>
-            <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
-              Discover the hottest trends of the season. Shop the collection now before it's gone.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
-              <Link to="/products" className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200">
-                Shop Now
-              </Link>
-              <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
-                Sell Now
-              </Link>
+      {/* Hero Section - Dynamic from CMS */}
+      {heroBanners.length > 0 ? (
+        heroBanners.map((banner) => (
+          <div 
+            key={banner.id} 
+            className="relative transition-colors duration-300"
+            style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
+          >
+            <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
+              <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
+                {banner.subtitle && (
+                  <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">
+                    {banner.subtitle}
+                  </span>
+                )}
+                <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
+                  {banner.title}
+                </h1>
+                {banner.description && (
+                  <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
+                    {banner.description}
+                  </p>
+                )}
+                <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
+                  {banner.cta_text && (
+                    <Link 
+                      to={banner.cta_link || '/products'} 
+                      className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200"
+                    >
+                      {banner.cta_text}
+                    </Link>
+                  )}
+                  <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
+                    Sell Now
+                  </Link>
+                </div>
+              </div>
+              <div className="relative h-[400px] md:h-auto overflow-hidden">
+                {banner.image ? (
+                  <img
+                    src={banner.image}
+                    alt={banner.title}
+                    className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                  />
+                ) : (
+                  <img
+                    src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
+                    alt="Fashion Model"
+                    className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+                  />
+                )}
+              </div>
             </div>
           </div>
-          <div className="relative h-[400px] md:h-auto overflow-hidden">
-            <img
-              src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
-              alt="Fashion Model"
-              className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
-            />
+        ))
+      ) : (
+        /* Default Hero Section (if no CMS banners) */
+        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300">
+          <div className="max-w-[1600px] mx-auto grid md:grid-cols-2">
+            <div className="flex flex-col justify-center px-8 py-16 md:py-24 lg:px-16 text-center md:text-left z-10">
+              <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
+              <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
+                UP TO <span className="text-primary">70%</span> OFF
+              </h1>
+              <p className="text-gray-600 text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300">
+                Discover the hottest trends of the season. Shop the collection now before it's gone.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
+                <Link to="/products" className="px-10 py-4 bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200">
+                  Shop Now
+                </Link>
+                <Link to="/register" className="px-10 py-4 bg-white border border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black">
+                  Sell Now
+                </Link>
+              </div>
+            </div>
+            <div className="relative h-[400px] md:h-auto overflow-hidden">
+              <img
+                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
+                alt="Fashion Model"
+                className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
+              />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Categories Row */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 overflow-x-auto pb-4 hide-scrollbar">

@@ -13,8 +13,8 @@ from django.conf import settings
 import random
 from decimal import Decimal
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon, HeroBanner, HomePageSection
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer, HeroBannerSerializer, HomePageSectionSerializer
 
 # ...
 
@@ -828,3 +828,27 @@ class CouponViewSet(viewsets.ModelViewSet):
                 'discount_value': str(coupon.discount_value),
             }
         })
+
+
+class HeroBannerViewSet(viewsets.ModelViewSet):
+    queryset = HeroBanner.objects.all().order_by('display_order', '-created_at')
+    serializer_class = HeroBannerSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role == 'admin':
+            return super().get_queryset()
+        # Non-admins see only active banners
+        return HeroBanner.objects.filter(is_active=True)
+
+
+class HomePageSectionViewSet(viewsets.ModelViewSet):
+    queryset = HomePageSection.objects.all().order_by('display_order', '-created_at')
+    serializer_class = HomePageSectionSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role == 'admin':
+            return super().get_queryset()
+        # Non-admins see only active sections
+        return HomePageSection.objects.filter(is_active=True)

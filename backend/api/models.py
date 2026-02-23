@@ -236,3 +236,55 @@ class Coupon(models.Model):
 
     def __str__(self):
         return self.code
+
+
+class HeroBanner(models.Model):
+    """Homepage hero banner management"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    subtitle = models.CharField(max_length=500, blank=True)
+    description = models.TextField(blank=True)
+    image = models.TextField(blank=True, null=True)  # Base64 or URL
+    background_color = models.CharField(max_length=7, default='#f6f6f6')  # Hex color
+    cta_text = models.CharField(max_length=100, blank=True)
+    cta_link = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+    display_order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', '-created_at']
+
+    def __str__(self):
+        return self.title
+
+
+class HomePageSection(models.Model):
+    """Manage homepage sections (featured collections, promotional banners, etc.)"""
+    SECTION_TYPE_CHOICES = [
+        ('featured_collection', 'Featured Collection'),
+        ('promotional_banner', 'Promotional Banner'),
+        ('category_showcase', 'Category Showcase'),
+        ('testimonial', 'Testimonial'),
+        ('brand_logo', 'Brand Logo'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    section_type = models.CharField(max_length=50, choices=SECTION_TYPE_CHOICES)
+    description = models.TextField(blank=True)
+    image = models.TextField(blank=True, null=True)  # Main section image
+    images = models.TextField(blank=True, null=True)  # JSON array of image URLs
+    link = models.CharField(max_length=255, blank=True)
+    is_active = models.BooleanField(default=True)
+    display_order = models.IntegerField(default=0)
+    metadata = models.TextField(blank=True, null=True)  # JSON for extra data
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['display_order', '-created_at']
+
+    def __str__(self):
+        return f"{self.section_type} - {self.title}"
