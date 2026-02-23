@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 import { ProductCard } from '../components/ProductCard';
+import { SizeGuideModal } from '../components/SizeGuideModal';
 
 export const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -27,6 +28,7 @@ export const ProductDetail = () => {
     const [activeTab, setActiveTab] = useState<'description' | 'specs' | 'shipping' | 'reviews'>('description');
     const [mainImage, setMainImage] = useState<string>('');
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
     const [reviews, setReviews] = useState<Review[]>([]);
     const [canReview, setCanReview] = useState(false);
@@ -304,7 +306,10 @@ export const ProductDetail = () => {
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Size</label>
-                                        <button className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black dark:hover:text-white transition-colors">
+                                        <button 
+                                            onClick={() => setIsSizeGuideOpen(true)}
+                                            className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black dark:hover:text-white transition-colors"
+                                        >
                                             Size Guide
                                         </button>
                                     </div>
@@ -646,5 +651,12 @@ export const ProductDetail = () => {
                 </div>
             )}
         </div>
+
+        {/* Size Guide Side Modal */}
+        <SizeGuideModal 
+            isOpen={isSizeGuideOpen} 
+            onClose={() => setIsSizeGuideOpen(false)}
+            category={product?.gender === 'Men' ? 'men' : product?.gender === 'Women' ? 'women' : 'unisex'}
+        />
     );
 };
