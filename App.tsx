@@ -21,6 +21,7 @@ import { UserProfile } from './pages/UserProfile';
 import { OrderHistory } from './pages/OrderHistory';
 import { OrderDetail } from './pages/OrderDetail';
 import { FAQ } from './pages/FAQ';
+import { AboutUs } from './pages/AboutUs';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -42,8 +43,8 @@ function App() {
 
                             <Route path="contact" element={<Contact />} />
                             <Route path="faq" element={<FAQ />} />
+                            <Route path="about" element={<AboutUs />} />
                             <Route path="page/:slug" element={<StaticPage />} />
-                            <Route path="about" element={<StaticPage page="about-us" />} />
                             <Route path="terms" element={<StaticPage page="terms" />} />
                             <Route path="privacy" element={<StaticPage page="privacy" />} />
 

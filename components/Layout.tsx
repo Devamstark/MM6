@@ -889,7 +889,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="space-y-4">
               <h3 className="text-sm font-bold text-gray-900 tracking-wider uppercase dark:text-white">Company Info</h3>
               <ul className="space-y-3">
-                <li><Link to="/page/about-us" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">About Us</Link></li>
+                <li><Link to="/about" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">About Us</Link></li>
                 {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Affiliate</Link></li>}
                 <li><Link to="/page/fashion-blogger" className="text-sm text-gray-500 hover:text-primary transition-colors dark:text-gray-400">Fashion Blogger</Link></li>
               </ul>
