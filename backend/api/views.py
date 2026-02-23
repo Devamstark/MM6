@@ -833,22 +833,32 @@ class CouponViewSet(viewsets.ModelViewSet):
 class HeroBannerViewSet(viewsets.ModelViewSet):
     queryset = HeroBanner.objects.all().order_by('display_order', '-created_at')
     serializer_class = HeroBannerSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'admin':
+        if self.request.user.is_authenticated and self.request.user.role == 'admin':
             return super().get_queryset()
-        # Non-admins see only active banners
+        # Public can see only active banners
         return HeroBanner.objects.filter(is_active=True)
+
+    def get_permissions(self):
+        # Allow public to list/retrieve, require admin for create/update/delete
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
 
 
 class HomePageSectionViewSet(viewsets.ModelViewSet):
     queryset = HomePageSection.objects.all().order_by('display_order', '-created_at')
     serializer_class = HomePageSectionSerializer
-    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.user.role == 'admin':
+        if self.request.user.is_authenticated and self.request.user.role == 'admin':
             return super().get_queryset()
-        # Non-admins see only active sections
+        # Public can see only active sections
         return HomePageSection.objects.filter(is_active=True)
+
+    def get_permissions(self):
+        # Allow public to list/retrieve, require admin for create/update/delete
+        if self.action in ['list', 'retrieve']:
+            return [permissions.AllowAny()]
+        return [permissions.IsAuthenticated()]
