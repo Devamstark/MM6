@@ -151,7 +151,7 @@ export const Home = () => {
             {heroBanners.map((banner) => (
               <div
                 key={banner.id}
-                className="relative flex-shrink-0 h-[650px] md:h-[600px] overflow-hidden shadow-sm"
+                className="relative shrink-0 h-[550px] md:h-[500px] overflow-hidden shadow-sm"
                 style={{
                   backgroundColor: banner.background_color || '#f6f6f6',
                   width: '100%'
@@ -164,11 +164,11 @@ export const Home = () => {
                         {banner.subtitle}
                       </span>
                     )}
-                    <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
+                    <h1 className="text-4xl md:text-6xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
                       {banner.title}
                     </h1>
                     {banner.description && (
-                      <p className="text-gray-600 text-base md:text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-3 md:line-clamp-none">
+                      <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3">
                         {banner.description}
                       </p>
                     )}
@@ -238,8 +238,8 @@ export const Home = () => {
                   key={index}
                   onClick={() => goToHeroSlide(index)}
                   className={`w-3 h-3 rounded-full transition-all duration-300 ${currentHeroIndex === index
-                      ? 'bg-black w-8'
-                      : 'bg-black/30 hover:bg-black/50'
+                    ? 'bg-black w-8'
+                    : 'bg-black/30 hover:bg-black/50'
                     }`}
                   aria-label={`Go to slide ${index + 1}`}
                 />
@@ -249,14 +249,14 @@ export const Home = () => {
         </div>
       ) : (
         /* Default Hero Section (if no CMS banners) */
-        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[650px] md:h-[600px] overflow-hidden">
+        <div className="relative bg-[#f6f6f6] dark:bg-gray-800 transition-colors duration-300 h-[550px] md:h-[500px] overflow-hidden">
           <div className="max-w-[1600px] mx-auto grid grid-cols-1 md:grid-cols-2 h-full">
             <div className="flex flex-col justify-center px-8 py-12 md:py-0 md:px-16 text-center md:text-left z-10 h-1/2 md:h-full overflow-hidden">
               <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4 animate-fade-in">Summer Sale</span>
-              <h1 className="text-5xl md:text-7xl font-black text-black leading-tight mb-6 animate-fade-in delay-100 font-heading dark:text-white">
+              <h1 className="text-4xl md:text-6xl font-black text-black leading-tight mb-4 animate-fade-in delay-100 font-heading dark:text-white">
                 UP TO <span className="text-primary">70%</span> OFF
               </h1>
-              <p className="text-gray-600 text-base md:text-lg mb-8 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-3 md:line-clamp-none">
+              <p className="text-gray-600 text-sm md:text-base mb-6 max-w-md animate-fade-in delay-200 dark:text-gray-300 line-clamp-2 md:line-clamp-3">
                 Discover the hottest trends of the season. Shop the collection now before it's gone.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fade-in delay-300">
