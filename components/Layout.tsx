@@ -31,6 +31,21 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [fontScale] = useAtom(fontScaleAtom);
   const [density] = useAtom(densityAtom);
   const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+  // Close user menu when clicking outside
+  React.useEffect(() => {
+    const handleOutsideClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.user-menu-container')) {
+        setIsUserMenuOpen(false);
+      }
+    };
+    if (isUserMenuOpen) {
+      window.addEventListener('click', handleOutsideClick);
+    }
+    return () => window.removeEventListener('click', handleOutsideClick);
+  }, [isUserMenuOpen]);
 
   // Apply Theme Settings
   React.useEffect(() => {
@@ -289,42 +304,68 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
               {/* User Account */}
               {isAuthenticated ? (
-                <div className="relative group">
+                <div className="relative user-menu-container">
                   <button
-                    onClick={() => navigate(isAdmin ? '/admin' : '/profile')}
-                    className="text-gray-900 hover:text-primary transition-colors flex items-center justify-center cursor-pointer dark:text-gray-200"
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className={`text-gray-900 hover:text-primary transition-all flex items-center justify-center cursor-pointer dark:text-gray-200 p-2 rounded-full ${isUserMenuOpen ? 'bg-gray-100 dark:bg-gray-800' : ''}`}
+                    title="Account"
                   >
                     <UserIcon className="w-5 h-5" />
                   </button>
 
-                  {/* Dropdown - Visible on Hover */}
-                  <div className="absolute right-0 top-full pt-2 w-56 hidden group-hover:block z-50">
-                    <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 overflow-hidden animate-fade-in dark:bg-gray-800 dark:border-gray-700">
-                      <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700 mb-2">
-                        <p className="text-sm font-black text-gray-900 truncate dark:text-white">{user?.name}</p>
-                        <p className="text-[10px] font-bold text-gray-500 truncate dark:text-gray-400">{user?.email}</p>
+                  {/* Dropdown - Visible on Click */}
+                  <div className={`absolute right-0 top-full pt-2 w-64 z-50 ${isUserMenuOpen ? 'block animate-fade-in' : 'hidden'}`}>
+                    <div className="bg-white border border-gray-100 shadow-2xl rounded-2xl py-3 overflow-hidden dark:bg-gray-900 dark:border-gray-800">
+                      <div className="px-5 py-4 border-b border-gray-100 dark:border-gray-800 mb-2 bg-gray-50/50 dark:bg-gray-800/30">
+                        <p className="text-sm font-black text-gray-900 truncate dark:text-white mb-0.5">{user?.name}</p>
+                        <p className="text-[10px] font-bold text-gray-400 truncate dark:text-gray-500 uppercase tracking-tighter">{user?.role} Portal • {user?.email}</p>
                       </div>
 
-                      <Link to="/profile" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-700 transition-colors">
-                        <UserIcon className="w-4 h-4 text-gray-400" /> My Profile
-                      </Link>
-
-                      {isAdmin && (
-                        <Link to="/admin" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-indigo-600 dark:hover:bg-gray-700 transition-colors">
-                          <LayoutDashboard className="w-4 h-4" /> Admin Portal
+                      <div className="px-2 space-y-0.5">
+                        <Link
+                          to="/profile"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-gray-50 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                        >
+                          <UserIcon className="w-4 h-4 text-gray-400" /> My Account
                         </Link>
-                      )}
 
-                      {isSeller && (
-                        <Link to="/seller" className="flex items-center gap-3 px-5 py-2.5 text-sm font-bold hover:bg-gray-50 text-orange-600 dark:hover:bg-gray-700 transition-colors">
-                          <Store className="w-4 h-4" /> Seller Studio
+                        {isAdmin && (
+                          <Link
+                            to="/admin"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-indigo-50 text-indigo-600 dark:hover:bg-indigo-900/20 rounded-xl transition-colors"
+                          >
+                            <LayoutDashboard className="w-4 h-4" /> Admin Dashboard
+                          </Link>
+                        )}
+
+                        {isSeller && (
+                          <Link
+                            to="/seller"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-orange-50 text-orange-600 dark:hover:bg-orange-900/20 rounded-xl transition-colors"
+                          >
+                            <Store className="w-4 h-4" /> Seller Studio
+                          </Link>
+                        )}
+
+                        <Link
+                          to="/orders"
+                          onClick={() => setIsUserMenuOpen(false)}
+                          className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-gray-50 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                        >
+                          <Package className="w-4 h-4 text-gray-400" /> Order History
                         </Link>
-                      )}
+                      </div>
 
-                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-700">
+                      <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 px-2 text-center">
                         <button
-                          onClick={handleLogout}
-                          className="w-full flex items-center gap-3 px-5 py-3 text-sm font-black text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all uppercase tracking-widest text-[10px]"
+                          onClick={() => {
+                            handleLogout();
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center justify-center gap-3 px-4 py-3 text-[10px] font-black text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all uppercase tracking-[0.2em]"
                         >
                           <LogOut className="w-4 h-4" /> Sign Out
                         </button>
