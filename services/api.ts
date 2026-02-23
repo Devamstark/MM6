@@ -45,15 +45,90 @@ client.interceptors.request.use((config) => {
   return config;
 });
 
-// Response Interceptor: Error Logging
+// Response Interceptor: Error Logging & Token Refresh
+let isRefreshing = false;
+let failedQueue: any[] = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 client.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
     const { config, response } = error;
+    const originalRequest = config;
     const url = config?.url;
     const method = config?.method?.toUpperCase();
 
     if (response) {
+      // Handle 401 Unauthorized
+      if (response.status === 401 && !originalRequest._retry) {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers.Authorization = `Bearer ${token}`;
+              return client(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        const refreshToken = localStorage.getItem('cm_refresh');
+        if (refreshToken) {
+          try {
+            const refreshResponse = await axios.post(`${API_URL}/auth/refresh/`, {
+              refresh: refreshToken,
+            });
+            const { access } = refreshResponse.data;
+
+            localStorage.setItem('cm_token', access);
+            client.defaults.headers.common.Authorization = `Bearer ${access}`;
+            originalRequest.headers.Authorization = `Bearer ${access}`;
+
+            processQueue(null, access);
+            isRefreshing = false;
+
+            return client(originalRequest);
+          } catch (refreshError) {
+            processQueue(refreshError, null);
+            isRefreshing = false;
+
+            // Refresh failed - Logout user
+            localStorage.removeItem('cm_token');
+            localStorage.removeItem('cm_refresh');
+            localStorage.removeItem('cm_user_data');
+
+            // For production/VPS: redirect if we're on a path that needs auth
+            const protectedPaths = ['/admin', '/dashboard', '/profile', '/checkout', '/orders', '/seller'];
+            if (protectedPaths.some(path => window.location.pathname.startsWith(path))) {
+              window.location.href = '/login?expired=true';
+            }
+
+            return Promise.reject(refreshError);
+          }
+        } else {
+          // No refresh token - logout
+          localStorage.removeItem('cm_token');
+          localStorage.removeItem('cm_refresh');
+          localStorage.removeItem('cm_user_data');
+          // Don't redirect immediately to avoid breaking public page views that just happen to fail on a bg call
+        }
+      }
+
       // Server responded with error status
       console.error(`[API Error] ${method} ${url}`, {
         status: response.status,
@@ -508,21 +583,21 @@ export const api = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    const response = await client.get('/products/');
+    const response = await client.get('products/');
     const products = response.data;
     const categories = new Set(products.map((p: any) => p.category));
     return Array.from(categories) as string[];
   },
 
   getBrands: async (): Promise<string[]> => {
-    const response = await client.get('/products/');
+    const response = await client.get('products/');
     const products = response.data;
     const brands = new Set(products.map((p: any) => p.brand));
     return Array.from(brands) as string[];
   },
 
   getSubcategories: async (category?: string): Promise<string[]> => {
-    const response = await client.get('/products/');
+    const response = await client.get('products/');
     const products = response.data;
     const subcats = new Set<string>();
     products.forEach((p: any) => {

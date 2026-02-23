@@ -35,6 +35,13 @@ export const Auth = () => {
     setSuccessMessage('');
   };
 
+  // Check for expired session
+  useEffect(() => {
+    if (searchParams.get('expired') === 'true') {
+      setErrors({ submit: 'Your session has expired. Please login again.' });
+    }
+  }, []);
+
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
