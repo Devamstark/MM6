@@ -14,6 +14,7 @@ export const Home = () => {
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -27,24 +28,28 @@ export const Home = () => {
     if (heroBanners.length <= 1) return;
 
     const interval = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+      setIsTransitioning(true);
+      setCurrentHeroIndex((prev) => prev + 1);
     }, 10000);
 
     return () => clearInterval(interval);
   }, [heroBanners.length]);
 
   const goToPreviousHero = () => {
-    if (heroBanners.length <= 1) return;
-    setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
+    if (heroBanners.length <= 1 || !isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentHeroIndex((prev) => prev === 0 ? heroBanners.length - 1 : prev - 1);
   };
 
   const goToNextHero = () => {
-    if (heroBanners.length <= 1) return;
-    setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+    if (heroBanners.length <= 1 || !isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentHeroIndex((prev) => prev + 1);
   };
 
   const goToHeroSlide = (index: number) => {
     if (heroBanners.length <= 1) return;
+    setIsTransitioning(true);
     setCurrentHeroIndex(index);
   };
 
@@ -121,87 +126,110 @@ export const Home = () => {
       {heroBanners.length > 0 ? (
         <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
           {/* Slides Container */}
-          <div className="relative w-full h-full">
-            {heroBanners.map((banner, index) => (
-              <div
-                key={banner.id}
-                className={`absolute inset-0 w-full h-full overflow-hidden transition-opacity duration-1000 ease-in-out ${currentHeroIndex === index ? 'opacity-100 z-10 pointer-events-auto' : 'opacity-0 z-0 pointer-events-none'
-                  }`}
-                style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
-              >
-                <div className="max-w-[1600px] mx-auto h-full px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center">
-                  {/* Text Container */}
-                  <div className={`w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0 transition-all duration-700 transform ${currentHeroIndex === index ? 'translate-y-0 opacity-100 delay-300' : 'translate-y-4 opacity-0'}`}>
-                    {banner.subtitle && (
-                      <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">
-                        {banner.subtitle}
-                      </span>
-                    )}
-                    <h1
-                      className="font-black text-black leading-tight mb-6 font-heading dark:text-white"
-                      style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.75rem)` }}
-                    >
-                      {banner.title}
-                    </h1>
-                    {banner.description && (
-                      <p
-                        className="text-gray-600 mb-8 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3"
-                        style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
+          <div
+            className={`flex h-full ${isTransitioning ? 'transition-transform duration-700 ease-in-out will-change-transform' : ''}`}
+            style={{ transform: `translateX(-${currentHeroIndex * 100}%)` }}
+            onTransitionEnd={() => {
+              if (currentHeroIndex === heroBanners.length) {
+                // If we reached the clone (last item), jump back to the first real item instantly
+                setIsTransitioning(false);
+                setCurrentHeroIndex(0);
+              } else if (currentHeroIndex === -1) { // This case is for going from 0 to -1 (effectively last real item)
+                setIsTransitioning(false);
+                setCurrentHeroIndex(heroBanners.length - 1);
+              }
+            }}
+          >
+            {[...heroBanners, heroBanners[0]].map((banner, index) => {
+              // Ensure we have a valid banner before rendering
+              if (!banner) return null;
+
+              // Determine if this slide's content should be active for animation
+              // It's active if it's the current real index, or if it's the clone and we're on the clone
+              const isActiveContent = (currentHeroIndex === index) ||
+                (currentHeroIndex === heroBanners.length && index === 0) ||
+                (currentHeroIndex === -1 && index === heroBanners.length - 1);
+
+              return (
+                <div
+                  key={`${banner.id}-${index}`}
+                  className="w-full h-full shrink-0 relative overflow-hidden"
+                  style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
+                >
+                  <div className="max-w-[1600px] mx-auto h-full px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center">
+                    {/* Text Container */}
+                    <div className={`w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0 transition-opacity duration-700 ${isActiveContent ? 'opacity-100' : 'opacity-0'}`}>
+                      {banner.subtitle && (
+                        <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">
+                          {banner.subtitle}
+                        </span>
+                      )}
+                      <h1
+                        className="font-black text-black leading-tight mb-6 font-heading dark:text-white"
+                        style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.75rem)` }}
                       >
-                        {banner.description}
-                      </p>
-                    )}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                      {banner.cta_text && (
+                        {banner.title}
+                      </h1>
+                      {banner.description && (
+                        <p
+                          className="text-gray-600 mb-8 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                          style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
+                        >
+                          {banner.description}
+                        </p>
+                      )}
+                      <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                        {banner.cta_text && (
+                          <Link
+                            to={banner.cta_link || '/products'}
+                            className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-14 px-10"
+                            style={{
+                              height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
+                              padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
+                              fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 0.875rem)`
+                            }}
+                          >
+                            {banner.cta_text}
+                          </Link>
+                        )}
                         <Link
-                          to={banner.cta_link || '/products'}
-                          className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-14 px-10"
+                          to="/register"
+                          className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-14 px-10"
                           style={{
                             height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
                             padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
                             fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 0.875rem)`
                           }}
                         >
-                          {banner.cta_text}
+                          Sell Now
                         </Link>
+                      </div>
+                    </div>
+
+                    {/* Image Container */}
+                    <div className={`w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last transition-transform duration-1000 ${isActiveContent ? 'scale-100' : 'scale-105'}`}>
+                      {banner.image ? (
+                        <img
+                          src={banner.image}
+                          alt={banner.title}
+                          loading={index === 0 ? "eager" : "lazy"}
+                          fetchPriority={index === 0 ? "high" : "auto"}
+                          className="absolute inset-0 w-full h-full"
+                          style={{
+                            objectFit: (banner.image_fit as any) || 'cover',
+                            objectPosition: banner.image_position || 'center'
+                          }}
+                        />
+                      ) : (
+                        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center transition-colors">
+                          <Loader2 className="animate-spin text-gray-400 w-8 h-8" />
+                        </div>
                       )}
-                      <Link
-                        to="/register"
-                        className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-14 px-10"
-                        style={{
-                          height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
-                          padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
-                          fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 0.875rem)`
-                        }}
-                      >
-                        Sell Now
-                      </Link>
                     </div>
                   </div>
-
-                  {/* Image Container */}
-                  <div className={`w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last transition-all duration-1000 transform ${currentHeroIndex === index ? 'scale-100' : 'scale-105'}`}>
-                    {banner.image ? (
-                      <img
-                        src={banner.image}
-                        alt={banner.title}
-                        loading={index === 0 ? "eager" : "lazy"}
-                        fetchPriority={index === 0 ? "high" : "auto"}
-                        className="absolute inset-0 w-full h-full"
-                        style={{
-                          objectFit: (banner.image_fit as any) || 'cover',
-                          objectPosition: banner.image_position || 'center'
-                        }}
-                      />
-                    ) : (
-                      <div className="absolute inset-0 bg-gray-200 flex items-center justify-center transition-colors">
-                        <Loader2 className="animate-spin text-gray-400 w-8 h-8" />
-                      </div>
-                    )}
-                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            })}
           </div>
 
           {/* Navigation Arrows */}
@@ -227,17 +255,22 @@ export const Home = () => {
           {/* Navigation Dots */}
           {heroBanners.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-              {heroBanners.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToHeroSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${currentHeroIndex === index
-                    ? 'bg-black w-8'
-                    : 'bg-black/30 hover:bg-black/50'
-                    }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
+              {heroBanners.map((_, index) => {
+                const isDotActive = currentHeroIndex === index ||
+                  (currentHeroIndex === heroBanners.length && index === 0) ||
+                  (currentHeroIndex === -1 && index === heroBanners.length - 1);
+                return (
+                  <button
+                    key={index}
+                    onClick={() => goToHeroSlide(index)}
+                    className={`w-3 h-3 rounded-full transition-all duration-300 ${isDotActive
+                      ? 'bg-black w-8'
+                      : 'bg-black/30 hover:bg-black/50'
+                      }`}
+                    aria-label={`Go to slide ${index + 1}`}
+                  />
+                )
+              })}
             </div>
           )}
         </div>
