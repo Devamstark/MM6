@@ -13,6 +13,20 @@ FROM nginx:alpine
 COPY --from=builder /app/dist /usr/share/nginx/html
 EXPOSE 80
 # SPA Configuration: redirect all 404s to index.html
-RUN echo 'server { listen 80; root /usr/share/nginx/html; index index.html; location / { try_files $uri $uri/ /index.html; } }' > /etc/nginx/conf.d/default.conf
+# SPA Configuration: hardened Nginx config
+RUN echo 'server { \
+    listen 80; \
+    root /usr/share/nginx/html; \
+    index index.html; \
+    # Deny access to hidden files and directories \
+    location ~ /\. { deny all; } \
+    # Deny access to potentially sensitive files \
+    location ~ \.(env|php|bak|sql|zip|tar|gz|config|log)$ { \
+    deny all; \
+    } \
+    location / { \
+    try_files $uri $uri/ /index.html; \
+    } \
+    }' > /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
