@@ -8,19 +8,19 @@ interface SizeGuideModalProps {
 }
 
 const menSizes = [
-    { size: 'S', chest: '34-36"', waist: '28-30"', hips: '34-36"', length: '27"' },
-    { size: 'M', chest: '38-40"', waist: '32-34"', hips: '38-40"', length: '28"' },
-    { size: 'L', chest: '42-44"', waist: '36-38"', hips: '42-44"', length: '29"' },
-    { size: 'XL', chest: '46-48"', waist: '40-42"', hips: '46-48"', length: '30"' },
-    { size: 'XXL', chest: '50-52"', waist: '44-46"', hips: '50-52"', length: '31"' },
+    { size: 'S', chest: '34-36', waist: '28-30', hips: '34-36', length: '27' },
+    { size: 'M', chest: '38-40', waist: '32-34', hips: '38-40', length: '28' },
+    { size: 'L', chest: '42-44', waist: '36-38', hips: '42-44', length: '29' },
+    { size: 'XL', chest: '46-48', waist: '40-42', hips: '46-48', length: '30' },
+    { size: 'XXL', chest: '50-52', waist: '44-46', hips: '50-52', length: '31' },
 ];
 
 const womenSizes = [
-    { size: 'XS', bust: '30-32"', waist: '22-24"', hips: '32-34"' },
-    { size: 'S', bust: '32-34"', waist: '24-26"', hips: '34-36"' },
-    { size: 'M', bust: '36-38"', waist: '28-30"', hips: '38-40"' },
-    { size: 'L', bust: '40-42"', waist: '32-34"', hips: '42-44"' },
-    { size: 'XL', bust: '44-46"', waist: '36-38"', hips: '46-48"' },
+    { size: 'XS', bust: '30-32', waist: '22-24', hips: '32-34' },
+    { size: 'S', bust: '32-34', waist: '24-26', hips: '34-36' },
+    { size: 'M', bust: '36-38', waist: '28-30', hips: '38-40' },
+    { size: 'L', bust: '40-42', waist: '32-34', hips: '42-44' },
+    { size: 'XL', bust: '44-46', waist: '36-38', hips: '46-48' },
 ];
 
 export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGuideModalProps) => {
@@ -140,23 +140,23 @@ export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGui
                                             </td>
                                             {'chest' in sizeData && (
                                                 <td className="text-center py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                    {sizeData.chest}
+                                                    {sizeData.chest}"
                                                 </td>
                                             )}
                                             {'bust' in sizeData && (
                                                 <td className="text-center py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                    {sizeData.bust}
+                                                    {sizeData.bust}"
                                                 </td>
                                             )}
                                             <td className="text-center py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                {sizeData.waist}
+                                                {sizeData.waist}"
                                             </td>
                                             <td className="text-center py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                {sizeData.hips}
+                                                {sizeData.hips}"
                                             </td>
                                             {'length' in sizeData && (
                                                 <td className="text-center py-3 px-3 text-gray-600 dark:text-gray-400">
-                                                    {sizeData.length}
+                                                    {sizeData.length}"
                                                 </td>
                                             )}
                                         </tr>
