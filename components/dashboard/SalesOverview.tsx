@@ -62,7 +62,7 @@ export const SalesOverview: React.FC<SalesOverviewProps> = ({ stats, orders }) =
                 <div
                     key={idx}
                     className={cn(
-                        "p-6 rounded-[2rem] text-white flex flex-col justify-between min-h-[160px] shadow-lg transition-transform hover:-translate-y-1 duration-300",
+                        "p-6 rounded-4xl text-white flex flex-col justify-between min-h-[160px] shadow-lg transition-transform hover:-translate-y-1 duration-300",
                         card.bg
                     )}
                 >

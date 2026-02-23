@@ -183,11 +183,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Women's Mega Menu */}
-                <div className="absolute top-full -left-20 w-[800px] bg-white shadow-xl border-t border-gray-100 hidden group-hover:block p-8 z-50 animate-fade-in">
+                <div className="absolute top-full -left-20 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors">
                   <div className="grid grid-cols-4 gap-8">
                     <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Dresses</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
+                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Dresses</h4>
+                      <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
                         <li><Link to="/products?category=Women&subcategory=Casual+Dresses" className="hover:text-primary hover:underline">Casual Dresses</Link></li>
                         <li><Link to="/products?category=Women&subcategory=Evening+Dresses" className="hover:text-primary hover:underline">Evening Dresses</Link></li>
                         <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" className="hover:text-primary hover:underline">Maxi Dresses</Link></li>
@@ -230,11 +230,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Men's Mega Menu */}
-                <div className="absolute top-full -left-20 w-[800px] bg-white shadow-xl border-t border-gray-100 hidden group-hover:block p-8 z-50 animate-fade-in">
+                <div className="absolute top-full -left-20 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors">
                   <div className="grid grid-cols-4 gap-8">
                     <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
+                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Tops</h4>
+                      <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
                         <li><Link to="/products?category=Men&subcategory=T-Shirts" className="hover:text-primary hover:underline">T-Shirts</Link></li>
                         <li><Link to="/products?category=Men&subcategory=Shirts" className="hover:text-primary hover:underline">Shirts</Link></li>
                         <li><Link to="/products?category=Men&subcategory=Polos" className="hover:text-primary hover:underline">Polos</Link></li>
@@ -413,20 +413,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Search Overlay */}
           {searchOpen && (
-            <div className="absolute top-16 left-0 w-full bg-white border-b border-gray-100 shadow-2xl p-8 z-40 animate-fade-in max-h-[85vh] overflow-y-auto">
+            <div className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-2xl p-8 z-40 animate-fade-in max-h-[85vh] overflow-y-auto transition-colors">
               <div className="max-w-4xl mx-auto">
                 <form onSubmit={handleSearch} className="relative group">
-                  <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black transition-colors" />
+                  <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
                   <input
                     autoFocus
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search for items, brands, or categories..."
-                    className="w-full text-3xl font-bold border-none pl-12 py-6 focus:outline-none placeholder:text-gray-200"
+                    className="w-full text-3xl font-bold border-none pl-12 py-6 focus:outline-none placeholder:text-gray-200 dark:text-white dark:placeholder:text-gray-600"
                   />
                   {searchQuery && (
-                    <button type="button" onClick={() => setSearchQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 rounded-full transition-colors">
-                      <X className="w-5 h-5 text-gray-400" />
+                    <button type="button" onClick={() => setSearchQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                      <X className="w-5 h-5 text-gray-400 dark:text-gray-500" />
                     </button>
                   )}
                   <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-2xl hover:bg-gray-800 transition-all">
@@ -434,26 +434,26 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   </button>
                 </form>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8 pt-8 border-t border-gray-50">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8 pt-8 border-t border-gray-50 dark:border-gray-800 transition-colors">
                   {/* Left Column: Recent & Trending */}
                   <div className="space-y-8">
                     {recentSearches.length > 0 && (
                       <div>
                         <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                          <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
                             <History className="w-3 h-3" /> Recent Searches
                           </h4>
-                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('ss_recent_searches'); }} className="text-[10px] font-bold text-gray-300 hover:text-red-500 uppercase tracking-tighter">Clear All</button>
+                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('ss_recent_searches'); }} className="text-[10px] font-bold text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 uppercase tracking-tighter">Clear All</button>
                         </div>
                         <div className="space-y-2">
                           {recentSearches.map((s, idx) => (
                             <button
                               key={idx}
                               onClick={() => handleSearch(undefined, s)}
-                              className="flex items-center gap-3 w-full text-left py-2 px-3 hover:bg-gray-50 rounded-xl transition-all group"
+                              className="flex items-center gap-3 w-full text-left py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all group"
                             >
-                              <Clock className="w-4 h-4 text-gray-300 group-hover:text-black" />
-                              <span className="text-sm font-semibold text-gray-600 group-hover:text-black">{s}</span>
+                              <Clock className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-black dark:group-hover:text-white" />
+                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white">{s}</span>
                             </button>
                           ))}
                         </div>
@@ -461,7 +461,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     )}
 
                     <div>
-                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2 mb-4">
+                      <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-4">
                         <TrendingUp className="w-3 h-3" /> Trending
                       </h4>
                       <div className="flex flex-wrap gap-2">
@@ -469,7 +469,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                           <button
                             key={t}
                             onClick={() => handleSearch(undefined, t)}
-                            className="px-4 py-2 bg-gray-50 text-gray-600 text-xs font-bold rounded-full hover:bg-black hover:text-white transition-all shadow-sm border border-gray-100"
+                            className="px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-sm border border-gray-100 dark:border-gray-700"
                           >
                             {t}
                           </button>
@@ -777,25 +777,25 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     Your Cart
                     <span className="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200 shadow-sm">{itemCount} items</span>
                   </h2>
-                  <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 p-2 hover:bg-gray-200 rounded-full transition-colors">
+                  <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
                     <X className="h-6 w-6" />
                   </button>
                 </div>
 
                 {/* Items List - Scrollable Area */}
-                <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/30">
+                <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/30 dark:bg-black/20 transition-colors">
                   {items.length === 0 ? (
                     <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-6">
                       <div className="w-24 h-24 bg-primary/5 rounded-3xl flex items-center justify-center transform rotate-3">
                         <ShoppingCart className="w-10 h-10 text-primary/50" />
                       </div>
                       <div className="space-y-2">
-                        <p className="text-xl font-bold text-gray-900">Your cart is empty</p>
-                        <p className="text-sm text-gray-500 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+                        <p className="text-xl font-bold text-gray-900 dark:text-white">Your cart is empty</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
                       </div>
                       <button
                         onClick={() => { setCartOpen(false); navigate('/products'); }}
-                        className="px-8 py-3 bg-white border border-gray-200 text-primary font-bold rounded-full hover:bg-gray-50 hover:shadow-md transition-all"
+                        className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-primary font-bold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md transition-all"
                       >
                         Start Shopping
                       </button>
@@ -803,8 +803,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                   ) : (
                     <ul className="space-y-4">
                       {items.map((item) => (
-                        <li key={item.id} className="flex p-4 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all group">
-                          <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                        <li key={item.id} className="flex p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all group">
+                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
                             <img
                               src={item.imageUrl}
                               alt={item.name}
@@ -814,26 +814,26 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
                           <div className="ml-4 flex flex-1 flex-col justify-between">
                             <div>
-                              <div className="flex justify-between text-base font-medium text-gray-900">
+                              <div className="flex justify-between text-base font-medium text-gray-900 dark:text-white">
                                 <h3 className="line-clamp-2 pr-4 leading-tight">{item.name}</h3>
                                 <p className="whitespace-nowrap font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</p>
                               </div>
-                              <p className="mt-1 text-sm text-gray-500">{item.brand}</p>
+                              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.brand}</p>
                             </div>
 
                             <div className="flex items-center justify-between mt-3">
                               {/* Quantity Controls */}
-                              <div className="flex items-center bg-gray-50 rounded-full border border-gray-200 shadow-sm">
+                              <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
                                 <button
                                   onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  className="p-1.5 hover:bg-white hover:text-red-500 rounded-full transition-colors text-gray-400 m-1"
+                                  className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500 rounded-full transition-colors text-gray-400 m-1"
                                 >
                                   {item.quantity === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
                                 </button>
-                                <span className="px-2 text-sm font-semibold text-gray-900 min-w-[1.5rem] text-center">{item.quantity}</span>
+                                <span className="px-2 text-sm font-semibold text-gray-900 dark:text-white min-w-6 text-center">{item.quantity}</span>
                                 <button
                                   onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="p-1.5 hover:bg-white hover:text-primary rounded-full transition-colors text-gray-400 m-1"
+                                  className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-primary rounded-full transition-colors text-gray-400 m-1"
                                 >
                                   <Plus className="w-4 h-4" />
                                 </button>
@@ -877,7 +877,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         </div>
       )}
 
-      <main className="flex-grow">
+      <main className="grow">
         {children}
       </main>
 
@@ -922,13 +922,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <p className="text-sm text-gray-500 dark:text-gray-400">Sign up for our newsletter to get updates on new arrivals and special offers.</p>
               <div className="flex space-x-4 pt-2">
                 {/* Social Icons Placeholder */}
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">FB</span>
                 </div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">IG</span>
                 </div>
-                <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
+                <div className="w-8 h-8 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center text-gray-400 hover:bg-primary/10 hover:text-primary transition-all cursor-pointer">
                   <span className="font-bold text-xs">TW</span>
                 </div>
               </div>
@@ -936,7 +936,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           </div>
 
-          <div className="mt-12 pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
+          <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800 flex flex-col md:flex-row justify-between items-center">
             <p className="text-sm text-gray-400">
               &copy; 2026 SmartShop Inc. All rights reserved.
             </p>

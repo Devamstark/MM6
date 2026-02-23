@@ -114,20 +114,20 @@ export const DashboardCharts: React.FC<DashboardChartsProps> = ({ orders, produc
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
                 <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Weekly Revenue</h3>
-                    <span className="text-xs font-black text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full uppercase tracking-widest">7 Day Trend</span>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Weekly Revenue</h3>
+                    <span className="text-xs font-black text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-full uppercase tracking-widest">7 Day Trend</span>
                 </div>
                 <div className="h-[300px]">
                     <Line data={weeklySalesData} options={options} />
                 </div>
             </div>
 
-            <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-gray-100">
+            <div className="bg-white dark:bg-gray-900 p-8 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
                 <div className="flex justify-between items-center mb-8">
-                    <h3 className="text-xl font-black text-gray-900 tracking-tight">Best Sellers</h3>
-                    <span className="text-xs font-black text-purple-600 bg-purple-50 px-3 py-1 rounded-full uppercase tracking-widest">Top Performance</span>
+                    <h3 className="text-xl font-black text-gray-900 dark:text-white tracking-tight">Best Sellers</h3>
+                    <span className="text-xs font-black text-purple-600 bg-purple-50 dark:bg-purple-900/30 px-3 py-1 rounded-full uppercase tracking-widest">Top Performance</span>
                 </div>
                 <div className="h-[300px]">
                     <Bar data={bestSellersData} options={options} />

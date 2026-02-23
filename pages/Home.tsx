@@ -67,11 +67,11 @@ export const Home = () => {
 
   if (user?.role === 'admin' || user?.role === 'seller') return null;
 
-  if (loading) return <div className="flex justify-center py-40 bg-white"><Loader2 className="animate-spin text-black w-10 h-10" /></div>;
+  if (loading) return <div className="flex justify-center py-40 bg-white dark:bg-gray-950 transition-colors duration-300"><Loader2 className="animate-spin text-black dark:text-white w-10 h-10" /></div>;
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-40 bg-white text-center px-4">
+      <div className="flex flex-col items-center justify-center py-40 bg-white dark:bg-gray-950 text-center px-4 transition-colors duration-300">
         <h2 className="text-2xl font-bold text-red-600 mb-4">Connection Error</h2>
         <p className="text-gray-600 mb-6">{error}</p>
         <button

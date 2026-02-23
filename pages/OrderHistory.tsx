@@ -93,7 +93,7 @@ export const OrderHistory = () => {
                                 <div className="flex-1 space-y-4">
                                     {(order.items || []).map((item, idx) => (
                                         <div key={idx} className="flex items-center gap-4">
-                                            <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 border border-gray-200">
+                                            <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0 border border-gray-200">
                                                 {item.imageUrl ? (
                                                     <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                                                 ) : (

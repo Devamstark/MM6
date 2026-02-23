@@ -59,7 +59,7 @@ export const Register = () => {
         {/* Referral Banner */}
         {refCode && (
           <div className="flex items-center gap-3 bg-emerald-50 border border-emerald-200 rounded-2xl px-4 py-3 animate-fade-in">
-            <div className="flex-shrink-0 w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
+            <div className="shrink-0 w-8 h-8 bg-emerald-100 rounded-xl flex items-center justify-center">
               <Gift className="w-4 h-4 text-emerald-600" />
             </div>
             <div>
@@ -117,7 +117,7 @@ export const Register = () => {
               onChange={(e) => setIsSeller(e.target.checked)}
               className="h-5 w-5 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
             />
-            <label htmlFor="seller-checkbox" className="ml-3 block text-sm font-medium text-gray-900 flex items-center gap-2 cursor-pointer select-none">
+            <label htmlFor="seller-checkbox" className="ml-3 text-sm font-medium text-gray-900 flex items-center gap-2 cursor-pointer select-none">
               <Store className="w-4 h-4 text-gray-500" />
               I want to sell on SmartShop
             </label>

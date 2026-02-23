@@ -165,7 +165,7 @@ export const UserProfile = () => {
     return (
         <div className="max-w-7xl mx-auto px-4 py-12 flex flex-col md:flex-row gap-8">
             {/* Sidebar */}
-            <aside className="w-full md:w-64 flex-shrink-0 space-y-2">
+            <aside className="w-full md:w-64 shrink-0 space-y-2">
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-6 dark:bg-gray-800 dark:border-gray-700">
                     <div className="flex flex-col items-center text-center">
                         <div className="w-20 h-20 rounded-full bg-gray-100 mb-4 overflow-hidden dark:bg-gray-700">

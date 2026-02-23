@@ -80,17 +80,17 @@ export const Auth = () => {
   const transparentBtn = "py-4 px-12 bg-transparent border-2 border-white text-white font-extrabold rounded-full hover:bg-white hover:text-indigo-900 transition-all duration-300 active:scale-[0.97] uppercase tracking-widest text-xs";
 
   return (
-    <div className="min-h-[85vh] bg-slate-100/50 flex items-center justify-center p-6 font-body">
+    <div className="min-h-[85vh] bg-slate-100/50 dark:bg-slate-950 flex items-center justify-center p-6 font-body transition-colors duration-500">
       {/* Darker background accents */}
-      <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 rounded-full blur-[120px] -z-10"></div>
-      <div className="absolute bottom-[-15%] left-[-10%] w-[40%] h-[40%] bg-purple-200/20 rounded-full blur-[120px] -z-10"></div>
+      <div className="absolute top-[-15%] right-[-10%] w-[50%] h-[50%] bg-indigo-200/30 dark:bg-indigo-900/10 rounded-full blur-[120px] -z-10 transition-colors"></div>
+      <div className="absolute bottom-[-15%] left-[-10%] w-[40%] h-[40%] bg-purple-200/20 dark:bg-purple-900/10 rounded-full blur-[120px] -z-10 transition-colors"></div>
 
       <div className={`auth-wrapper ${isPanelActive ? 'panel-active' : ''}`}>
 
         {/* SIGN UP FORM AREA */}
-        <div className="auth-form-box register-form-box">
-          <form className="auth-form" onSubmit={handleRegisterSubmit}>
-            <h1 className="text-4xl font-black text-slate-950 mb-6 font-display tracking-tight">Create Account</h1>
+        <div className="auth-form-box register-form-box transition-colors">
+          <form className="auth-form dark:bg-slate-900" onSubmit={handleRegisterSubmit}>
+            <h1 className="text-4xl font-black text-slate-950 dark:text-white mb-6 font-display tracking-tight transition-colors">Create Account</h1>
 
             <div className="w-full space-y-4">
               <div className="relative group">
@@ -100,7 +100,7 @@ export const Auth = () => {
                   required
                   value={registerData.name}
                   onChange={(e) => setRegisterData({ ...registerData, name: e.target.value })}
-                  className="auth-input font-medium text-slate-900"
+                  className="auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900"
                   placeholder="Full Name"
                 />
               </div>
@@ -111,7 +111,7 @@ export const Auth = () => {
                   required
                   value={registerData.email}
                   onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
-                  className="auth-input font-medium text-slate-900"
+                  className="auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900"
                   placeholder="Email Address"
                 />
               </div>
@@ -122,18 +122,20 @@ export const Auth = () => {
                   required
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
-                  className="auth-input font-medium text-slate-900"
+                  className="auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900"
                   placeholder="Password"
                 />
               </div>
 
               <div
-                className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${registerData.isSeller ? 'bg-indigo-50 border-indigo-200 shadow-sm' : 'bg-slate-50 border-transparent hover:border-slate-200'}`}
+                className={`flex items-center gap-3 p-4 rounded-2xl border-2 cursor-pointer transition-all ${registerData.isSeller
+                  ? 'bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 shadow-sm'
+                  : 'bg-slate-50 border-transparent dark:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700'}`}
                 onClick={() => setRegisterData({ ...registerData, isSeller: !registerData.isSeller })}
               >
-                <Store className={`w-5 h-5 ${registerData.isSeller ? 'text-indigo-700' : 'text-slate-500'}`} />
-                <span className="text-sm font-black text-slate-800 tracking-tight">Become a Seller</span>
-                <input type="checkbox" checked={registerData.isSeller} readOnly className="ml-auto w-4 h-4 text-indigo-700 rounded-md border-slate-300" />
+                <Store className={`w-5 h-5 ${registerData.isSeller ? 'text-indigo-700 dark:text-indigo-400' : 'text-slate-500'}`} />
+                <span className="text-sm font-black text-slate-800 dark:text-slate-200 tracking-tight">Become a Seller</span>
+                <input type="checkbox" checked={registerData.isSeller} readOnly className="ml-auto w-4 h-4 text-indigo-700 dark:text-indigo-500 rounded-md border-slate-300 dark:border-slate-600 dark:bg-slate-800" />
               </div>
             </div>
 
@@ -159,9 +161,9 @@ export const Auth = () => {
         </div>
 
         {/* SIGN IN FORM AREA */}
-        <div className="auth-form-box login-form-box">
-          <form className="auth-form" onSubmit={handleLoginSubmit}>
-            <h1 className="text-4xl font-black text-slate-950 mb-6 font-display tracking-tight">Sign In</h1>
+        <div className="auth-form-box login-form-box transition-colors">
+          <form className="auth-form dark:bg-slate-900" onSubmit={handleLoginSubmit}>
+            <h1 className="text-4xl font-black text-slate-950 dark:text-white mb-6 font-display tracking-tight transition-colors">Sign In</h1>
 
             <div className="w-full space-y-4">
               <div className="relative group">
@@ -171,7 +173,7 @@ export const Auth = () => {
                   required
                   value={loginData.email}
                   onChange={(e) => setLoginData({ ...loginData, email: e.target.value })}
-                  className="auth-input font-medium text-slate-900"
+                  className="auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900"
                   placeholder="Email Address"
                 />
               </div>
@@ -182,7 +184,7 @@ export const Auth = () => {
                   required
                   value={loginData.password}
                   onChange={(e) => setLoginData({ ...loginData, password: e.target.value })}
-                  className="auth-input font-medium text-slate-900"
+                  className="auth-input font-medium text-slate-900 dark:text-white dark:bg-slate-800 dark:border-slate-800 focus:dark:bg-slate-900"
                   placeholder="Password"
                 />
                 <button
@@ -266,6 +268,13 @@ export const Auth = () => {
                     max-width: 100%;
                     min-height: 650px;
                     border: 1px solid rgba(255, 255, 255, 0.1);
+                    transition: all 0.5s ease;
+                }
+
+                .dark .auth-wrapper {
+                    background-color: #0f172a;
+                    border-color: rgba(255, 255, 255, 0.05);
+                    box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.5);
                 }
 
                 .auth-form-box {
@@ -376,8 +385,12 @@ export const Auth = () => {
                     padding: 0 80px;
                     height: 100%;
                     text-align: center;
+                    transition: background-color 0.5s ease;
                 }
 
+                .dark .auth-form {
+                    background-color: #0f172a;
+                }
                 .auth-input {
                     background-color: #f1f5f9;
                     border: 2px solid transparent;

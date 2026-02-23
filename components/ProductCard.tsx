@@ -62,7 +62,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
             />
 
             {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             {/* Badges */}
             <div className="absolute top-2 left-2 flex flex-col gap-1.5">
@@ -86,7 +86,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
           </div>
 
           {/* Content */}
-          <div className="p-3 flex flex-col flex-grow text-center">
+          <div className="p-3 flex flex-col grow text-center">
             <div className="mb-1 text-[9px] text-gray-400 font-bold uppercase tracking-[0.15em] font-sans">
               {product.brand || product.category}
             </div>

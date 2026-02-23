@@ -151,7 +151,7 @@ export const ProductDetail = () => {
                 <div className="mb-6">
                     <button
                         onClick={() => navigate(-1)}
-                        className="flex items-center text-[10px] uppercase font-bold text-gray-400 hover:text-black transition-colors"
+                        className="flex items-center text-[10px] uppercase font-bold text-gray-400 hover:text-black dark:hover:text-white transition-colors"
                     >
                         <ArrowLeft className="w-3 h-3 mr-1.5" />
                         Back
@@ -170,8 +170,8 @@ export const ProductDetail = () => {
                                     <button
                                         key={idx}
                                         onMouseEnter={() => setMainImage(img)}
-                                        className={`w-16 h-16 rounded-sm overflow-hidden border transition-all p-0.5 flex-shrink-0
-                                            ${mainImage === img ? 'border-orange-500 ring-1 ring-orange-500' : 'border-gray-100 hover:border-gray-300'}`}
+                                        className={`w-16 h-16 rounded-sm overflow-hidden border transition-all p-0.5 shrink-0
+                                            ${mainImage === img ? 'border-orange-500 ring-1 ring-orange-500' : 'border-gray-100 dark:border-gray-800 hover:border-gray-300 dark:hover:border-gray-600'}`}
                                     >
                                         <img
                                             src={img}
@@ -205,8 +205,8 @@ export const ProductDetail = () => {
                                         <button
                                             key={idx}
                                             onClick={() => setMainImage(img)}
-                                            className={`w-16 h-16 flex-shrink-0 rounded-sm overflow-hidden border transition-all
-                                                ${mainImage === img ? 'border-orange-500' : 'border-gray-100'}`}
+                                            className={`w-16 h-16 shrink-0 rounded-sm overflow-hidden border transition-all
+                                                ${mainImage === img ? 'border-orange-500' : 'border-gray-100 dark:border-gray-800'}`}
                                         >
                                             <img
                                                 src={img}
@@ -266,19 +266,19 @@ export const ProductDetail = () => {
                             )}
                         </div>
 
-                        <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-gray-400 border-b border-gray-100 pb-4">
+                        <div className="flex items-center gap-2 text-[10px] uppercase font-bold text-gray-400 border-b border-gray-100 dark:border-gray-800 pb-4">
                             <span className={`w-1.5 h-1.5 rounded-full ${isOutOfStock ? 'bg-red-500' : 'bg-green-500'}`}></span>
                             {isOutOfStock ? 'Out of Stock' : 'In Stock & Ready to ship'}
                         </div>
 
                         {/* Selection Area */}
-                        <div className="space-y-6 border-b border-gray-100 pb-6">
+                        <div className="space-y-6 border-b border-gray-100 dark:border-gray-800 pb-6">
                             {/* Color Selector */}
                             {product.colors && product.colors.length > 0 && (
                                 <div>
                                     <div className="flex items-center gap-2 mb-3">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Color</label>
-                                        <span className="text-[10px] text-gray-900 uppercase font-bold">{selectedColor}</span>
+                                        <span className="text-[10px] text-gray-900 dark:text-gray-100 uppercase font-bold">{selectedColor}</span>
                                     </div>
                                     <div className="flex flex-wrap gap-2">
                                         {product.colors.map(color => (
@@ -286,7 +286,7 @@ export const ProductDetail = () => {
                                                 key={color}
                                                 onClick={() => setSelectedColor(color)}
                                                 className={`w-8 h-8 rounded-full transition-all p-0.5 border
-                                                    ${selectedColor === color ? 'border-black ring-1 ring-black ring-offset-2' : 'border-gray-200 hover:border-gray-400'}`}
+                                                    ${selectedColor === color ? 'border-black dark:border-white ring-1 ring-black dark:ring-white ring-offset-2 dark:ring-offset-gray-900' : 'border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500'}`}
                                                 title={color}
                                             >
                                                 <div
@@ -304,7 +304,7 @@ export const ProductDetail = () => {
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Size</label>
-                                        <button className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black">
+                                        <button className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black dark:hover:text-white transition-colors">
                                             Size Guide
                                         </button>
                                     </div>
@@ -315,8 +315,8 @@ export const ProductDetail = () => {
                                                 onClick={() => setSelectedSize(size)}
                                                 className={`py-3 rounded-sm font-bold text-[11px] uppercase transition-all border
                                                     ${selectedSize === size
-                                                        ? 'bg-black text-white border-black'
-                                                        : 'border-gray-200 text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:text-gray-300'}`}
+                                                        ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white'
+                                                        : 'border-gray-200 text-gray-600 hover:border-gray-400 dark:border-gray-700 dark:text-gray-300 dark:hover:border-gray-500'}`}
                                             >
                                                 {size}
                                             </button>
@@ -329,17 +329,17 @@ export const ProductDetail = () => {
                             {!isOutOfStock && (
                                 <div>
                                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3 block">Quantity</label>
-                                    <div className="flex items-center w-fit border border-gray-200 rounded-sm overflow-hidden">
+                                    <div className="flex items-center w-fit border border-gray-200 dark:border-gray-700 rounded-sm overflow-hidden">
                                         <button
                                             onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                                            className="w-12 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-400 border-r border-gray-200"
+                                            className="w-12 h-10 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-400 border-r border-gray-200 dark:border-gray-700 transition-colors"
                                         >
                                             <Minus className="w-3 h-3" />
                                         </button>
-                                        <span className="w-12 text-center font-bold text-xs">{quantity}</span>
+                                        <span className="w-12 text-center font-bold text-xs dark:text-white">{quantity}</span>
                                         <button
                                             onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                                            className="w-12 h-10 flex items-center justify-center hover:bg-gray-50 text-gray-400 border-l border-gray-200"
+                                            className="w-12 h-10 flex items-center justify-center hover:bg-gray-50 dark:hover:bg-gray-800 text-gray-400 border-l border-gray-200 dark:border-gray-700 transition-colors"
                                         >
                                             <Plus className="w-3 h-3" />
                                         </button>
@@ -357,14 +357,14 @@ export const ProductDetail = () => {
                                 <>
                                     <button
                                         onClick={handleAddToCart}
-                                        className="w-full bg-black text-white py-4 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-900 transition-all flex items-center justify-center gap-3 active:scale-[0.99] text-[11px]"
+                                        className="w-full bg-black text-white dark:bg-white dark:text-black py-4 rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-gray-900 dark:hover:bg-gray-100 transition-all flex items-center justify-center gap-3 active:scale-[0.99] text-[11px]"
                                     >
                                         Add to Bag
                                     </button>
 
                                     <button
                                         onClick={handleBuyNow}
-                                        className="w-full py-3.5 border border-black text-black rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all text-[11px] active:scale-[0.99]"
+                                        className="w-full py-3.5 border border-black text-black dark:border-white dark:text-white rounded-sm font-bold uppercase tracking-[0.2em] hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all text-[11px] active:scale-[0.99]"
                                     >
                                         Buy it now
                                     </button>
@@ -373,8 +373,8 @@ export const ProductDetail = () => {
 
                             <button
                                 onClick={handleWishlistToggle}
-                                className={`w-full flex items-center justify-center gap-2 py-3 text-[10px] uppercase font-bold tracking-widest border border-gray-100 rounded-sm transition-all hover:bg-gray-50
-                                    ${inWishlist ? 'text-red-600 bg-red-50/50 border-red-100' : 'text-gray-400'}`}
+                                className={`w-full flex items-center justify-center gap-2 py-3 text-[10px] uppercase font-bold tracking-widest border border-gray-100 rounded-sm transition-all hover:bg-gray-50 dark:border-gray-800 dark:hover:bg-gray-800
+                                    ${inWishlist ? 'text-red-600 bg-red-50/50 border-red-100 dark:bg-red-900/10 dark:border-red-900/20' : 'text-gray-400'}`}
                             >
                                 <Heart className={`w-3.5 h-3.5 ${inWishlist ? 'fill-current' : ''}`} />
                                 {inWishlist ? 'Saved in Wishlist' : 'Add to Wishlist'}
@@ -385,7 +385,7 @@ export const ProductDetail = () => {
                         <div className="pt-8">
                             <div className="grid grid-cols-2 gap-4 border-t border-gray-100 pt-6 dark:border-gray-800">
                                 <div className="flex items-center gap-3 group">
-                                    <div className="w-10 h-10 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
+                                    <div className="w-10 h-10 shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
                                         <Truck className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -394,7 +394,7 @@ export const ProductDetail = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 group">
-                                    <div className="w-10 h-10 flex-shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
+                                    <div className="w-10 h-10 shrink-0 bg-gray-50 rounded-lg flex items-center justify-center text-gray-400 dark:bg-gray-800">
                                         <RotateCcw className="w-5 h-5" />
                                     </div>
                                     <div>
@@ -408,8 +408,8 @@ export const ProductDetail = () => {
                 </div>
 
                 {/* Middle Section: Tabbed Experience */}
-                <div className="mt-12 pt-8 border-t border-gray-100">
-                    <div className="flex justify-center gap-12 mb-10 border-b border-gray-100">
+                <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-800">
+                    <div className="flex justify-center gap-12 mb-10 border-b border-gray-100 dark:border-gray-800">
                         {[
                             { id: 'description', label: 'Description' },
                             { id: 'specs', label: 'Specifications' },
@@ -419,20 +419,19 @@ export const ProductDetail = () => {
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id as any)}
-                                className={`pb-4 text-[13px] font-bold uppercase tracking-widest border-b-[2px] transition-all
+                                className={`pb-4 text-[13px] font-bold uppercase tracking-widest border-b-2 transition-all
                                     ${activeTab === tab.id
-                                        ? 'border-black text-black'
-                                        : 'border-transparent text-gray-400 hover:text-gray-600'}`}
+                                        ? 'border-black text-black dark:border-white dark:text-white'
+                                        : 'border-transparent text-gray-400 hover:text-gray-600 dark:hover:text-gray-200'}`}
                             >
                                 {tab.label}
                             </button>
                         ))}
                     </div>
-
                     <div className="max-w-4xl mx-auto min-h-[400px] animate-fade-in">
                         {activeTab === 'description' && (
                             <div className="animate-fade-in py-6">
-                                <p className="text-gray-600 leading-relaxed text-lg max-w-3xl mx-auto text-center italic mb-12">
+                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg max-w-3xl mx-auto text-center italic mb-12">
                                     "{product.description}"
                                 </p>
                                 <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -478,16 +477,16 @@ export const ProductDetail = () => {
 
                         {activeTab === 'shipping' && (
                             <div className="prose prose-lg dark:prose-invert max-w-none">
-                                <div className="flex items-center gap-6 mb-12 p-8 bg-indigo-50 rounded-[2.5rem] dark:bg-indigo-900/10">
+                                <div className="flex items-center gap-6 mb-12 p-8 bg-indigo-50 rounded-[2.5rem] dark:bg-indigo-900/10 transition-colors">
                                     <Truck className="w-14 h-14 text-indigo-600" />
                                     <div>
                                         <h3 className="text-2xl font-black text-indigo-900 dark:text-white mb-2">Priority Global Logistics</h3>
-                                        <p className="text-base font-bold text-indigo-600">Free delivery on all orders over $150</p>
+                                        <p className="text-base font-bold text-indigo-600 dark:text-indigo-400">Free delivery on all orders over $150</p>
                                     </div>
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
                                     <div>
-                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 pb-2 inline-block">Dispatch Times</h4>
+                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 dark:border-indigo-900 pb-2 inline-block dark:text-white">Dispatch Times</h4>
                                         <ul className="space-y-4 text-gray-600 dark:text-gray-400 text-base font-medium">
                                             <li>• Standard: 3-5 business days</li>
                                             <li>• Express: 1-2 business days</li>
@@ -506,7 +505,7 @@ export const ProductDetail = () => {
 
                         {activeTab === 'reviews' && (
                             <div className="space-y-12">
-                                <div className="flex flex-col md:flex-row items-center gap-12 bg-gray-50 p-10 rounded-[3rem] dark:bg-gray-800">
+                                <div className="flex flex-col md:flex-row items-center gap-12 bg-gray-50 p-10 rounded-[3rem] dark:bg-gray-800 transition-colors">
                                     <div className="text-center md:text-left">
                                         <p className="text-sm font-black text-gray-400 uppercase tracking-widest mb-2">Total Score</p>
                                         <h4 className="text-7xl font-black text-gray-900 dark:text-white">{averageRating.toFixed(1)}</h4>
@@ -536,7 +535,7 @@ export const ProductDetail = () => {
                                 </div>
 
                                 {canReview && (
-                                    <div className="p-10 border-2 border-dashed border-gray-100 rounded-[3rem] dark:border-gray-800">
+                                    <div className="p-10 border-2 border-dashed border-gray-100 rounded-[3rem] dark:border-gray-800 transition-colors">
                                         <h3 className="text-xl font-black mb-6 dark:text-white flex items-center gap-3">
                                             <div className="p-2 bg-indigo-600 text-white rounded-xl"><Plus className="w-5 h-5" /></div>
                                             Share Your Experience
@@ -554,15 +553,15 @@ export const ProductDetail = () => {
                                             ))}
                                         </div>
                                         <textarea
-                                            className="w-full p-6 border border-gray-100 rounded-[2rem] mb-6 focus:ring-4 focus:ring-indigo-50 focus:border-indigo-600 transition-all dark:bg-gray-800 dark:border-gray-700 outline-none font-medium"
+                                            className="w-full p-6 border border-gray-100 rounded-4xl mb-6 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/10 focus:border-indigo-600 transition-all dark:bg-gray-800 dark:border-gray-700 outline-none font-medium dark:text-white"
                                             rows={5}
                                             placeholder="What did you love about this item?"
                                             value={newReviewComment}
                                             onChange={e => setNewReviewComment(e.target.value)}
                                         ></textarea>
                                         <button
-                                            onClick={submitReview}
-                                            className="px-12 py-5 bg-black text-white rounded-[2rem] font-black uppercase tracking-widest transition-all hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100 active:scale-95 shadow-xl"
+                                            type="submit"
+                                            className="w-full py-4 bg-indigo-600 text-white rounded-4xl font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/20 active:scale-[0.98] transition-all"
                                         >
                                             Publish Review
                                         </button>
@@ -571,13 +570,13 @@ export const ProductDetail = () => {
 
                                 <div className="space-y-10">
                                     {reviews.length === 0 ? (
-                                        <div className="text-center py-20 bg-gray-50 rounded-[3rem] dark:bg-gray-800/50">
-                                            <MessageSquare className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                                        <div className="text-center py-20 bg-gray-50 rounded-[3rem] dark:bg-gray-800/50 transition-colors">
+                                            <MessageSquare className="w-12 h-12 text-gray-200 dark:text-gray-700 mx-auto mb-4" />
                                             <p className="text-gray-400 font-bold italic tracking-wide uppercase text-[10px]">Be the first to leave a mark</p>
                                         </div>
                                     ) : (
                                         reviews.map((rev) => (
-                                            <div key={rev.id} className="group p-8 border border-gray-50 rounded-[3rem] hover:border-indigo-100 hover:bg-gray-50/50 transition-all dark:border-gray-800 dark:bg-gray-800/20">
+                                            <div key={rev.id} className="group p-8 border border-gray-50 rounded-[3rem] hover:border-indigo-100 dark:hover:border-indigo-900 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-all dark:border-gray-800 dark:bg-gray-800/20">
                                                 <div className="flex items-center justify-between mb-8">
                                                     <div className="flex items-center gap-5">
                                                         <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-lg uppercase shadow-lg shadow-indigo-100">
@@ -594,7 +593,7 @@ export const ProductDetail = () => {
                                                         ))}
                                                     </div>
                                                 </div>
-                                                <p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-relaxed italic border-l-4 border-indigo-600 pl-8 py-2 bg-white/50 rounded-r-lg">
+                                                <p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-relaxed italic border-l-4 border-indigo-600 pl-8 py-2 bg-white/50 dark:bg-gray-900/30 rounded-r-lg">
                                                     "{rev.comment}"
                                                 </p>
                                             </div>
@@ -625,7 +624,7 @@ export const ProductDetail = () => {
             {/* Lightbox Modal */}
             {isLightboxOpen && (
                 <div
-                    className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-fade-in"
+                    className="fixed inset-0 z-100 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-fade-in"
                     onClick={() => setIsLightboxOpen(false)}
                 >
                     <button

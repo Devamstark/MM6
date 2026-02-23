@@ -60,7 +60,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
       </div>
 
       {/* Price Filter */}
-      <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-sm dark:bg-gray-800 dark:border-gray-700">
+      <div className="bg-white dark:bg-gray-800 p-5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm transition-colors">
         <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide dark:text-gray-200">Price Range</h3>
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
