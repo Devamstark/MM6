@@ -50,7 +50,7 @@ export const ProductList = () => {
         sort,
       };
 
-      let productsData = await api.getProducts(apiFilters);
+      let productsData = await api.getProducts(apiFilters).catch(() => []); // Fallback on error
 
       // Client-side filtering for Flash Sales
       if (filters.flashSale) {
