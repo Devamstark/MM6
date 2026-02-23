@@ -13,8 +13,8 @@ from django.conf import settings
 import random
 from decimal import Decimal
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer
 
 # ...
 
@@ -741,3 +741,14 @@ class AddressViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
+class CouponViewSet(viewsets.ModelViewSet):
+    queryset = Coupon.objects.all().order_by('-created_at')
+    serializer_class = CouponSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        # Only admins can manage coupons
+        if self.request.user.role == 'admin':
+            return super().get_queryset()
+        return Coupon.objects.none()

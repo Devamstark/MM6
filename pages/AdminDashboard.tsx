@@ -9,8 +9,15 @@ import { BatchProductCreator } from '../components/BatchProductCreator';
 import { AdminAnalytics } from '../components/AdminAnalytics';
 
 
+import { SalesOverview } from '../components/dashboard/SalesOverview';
+import { StatusOverview } from '../components/dashboard/StatusOverview';
+import { DashboardCharts } from '../components/dashboard/DashboardCharts';
+import { CouponsTab } from '../components/dashboard/CouponsTab';
+import { StaffTab } from '../components/dashboard/StaffTab';
+
+
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'coupons' | 'staff'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -200,25 +207,25 @@ export const AdminDashboard = () => {
             <p className="text-gray-400 font-medium mt-3 text-lg">Real-time insights and product management console.</p>
           </div>
           <div className="flex items-center gap-3 bg-white p-2 rounded-2xl shadow-sm border border-gray-100">
-            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 font-black">
+            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 font-black shadow-inner">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Status</p>
+              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Security Status</p>
               <p className="text-sm font-bold text-gray-900">System Healthy</p>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-3 mb-12 w-full animate-fade-up delay-100">
-          {['overview', 'products', 'sellers', 'users', 'orders', 'messages', 'analytics'].map((tab) => (
+        <div className="flex flex-wrap gap-3 mb-12 w-full animate-fade-up delay-100 overflow-x-auto pb-2 scrollbar-hide">
+          {['overview', 'products', 'sellers', 'users', 'orders', 'coupons', 'messages', 'analytics', 'staff'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-8 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === tab
-                ? 'bg-black text-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.3)] transform -translate-y-1'
-                : 'bg-white text-gray-400 hover:text-black hover:bg-gray-50 border border-gray-100'
+              className={`px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === tab
+                ? 'bg-indigo-600 text-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.4)] transform -translate-y-1'
+                : 'bg-white text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100'
                 }`}
             >
               {tab}
@@ -230,66 +237,28 @@ export const AdminDashboard = () => {
         <div className="animate-fade-up delay-200">
           {activeTab === 'overview' && (
             <div className="space-y-6 animate-fade-in">
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <StatCard
-                  title="Total Revenue"
-                  value={`$${(stats?.totalRevenue ?? 0).toLocaleString()} `}
-                  icon={DollarSign}
-                  color="text-green-600"
-                  bg="bg-green-50"
-                  delay={0}
-                />
-                <StatCard
-                  title="Total Units Sold"
-                  value={orders.reduce((sum, o) => sum + (o.items?.reduce((isum, i) => isum + (i.quantity || 1), 0) || 0), 0)}
-                  icon={ShoppingBag}
-                  color="text-blue-600"
-                  bg="bg-blue-50"
-                  delay={100}
-                />
-                <StatCard
-                  title="Total Users"
-                  value={users.length}
-                  icon={Users}
-                  color="text-purple-600"
-                  bg="bg-purple-50"
-                  delay={200}
-                />
-                <StatCard
-                  title="Low Stock Alerts"
-                  value={products.filter(p => p.stock < 10).length}
-                  icon={Package}
-                  color="text-orange-600"
-                  bg="bg-orange-50"
-                  delay={300}
-                />
-              </div>
-
-              {/* Monthly Sales Trend Chart (Mock) */}
-              <div className="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
-                <h3 className="font-bold text-gray-900 mb-6 text-lg">Monthly Sales Trend</h3>
-                <div className="h-40 flex items-end gap-3 justify-between">
-                  {(stats?.monthlyTrend || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]).map((h, i) => {
-                    const maxVal = Math.max(...(stats?.monthlyTrend || [1]));
-                    const heightPercent = maxVal > 0 ? (h / maxVal) * 100 : 0;
-                    return (
-                      <div key={i} className="w-full bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
-                        <div style={{ height: `${heightPercent}% ` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
-                        <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg whitespace-nowrap z-10">
-                          ${typeof h === 'number' ? h.toLocaleString() : h}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-between mt-4 text-xs font-semibold text-gray-400 uppercase tracking-wide px-1">
-                  <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
-                </div>
-              </div>
+              <SalesOverview stats={stats} orders={orders} />
+              <StatusOverview
+                orders={orders}
+                productsCount={products.length}
+                lowStockCount={products.filter(p => p.stock < 10).length}
+              />
+              <DashboardCharts orders={orders} products={products} />
 
               {/* Recent Orders Preview */}
-              <h3 className="font-bold text-gray-900 text-lg mt-8 mb-4">Recent Orders</h3>
-              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+              <div className="flex justify-between items-end mt-12 mb-6 px-2">
+                <div>
+                  <h3 className="font-bold text-gray-900 text-2xl tracking-tight">Recent Orders</h3>
+                  <p className="text-sm font-medium text-gray-500">Last 5 transactions processed.</p>
+                </div>
+                <button
+                  onClick={() => setActiveTab('orders')}
+                  className="text-indigo-600 font-black text-xs uppercase tracking-widest hover:translate-x-1 transition-transform"
+                >
+                  View All &rarr;
+                </button>
+              </div>
+              <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
                 <table className="min-w-full divide-y divide-gray-100">
                   <thead className="bg-white">
                     <tr>
@@ -322,7 +291,7 @@ export const AdminDashboard = () => {
 
           {activeTab === 'products' && (
             <>
-              <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+              <div className="bg-white rounded-4xl shadow-sm border border-gray-100 overflow-hidden">
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
                   <h3 className="font-bold text-lg text-gray-800">All Products</h3>
                   <div className="flex gap-2">
@@ -384,7 +353,7 @@ export const AdminDashboard = () => {
                             <tr key={p.id} className="hover:bg-gray-50/80 transition-all group">
                               <td className="px-8 py-6 whitespace-nowrap">
                                 <div className="flex items-center">
-                                  <div className="h-14 w-14 rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+                                  <div className="h-14 w-14 rounded-2xl overflow-hidden shadow-sm border border-gray-100 shrink-0 group-hover:scale-110 transition-transform duration-500">
                                     <img className="h-full w-full object-cover" src={p.imageUrl} alt="" />
                                   </div>
                                   <div className="ml-5">
@@ -716,7 +685,13 @@ export const AdminDashboard = () => {
             <AdminAnalytics orders={orders} products={products} />
           )}
 
+          {activeTab === 'coupons' && (
+            <CouponsTab />
+          )}
 
+          {activeTab === 'staff' && (
+            <StaffTab />
+          )}
         </div>
 
       </div>

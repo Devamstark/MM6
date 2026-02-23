@@ -746,5 +746,20 @@ export const api = {
 
   deleteContactMessage: async (id: string): Promise<void> => {
     await client.delete(`contact-messages/${id}/`);
-  }
+  },
+
+  // --- Coupons ---
+  getCoupons: async (): Promise<any[]> => {
+    const response = await client.get('coupons/');
+    return response.data;
+  },
+
+  createCoupon: async (data: any): Promise<any> => {
+    const response = await client.post('coupons/', data);
+    return response.data;
+  },
+
+  deleteCoupon: async (id: string): Promise<void> => {
+    await client.delete(`coupons/${id}/`);
+  },
 };
