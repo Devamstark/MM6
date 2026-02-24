@@ -12,10 +12,12 @@ from .views import (
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet
 )
 
-from rest_framework.routers import SimpleRouter, DefaultRouter
+from rest_framework.routers import SimpleRouter
 from django.conf import settings
 
-router = DefaultRouter()
+# SECURITY: SimpleRouter omits the public /api/ index that DefaultRouter exposes.
+# DefaultRouter would advertise every endpoint to unauthenticated visitors.
+router = SimpleRouter()
 router.register(r'products', ProductViewSet)
 router.register(r'orders', OrderViewSet, basename='orders')
 router.register(r'payments', PaymentViewSet)

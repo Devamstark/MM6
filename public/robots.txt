@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /api/
+Disallow: /ssx/
+Disallow: /media/
+Allow: /
+
+Sitemap: https://smartshop1.us/sitemap.xml

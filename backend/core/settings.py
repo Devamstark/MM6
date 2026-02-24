@@ -10,9 +10,11 @@ load_dotenv(BASE_DIR.parent / '.env')
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-for-production')
 
-DEBUG = os.environ.get('DEBUG', 'True') == 'True'
+# SECURITY: Default is False. Must explicitly set DEBUG=True in .env for local dev.
+DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = [host for host in os.environ.get('ALLOWED_HOSTS', '*').split(',') if host]
+# SECURITY: Default to strict allowed hosts — no wildcard in production.
+ALLOWED_HOSTS = [host for host in os.environ.get('ALLOWED_HOSTS', 'smartshop1.us,api.smartshop1.us,www.smartshop1.us').split(',') if host]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -88,9 +90,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # Using default storage for build stability; WhiteNoise Middleware will handle serving
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 WHITENOISE_USE_FINDERS = True 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Media Configuration (Local Storage)
 MEDIA_URL = '/media/'

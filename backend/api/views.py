@@ -491,9 +491,13 @@ class UserViewSet(viewsets.ModelViewSet):
         })
 
 class DashboardStatsView(APIView):
+    # SECURITY: Only admins should see platform-wide revenue and user counts
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
+        if request.user.role != 'admin':
+            from rest_framework.response import Response
+            return Response({'error': 'Admin access required.'}, status=403)
         # Calculate real data for dashboard
         total_revenue_data = Order.objects.aggregate(total=Sum('total_amount'))
         total_revenue = float(total_revenue_data['total'] or 0)
@@ -551,14 +555,22 @@ class RequestPasswordResetView(APIView):
             expires_at=timezone.now() + timedelta(minutes=15)
         )
         
-        # Send Email (Mocking for now)
-        print(f"PASSWORD RESET CODE FOR {email}: {code}")
-        # In production without email service, we can't do much.
-        # For now, we mock success so the UI doesn't break.
-        
-        return Response({'message': 'Reset code sent successfully (Check console)'}, status=status.HTTP_200_OK)
-        
-        return Response({'message': 'Reset code sent successfully'}, status=status.HTTP_200_OK)
+        # Send password reset email via configured email backend
+        try:
+            from django.core.mail import send_mail
+            send_mail(
+                subject='SmartShop — Your Password Reset Code',
+                message=f'Your 6-digit password reset code is: {code}\n\nThis code expires in 15 minutes. Do not share it with anyone.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[email],
+                fail_silently=False,
+            )
+        except Exception:
+            # Log server-side only — never expose the code in the response
+            import logging
+            logging.getLogger(__name__).error('Failed to send password reset email to %s', email)
+
+        return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
 
 class VerifyResetCodeView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -647,16 +659,21 @@ class ReviewViewSet(viewsets.ModelViewSet):
         ).exists()
 
         if not has_ordered:
-             from rest_framework.exceptions import PermissionDenied
-             raise PermissionDenied("You can only review products you have purchased.")
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("You can only review products you have purchased.")
 
-        serializer.save(user=user)
-
-        serializer.save(user=user)
+        serializer.save(user=user)  # single save — bug fix: was called twice
 
 class BulkProductUploadView(APIView):
     parser_classes = (parsers.MultiPartParser,)
+    # SECURITY: Only admins and sellers may bulk-upload products
     permission_classes = [permissions.IsAuthenticated]
+
+    def check_permissions(self, request):
+        super().check_permissions(request)
+        if request.user.role not in ('admin', 'seller'):
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied('Only admins and sellers can bulk-upload products.')
 
     def post(self, request):
         if 'file' not in request.FILES:

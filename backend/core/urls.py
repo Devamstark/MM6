@@ -10,7 +10,8 @@ def root_view(request):
 
 urlpatterns = [
     path('', root_view),
-    path('admin/', admin.site.urls),
+    # SECURITY: Admin URL is deliberately non-standard to prevent automated targeting
+    path('ssx/', admin.site.urls),
     path('api/', include('api.urls')),
     # Serve media files in both dev and production
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
