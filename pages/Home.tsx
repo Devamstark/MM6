@@ -13,8 +13,9 @@ export const Home = () => {
   const navigate = useNavigate();
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(1); // Start at 1 for the leading clone
   const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isBusy, setIsBusy] = useState(false); // Anti-spam flag
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -28,29 +29,33 @@ export const Home = () => {
     if (heroBanners.length <= 1) return;
 
     const interval = setInterval(() => {
+      if (isBusy) return;
       setIsTransitioning(true);
       setCurrentHeroIndex((prev) => prev + 1);
     }, 10000);
 
     return () => clearInterval(interval);
-  }, [heroBanners.length]);
+  }, [heroBanners.length, isBusy]);
 
   const goToPreviousHero = () => {
-    if (heroBanners.length <= 1 || !isTransitioning) return;
+    if (heroBanners.length <= 1 || isBusy) return;
+    setIsBusy(true);
     setIsTransitioning(true);
-    setCurrentHeroIndex((prev) => prev === 0 ? heroBanners.length - 1 : prev - 1);
+    setCurrentHeroIndex((prev) => prev - 1);
   };
 
   const goToNextHero = () => {
-    if (heroBanners.length <= 1 || !isTransitioning) return;
+    if (heroBanners.length <= 1 || isBusy) return;
+    setIsBusy(true);
     setIsTransitioning(true);
     setCurrentHeroIndex((prev) => prev + 1);
   };
 
   const goToHeroSlide = (index: number) => {
-    if (heroBanners.length <= 1) return;
+    if (heroBanners.length <= 1 || isBusy) return;
+    setIsBusy(true);
     setIsTransitioning(true);
-    setCurrentHeroIndex(index);
+    setCurrentHeroIndex(index + 1); // +1 because slides are offset by leading clone
   };
 
   // Redirect Admins and Sellers to their dashboards
@@ -130,25 +135,26 @@ export const Home = () => {
             className={`flex h-full ${isTransitioning ? 'transition-transform duration-700 ease-in-out will-change-transform' : ''}`}
             style={{ transform: `translateX(-${currentHeroIndex * 100}%)` }}
             onTransitionEnd={() => {
-              if (currentHeroIndex === heroBanners.length) {
-                // If we reached the clone (last item), jump back to the first real item instantly
+              if (currentHeroIndex === heroBanners.length + 1) {
+                // At trailing clone, snap to first real item
                 setIsTransitioning(false);
-                setCurrentHeroIndex(0);
-              } else if (currentHeroIndex === -1) { // This case is for going from 0 to -1 (effectively last real item)
+                setCurrentHeroIndex(1);
+              } else if (currentHeroIndex === 0) {
+                // At leading clone, snap to last real item
                 setIsTransitioning(false);
-                setCurrentHeroIndex(heroBanners.length - 1);
+                setCurrentHeroIndex(heroBanners.length);
               }
+              setIsBusy(false);
             }}
           >
-            {[...heroBanners, heroBanners[0]].map((banner, index) => {
-              // Ensure we have a valid banner before rendering
+            {[heroBanners[heroBanners.length - 1], ...heroBanners, heroBanners[0]].map((banner, index) => {
               if (!banner) return null;
 
-              // Determine if this slide's content should be active for animation
-              // It's active if it's the current real index, or if it's the clone and we're on the clone
-              const isActiveContent = (currentHeroIndex === index) ||
-                (currentHeroIndex === heroBanners.length && index === 0) ||
-                (currentHeroIndex === -1 && index === heroBanners.length - 1);
+              // Content is active if we are on this index, or if we are at a clone that represents this index
+              const isActiveContent =
+                (currentHeroIndex === index) ||
+                (currentHeroIndex === heroBanners.length + 1 && index === 1) ||
+                (currentHeroIndex === 0 && index === heroBanners.length);
 
               return (
                 <div
@@ -212,8 +218,8 @@ export const Home = () => {
                         <img
                           src={banner.image}
                           alt={banner.title}
-                          loading={index === 0 ? "eager" : "lazy"}
-                          fetchPriority={index === 0 ? "high" : "auto"}
+                          loading={index === 1 ? "eager" : "lazy"}
+                          fetchPriority={index === 1 ? "high" : "auto"}
                           className="absolute inset-0 w-full h-full"
                           style={{
                             objectFit: (banner.image_fit as any) || 'cover',
@@ -256,9 +262,10 @@ export const Home = () => {
           {heroBanners.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
               {heroBanners.map((_, index) => {
-                const isDotActive = currentHeroIndex === index ||
-                  (currentHeroIndex === heroBanners.length && index === 0) ||
-                  (currentHeroIndex === -1 && index === heroBanners.length - 1);
+                const dotIndex = index + 1;
+                const isDotActive = currentHeroIndex === dotIndex ||
+                  (currentHeroIndex === heroBanners.length + 1 && dotIndex === 1) ||
+                  (currentHeroIndex === 0 && dotIndex === heroBanners.length);
                 return (
                   <button
                     key={index}

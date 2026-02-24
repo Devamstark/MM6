@@ -863,12 +863,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         <span>${cartTotal.toFixed(2)}</span>
                       </div>
                     </div>
-                    <button
-                      onClick={handleCheckout}
-                      className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-primary hover:shadow-primary/20 transition-all duration-300 active:scale-[0.98]"
-                    >
-                      Proceed to Checkout <ArrowRight className="w-5 h-5" />
-                    </button>
+                    <div className="flex flex-col gap-3">
+                      <button
+                        onClick={() => { setCartOpen(false); navigate('/cart'); }}
+                        className="w-full flex items-center justify-center gap-2 rounded-full border border-gray-900 px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] dark:border-white dark:text-white dark:hover:bg-gray-800"
+                      >
+                        View Full Bag
+                      </button>
+                      <button
+                        onClick={handleCheckout}
+                        className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-primary hover:shadow-primary/20 transition-all duration-300 active:scale-[0.98] dark:bg-primary dark:shadow-none"
+                      >
+                        Proceed to Checkout <ArrowRight className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>

@@ -22,6 +22,7 @@ import { OrderHistory } from './pages/OrderHistory';
 import { OrderDetail } from './pages/OrderDetail';
 import { FAQ } from './pages/FAQ';
 import { AboutUs } from './pages/AboutUs';
+import { Cart } from './pages/Cart';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
                             <Route index element={<Home />} />
                             <Route path="products" element={<Shop />} />
                             <Route path="product/:slug" element={<ProductDetail />} />
+                            <Route path="cart" element={<Cart />} />
 
                             <Route path="login" element={<Auth />} />
                             <Route path="register" element={<Auth />} />
