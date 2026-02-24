@@ -156,13 +156,164 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'payment-method': {
     title: 'Payment Methods',
     content: `
-      <p class="mb-4">We accept the following payment methods:</p>
-      <ul class="list-disc pl-5 space-y-1">
-        <li>Credit/Debit Cards (Visa, Mastercard, Amex)</li>
-        <li>PayPal</li>
-        <li>Apple Pay</li>
-        <li>Google Pay</li>
-      </ul>
+      <div class="space-y-12 animate-fade-in">
+
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100">
+          <div class="text-center max-w-3xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Secure & Flexible Payment Options</h2>
+            <p class="text-lg text-gray-600">Shop with confidence using our wide range of trusted payment methods. All transactions are encrypted and secure.</p>
+          </div>
+        </div>
+
+        <!-- Payment Methods Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Credit/Debit Cards -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Credit/Debit Cards</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Visa, Mastercard, American Express, and Discover cards accepted.</p>
+            <div class="flex gap-2 flex-wrap">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" class="h-6 opacity-70 hover:opacity-100 transition-opacity" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" class="h-6 opacity-70 hover:opacity-100 transition-opacity" />
+              <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/American_Express_logo_%282018%29.svg/1200px-American_Express_logo_%282018%29.svg.png" alt="Amex" class="h-6 opacity-70 hover:opacity-100 transition-opacity" />
+            </div>
+          </div>
+
+          <!-- PayPal -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M7.022 21h3.97c.436 0 .806-.314.878-.744l2.46-15.572a.89.89 0 00-.878-1.028H9.18a2.67 2.67 0 00-2.636 2.228L5.368 13.5.888 21h6.134z"/></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">PayPal</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Fast and secure payments with PayPal buyer protection.</p>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png" alt="PayPal" class="h-7 opacity-70 hover:opacity-100 transition-opacity" />
+          </div>
+
+          <!-- Apple Pay -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Apple Pay</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Quick checkout with Touch ID or Face ID authentication.</p>
+            <div class="flex items-center gap-2">
+              <span class="text-2xl">🍎</span>
+              <span class="font-semibold text-gray-700">Pay</span>
+            </div>
+          </div>
+
+          <!-- Google Pay -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-white to-gray-100 rounded-2xl flex items-center justify-center shadow-lg border border-gray-200">
+                <span class="text-2xl font-bold text-gray-700">G</span>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Google Pay</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Seamless payments with your saved Google account.</p>
+            <div class="flex items-center gap-1">
+              <span class="text-xl font-bold text-gray-700">G</span>
+              <span class="font-semibold text-gray-700">Pay</span>
+            </div>
+          </div>
+
+          <!-- Bank Transfer -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Bank Transfer</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Direct bank transfer for large orders. Contact support for details.</p>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">For orders $500+</span>
+          </div>
+
+          <!-- Cash on Delivery -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Cash on Delivery</h3>
+            </div>
+            <p class="text-gray-600 mb-4">Pay with cash when your order is delivered to your doorstep.</p>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">Select regions only</span>
+          </div>
+
+        </div>
+
+        <!-- Security Section -->
+        <div class="bg-gray-900 text-white p-10 rounded-4xl relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20"></div>
+          <div class="relative z-10">
+            <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-400">🔒 Your Security is Our Priority</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 bg-indigo-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                </div>
+                <h4 class="font-bold text-white mb-2">SSL Encrypted</h4>
+                <p class="text-gray-400 text-sm">256-bit SSL encryption protects all your data</p>
+              </div>
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                </div>
+                <h4 class="font-bold text-white mb-2">PCI Compliant</h4>
+                <p class="text-gray-400 text-sm">Certified to handle credit card information securely</p>
+              </div>
+              <div class="text-center">
+                <div class="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-2xl flex items-center justify-center">
+                  <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                </div>
+                <h4 class="font-bold text-white mb-2">Fraud Protection</h4>
+                <p class="text-gray-400 text-sm">Advanced fraud detection keeps you safe</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-indigo-50/50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-gray-900">Frequently Asked Questions</h3>
+          <div class="space-y-4">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">Can I use multiple payment methods for one order?</h4>
+              <p class="text-gray-600 text-sm">Currently, we accept one payment method per order. However, you can use gift cards in combination with another payment method if your gift card balance doesn't cover the full amount.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">Are installment plans available?</h4>
+              <p class="text-gray-600 text-sm">Yes! We partner with Klarna and Afterpay to offer flexible installment payment options. You can split your purchase into 4 interest-free payments.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">Is my payment information secure?</h4>
+              <p class="text-gray-600 text-sm">Absolutely. We use industry-leading encryption and never store your full credit card details. All payments are processed through secure, PCI-compliant gateways.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Support Banner -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
+          <h3 class="text-2xl font-black mb-3">Need Help with Payment?</h3>
+          <p class="text-indigo-100 mb-6">Our support team is here to assist you 24/7 with any payment-related questions.</p>
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-full font-bold hover:bg-indigo-50 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            Contact Support
+          </a>
+        </div>
+
+      </div>
     `
   }
 };
