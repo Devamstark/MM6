@@ -15,7 +15,7 @@ class UserSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'bio', 'bonus_points', 'profile_picture', 'date_joined', 'last_login', 'addresses', 'referral_earnings')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'role', 'bio', 'bonus_points', 'profile_picture', 'date_joined', 'last_login', 'addresses', 'referral_earnings', 'is_active')
         read_only_fields = ('id', 'date_joined', 'bonus_points', 'last_login', 'referral_earnings')
 
 class PageContentSerializer(serializers.ModelSerializer):

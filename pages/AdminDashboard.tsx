@@ -70,7 +70,7 @@ export const AdminDashboard = () => {
     try {
       const [statsData, productsRes, usersData, ordersRes, categoriesData, messagesData] = await Promise.all([
         api.getDashboardStats(),
-        api.getProducts(),
+        api.getProducts({ page: 1 } as any),
         api.getUsers(),
         api.getRecentOrders(),
         api.getCategories(),
@@ -78,9 +78,21 @@ export const AdminDashboard = () => {
       ]);
       setStats(statsData);
 
-      const productsList = (productsRes as any).results || [];
-      setProducts(productsList.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
-      setHasMoreProducts(!!(productsRes as any).next);
+      // Load ALL products by fetching multiple pages if needed
+      let allProducts = (productsRes as any).results || [];
+      let nextPage = (productsRes as any).next;
+      // Fetch remaining pages (up to 10 pages to avoid infinite loop)
+      let pageNum = 2;
+      while (nextPage && pageNum <= 10) {
+        const moreRes = await api.getProducts({ page: pageNum } as any);
+        const more = (moreRes as any).results || [];
+        allProducts = [...allProducts, ...more];
+        nextPage = (moreRes as any).next;
+        pageNum++;
+      }
+
+      setProducts(allProducts.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
+      setHasMoreProducts(false); // We loaded everything
       setProductPage(1);
 
       setUsers(usersData);
@@ -279,8 +291,8 @@ export const AdminDashboard = () => {
               key={tab}
               onClick={() => setActiveTab(tab as any)}
               className={`px-6 py-3 rounded-xl text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab
-                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 -translate-y-0.5'
-                  : 'bg-white text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
+                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 -translate-y-0.5'
+                : 'bg-white text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
                 }`}
             >
               {tab}
@@ -415,8 +427,8 @@ export const AdminDashboard = () => {
                         >
                           {cat.label}
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${productCatTab === cat.key
-                              ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
-                              : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                            ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
+                            : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
                             }`}>
                             {getCount(cat.key)}
                           </span>

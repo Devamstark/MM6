@@ -602,8 +602,17 @@ export const api = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    // Fetch with a high limit to get more categories for metadata
-    const response = await client.get('products/?limit=100');
+    // Use the dedicated categories endpoint that returns distinct category data
+    try {
+      const response = await client.get('categories/');
+      if (response.data && typeof response.data === 'object' && !Array.isArray(response.data)) {
+        return Object.keys(response.data);
+      }
+    } catch (e) {
+      // fallback
+    }
+    // Fallback: fetch products with large page_size
+    const response = await client.get('products/', { params: { page_size: 200 } });
     const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
     const categories = new Set(data.filter((p: any) => p.category).map((p: any) => p.category));
     return Array.from(categories) as string[];
@@ -695,10 +704,20 @@ export const api = {
     return newOrder;
   },
 
-  getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
-    const response = await client.get('orders/');
-    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
-    return data.map(mapOrder);
+  getRecentOrders: async (sellerId?: string): Promise<any> => {
+    const response = await client.get('orders/', { params: { page_size: 200 } });
+    // Return raw paginated response so AdminDashboard can access .results and .next
+    if (response.data.results && Array.isArray(response.data.results)) {
+      return {
+        count: response.data.count,
+        next: response.data.next,
+        previous: response.data.previous,
+        results: response.data.results.map(mapOrder),
+      };
+    }
+    // Fallback for non-paginated
+    const data = Array.isArray(response.data) ? response.data : [];
+    return { count: data.length, next: null, previous: null, results: data.map(mapOrder) };
   },
 
   getMyOrders: async (): Promise<Order[]> => {
