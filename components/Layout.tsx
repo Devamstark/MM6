@@ -1006,7 +1006,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </main>
 
-      <footer className="bg-gray-950 text-gray-400 mt-auto">
+      <footer className="bg-white border-t border-gray-200 mt-auto dark:bg-gray-900 dark:border-gray-800 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
           {/* Main Footer Content */}
@@ -1015,20 +1015,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             {/* Brand Column */}
             <div className="lg:col-span-4 space-y-5">
               <Link to="/" className="inline-block">
-                <span className="text-xl font-black tracking-widest text-white uppercase">SmartShop</span>
+                <span className="text-xl font-black tracking-widest text-gray-900 dark:text-white uppercase">SmartShop</span>
               </Link>
-              <p className="text-sm leading-relaxed text-gray-500 max-w-xs">
+              <p className="text-sm leading-relaxed text-gray-500 dark:text-gray-400 max-w-xs">
                 Your premium destination for quality fashion, accessories, and lifestyle products. Fast shipping worldwide.
               </p>
               {/* Social Icons */}
               <div className="flex gap-3 pt-1">
-                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500 hover:bg-blue-600 hover:text-white transition-all duration-300 hover:-translate-y-0.5" title="Facebook">
+                <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-blue-600 hover:text-white transition-all duration-300 hover:-translate-y-0.5" title="Facebook">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" /></svg>
                 </a>
-                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500 hover:bg-gradient-to-br hover:from-purple-600 hover:to-pink-500 hover:text-white transition-all duration-300 hover:-translate-y-0.5" title="Instagram">
+                <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-pink-600 hover:text-white transition-all duration-300 hover:-translate-y-0.5" title="Instagram">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" /></svg>
                 </a>
-                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-800 rounded-lg flex items-center justify-center text-gray-500 hover:bg-black hover:text-white hover:ring-1 hover:ring-gray-600 transition-all duration-300 hover:-translate-y-0.5" title="X (Twitter)">
+                <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="w-9 h-9 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500 hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-all duration-300 hover:-translate-y-0.5" title="X (Twitter)">
                   <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                 </a>
               </div>
@@ -1036,51 +1036,51 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Shop Column */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Shop</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white tracking-widest uppercase">Shop</h3>
               <ul className="space-y-2.5">
-                <li><Link to="/products?sort=newest" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">New Arrivals</Link></li>
-                <li><Link to="/products?category=Women" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Women</Link></li>
-                <li><Link to="/products?category=Men" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Men</Link></li>
-                <li><Link to="/products?category=Accessories" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Accessories</Link></li>
-                <li><Link to="/products?on_sale=true" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Sale</Link></li>
+                <li><Link to="/products?sort=newest" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">New Arrivals</Link></li>
+                <li><Link to="/products?category=Women" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Women</Link></li>
+                <li><Link to="/products?category=Men" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Men</Link></li>
+                <li><Link to="/products?category=Accessories" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Accessories</Link></li>
+                <li><Link to="/products?on_sale=true" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Sale</Link></li>
               </ul>
             </div>
 
             {/* Help Column */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Help</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white tracking-widest uppercase">Help</h3>
               <ul className="space-y-2.5">
-                <li><Link to="/faq" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">FAQ</Link></li>
-                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Shipping Info</Link></li>
-                <li><Link to="/page/returns" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Returns</Link></li>
-                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">How to Order</Link></li>
-                <li><Link to="/page/size-guide" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Size Guide</Link></li>
+                <li><Link to="/faq" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">FAQ</Link></li>
+                <li><Link to="/page/shipping-info" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Shipping Info</Link></li>
+                <li><Link to="/page/returns" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Returns</Link></li>
+                <li><Link to="/page/how-to-order" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">How to Order</Link></li>
+                <li><Link to="/page/size-guide" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Size Guide</Link></li>
               </ul>
             </div>
 
             {/* Company Column */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Company</h3>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white tracking-widest uppercase">Company</h3>
               <ul className="space-y-2.5">
-                <li><Link to="/about" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">About Us</Link></li>
-                <li><Link to="/contact" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Contact</Link></li>
-                <li><Link to="/blog" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Blog</Link></li>
-                {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Affiliate</Link></li>}
-                {!isAdmin && <li><Link to="/bonus-points" className="text-sm text-gray-500 hover:text-white transition-colors duration-200">Bonus Points</Link></li>}
+                <li><Link to="/about" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">About Us</Link></li>
+                <li><Link to="/contact" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Contact</Link></li>
+                <li><Link to="/blog" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Blog</Link></li>
+                {!isAdmin && <li><Link to="/affiliate" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Affiliate</Link></li>}
+                {!isAdmin && <li><Link to="/bonus-points" className="text-sm text-gray-500 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors duration-200">Bonus Points</Link></li>}
               </ul>
             </div>
 
             {/* Newsletter Column */}
             <div className="lg:col-span-2 space-y-4">
-              <h3 className="text-xs font-bold text-white tracking-widest uppercase">Newsletter</h3>
-              <p className="text-sm text-gray-500 leading-relaxed">Get updates on new arrivals and special offers.</p>
+              <h3 className="text-xs font-bold text-gray-900 dark:text-white tracking-widest uppercase">Newsletter</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Get updates on new arrivals and special offers.</p>
               <form onSubmit={(e) => { e.preventDefault(); }} className="flex flex-col gap-2">
                 <input
                   type="email"
                   placeholder="your@email.com"
-                  className="w-full px-3.5 py-2.5 bg-gray-800 border border-gray-700 rounded-lg text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
+                  className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                 />
-                <button type="submit" className="w-full px-4 py-2.5 bg-white text-gray-900 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-200 transition-colors">
+                <button type="submit" className="w-full px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors">
                   Subscribe
                 </button>
               </form>
@@ -1088,20 +1088,34 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-gray-800" />
+          <div className="border-t border-gray-200 dark:border-gray-800" />
 
           {/* Bottom Bar */}
           <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-600">
+            <p className="text-xs text-gray-400 dark:text-gray-500">
               &copy; 2026 SmartShop Inc. All rights reserved.
             </p>
             <div className="flex items-center gap-6">
-              <Link to="/page/privacy-policy" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Privacy Policy</Link>
-              <Link to="/page/terms-of-service" className="text-xs text-gray-600 hover:text-gray-400 transition-colors">Terms of Service</Link>
-              <div className="flex items-center gap-3 pl-4 border-l border-gray-800">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2560px-Visa_Inc._logo.svg.png" alt="Visa" className="h-4 opacity-40 grayscale hover:opacity-80 hover:grayscale-0 transition-all" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Mastercard" className="h-4 opacity-40 grayscale hover:opacity-80 hover:grayscale-0 transition-all" />
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/PayPal.svg/2560px-PayPal.svg.png" alt="PayPal" className="h-4 opacity-40 grayscale hover:opacity-80 hover:grayscale-0 transition-all" />
+              <Link to="/page/privacy-policy" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy Policy</Link>
+              <Link to="/page/terms-of-service" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Terms of Service</Link>
+              <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-gray-700">
+                {/* Visa */}
+                <svg className="h-5 opacity-40 hover:opacity-90 transition-all" viewBox="0 0 780 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M293.2 348.73l33.36-195.76h53.34l-33.38 195.76H293.2zm246.11-191.54c-10.57-3.98-27.19-8.24-47.95-8.24-52.87 0-90.12 26.73-90.39 65.01-.52 28.27 26.52 44.06 46.77 53.47 20.78 9.63 27.77 15.83 27.77 24.4-.14 13.18-16.68 19.2-32.06 19.2-21.42 0-32.81-2.98-50.38-10.34l-6.95-3.15-7.51 44.09c12.52 5.5 35.67 10.27 59.72 10.52 56.23 0 92.7-26.4 93.13-67.3.21-22.42-14.07-39.5-44.94-53.56-18.72-9.11-30.19-15.18-30.07-24.41 0-8.18 9.7-16.94 30.66-16.94 17.47-.28 30.15 3.55 40.02 7.53l4.8 2.27 7.38-42.55zm139.58-4.22h-41.35c-12.81 0-22.39 3.51-28.01 16.34l-79.47 180.43h56.16s9.18-24.24 11.26-29.57l68.49.08c1.59 6.9 6.5 29.49 6.5 29.49h49.66l-43.24-196.77zM637.88 303c4.42-11.32 21.31-54.93 21.31-54.93-.31.52 4.39-11.39 7.09-18.78l3.62 16.97s10.25 46.92 12.39 56.74h-44.41zM248.72 152.97l-52.39 133.6-5.6-27.24c-9.72-31.35-40.01-65.33-73.92-82.32l47.89 171.6 56.6-.06 84.25-195.58h-56.83z" fill="#1A1F71" />
+                  <path d="M146.92 152.97H60.88l-.68 4.08c67.14 16.3 111.59 55.63 129.98 102.89l-18.77-90.59c-3.24-12.46-12.64-16.02-24.49-16.38z" fill="#F9A533" />
+                </svg>
+                {/* Mastercard */}
+                <svg className="h-5 opacity-40 hover:opacity-90 transition-all" viewBox="0 0 780 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="312" cy="250" r="156" fill="#EB001B" />
+                  <circle cx="468" cy="250" r="156" fill="#F79E1B" />
+                  <path d="M390 130.7c39.6 30 65.2 77.6 65.2 131.3s-25.6 101.3-65.2 131.3c-39.6-30-65.2-77.6-65.2-131.3s25.6-101.3 65.2-131.3z" fill="#FF5F00" />
+                </svg>
+                {/* PayPal */}
+                <svg className="h-5 opacity-40 hover:opacity-90 transition-all" viewBox="0 0 780 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M622.95 194.64c-8.38-50.52-56.76-67.87-113.4-67.87H377.13c-9.22 0-17.12 6.48-18.54 15.57l-54.04 330.38c-1.05 6.71 4.18 12.78 10.96 12.78h79.82l20.04-122.61-.63 3.88c1.42-9.09 9.29-15.57 18.51-15.57h38.53c75.7 0 134.94-29.66 152.27-115.5.51-2.54.96-5.02 1.34-7.43 5.15-31.73 0-53.34-13.44-72.63z" fill="#27346A" />
+                  <path d="M636.39 267.27c-17.33 85.83-76.57 115.5-152.27 115.5h-38.53c-9.22 0-17.09 6.48-18.51 15.57l-24.5 149.82c-.92 5.86 3.65 11.17 9.58 11.17h67.23c8.07 0 14.99-5.68 16.24-13.64l.67-3.36 12.86-78.71.83-4.35c1.25-7.96 8.17-13.64 16.24-13.64h10.22c66.24 0 118.09-25.95 133.24-101.06 6.33-31.37 3.06-57.56-13.7-75.93-5.07-5.56-11.39-10.1-18.6-13.37z" fill="#2790C3" />
+                  <path d="M609.15 256.32c-3.19-.92-6.5-1.77-9.92-2.54-3.42-.76-6.97-1.44-10.62-2.05-12.83-2.12-26.88-3.13-41.85-3.13H443.9c-3.04 0-5.93.6-8.56 1.68-5.79 2.38-10.08 7.49-11.19 13.76l-21.38 130.73-.63 3.88c1.42-9.09 9.29-15.57 18.51-15.57h38.53c75.7 0 134.94-29.66 152.27-115.5.52-2.54.96-5.02 1.34-7.43-4.61-2.39-9.62-4.37-3.64-3.83z" fill="#1F264F" />
+                </svg>
               </div>
             </div>
           </div>
