@@ -147,9 +147,7 @@ export const ProductList = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {products.map((product, idx) => (
-              <div key={product.id} className="animate-fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
-                <ProductCard product={product} />
-              </div>
+              <ProductCard key={product.id} product={product} index={idx} priority={idx < 4} />
             ))}
             {loading && <SkeletonCard count={4} />}
           </div>

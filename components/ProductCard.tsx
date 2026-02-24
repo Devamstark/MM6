@@ -9,9 +9,10 @@ import { cn } from '../utils/cn';
 interface ProductCardProps {
   product: Product;
   index?: number;
+  priority?: boolean;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, priority = false }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
 
@@ -25,22 +26,31 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.05 }}
-      whileHover={{ y: -4 }}
+      transition={{
+        duration: 0.4,
+        ease: [0.22, 1, 0.36, 1],
+        delay: index * 0.05
+      }}
+      whileHover={{
+        y: -12,
+        scale: 1.02,
+        transition: { duration: 0.2, ease: "easeOut" }
+      }}
       className="h-full"
     >
       <Link to={`/product/${product.slug}`} className="group cursor-pointer block h-full">
-        <div className="relative bg-white overflow-hidden transition-all duration-300 h-full flex flex-col border border-gray-100 dark:bg-gray-900 dark:border-gray-800 rounded-2xl shadow-sm hover:shadow-xl dark:hover:shadow-indigo-900/10">
+        <div className="relative bg-white overflow-hidden transition-all duration-500 h-full flex flex-col border border-gray-100 dark:bg-gray-900 dark:border-gray-800 rounded-2xl shadow-sm hover:shadow-2xl dark:hover:shadow-indigo-500/10">
 
           {/* Image Container */}
           <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-800">
             <motion.img
               initial={{ scale: 1 }}
               whileHover={{ scale: 1.1 }}
-              transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
+              transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
               src={product.imageUrl || 'https://via.placeholder.com/600x600?text=No+Image'}
               alt={product.name}
-              loading="lazy"
+              loading={priority ? "eager" : "lazy"}
+              fetchPriority={priority ? "high" : "auto"}
               className={`h-full w-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x600?text=No+Image';

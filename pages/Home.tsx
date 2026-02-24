@@ -423,7 +423,7 @@ export const Home = () => {
             className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12"
           >
             {featuredProducts.map((p, i) => (
-              <ProductCard key={p.id} product={p} index={i} />
+              <ProductCard key={p.id} product={p} index={i} priority={i < 4} />
             ))}
           </motion.div>
         )}
