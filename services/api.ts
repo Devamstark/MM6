@@ -303,7 +303,8 @@ export const api = {
   // --- Addresses ---
   getAddresses: async (): Promise<import('../types').Address[]> => {
     const response = await client.get('addresses/');
-    return response.data.map((a: any) => ({
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map((a: any) => ({
       id: a.id,
       fullName: a.full_name,
       street: a.street,
@@ -360,7 +361,8 @@ export const api = {
 
   getUserReviews: async (): Promise<import('../types').Review[]> => {
     const response = await client.get('reviews/my_reviews/'); // Assuming endpoint
-    return response.data.map((r: any) => ({
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map((r: any) => ({
       id: r.id,
       productId: r.product.id || r.product, // Handle populated or ID
       productName: r.product.name, // If populated
@@ -601,23 +603,23 @@ export const api = {
 
   getCategories: async (): Promise<string[]> => {
     const response = await client.get('products/');
-    const products = response.data;
-    const categories = new Set(products.map((p: any) => p.category));
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    const categories = new Set(data.map((p: any) => p.category));
     return Array.from(categories) as string[];
   },
 
   getBrands: async (): Promise<string[]> => {
     const response = await client.get('products/');
-    const products = response.data;
-    const brands = new Set(products.map((p: any) => p.brand));
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    const brands = new Set(data.map((p: any) => p.brand));
     return Array.from(brands) as string[];
   },
 
   getSubcategories: async (category?: string): Promise<string[]> => {
     const response = await client.get('products/');
-    const products = response.data;
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
     const subcats = new Set<string>();
-    products.forEach((p: any) => {
+    data.forEach((p: any) => {
       if (p.subcategory) {
         if (!category || p.category === category) {
           subcats.add(p.subcategory);
@@ -632,7 +634,8 @@ export const api = {
     try {
       // Filter by product
       const response = await client.get(`reviews/?product=${productId}`);
-      return response.data.map((r: any) => ({
+      const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+      return data.map((r: any) => ({
         id: r.id,
         productId: r.product,
         userId: r.user,
@@ -693,12 +696,14 @@ export const api = {
 
   getRecentOrders: async (sellerId?: string): Promise<Order[]> => {
     const response = await client.get('orders/');
-    return response.data.map(mapOrder);
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map(mapOrder);
   },
 
   getMyOrders: async (): Promise<Order[]> => {
     const response = await client.get('orders/my_orders/');
-    return response.data.map(mapOrder);
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map(mapOrder);
   },
 
   getOrderDetails: async (id: string): Promise<Order> => {
@@ -744,7 +749,8 @@ export const api = {
 
   getUsers: async (): Promise<User[]> => {
     const response = await client.get('users/');
-    return response.data.map(mapUser);
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map(mapUser);
   },
 
   updateUserStatus: async (userId: string, isActive: boolean): Promise<void> => {
@@ -806,7 +812,8 @@ export const api = {
   getWishlist: async (): Promise<Product[]> => {
     try {
       const response = await client.get('wishlist/');
-      return response.data.map((item: any) => mapProduct(item.product));
+      const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+      return data.map((item: any) => mapProduct(item.product));
     } catch (e) {
       return [];
     }
@@ -821,7 +828,9 @@ export const api = {
   // --- Contact Messages ---
   getContactMessages: async (): Promise<ContactMessage[]> => {
     const response = await client.get('contact-messages/');
-    return response.data.map((m: any) => ({
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : response.data;
+    if (!Array.isArray(data)) return [];
+    return data.map((m: any) => ({
       id: m.id,
       name: m.name,
       email: m.email,
@@ -843,7 +852,7 @@ export const api = {
   // --- Coupons ---
   getCoupons: async (): Promise<any[]> => {
     const response = await client.get('coupons/');
-    return response.data;
+    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
   },
 
   validateCoupon: async (code: string, cartTotal: number): Promise<{ valid: boolean; discount: number; message?: string; coupon?: any }> => {
@@ -875,7 +884,7 @@ export const api = {
   // --- CMS (Hero Banners & Home Sections) ---
   getHeroBanners: async (): Promise<any[]> => {
     const response = await client.get('hero-banners/');
-    return response.data;
+    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
   },
 
   createHeroBanner: async (data: any): Promise<any> => {
@@ -894,7 +903,7 @@ export const api = {
 
   getHomeSections: async (): Promise<any[]> => {
     const response = await client.get('home-sections/');
-    return response.data;
+    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
   },
 
   createHomeSection: async (data: any): Promise<any> => {
