@@ -53,6 +53,11 @@ export const AdminDashboard = () => {
   const [savingReorder, setSavingReorder] = useState(false);
   const [productCatTab, setProductCatTab] = useState('all');
 
+  // User Management
+  const [viewingUser, setViewingUser] = useState<UserType | null>(null);
+  const [editingUser, setEditingUser] = useState<UserType | null>(null);
+  const [editUserForm, setEditUserForm] = useState<{ first_name: string; last_name: string; email: string; role: string; is_active: boolean }>({ first_name: '', last_name: '', email: '', role: 'user', is_active: true });
+
   const formRef = React.useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -257,6 +262,39 @@ export const AdminDashboard = () => {
       } finally {
         setIsUploading(false);
       }
+    }
+  };
+
+  // -- User Management Handlers --
+  const handleEditUser = (u: UserType) => {
+    setEditingUser(u);
+    setEditUserForm({
+      first_name: (u as any).firstName || u.name.split(' ')[0] || '',
+      last_name: (u as any).lastName || u.name.split(' ').slice(1).join(' ') || '',
+      email: u.email,
+      role: u.role,
+      is_active: u.isActive !== false,
+    });
+  };
+
+  const handleSaveUser = async () => {
+    if (!editingUser) return;
+    try {
+      await api.updateUser(editingUser.id, editUserForm);
+      setEditingUser(null);
+      loadData();
+    } catch (e: any) {
+      alert('Failed to update user: ' + (e?.response?.data?.error || 'Unknown error'));
+    }
+  };
+
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    if (!window.confirm(`Are you sure you want to delete "${userName}"? This action cannot be undone.`)) return;
+    try {
+      await api.deleteUser(userId);
+      setUsers(prev => prev.filter(u => u.id !== userId));
+    } catch (e: any) {
+      alert('Failed to delete user: ' + (e?.response?.data?.error || 'Unknown error'));
     }
   };
 
@@ -653,6 +691,7 @@ export const AdminDashboard = () => {
                       <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Role</th>
                       <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
                       <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Joined</th>
+                      <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
@@ -704,12 +743,88 @@ export const AdminDashboard = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <span className="text-sm text-gray-700 dark:text-gray-300">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</span>
                           </td>
+                          {/* Actions: View, Edit, Delete */}
+                          <td className="px-6 py-4 whitespace-nowrap text-right">
+                            <div className="flex justify-end gap-1.5">
+                              <button onClick={() => setViewingUser(u)} className="w-8 h-8 flex items-center justify-center text-gray-500 bg-gray-50 hover:bg-indigo-50 hover:text-indigo-600 rounded-full transition-all dark:bg-gray-800 dark:hover:bg-indigo-900/30" title="View Details"><Search className="w-4 h-4" /></button>
+                              <button onClick={() => handleEditUser(u)} className="w-8 h-8 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all" title="Edit User"><Edit2 className="w-3.5 h-3.5" /></button>
+                              <button onClick={() => handleDeleteUser(u.id, u.name)} className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all" title="Delete User"><Trash2 className="w-3.5 h-3.5" /></button>
+                            </div>
+                          </td>
                         </tr>
                       );
                     })}
                   </tbody>
                 </table>
               </div>
+
+              {/* View User Detail Modal */}
+              {viewingUser && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setViewingUser(null)}>
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <button onClick={() => setViewingUser(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="w-5 h-5" /></button>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xl border-2 border-indigo-200 dark:border-indigo-800">{viewingUser.name.charAt(0)}</div>
+                      <div>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{viewingUser.name}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{viewingUser.email}</p>
+                      </div>
+                    </div>
+                    <div className="space-y-4 border-t border-gray-100 dark:border-gray-800 pt-6">
+                      <div className="flex justify-between"><span className="text-sm font-semibold text-gray-600 dark:text-gray-400">User ID</span><span className="text-sm font-bold text-gray-900 dark:text-white font-mono">{viewingUser.id}</span></div>
+                      <div className="flex justify-between"><span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Role</span><span className="text-sm font-bold text-gray-900 dark:text-white uppercase">{viewingUser.role}</span></div>
+                      <div className="flex justify-between"><span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Status</span><span className={`text-sm font-bold ${viewingUser.isActive !== false ? 'text-green-600' : 'text-red-600'}`}>{viewingUser.isActive !== false ? 'Active' : 'Disabled'}</span></div>
+                      <div className="flex justify-between"><span className="text-sm font-semibold text-gray-600 dark:text-gray-400">Joined</span><span className="text-sm font-bold text-gray-900 dark:text-white">{viewingUser.createdAt ? new Date(viewingUser.createdAt).toLocaleDateString() : 'N/A'}</span></div>
+                    </div>
+                    <button onClick={() => setViewingUser(null)} className="w-full mt-6 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Close</button>
+                  </div>
+                </div>
+              )}
+
+              {/* Edit User Modal */}
+              {editingUser && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setEditingUser(null)}>
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
+                    <button onClick={() => setEditingUser(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="w-5 h-5" /></button>
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Edit User — {editingUser.name}</h3>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 block">First Name</label>
+                          <input className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500" value={editUserForm.first_name} onChange={e => setEditUserForm({ ...editUserForm, first_name: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 block">Last Name</label>
+                          <input className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500" value={editUserForm.last_name} onChange={e => setEditUserForm({ ...editUserForm, last_name: e.target.value })} />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 block">Email</label>
+                        <input type="email" className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500" value={editUserForm.email} onChange={e => setEditUserForm({ ...editUserForm, email: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-1 block">Role</label>
+                        <select className="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-sm font-semibold text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 cursor-pointer" value={editUserForm.role} onChange={e => setEditUserForm({ ...editUserForm, role: e.target.value })}>
+                          <option value="user">User</option>
+                          <option value="seller">Seller</option>
+                          <option value="blogger">Blogger</option>
+                          <option value="admin">Admin</option>
+                        </select>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <label className="text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Account Active</label>
+                        <button type="button" className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out ${editUserForm.is_active ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`} onClick={() => setEditUserForm({ ...editUserForm, is_active: !editUserForm.is_active })}>
+                          <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${editUserForm.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                        </button>
+                      </div>
+                    </div>
+                    <div className="flex gap-3 mt-6">
+                      <button onClick={() => setEditingUser(null)} className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 py-3 rounded-xl font-bold text-sm hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Cancel</button>
+                      <button onClick={handleSaveUser} className="flex-1 bg-indigo-600 text-white py-3 rounded-xl font-bold text-sm hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30">Save Changes</button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 

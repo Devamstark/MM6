@@ -774,7 +774,16 @@ export const api = {
   },
 
   updateUserStatus: async (userId: string, isActive: boolean): Promise<void> => {
-    // Not implemented in backend MVP
+    await client.patch(`users/${userId}/`, { is_active: isActive });
+  },
+
+  updateUser: async (userId: string, data: any): Promise<any> => {
+    const response = await client.patch(`users/${userId}/`, data);
+    return response.data;
+  },
+
+  deleteUser: async (userId: string): Promise<void> => {
+    await client.delete(`users/${userId}/`);
   },
 
   getMyEarnings: async (): Promise<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number }> => {

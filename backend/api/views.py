@@ -441,13 +441,25 @@ class AffiliateViewSet(viewsets.ModelViewSet):
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
-    http_method_names = ['get', 'patch', 'head', 'options']
+    http_method_names = ['get', 'patch', 'delete', 'head', 'options']
 
     def get_queryset(self):
         user = self.request.user
         if user.role == 'admin':
             return User.objects.all()
         return User.objects.filter(id=user.id)
+
+    def destroy(self, request, *args, **kwargs):
+        """Admin-only: delete a user account."""
+        if request.user.role != 'admin':
+            return Response({'error': 'Admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+        instance = self.get_object()
+        if instance.id == request.user.id:
+            return Response({'error': 'You cannot delete your own account.'}, status=status.HTTP_400_BAD_REQUEST)
+        instance.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
 
     def partial_update(self, request, *args, **kwargs):
         """Allow users to update their own profile, and admins to update any user."""
