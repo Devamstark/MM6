@@ -6,10 +6,169 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'about-us': {
     title: 'About Us',
     content: `
-      <p class="mb-4">SmartShop started in January 2026 by team MM6 from class IT 495. We are dedicated to providing the best e-commerce experience.</p>
-      <p class="mb-4">Our mission is to bring high-quality products to customers worldwide with exceptional service and speed.</p>
-      <h3 class="text-xl font-bold mt-6 mb-3">Our Team</h3>
-      <p>Team MM6 consists of passionate developers and designers working together to build next-generation shopping platforms.</p>
+      <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
+
+        <!-- Hero Section with Animation -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 animate-pulse"></div>
+          <div class="relative z-10">
+            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl animate-bounce">
+              <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Welcome to SmartShop</h2>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">Your trusted destination for trendy fashion and quality products.</p>
+          </div>
+        </div>
+
+        <!-- Our Story Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Founded -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Founded</h3>
+            </div>
+            <p class="text-gray-600">SmartShop started in January 2026, bringing innovation to e-commerce.</p>
+          </div>
+
+          <!-- Our Mission -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Our Mission</h3>
+            </div>
+            <p class="text-gray-600">Deliver high-quality products worldwide with exceptional service and speed.</p>
+          </div>
+
+          <!-- Our Team -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Our Team</h3>
+            </div>
+            <p class="text-gray-600">Team MM6 from IT 495 - passionate developers and designers building next-gen shopping platforms.</p>
+          </div>
+
+        </div>
+
+        <!-- Team Members Section -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-600">👥 Meet Our Team</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Team Member 1 -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group">
+              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AC</div>
+              <h4 class="font-bold text-gray-900 mb-1">Abdul Choudhary</h4>
+              <p class="text-gray-500 text-sm mb-4">Team Lead</p>
+              <a href="https://github.com/achoudhury28" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </a>
+            </div>
+
+            <!-- Team Member 2 -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group">
+              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">VG</div>
+              <h4 class="font-bold text-gray-900 mb-1">Vrushika Gajjar</h4>
+              <p class="text-gray-500 text-sm mb-4">Developer</p>
+              <a href="https://github.com/Helly1529" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </a>
+            </div>
+
+            <!-- Team Member 3 -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group">
+              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AM</div>
+              <h4 class="font-bold text-gray-900 mb-1">Abdul Munshi Masjud</h4>
+              <p class="text-gray-500 text-sm mb-4">Developer</p>
+              <a href="https://github.com/Masjud2001" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </a>
+            </div>
+
+            <!-- Team Member 4 -->
+            <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group">
+              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">DT</div>
+              <h4 class="font-bold text-gray-900 mb-1">Devam Trivedi</h4>
+              <p class="text-gray-500 text-sm mb-4">Developer</p>
+              <a href="https://github.com/Devamstark" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                GitHub
+              </a>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Values Section -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">⭐ Our Values</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path></svg>
+                Customer First
+              </h4>
+              <p class="text-gray-600 text-sm">Your satisfaction is our top priority. We go above and beyond to ensure you have the best shopping experience.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+                Quality Assured
+              </h4>
+              <p class="text-gray-600 text-sm">Every product is carefully selected to meet our high standards of quality and durability.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                Fast Delivery
+              </h4>
+              <p class="text-gray-600 text-sm">We partner with reliable shipping providers to get your orders to you as quickly as possible.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                24/7 Support
+              </h4>
+              <p class="text-gray-600 text-sm">Our dedicated support team is always ready to help you with any questions or concerns.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Section with Animation -->
+        <div class="bg-white p-8 rounded-4xl shadow-lg shadow-gray-100 border border-gray-100">
+          <h3 class="text-2xl font-black mb-6 text-center text-gray-900">Our Impact</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="text-center group">
+              <div class="text-4xl font-black text-indigo-600 mb-2 group-hover:scale-125 transition-transform duration-300">10K+</div>
+              <p class="text-gray-600 text-sm font-medium">Happy Customers</p>
+            </div>
+            <div class="text-center group">
+              <div class="text-4xl font-black text-purple-600 mb-2 group-hover:scale-125 transition-transform duration-300">5K+</div>
+              <p class="text-gray-600 text-sm font-medium">Products</p>
+            </div>
+            <div class="text-center group">
+              <div class="text-4xl font-black text-amber-600 mb-2 group-hover:scale-125 transition-transform duration-300">50+</div>
+              <p class="text-gray-600 text-sm font-medium">Countries</p>
+            </div>
+            <div class="text-center group">
+              <div class="text-4xl font-black text-green-600 mb-2 group-hover:scale-125 transition-transform duration-300">99%</div>
+              <p class="text-gray-600 text-sm font-medium">Satisfaction Rate</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
     `
   },
   'shipping-info': {
