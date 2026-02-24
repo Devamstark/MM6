@@ -15,8 +15,6 @@ export default defineConfig({
                     'vendor-react': ['react', 'react-dom', 'react-router-dom'],
                     // Animation library (large, only needed when animations play)
                     'vendor-motion': ['framer-motion'],
-                    // Charting (only needed on admin dashboard)
-                    'vendor-charts': ['recharts'],
                     // Radix UI primitives
                     'vendor-radix': ['@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
                     // Icons tree-shaken but still worth splitting
