@@ -99,7 +99,7 @@ export const Wishlist = () => {
                                         exit={{ opacity: 0, scale: 0.9, y: -10, transition: { duration: 0.25 } }}
                                         className="group relative"
                                     >
-                                        <div className="aspect-[3/4] w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 relative">
+                                        <div className="aspect-3/4 w-full overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 relative">
                                             <img
                                                 src={product.imageUrl}
                                                 alt={product.name}

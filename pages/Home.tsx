@@ -9,6 +9,32 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 
+// Utility to get a generic placeholder image and formatted title based on category string
+const getCategoryDetails = (catName: string) => {
+  const norm = catName.toLowerCase();
+  let image = 'https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=1200'; // Default fashion
+  let title = catName;
+
+  if (norm.includes('women')) {
+    image = 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1200';
+    title = "Women's Collection";
+  } else if (norm.includes('men')) {
+    image = 'https://images.unsplash.com/photo-1516826957135-700ede19c6ce?q=80&w=1200';
+    title = "Men's Collection";
+  } else if (norm.includes('access')) {
+    image = 'https://images.unsplash.com/photo-1515562141207-7a8efcaf34bc?q=80&w=1200';
+    title = "Accessories";
+  } else if (norm.includes('shoes') || norm.includes('footwear')) {
+    image = 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1200';
+  } else if (norm.includes('electronics') || norm.includes('tech')) {
+    image = 'https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1200';
+  } else if (norm.includes('sale') || norm.includes('clearance')) {
+    image = 'https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?q=80&w=1200';
+  }
+
+  return { image, title };
+};
+
 export const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -346,29 +372,51 @@ export const Home = () => {
         </div>
       )}
 
-      {/* Categories Row */}
-      <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 overflow-x-auto pb-4 hide-scrollbar">
-        <div className="flex gap-6 min-w-max justify-center">
-          {categories.slice(0, 8).map((cat, idx) => (
-            <motion.div
-              key={cat}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: idx * 0.1 }}
-            >
-              <Link to={`/products?category=${cat}`} className="group flex flex-col items-center gap-3 cursor-pointer">
-                <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden border border-transparent group-hover:border-black transition-all dark:bg-gray-800 dark:group-hover:border-white">
-                  <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold uppercase dark:bg-gray-700 dark:text-gray-500">
-                    {cat.slice(0, 2)}
-                  </div>
-                </div>
-                <span className="text-sm font-bold uppercase tracking-wide group-hover:text-red-600 transition-colors dark:text-gray-300 dark:group-hover:text-red-400">{cat}</span>
-              </Link>
-            </motion.div>
-          ))}
+      {/* Categories Row (Dynamic Layout) */}
+      {categories.length > 0 && (
+        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16 mb-8">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-black uppercase tracking-tight mb-2 font-heading text-zinc-900 dark:text-white">Shop By Category</h2>
+            <div className="w-16 h-1 bg-zinc-900 mx-auto dark:bg-white"></div>
+          </div>
+
+          <div className={`grid gap-6 ${categories.slice(0, 4).length === 1 ? 'grid-cols-1 max-w-3xl mx-auto' :
+            categories.slice(0, 4).length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto' :
+              categories.slice(0, 4).length === 3 ? 'grid-cols-1 md:grid-cols-3' :
+                'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
+            }`}>
+            {categories.slice(0, 4).map((cat, idx) => {
+              const { image, title } = getCategoryDetails(cat);
+              return (
+                <motion.div
+                  key={cat}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.15 }}
+                >
+                  <Link to={`/products?category=${cat}`} className="group relative block w-full aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+                    <img
+                      src={image}
+                      alt={title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/90"></div>
+
+                    <div className="absolute inset-x-0 bottom-0 p-6 md:p-8 transform transition-transform duration-300 translate-y-2 group-hover:translate-y-0">
+                      <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{title}</h3>
+                      <div className="flex items-center gap-2 text-white/90 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Explore Now</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </Link>
+                </motion.div>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Flash Sale Banner */}
       {flashSaleProducts.length > 0 && closestFlashSaleEnd && (

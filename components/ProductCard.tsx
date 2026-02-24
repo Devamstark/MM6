@@ -83,7 +83,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, pr
             />
 
             {/* Bottom gradient for CTA visibility */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
             {/* ── Discount + Wishlist row ── */}
             <div className="absolute top-0 left-0 right-0 flex items-start justify-between p-3 z-10">
@@ -109,8 +109,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, pr
               >
                 <Heart
                   className={`w-4 h-4 transition-colors ${wishlisted
-                      ? 'fill-red-500 text-red-500'
-                      : 'text-gray-500 dark:text-gray-400'
+                    ? 'fill-red-500 text-red-500'
+                    : 'text-gray-500 dark:text-gray-400'
                     }`}
                 />
               </button>

@@ -206,7 +206,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
                 {hoveredMenu === 'Women' && (
                   <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-[200] rounded-2xl"
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-200 rounded-2xl"
                     onMouseEnter={keepMenuOpen}
                     onMouseLeave={closeMenu}
                   >
@@ -263,7 +263,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
                 {hoveredMenu === 'Men' && (
                   <div
-                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-[200] rounded-2xl"
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-200 rounded-2xl"
                     onMouseEnter={keepMenuOpen}
                     onMouseLeave={closeMenu}
                   >
