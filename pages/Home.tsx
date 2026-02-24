@@ -19,13 +19,13 @@ const getCategoryDetails = (catName: string) => {
     image = 'https://images.unsplash.com/photo-1543163521-1bf539c55dd2?q=80&w=1200';
     title = "Women's Collection";
   } else if (norm.includes('men')) {
-    image = 'https://images.unsplash.com/photo-1516826957135-700ede19c6ce?q=80&w=1200';
+    image = 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?q=80&w=1200';
     title = "Men's Collection";
   } else if (norm.includes('access')) {
-    image = 'https://images.unsplash.com/photo-1515562141207-7a8efcaf34bc?q=80&w=1200';
+    image = 'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?q=80&w=1200';
     title = "Accessories";
   } else if (norm.includes('shoes') || norm.includes('footwear')) {
-    image = 'https://images.unsplash.com/photo-1549298916-b41d501d3772?q=80&w=1200';
+    image = 'https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1200';
   } else if (norm.includes('electronics') || norm.includes('tech')) {
     image = 'https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=1200';
   } else if (norm.includes('sale') || norm.includes('clearance')) {
