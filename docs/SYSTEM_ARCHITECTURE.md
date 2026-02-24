@@ -224,25 +224,48 @@
 │ transaction_id  │
 └─────────────────┘
 
-┌─────────────────┐
-│   Affiliate     │
-├─────────────────┤
-│ id (PK)         │
-│ user_id (FK)    │
-│ referral_code   │
-│ earnings        │
-│ clicks          │
+┌─────────────────┐       ┌─────────────────┐
+│   Affiliate     │       │    Address      │
+├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │
+│ user_id (FK)    │       │ user_id (FK)    │
+│ referral_code   │       │ full_name       │
+│ earnings        │       │ street, city    │
+│ clicks          │       │ state, country  │
+└─────────────────┘       │ phone, type     │
+                          └─────────────────┘
+
+┌─────────────────┐       ┌─────────────────┐
+│  PageContent    │       │    Wishlist     │
+├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │
+│ slug            │       │ user_id (FK)    │
+│ title           │       │ product_id (FK) │
+│ content         │       │ created_at      │
+│ updated_at      │       └─────────────────┘
 └─────────────────┘
 
-┌─────────────────┐
-│  PageContent    │
-├─────────────────┤
-│ id (PK)         │
-│ slug            │
-│ title           │
-│ content         │
-│ updated_at      │
-└─────────────────┘
+┌─────────────────┐       ┌─────────────────┐
+│   HeroBanner    │       │ HomePageSection │
+├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │
+│ title           │       │ title           │
+│ subtitle        │       │ section_type    │
+│ image           │       │ image / images  │
+│ is_active       │       │ is_active       │
+│ display_order   │       │ display_order   │
+└─────────────────┘       └─────────────────┘
+
+┌─────────────────┐       ┌─────────────────┐
+│     Coupon      │       │ ContactMessage  │
+├─────────────────┤       ├─────────────────┤
+│ id (PK)         │       │ id (PK)         │
+│ code            │       │ name            │
+│ discount_value  │       │ email           │
+│ min_purchase    │       │ subject         │
+│ start/end_date  │       │ message         │
+│ is_active       │       │ is_read         │
+└─────────────────┘       └─────────────────┘
 ```
 
 ---

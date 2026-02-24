@@ -247,6 +247,15 @@ New version is live at https://smartshop1.us
 
 ---
 
-**Version**: 1.0.0  
+## 11. External Integrations (Outbound Traffic)
+
+| Service | Used For | Protocol / Port |
+|:---|:---|:---|
+| **cPanel Mail Server** | Sending OTPs for new user registration and password resets | SMTP (465/587) |
+| **Unsplash API** | Placeholder images for Bloggers and Home Categories | HTTPS (443) |
+
+---
+
+**Version**: 1.3.0  
 **Last Updated**: February 2026  
 **Infrastructure**: HostAsia VPS, Docker, Dokploy, Traefik  

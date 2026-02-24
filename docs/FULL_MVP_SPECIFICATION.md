@@ -689,4 +689,4 @@ For questions or issues:
 ---
 
 **Last Updated**: February 2026
-**Version**: 1.2.0 (VPS Deployment)
+**Version**: 1.3.0 (Role Expansion & Unified Architecture)
