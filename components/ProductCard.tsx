@@ -1,9 +1,9 @@
-import React, { useRef, useEffect } from 'react';
+import React from 'react';
 import { Product } from '../types';
-import { ShoppingBag, Zap, Star } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react'; // Removing Zap, Star if unused to clean up
 import { useCart } from '../context/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
-import gsap from 'gsap';
+import { motion } from 'framer-motion';
 import { cn } from '../utils/cn';
 
 interface ProductCardProps {
@@ -14,23 +14,6 @@ interface ProductCardProps {
 export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) => {
   const { addToCart } = useCart();
   const navigate = useNavigate();
-  const cardRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (cardRef.current) {
-      gsap.fromTo(
-        cardRef.current,
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.5,
-          delay: index * 0.1,
-          ease: 'power2.out',
-        }
-      );
-    }
-  }, [index]);
 
   const handleBuy = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -38,92 +21,101 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0 }) 
     addToCart(product);
   };
 
-  const handleBuyNow = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    addToCart(product);
-    navigate('/checkout');
-  };
-
   return (
-    <div ref={cardRef} className="opacity-0">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay: index * 0.05 }}
+      whileHover={{ y: -4 }}
+      className="h-full"
+    >
       <Link to={`/product/${product.slug}`} className="group cursor-pointer block h-full">
-        <div className="relative bg-white overflow-hidden transition-all duration-300 h-full flex flex-col border border-gray-100 dark:bg-gray-900 dark:border-gray-800">
+        <div className="relative bg-white overflow-hidden transition-all duration-300 h-full flex flex-col border border-gray-100 dark:bg-gray-900 dark:border-gray-800 rounded-2xl shadow-sm hover:shadow-xl dark:hover:shadow-indigo-900/10">
 
           {/* Image Container */}
-          <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-700">
-            <img
+          <div className="relative aspect-square overflow-hidden bg-white dark:bg-gray-800">
+            <motion.img
+              initial={{ scale: 1 }}
+              whileHover={{ scale: 1.1 }}
+              transition={{ duration: 0.6, ease: [0.33, 1, 0.68, 1] }}
               src={product.imageUrl || 'https://via.placeholder.com/600x600?text=No+Image'}
               alt={product.name}
-              className={`h-full w-full transition-transform duration-700 group-hover:scale-110 ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
+              loading="lazy"
+              className={`h-full w-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'}`}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = 'https://via.placeholder.com/600x600?text=No+Image';
               }}
             />
 
             {/* Overlay Gradient */}
-            <div className="absolute inset-0 bg-linear-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            <div className="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
             {/* Badges */}
-            <div className="absolute top-2 left-2 flex flex-col gap-1.5">
+            <div className="absolute top-3 left-3 flex flex-col gap-1.5 focus:z-10">
               {product.salePrice && product.salePrice < product.price && (
-                <div className="bg-red-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-widest shadow-sm">
+                <div className="bg-red-500 text-white text-[10px] font-black px-2.5 py-1 rounded-full uppercase tracking-wider shadow-lg">
                   {product.discountPercentage ? `-${product.discountPercentage}%` : 'SALE'}
                 </div>
               )}
             </div>
 
-            {/* Action Buttons - Always visible as min stock is 1 */}
-            {/* Action Buttons - Minimal */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
+            {/* Quick Add Button */}
+            <div className="absolute bottom-4 left-4 right-4 translate-y-4 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
               <button
                 onClick={handleBuy}
-                className="bg-white text-black text-[10px] font-bold uppercase tracking-widest px-4 py-2 border border-black transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 hover:bg-black hover:text-white"
+                className="w-full bg-white dark:bg-gray-900 text-gray-900 dark:text-white text-xs font-bold uppercase tracking-widest py-3 rounded-xl shadow-2xl hover:bg-gray-900 hover:text-white dark:hover:bg-white dark:hover:text-gray-900 transition-colors flex items-center justify-center gap-2"
               >
+                <ShoppingBag className="w-4 h-4" />
                 Quick Add
               </button>
             </div>
           </div>
 
           {/* Content */}
-          <div className="p-3 flex flex-col grow text-center">
-            <div className="mb-1 text-[9px] text-gray-400 font-bold uppercase tracking-[0.15em] font-sans">
+          <div className="p-4 flex flex-col grow">
+            <div className="mb-1 text-[10px] text-indigo-600 dark:text-indigo-400 font-black uppercase tracking-[0.2em]">
               {product.brand || product.category}
             </div>
-            <h3 className="text-gray-900 font-medium text-sm leading-snug mb-2 group-hover:underline transition-all dark:text-gray-100 uppercase tracking-tight">
+            <h3 className="text-gray-900 font-bold text-sm leading-tight mb-3 line-clamp-2 dark:text-gray-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
               {product.name}
             </h3>
 
-            <div className="mt-auto flex flex-col items-center pt-2">
-              {product.salePrice && product.salePrice < product.price ? (
-                <div className="flex items-baseline justify-center gap-2">
-                  <span className="text-sm font-bold text-red-600">${product.salePrice.toFixed(2)}</span>
-                  <span className="text-[10px] text-gray-400 line-through">${product.price.toFixed(2)}</span>
-                </div>
-              ) : (
-                <span className="text-sm font-bold text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
-              )}
+            <div className="mt-auto flex items-center justify-between">
+              <div className="flex flex-col">
+                {product.salePrice && product.salePrice < product.price ? (
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-lg font-black text-gray-900 dark:text-white">${product.salePrice.toFixed(2)}</span>
+                    <span className="text-xs text-gray-400 line-through font-medium">${product.price.toFixed(2)}</span>
+                  </div>
+                ) : (
+                  <span className="text-lg font-black text-gray-900 dark:text-white">${product.price.toFixed(2)}</span>
+                )}
+              </div>
 
-              {/* Size/Color Indicator - Subtle */}
-              {(product.colors?.length > 0 || product.sizes?.length > 0) && (
-                <div className="flex mt-2 -space-x-1.5 opacity-60 group-hover:opacity-100 transition-opacity">
-                  {product.colors?.slice(0, 3).map((c, i) => (
-                    <div key={i}
-                      className="w-3.5 h-3.5 rounded-full border border-white shadow-sm"
-                      style={{ backgroundColor: c.toLowerCase() }}
-                    />
-                  ))}
-                  {product.colors?.length > 3 && (
-                    <div className="w-3.5 h-3.5 rounded-full border border-white bg-gray-50 flex items-center justify-center text-[7px] font-bold text-gray-400">
-                      +{product.colors.length - 3}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* stock indicator */}
+              <div className={cn(
+                "w-2 h-2 rounded-full",
+                product.stock > 10 ? "bg-green-500" : "bg-orange-500"
+              )} title={`${product.stock} in stock`} />
             </div>
+
+            {/* Size/Color Dots */}
+            {(product.colors?.length > 0) && (
+              <div className="flex mt-3 gap-1.5 overflow-hidden">
+                {product.colors?.slice(0, 4).map((c, i) => (
+                  <div key={i}
+                    className="w-3 h-3 rounded-full border border-gray-100 dark:border-gray-800 shadow-sm"
+                    style={{ backgroundColor: c.toLowerCase() }}
+                  />
+                ))}
+                {product.colors?.length > 4 && (
+                  <span className="text-[9px] font-bold text-gray-400">+{product.colors.length - 4}</span>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </Link>
-    </div>
+    </motion.div>
   );
 };

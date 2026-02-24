@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { Product, Review } from '../types';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Star, ShoppingBag, ArrowLeft, Truck, RotateCcw,
     ShieldCheck, Heart, Share2, Plus, Minus, Check,
@@ -49,8 +50,9 @@ export const ProductDetail = () => {
                     if (data.colors && data.colors.length > 0) setSelectedColor(data.colors[0]);
 
                     // Fetch Related
-                    const related = await api.getProducts({ category: data.category });
-                    setRelatedProducts(related.filter(p => p.id !== data.id).slice(0, 4));
+                    const relatedRes = await api.getProducts({ category: data.category });
+                    const related = (relatedRes as any).results || [];
+                    setRelatedProducts(related.filter((p: any) => p.id !== data.id).slice(0, 4));
 
                     // Fetch Reviews
                     const revs = await api.getReviews(data.id);
@@ -146,7 +148,11 @@ export const ProductDetail = () => {
     };
 
     return (
-        <div className="bg-white min-h-screen pb-16 pt-20 dark:bg-gray-900 transition-colors duration-300 font-body">
+        <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white min-h-screen pb-16 pt-20 dark:bg-gray-900 transition-colors duration-300 font-body"
+        >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
                 {/* Header Navigation */}
@@ -189,12 +195,19 @@ export const ProductDetail = () => {
                         {/* Main Image Container */}
                         <div className="flex-1 min-w-0">
                             <div className="relative group bg-white rounded-sm overflow-hidden border border-gray-100 dark:bg-gray-800 dark:border-gray-700 aspect-square flex items-center justify-center p-4">
-                                <img
-                                    src={mainImage || PLACEHOLDER_IMAGE}
-                                    alt={product.name}
-                                    className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all duration-300`}
-                                    onError={handleImageError}
-                                />
+                                <AnimatePresence mode="wait">
+                                    <motion.img
+                                        key={mainImage}
+                                        initial={{ opacity: 0, scale: 1.1 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        exit={{ opacity: 0, scale: 0.95 }}
+                                        transition={{ duration: 0.4 }}
+                                        src={mainImage || PLACEHOLDER_IMAGE}
+                                        alt={product.name}
+                                        className={`max-w-full max-h-full ${product.imageFit === 'contain' ? 'object-contain' : 'object-cover'} transition-all`}
+                                        onError={handleImageError}
+                                    />
+                                </AnimatePresence>
 
                                 {/* Zoom Placeholder / Hover Effect */}
                                 <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity" />
@@ -224,7 +237,12 @@ export const ProductDetail = () => {
                     </div>
 
                     {/* Right: Product Info (Span 6) - Sticky */}
-                    <div className="lg:col-span-6 flex flex-col sticky top-24 space-y-6 lg:pl-8">
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 }}
+                        className="lg:col-span-6 flex flex-col sticky top-24 space-y-6 lg:pl-8"
+                    >
                         <div>
                             {/* Brand & Category */}
                             <div className="flex items-center gap-2 mb-1">
@@ -409,7 +427,7 @@ export const ProductDetail = () => {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Middle Section: Tabbed Experience */}
@@ -627,36 +645,37 @@ export const ProductDetail = () => {
             </div>
 
             {/* Lightbox Modal */}
-            {isLightboxOpen && (
-                <div
-                    className="fixed inset-0 z-100 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-fade-in"
-                    onClick={() => setIsLightboxOpen(false)}
-                >
-                    <button
-                        className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2"
+            {
+                isLightboxOpen && (
+                    <div
+                        className="fixed inset-0 z-100 bg-black/95 flex items-center justify-center p-4 backdrop-blur-sm transition-all animate-fade-in"
                         onClick={() => setIsLightboxOpen(false)}
                     >
-                        <X className="w-10 h-10" />
-                    </button>
-                    <div
-                        className="max-w-6xl w-full h-[85vh] relative flex items-center justify-center animate-scale-in"
-                        onClick={e => e.stopPropagation()}
-                    >
-                        <img
-                            src={mainImage}
-                            alt={product?.name}
-                            className={`w-full h-full ${product?.imageFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-2xl shadow-2xl`}
-                        />
+                        <button
+                            className="absolute top-6 right-6 text-white/50 hover:text-white transition-colors p-2"
+                            onClick={() => setIsLightboxOpen(false)}
+                        >
+                            <X className="w-10 h-10" />
+                        </button>
+                        <div
+                            className="max-w-6xl w-full h-[85vh] relative flex items-center justify-center animate-scale-in"
+                            onClick={e => e.stopPropagation()}
+                        >
+                            <img
+                                src={mainImage}
+                                alt={product?.name}
+                                className={`w-full h-full ${product?.imageFit === 'contain' ? 'object-contain' : 'object-cover'} rounded-2xl shadow-2xl`}
+                            />
+                        </div>
                     </div>
-                </div>
-            )}
+                )
+            }
 
-            {/* Size Guide Side Modal */}
             <SizeGuideModal
                 isOpen={isSizeGuideOpen}
                 onClose={() => setIsSizeGuideOpen(false)}
                 category={product?.gender === 'Men' ? 'men' : product?.gender === 'Women' ? 'women' : 'unisex'}
             />
-        </div>
+        </motion.div>
     );
 };

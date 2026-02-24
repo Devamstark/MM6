@@ -5,6 +5,7 @@ import { ProductCard } from '../components/ProductCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Loader2, ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 
@@ -23,6 +24,9 @@ export const Home = () => {
   const [closestFlashSaleEnd, setClosestFlashSaleEnd] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [featuredPage, setFeaturedPage] = useState(1);
+  const [hasMoreFeatured, setHasMoreFeatured] = useState(false);
+  const [loadingMoreFeatured, setLoadingMoreFeatured] = useState(false);
 
   // Auto-rotate hero banners every 10 seconds
   useEffect(() => {
@@ -70,22 +74,28 @@ export const Home = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [banners, sections, featured, popular, cats, allProducts] = await Promise.all([
+        const [banners, sections, featuredRes, popularRes, cats, allProductsRes] = await Promise.all([
           api.getHeroBanners().catch(() => []),
           api.getHomeSections().catch(() => []),
-          api.getProducts({ isFeatured: true }).catch(() => []),
-          api.getProducts({ isPopular: true }).catch(() => []),
+          api.getProducts({ isFeatured: true }).catch(() => ({ results: [] })),
+          api.getProducts({ isPopular: true }).catch(() => ({ results: [] })),
           api.getCategories().catch(() => []),
-          api.getProducts({}).catch(() => [])
+          api.getProducts({}).catch(() => ({ results: [] }))
         ]);
+
+        const featured = (featuredRes as any).results || [];
+        const popular = (popularRes as any).results || [];
+        const allProducts = (allProductsRes as any).results || [];
+
         setHeroBanners(banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
         setHomeSections(sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
-        setFeaturedProducts(featured.slice(0, 8));
+        setFeaturedProducts(featuredRes.results || []);
+        setHasMoreFeatured(!!(featuredRes as any).next);
         setPopularProducts(popular.slice(0, 4));
         setCategories(cats);
 
         const now = new Date();
-        const flashSales = allProducts.filter(p =>
+        const flashSales = allProducts.filter((p: any) =>
           p.flashSaleEnd && new Date(p.flashSaleEnd) > now
         );
         setFlashSaleProducts(flashSales);
@@ -104,6 +114,22 @@ export const Home = () => {
     };
     fetchData();
   }, []);
+
+  const handleLoadMoreFeatured = async () => {
+    if (loadingMoreFeatured || !hasMoreFeatured) return;
+    setLoadingMoreFeatured(true);
+    try {
+      const nextPage = featuredPage + 1;
+      const res = await api.getProducts({ isFeatured: true, page: nextPage });
+      setFeaturedProducts(prev => [...prev, ...res.results]);
+      setFeaturedPage(nextPage);
+      setHasMoreFeatured(!!res.next);
+    } catch (err) {
+      console.error('Failed to load more featured products:', err);
+    } finally {
+      setLoadingMoreFeatured(false);
+    }
+  };
 
   if (user?.role === 'admin' || user?.role === 'seller') return null;
 
@@ -316,23 +342,38 @@ export const Home = () => {
       {/* Categories Row */}
       <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-12 overflow-x-auto pb-4 hide-scrollbar">
         <div className="flex gap-6 min-w-max justify-center">
-          {categories.slice(0, 8).map((cat) => (
-            <Link key={cat} to={`/products?category=${cat}`} className="group flex flex-col items-center gap-3 cursor-pointer">
-              <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden border border-transparent group-hover:border-black transition-all dark:bg-gray-800 dark:group-hover:border-white">
-                <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold uppercase dark:bg-gray-700 dark:text-gray-500">
-                  {cat.slice(0, 2)}
+          {categories.slice(0, 8).map((cat, idx) => (
+            <motion.div
+              key={cat}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: idx * 0.1 }}
+            >
+              <Link to={`/products?category=${cat}`} className="group flex flex-col items-center gap-3 cursor-pointer">
+                <div className="w-24 h-24 rounded-full bg-gray-100 overflow-hidden border border-transparent group-hover:border-black transition-all dark:bg-gray-800 dark:group-hover:border-white">
+                  <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400 text-xs font-bold uppercase dark:bg-gray-700 dark:text-gray-500">
+                    {cat.slice(0, 2)}
+                  </div>
                 </div>
-              </div>
-              <span className="text-sm font-bold uppercase tracking-wide group-hover:text-red-600 transition-colors dark:text-gray-300 dark:group-hover:text-red-400">{cat}</span>
-            </Link>
+                <span className="text-sm font-bold uppercase tracking-wide group-hover:text-red-600 transition-colors dark:text-gray-300 dark:group-hover:text-red-400">{cat}</span>
+              </Link>
+            </motion.div>
           ))}
         </div>
       </div>
 
       {/* Flash Sale Banner */}
       {flashSaleProducts.length > 0 && closestFlashSaleEnd && (
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16 animate-fade-up">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16"
+        >
           <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group dark:bg-primary/10 dark:border-primary/30">
+            {/* ... banner content ... */}
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
 
@@ -360,7 +401,7 @@ export const Home = () => {
               Shop the Drop
             </Link>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Featured Grid */}
@@ -375,18 +416,35 @@ export const Home = () => {
             <SkeletonCard count={10} />
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12"
+          >
             {featuredProducts.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} />
             ))}
-          </div>
+          </motion.div>
         )}
 
-        <div className="mt-12 text-center">
-          <Link to="/products" className="inline-flex items-center gap-2 border-b-2 border-black pb-1 text-sm font-bold uppercase tracking-widest hover:text-primary hover:border-primary transition-all dark:border-white dark:text-white dark:hover:text-primary dark:hover:border-primary">
-            View More <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
+        {hasMoreFeatured ? (
+          <div className="mt-12 text-center">
+            <button
+              onClick={handleLoadMoreFeatured}
+              disabled={loadingMoreFeatured}
+              className="bg-black text-white px-10 py-4 rounded-full font-bold uppercase tracking-widest hover:bg-gray-800 transition-all shadow-lg hover:shadow-black/20 hover:-translate-y-1 disabled:opacity-50 dark:bg-white dark:text-black dark:hover:bg-gray-200"
+            >
+              {loadingMoreFeatured ? 'Loading...' : 'Load More Drops'}
+            </button>
+          </div>
+        ) : (
+          <div className="mt-12 text-center">
+            <Link to="/products" className="inline-flex items-center gap-2 border-b-2 border-black pb-1 text-sm font-bold uppercase tracking-widest hover:text-primary hover:border-primary transition-all dark:border-white dark:text-white dark:hover:text-primary dark:hover:border-primary">
+              View All Products <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Full Width Banner */}

@@ -11,6 +11,9 @@ export const ProductList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalCount, setTotalCount] = useState(0);
 
   // Parse filters from URL
   const filters = {
@@ -29,13 +32,14 @@ export const ProductList = () => {
   };
 
   useEffect(() => {
-    loadProducts();
+    setProducts([]);
+    setPage(1);
+    loadProducts(1, true);
   }, [searchParams]);
 
-  const loadProducts = async () => {
+  const loadProducts = async (pageNum: number, isNewSearch: boolean = false) => {
     setLoading(true);
     try {
-      // Convert string params to correct types for API
       const validSorts = ['price_asc', 'price_desc', 'newest'];
       const sort = validSorts.includes(filters.sort)
         ? (filters.sort as ProductFilter['sort'])
@@ -48,24 +52,34 @@ export const ProductList = () => {
         isFeatured: filters.isFeatured === 'true' ? true : (filters.isFeatured === 'false' ? false : undefined),
         isPopular: filters.isPopular === 'true' ? true : (filters.isPopular === 'false' ? false : undefined),
         sort,
+        page: pageNum,
       };
 
-      let productsData = await api.getProducts(apiFilters).catch(() => []); // Fallback on error
+      const res: any = await api.getProducts(apiFilters).catch(() => ({ results: [], count: 0 }));
+      let newProducts = res.results || [];
 
       // Client-side filtering for Flash Sales
       if (filters.flashSale) {
         const now = new Date();
-        productsData = productsData.filter(p =>
+        newProducts = newProducts.filter((p: any) =>
           p.flashSaleEnd && new Date(p.flashSaleEnd) > now
         );
       }
 
-      setProducts(productsData);
+      setProducts(prev => isNewSearch ? newProducts : [...prev, ...newProducts]);
+      setTotalCount(res.count || 0);
+      setHasMore(!!res.next);
     } catch (err) {
       console.error(err);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    loadProducts(nextPage);
   };
 
   const updateFilter = (key: string, value: string) => {
@@ -104,8 +118,9 @@ export const ProductList = () => {
               filters={{
                 ...filters,
                 isFeatured: filters.isFeatured === 'true',
-                isPopular: filters.isPopular === 'true'
-              }}
+                isPopular: filters.isPopular === 'true',
+                onSale: filters.onSale
+              } as any}
               onFilterChange={updateFilter}
               onClearFilters={clearFilters}
             />
@@ -116,7 +131,7 @@ export const ProductList = () => {
         <div className="grow animate-fade-up delay-200">
           <div className="flex justify-between items-center mb-6 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
             <div className="text-sm font-medium text-gray-600 dark:text-gray-300 px-2">
-              {products.length} {products.length === 1 ? 'item' : 'items'} found {filters.search && `for "${filters.search}"`}
+              Showing {products.length} of {totalCount} {totalCount === 1 ? 'item' : 'items'}
             </div>
             <select
               className="border-none bg-gray-50 dark:bg-gray-800 rounded-xl px-4 py-2 text-sm font-medium focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors dark:text-gray-200"
@@ -130,19 +145,16 @@ export const ProductList = () => {
             </select>
           </div>
 
-          {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              <SkeletonCard count={8} />
-            </div>
-          ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {products.map((product, idx) => (
-                <div key={product.id} className="animate-fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
-                  <ProductCard product={product} />
-                </div>
-              ))}
-            </div>
-          ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {products.map((product, idx) => (
+              <div key={product.id} className="animate-fade-up" style={{ animationDelay: `${idx * 50}ms` }}>
+                <ProductCard product={product} />
+              </div>
+            ))}
+            {loading && <SkeletonCard count={4} />}
+          </div>
+
+          {products.length === 0 && !loading && (
             <div className="bg-white dark:bg-gray-900 p-16 text-center rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
               <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Loader2 className="w-8 h-8 text-gray-400 dark:text-gray-500" />
@@ -150,6 +162,17 @@ export const ProductList = () => {
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">No products found</h3>
               <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your filters or search terms.</p>
               <button onClick={clearFilters} className="mt-6 px-6 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">Clear all filters</button>
+            </div>
+          )}
+
+          {hasMore && !loading && (
+            <div className="mt-12 flex justify-center">
+              <button
+                onClick={handleLoadMore}
+                className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-full font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all shadow-lg hover:shadow-indigo-200 dark:hover:shadow-white/20 hover:-translate-y-1"
+              >
+                Load More Products
+              </button>
             </div>
           )}
         </div>

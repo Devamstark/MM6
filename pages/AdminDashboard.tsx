@@ -29,6 +29,15 @@ export const AdminDashboard = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Pagination
+  const [productPage, setProductPage] = useState(1);
+  const [hasMoreProducts, setHasMoreProducts] = useState(false);
+  const [loadingMoreProducts, setLoadingMoreProducts] = useState(false);
+
+  const [orderPage, setOrderPage] = useState(1);
+  const [hasMoreOrders, setHasMoreOrders] = useState(false);
+  const [loadingMoreOrders, setLoadingMoreOrders] = useState(false);
+
   // Filters
   const [sellerFilter, setSellerFilter] = useState<string>('');
 
@@ -58,7 +67,7 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, productsData, usersData, ordersData, categoriesData, messagesData] = await Promise.all([
+      const [statsData, productsRes, usersData, ordersRes, categoriesData, messagesData] = await Promise.all([
         api.getDashboardStats(),
         api.getProducts(),
         api.getUsers(),
@@ -67,16 +76,60 @@ export const AdminDashboard = () => {
         api.getContactMessages(),
       ]);
       setStats(statsData);
-      // Sort products by display_order
-      setProducts(productsData.sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0)));
+
+      const productsList = (productsRes as any).results || [];
+      setProducts(productsList.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
+      setHasMoreProducts(!!(productsRes as any).next);
+      setProductPage(1);
+
       setUsers(usersData);
-      setOrders(ordersData);
+
+      const ordersList = (ordersRes as any).results || [];
+      setOrders(ordersList);
+      setHasMoreOrders(!!(ordersRes as any).next);
+      setOrderPage(1);
+
       setCategories(categoriesData);
       setMessages(messagesData);
     } catch (e) {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLoadMoreProducts = async () => {
+    if (loadingMoreProducts || !hasMoreProducts) return;
+    setLoadingMoreProducts(true);
+    try {
+      const nextPage = productPage + 1;
+      const res = await api.getProducts({ page: nextPage });
+      const newItems = (res as any).results || [];
+      setProducts(prev => [...prev, ...newItems].sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
+      setProductPage(nextPage);
+      setHasMoreProducts(!!(res as any).next);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingMoreProducts(false);
+    }
+  };
+
+  const handleLoadMoreOrders = async () => {
+    if (loadingMoreOrders || !hasMoreOrders) return;
+    setLoadingMoreOrders(true);
+    try {
+      const nextPage = orderPage + 1;
+      // Note: api.getRecentOrders doesn't currently take page, but we'll pass it for future-proofing or if we use the same endpoint
+      const res = await api.getRecentOrders();
+      const newItems = (res as any).results || [];
+      setOrders(prev => [...prev, ...newItems]);
+      setOrderPage(nextPage);
+      setHasMoreOrders(!!(res as any).next);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingMoreOrders(false);
     }
   };
 
@@ -399,6 +452,17 @@ export const AdminDashboard = () => {
                         })}
                       </tbody>
                     </table>
+                    {hasMoreProducts && (
+                      <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-center">
+                        <button
+                          onClick={handleLoadMoreProducts}
+                          disabled={loadingMoreProducts}
+                          className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 disabled:opacity-50"
+                        >
+                          {loadingMoreProducts ? 'Syncing...' : 'Load More Products'}
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -597,6 +661,17 @@ export const AdminDashboard = () => {
                     ))}
                   </tbody>
                 </table>
+                {hasMoreOrders && (
+                  <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-center">
+                    <button
+                      onClick={handleLoadMoreOrders}
+                      disabled={loadingMoreOrders}
+                      className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 disabled:opacity-50"
+                    >
+                      {loadingMoreOrders ? 'Syncing...' : 'Load More Orders'}
+                    </button>
+                  </div>
+                )}
               </div>
               {filteredOrders.length === 0 && <div className="p-12 text-center text-gray-500 dark:text-gray-400 font-medium">No orders found.</div>}
             </div>

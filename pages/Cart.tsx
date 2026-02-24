@@ -2,6 +2,7 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, Plus, Minus, ArrowRight, ShoppingBag,
     ArrowLeft, ShieldCheck, Truck, CreditCard,
@@ -63,77 +64,84 @@ export const Cart = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
 
                     {/* Items List - Large Column */}
-                    <div className="lg:col-span-2 space-y-4 animate-fade-up delay-100">
-                        {items.map((item) => (
-                            <div
-                                key={item.id}
-                                className="bg-white dark:bg-gray-900 rounded-4xl border border-gray-100 dark:border-gray-800 p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-none transition-all group overflow-hidden relative"
-                            >
-                                {/* Decorative Background Gradient */}
-                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 dark:bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
+                    <div className="lg:col-span-2 space-y-4">
+                        <AnimatePresence mode="popLayout">
+                            {items.map((item) => (
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                                    exit={{ opacity: 0, scale: 0.9, x: -50 }}
+                                    transition={{ duration: 0.4, ease: [0.33, 1, 0.68, 1] }}
+                                    key={item.id}
+                                    className="bg-white dark:bg-gray-900 rounded-4xl border border-gray-100 dark:border-gray-800 p-6 flex flex-col sm:flex-row items-center gap-6 shadow-sm hover:shadow-xl hover:shadow-gray-100 dark:hover:shadow-indigo-500/5 transition-all group overflow-hidden relative"
+                                >
+                                    {/* Decorative Background Gradient */}
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-50/30 dark:bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
 
-                                {/* Image Section */}
-                                <div className="w-full sm:w-44 h-44 shrink-0 overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 relative group/img">
-                                    <img
-                                        src={item.imageUrl}
-                                        alt={item.name}
-                                        className="h-full w-full object-cover group-hover/img:scale-110 transition-transform duration-700"
-                                    />
-                                    <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-[10px] font-black text-gray-900 dark:text-white border border-gray-100 dark:border-gray-800 shadow-sm">
-                                        QTY: {item.quantity}
-                                    </div>
-                                </div>
-
-                                {/* Info Section */}
-                                <div className="flex-1 flex flex-col justify-between w-full h-44 py-1">
-                                    <div className="flex justify-between items-start">
-                                        <div>
-                                            <p className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">{item.brand}</p>
-                                            <Link to={`/product/${item.id}`} className="text-xl font-bold text-gray-900 dark:text-white hover:text-indigo-600 transition-colors line-clamp-2 pr-8">{item.name}</Link>
-                                        </div>
-                                        <div className="text-right">
-                                            <p className="text-xl font-black text-gray-900 dark:text-white">${item.price.toFixed(2)}</p>
-                                            {item.price > 100 && <p className="text-[10px] text-green-600 font-bold uppercase tracking-tighter">Express Available</p>}
+                                    {/* Image Section */}
+                                    <div className="w-full sm:w-44 h-44 shrink-0 overflow-hidden rounded-2xl bg-gray-100 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 relative group/img">
+                                        <img
+                                            src={item.imageUrl}
+                                            alt={item.name}
+                                            className="h-full w-full object-cover group-hover/img:scale-110 transition-transform duration-700"
+                                        />
+                                        <div className="absolute top-3 left-3 px-2 py-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm rounded-lg text-[10px] font-black text-gray-900 dark:text-white border border-gray-100 dark:border-gray-800 shadow-sm">
+                                            QTY: {item.quantity}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center justify-between mt-6">
-                                        {/* Quantity Controls */}
-                                        <div className="flex items-center bg-gray-50 dark:bg-gray-800/80 p-1.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner group-hover:border-indigo-100 transition-colors">
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-gray-700 hover:text-red-500 transition-all text-gray-400 shadow-sm"
-                                            >
-                                                {item.quantity === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
-                                            </button>
-                                            <span className="w-12 text-center text-lg font-black text-gray-900 dark:text-white">{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-gray-700 hover:text-indigo-600 transition-all text-gray-400 shadow-sm"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </button>
+                                    {/* Info Section */}
+                                    <div className="flex-1 flex flex-col justify-between w-full h-44 py-1">
+                                        <div className="flex justify-between items-start">
+                                            <div>
+                                                <p className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-1">{item.brand}</p>
+                                                <Link to={`/product/${item.id}`} className="text-xl font-bold text-gray-900 dark:text-white hover:text-indigo-600 transition-colors line-clamp-2 pr-8">{item.name}</Link>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xl font-black text-gray-900 dark:text-white">${item.price.toFixed(2)}</p>
+                                                {item.price > 100 && <p className="text-[10px] text-green-600 font-bold uppercase tracking-tighter">Express Available</p>}
+                                            </div>
                                         </div>
 
-                                        <div className="flex items-center gap-2">
-                                            <button
-                                                className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all border border-transparent hover:border-red-100"
-                                                onClick={() => removeFromCart(item.id)}
-                                                title="Remove from bag"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                            <button
-                                                className="p-3 text-gray-400 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-2xl transition-all border border-transparent hover:border-pink-100"
-                                                title="Move to wishlist"
-                                            >
-                                                <Heart className="w-5 h-5" />
-                                            </button>
+                                        <div className="flex items-center justify-between mt-6">
+                                            {/* Quantity Controls */}
+                                            <div className="flex items-center bg-gray-50 dark:bg-gray-800/80 p-1.5 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-inner group-hover:border-indigo-100 transition-colors">
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                                    className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-gray-700 hover:text-red-500 transition-all text-gray-400 shadow-sm"
+                                                >
+                                                    {item.quantity === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                                                </button>
+                                                <span className="w-12 text-center text-lg font-black text-gray-900 dark:text-white">{item.quantity}</span>
+                                                <button
+                                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                                    className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-gray-700 hover:text-indigo-600 transition-all text-gray-400 shadow-sm"
+                                                >
+                                                    <Plus className="w-4 h-4" />
+                                                </button>
+                                            </div>
+
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-2xl transition-all border border-transparent hover:border-red-100"
+                                                    onClick={() => removeFromCart(item.id)}
+                                                    title="Remove from bag"
+                                                >
+                                                    <Trash2 className="w-5 h-5" />
+                                                </button>
+                                                <button
+                                                    className="p-3 text-gray-400 hover:text-pink-500 hover:bg-pink-50 dark:hover:bg-pink-900/20 rounded-2xl transition-all border border-transparent hover:border-pink-100"
+                                                    title="Move to wishlist"
+                                                >
+                                                    <Heart className="w-5 h-5" />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        ))}
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
                         {/* Order Features Labels */}
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-12 pt-6 border-t border-gray-100 dark:border-gray-800 transition-colors">

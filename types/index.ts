@@ -96,6 +96,14 @@ export interface ProductFilter {
     isFeatured?: boolean; // Using 'isFeatured' for consistency
     isPopular?: boolean;
     sort?: string;
+    page?: number;
+}
+
+export interface PaginatedResponse<T> {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: T[];
 }
 
 export interface Order {

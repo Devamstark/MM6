@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions } from '../types';
+import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions, PaginatedResponse } from '../types';
 
 // @ts-ignore
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
@@ -427,7 +427,7 @@ export const api = {
   },
 
   // --- Products ---
-  getProducts: async (filters: ProductFilter = {}): Promise<Product[]> => {
+  getProducts: async (filters: ProductFilter = {}): Promise<PaginatedResponse<Product>> => {
     const params: any = {};
     if (filters.category) params.category = filters.category;
     if (filters.subcategory) params.subcategory = filters.subcategory;
@@ -435,6 +435,7 @@ export const api = {
     if (filters.sellerId) params.seller = filters.sellerId;
     if (filters.search) params.search = filters.search;
     if (filters.onSale) params.on_sale = 'true';
+    if (filters.page) params.page = filters.page;
 
     if (filters.minPrice !== undefined) params.min_price = filters.minPrice;
     if (filters.maxPrice !== undefined) params.max_price = filters.maxPrice;
@@ -449,7 +450,23 @@ export const api = {
     }
 
     const response = await client.get('products/', { params });
-    return response.data.map(mapProduct);
+
+    // Handle both paginated and non-paginated responses for safety
+    if (response.data.results && Array.isArray(response.data.results)) {
+      return {
+        count: response.data.count,
+        next: response.data.next,
+        previous: response.data.previous,
+        results: response.data.results.map(mapProduct)
+      };
+    }
+
+    return {
+      count: response.data.length || 0,
+      next: null,
+      previous: null,
+      results: Array.isArray(response.data) ? response.data.map(mapProduct) : []
+    };
   },
 
   getProduct: async (id: string): Promise<Product | undefined> => {

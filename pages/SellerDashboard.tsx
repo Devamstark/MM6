@@ -13,6 +13,9 @@ export const SellerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -22,12 +25,14 @@ export const SellerDashboard = () => {
     setLoading(true);
     try {
       if (user?.id) {
-        const [productsData, statsData, ordersData] = await Promise.all([
+        const [productsRes, statsData, ordersData] = await Promise.all([
           api.getProducts({ sellerId: user.id }),
           api.getSellerStats(user.id),
           api.getRecentOrders(user.id)
         ]);
-        setProducts(productsData);
+        setProducts((productsRes as any).results || []);
+        setHasMore(!!(productsRes as any).next);
+        setPage(1);
         setStats(statsData);
         setOrders(ordersData);
       }
@@ -35,6 +40,21 @@ export const SellerDashboard = () => {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+  const handleLoadMore = async () => {
+    if (loadingMore || !hasMore || !user?.id) return;
+    setLoadingMore(true);
+    try {
+      const nextPage = page + 1;
+      const res = await api.getProducts({ sellerId: user.id, page: nextPage });
+      setProducts(prev => [...prev, ...((res as any).results || [])]);
+      setPage(nextPage);
+      setHasMore(!!(res as any).next);
+    } catch (err) {
+      console.error('Failed to load more products:', err);
+    } finally {
+      setLoadingMore(false);
     }
   };
 
@@ -185,6 +205,17 @@ export const SellerDashboard = () => {
               <p className="text-xl font-bold text-gray-900 dark:text-white">No products listed</p>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Get started by adding your first product to the marketplace.</p>
               <button onClick={() => openModal()} className="text-indigo-600 dark:text-indigo-400 font-bold hover:underline">Add Product</button>
+            </div>
+          )}
+          {hasMore && products.length > 0 && (
+            <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-center">
+              <button
+                onClick={handleLoadMore}
+                disabled={loadingMore}
+                className="text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 disabled:opacity-50 flex items-center gap-2"
+              >
+                {loadingMore ? 'Loading...' : 'Load More Products'}
+              </button>
             </div>
           )}
         </div>
