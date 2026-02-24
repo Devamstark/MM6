@@ -11,7 +11,7 @@ Welcome to the SmartShop documentation. This folder contains all project documen
 | URL | Description |
 |:---|:---|
 | [https://smartshop1.us](https://smartshop1.us) | Customer storefront |
-| [https://api.smartshop1.us/admin/](https://api.smartshop1.us/admin/) | Django admin panel |
+| [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Django admin panel |
 | [https://db.smartshop1.us](https://db.smartshop1.us) | Database browser (Adminer) |
 | [https://minio.smartshop1.us](https://minio.smartshop1.us) | MinIO storage console |
 

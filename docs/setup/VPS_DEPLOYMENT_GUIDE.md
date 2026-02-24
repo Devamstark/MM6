@@ -50,7 +50,7 @@ All of these A records must point to the VPS IP address:
 ### `backend` — Django API (Gunicorn)
 - Runs database migrations and static file collection on startup
 - Serves the REST API at `api.smartshop1.us/api/`
-- Serves the Django admin panel at `api.smartshop1.us/admin/`
+- Serves the Django admin panel at `api.smartshop1.us/ssx/`
 - Serves uploaded media files (product images) at `api.smartshop1.us/media/`
 - Uses **WhiteNoise** middleware to serve admin CSS/JS static files
 
@@ -112,7 +112,7 @@ After first deployment, create an admin account by running this on the VPS:
 docker exec -it <backend-container-name> python manage.py createsuperuser
 ```
 
-Follow the prompts to set email and password. Then log in at `https://api.smartshop1.us/admin/`.
+Follow the prompts to set email and password. Then log in at `https://api.smartshop1.us/ssx/`.
 
 ---
 

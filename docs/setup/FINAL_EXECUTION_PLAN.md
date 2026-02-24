@@ -92,7 +92,7 @@ docker compose exec backend python manage.py createsuperuser
 Since your DNS (`smartshop1.us`) is still propagating, **test using your IP address**:
 
 1.  **Frontend**: Visit `http://<VPS_IP>` -> Should see the store.
-2.  **Backend Admin**: Visit `http://<VPS_IP>/admin` -> Login with your new superuser.
+2.  **Backend Admin**: Visit `http://<VPS_IP>/ssx/` -> Login with your new superuser.
 3.  **API**: Visit `http://<VPS_IP>/api/` -> Should respond.
 
 ---

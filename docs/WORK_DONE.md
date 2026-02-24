@@ -10,7 +10,7 @@
 |:---|:---|:---|
 | 🛍️ **SmartShop Store** | [https://smartshop1.us](https://smartshop1.us) | Main customer-facing e-commerce website |
 | 🌐 **WWW Redirect** | [https://www.smartshop1.us](https://www.smartshop1.us) | Redirects to main store |
-| ⚙️ **Django Admin** | [https://api.smartshop1.us/admin/](https://api.smartshop1.us/admin/) | Admin panel to manage products, orders, users, categories |
+| ⚙️ **Django Admin** | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Admin panel to manage products, orders, users, categories |
 | 🔌 **REST API** | [https://api.smartshop1.us/api/](https://api.smartshop1.us/api/) | Backend API consumed by the frontend |
 | 🗄️ **Adminer** | [https://db.smartshop1.us](https://db.smartshop1.us) | Web UI to browse and query the PostgreSQL database |
 | 📁 **FileBrowser** | *(accessible via VPS IP — internal only)* | Browse and manage uploaded product media files |

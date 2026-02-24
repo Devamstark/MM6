@@ -8,6 +8,7 @@ import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
+import { useSEO } from '../hooks/useSEO';
 
 // Utility to get a generic placeholder image and formatted title based on category string
 const getCategoryDetails = (catName: string) => {
@@ -38,6 +39,13 @@ const getCategoryDetails = (catName: string) => {
 export const Home = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  useSEO({
+    title: 'SmartShop — Premium Fashion for Men, Women & Accessories',
+    description: 'Discover the latest trends in fashion at SmartShop. Shop men\'s clothing, women\'s fashion, accessories and more. Free shipping on orders over $100.',
+    canonical: 'https://smartshop1.us/',
+    ogImage: 'https://smartshop1.us/og-image.jpg',
+  });
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
   const [currentHeroIndex, setCurrentHeroIndex] = useState(0);

@@ -31,7 +31,7 @@ SmartShop is deployed on a **HostAsia VPS** using:
 |:---|:---|
 | Store | https://smartshop1.us |
 | Backend API | https://api.smartshop1.us |
-| Django Admin | https://api.smartshop1.us/admin/ |
+| Django Admin | https://api.smartshop1.us/ssx/ |
 | Database Browser | https://db.smartshop1.us |
 | MinIO Console | https://minio.smartshop1.us |
 

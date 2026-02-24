@@ -4,6 +4,7 @@ import { api } from '../services/api';
 import { BlogPost } from '../types';
 import { Clock, Eye, ChevronRight, PenLine, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSEO } from '../hooks/useSEO';
 
 const CATEGORIES = ['All', 'Style', 'Trends', 'Care', 'News', 'Lookbook'];
 
@@ -190,6 +191,12 @@ export const Blog = () => {
     const [error, setError] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
 
+    useSEO({
+        title: 'Fashion Blog — Style Guides, Trends & Lookbooks | SmartShop',
+        description: 'Read the SmartShop fashion journal. Style guides, trend reports, outfit ideas and care tips from our editors and community bloggers.',
+        canonical: 'https://smartshop1.us/blog',
+    });
+
     useEffect(() => {
         const load = async () => {
             setLoading(true);
@@ -247,8 +254,8 @@ export const Blog = () => {
                             key={cat}
                             onClick={() => setActiveCategory(cat)}
                             className={`shrink-0 px-4 py-1.5 rounded-full text-xs font-semibold border transition-all ${activeCategory === cat
-                                    ? 'bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900 dark:border-white'
-                                    : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700 dark:bg-transparent dark:text-gray-400 dark:border-gray-800 dark:hover:border-gray-700'
+                                ? 'bg-gray-900 text-white border-gray-900 dark:bg-white dark:text-gray-900 dark:border-white'
+                                : 'bg-white text-gray-500 border-gray-200 hover:border-gray-300 hover:text-gray-700 dark:bg-transparent dark:text-gray-400 dark:border-gray-800 dark:hover:border-gray-700'
                                 }`}
                         >
                             {cat}

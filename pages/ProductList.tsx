@@ -7,6 +7,7 @@ import { SkeletonCard } from '../components/SkeletonCard';
 import { FilterPanel } from '../components/FilterPanel';
 import { Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSEO } from '../hooks/useSEO';
 
 export const ProductList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -31,6 +32,22 @@ export const ProductList = () => {
     flashSale: searchParams.get('flash_sale') === 'true',
     isNew: searchParams.get('sort') === 'newest'
   };
+
+  // Dynamic SEO based on active filter
+  const seoTitle = filters.search
+    ? `Search: "${filters.search}" | SmartShop`
+    : filters.category
+      ? `${filters.category}'s Fashion | SmartShop`
+      : filters.flashSale ? 'Flash Sale | SmartShop'
+        : filters.sort === 'newest' ? 'New Arrivals | SmartShop'
+          : filters.onSale ? 'Sale Items | SmartShop'
+            : 'All Products | SmartShop';
+
+  const seoDesc = filters.category
+    ? `Shop the latest ${filters.category}'s fashion at SmartShop. Browse clothing, accessories and more with free shipping over $100.`
+    : 'Browse all products at SmartShop — premium fashion for men, women and accessories. Filter by category, brand and price.';
+
+  useSEO({ title: seoTitle, description: seoDesc });
 
   useEffect(() => {
     setProducts([]);

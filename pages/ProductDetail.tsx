@@ -13,6 +13,7 @@ import {
 import { CountdownTimer } from '../components/CountdownTimer';
 import { ProductCard } from '../components/ProductCard';
 import { SizeGuideModal } from '../components/SizeGuideModal';
+import { useSEO } from '../hooks/useSEO';
 
 export const ProductDetail = () => {
     const { slug } = useParams<{ slug: string }>();
@@ -123,6 +124,16 @@ export const ProductDetail = () => {
     const averageRating = reviews.length > 0
         ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
         : 0; // Live data only, no fallback 4.5
+
+    // Dynamic SEO per product
+    useSEO({
+        title: product ? `${product.name} | SmartShop` : 'Product | SmartShop',
+        description: product
+            ? `${product.description?.slice(0, 140) || `Buy ${product.name} at SmartShop`}. Shop ${product.category} products with free shipping over $100.`
+            : 'Shop premium fashion at SmartShop.',
+        canonical: product ? `https://smartshop1.us/products/${product.slug || product.id}` : undefined,
+        ogImage: product?.imageUrl,
+    });
 
     if (loading) return (
         <div className="flex justify-center items-center h-screen bg-white">

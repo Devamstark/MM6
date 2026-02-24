@@ -10,7 +10,7 @@
 | Service | URL |
 |:---|:---|
 | Store | [https://smartshop1.us](https://smartshop1.us) |
-| Django Admin | [https://api.smartshop1.us/admin/](https://api.smartshop1.us/admin/) |
+| Django Admin | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) |
 | Database Browser | [https://db.smartshop1.us](https://db.smartshop1.us) |
 | MinIO Storage | *(Internal only at VPS_IP:9001)* |
 
@@ -84,7 +84,7 @@ npm run dev
 
 ### User Interfaces
 - **Main App**: http://localhost:5173
-- **Django Admin**: http://localhost:8000/admin
+- **Django Admin**: http://localhost:8000/ssx/
 - **API Root**: http://localhost:8000/api/
 
 ### Test Accounts
@@ -145,7 +145,7 @@ After creating your superuser, you can:
 ### 6. Test Review System
 ```
 1. Purchase a product (complete checkout)
-2. Go to Django admin: http://localhost:8000/admin
+2. Go to Django admin: http://localhost:8000/ssx/
 3. Change order status to "delivered"
 4. Go back to product detail page
 5. Write a review (should now be allowed)
@@ -316,7 +316,7 @@ python manage.py createsuperuser
 ### Creating Test Data
 
 #### Option 1: Django Admin
-1. Go to http://localhost:8000/admin
+1. Go to http://localhost:8000/ssx/
 2. Login with superuser credentials
 3. Manually create products, users, orders
 
