@@ -380,11 +380,7 @@ export const Home = () => {
             <div className="w-16 h-1 bg-zinc-900 mx-auto dark:bg-white"></div>
           </div>
 
-          <div className={`grid gap-6 ${categories.slice(0, 4).length === 1 ? 'grid-cols-1 max-w-3xl mx-auto' :
-            categories.slice(0, 4).length === 2 ? 'grid-cols-1 md:grid-cols-2 max-w-5xl mx-auto' :
-              categories.slice(0, 4).length === 3 ? 'grid-cols-1 md:grid-cols-3' :
-                'grid-cols-1 sm:grid-cols-2 lg:grid-cols-4'
-            }`}>
+          <div className="flex flex-wrap justify-center gap-6 w-full">
             {categories.slice(0, 4).map((cat, idx) => {
               const { image, title } = getCategoryDetails(cat);
               return (
@@ -394,8 +390,9 @@ export const Home = () => {
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: idx * 0.15 }}
+                  className="w-full sm:w-[calc(50%-12px)] md:w-[calc(33.333%-16px)] lg:w-[calc(25%-18px)] max-w-[400px]"
                 >
-                  <Link to={`/products?category=${cat}`} className="group relative block w-full aspect-square overflow-hidden bg-gray-100 dark:bg-gray-800">
+                  <Link to={`/products?category=${cat}`} className="group relative block w-full h-[320px] overflow-hidden bg-gray-100 dark:bg-gray-800 rounded-2xl shadow-sm">
                     <img
                       src={image}
                       alt={title}
