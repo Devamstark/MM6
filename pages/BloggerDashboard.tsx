@@ -20,16 +20,7 @@ const emptyForm = {
     isPublished: false,
 };
 
-const PLACEHOLDER_POSTS: BlogPost[] = [
-    {
-        id: '1', title: 'The Art of Layering: Master Winter Fashion', slug: 'art-of-layering',
-        excerpt: 'Discover how to create effortlessly stylish layered looks.',
-        content: 'Full content here...', author: 'You', authorId: 'me',
-        category: 'Style', tags: ['winter', 'layering'], isPublished: true, isFeatured: true,
-        publishedAt: '2026-02-20T10:00:00Z', createdAt: '2026-02-20T10:00:00Z', updatedAt: '2026-02-20T10:00:00Z',
-        readingTime: 5, views: 1240,
-    },
-];
+
 
 export const BloggerDashboard = () => {
     const { user } = useAuth();
@@ -49,9 +40,9 @@ export const BloggerDashboard = () => {
         setLoading(true);
         try {
             const data = await api.getBlogPosts({ author: user?.id });
-            setPosts(data.length > 0 ? data : PLACEHOLDER_POSTS);
+            setPosts(Array.isArray(data) ? data : []);
         } catch {
-            setPosts(PLACEHOLDER_POSTS);
+            setPosts([]);
         } finally {
             setLoading(false);
         }
@@ -338,8 +329,8 @@ export const BloggerDashboard = () => {
                                                 type="button"
                                                 onClick={() => setForm({ ...form, category: cat })}
                                                 className={`px-3 py-1 rounded-full text-xs font-semibold transition-all ${form.category === cat
-                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
+                                                    ? 'bg-black text-white dark:bg-white dark:text-black'
+                                                    : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                                                     }`}
                                             >
                                                 {cat}
