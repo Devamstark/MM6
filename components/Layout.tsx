@@ -179,7 +179,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 New Arrivals
               </Link>
               <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <span className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Women</span>
+                <Link to="/products?category=Women" className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Women</Link>
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Women's Mega Menu */}
@@ -651,9 +651,27 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 New Arrivals
               </Link>
 
+              <Link
+                to="/products?category=Women"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <span className="text-lg">👩</span>
+                Women's Collection
+              </Link>
+
+              <Link
+                to="/products?category=Men"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+              >
+                <span className="text-lg">👨</span>
+                Men's Collection
+              </Link>
+
               {/* Categories Button - Opens Drawer */}
               <button
-                onClick={() => { setCategoryDrawerOpen(true); setMobileMenuOpen(false); }}
+                onClick={() => { setCategoryDrawerOpen(true); }}
                 className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
               >
                 <span className="flex items-center gap-3">

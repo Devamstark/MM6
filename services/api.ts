@@ -602,21 +602,22 @@ export const api = {
   },
 
   getCategories: async (): Promise<string[]> => {
-    const response = await client.get('products/');
+    // Fetch with a high limit to get more categories for metadata
+    const response = await client.get('products/?limit=100');
     const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
-    const categories = new Set(data.map((p: any) => p.category));
+    const categories = new Set(data.filter((p: any) => p.category).map((p: any) => p.category));
     return Array.from(categories) as string[];
   },
 
   getBrands: async (): Promise<string[]> => {
-    const response = await client.get('products/');
+    const response = await client.get('products/?limit=100');
     const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
-    const brands = new Set(data.map((p: any) => p.brand));
+    const brands = new Set(data.filter((p: any) => p.brand).map((p: any) => p.brand));
     return Array.from(brands) as string[];
   },
 
   getSubcategories: async (category?: string): Promise<string[]> => {
-    const response = await client.get('products/');
+    const response = await client.get(`products/?limit=100${category ? `&category=${encodeURIComponent(category)}` : ''}`);
     const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
     const subcats = new Set<string>();
     data.forEach((p: any) => {
