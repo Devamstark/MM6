@@ -14,9 +14,7 @@ export const Home = () => {
   const navigate = useNavigate();
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(1); // Start at 1 for the leading clone
-  const [isTransitioning, setIsTransitioning] = useState(true);
-  const [isBusy, setIsBusy] = useState(false); // Anti-spam flag
+  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -28,38 +26,27 @@ export const Home = () => {
   const [hasMoreFeatured, setHasMoreFeatured] = useState(false);
   const [loadingMoreFeatured, setLoadingMoreFeatured] = useState(false);
 
-  // Auto-rotate hero banners every 10 seconds
+  // Auto-rotate hero banners every 6 seconds
   useEffect(() => {
     if (heroBanners.length <= 1) return;
-
     const interval = setInterval(() => {
-      if (isBusy) return;
-      setIsTransitioning(true);
-      setCurrentHeroIndex((prev) => prev + 1);
-    }, 10000);
-
+      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+    }, 6000);
     return () => clearInterval(interval);
-  }, [heroBanners.length, isBusy]);
+  }, [heroBanners.length]);
 
   const goToPreviousHero = () => {
-    if (heroBanners.length <= 1 || isBusy) return;
-    setIsBusy(true);
-    setIsTransitioning(true);
-    setCurrentHeroIndex((prev) => prev - 1);
+    if (heroBanners.length <= 1) return;
+    setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
   };
 
   const goToNextHero = () => {
-    if (heroBanners.length <= 1 || isBusy) return;
-    setIsBusy(true);
-    setIsTransitioning(true);
-    setCurrentHeroIndex((prev) => prev + 1);
+    if (heroBanners.length <= 1) return;
+    setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
   };
 
   const goToHeroSlide = (index: number) => {
-    if (heroBanners.length <= 1 || isBusy) return;
-    setIsBusy(true);
-    setIsTransitioning(true);
-    setCurrentHeroIndex(index + 1); // +1 because slides are offset by leading clone
+    setCurrentHeroIndex(index);
   };
 
   // Redirect Admins and Sellers to their dashboards
@@ -153,44 +140,25 @@ export const Home = () => {
   return (
     <div className="bg-white pb-20 dark:bg-gray-900 transition-colors duration-300">
 
-      {/* Hero Section - Carousel */}
+      {/* Hero Section - Crossfade Carousel (no clones, no black slides) */}
       {heroBanners.length > 0 ? (
         <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
-          {/* Slides Container */}
-          <div
-            className={`flex h-full ${isTransitioning ? 'transition-transform duration-700 ease-in-out will-change-transform' : ''}`}
-            style={{ transform: `translateX(-${currentHeroIndex * 100}%)` }}
-            onTransitionEnd={() => {
-              if (currentHeroIndex === heroBanners.length + 1) {
-                // At trailing clone, snap to first real item
-                setIsTransitioning(false);
-                setCurrentHeroIndex(1);
-              } else if (currentHeroIndex === 0) {
-                // At leading clone, snap to last real item
-                setIsTransitioning(false);
-                setCurrentHeroIndex(heroBanners.length);
-              }
-              setIsBusy(false);
-            }}
-          >
-            {[heroBanners[heroBanners.length - 1], ...heroBanners, heroBanners[0]].map((banner, index) => {
-              if (!banner) return null;
-
-              // Content is active if we are on this index, or if we are at a clone that represents this index
-              const isActiveContent =
-                (currentHeroIndex === index) ||
-                (currentHeroIndex === heroBanners.length + 1 && index === 1) ||
-                (currentHeroIndex === 0 && index === heroBanners.length);
-
+          <AnimatePresence mode="wait" initial={false}>
+            {heroBanners.map((banner: any, index: number) => {
+              if (index !== currentHeroIndex) return null;
               return (
-                <div
-                  key={`${banner.id}-${index}`}
-                  className="w-full h-full shrink-0 relative overflow-hidden"
+                <motion.div
+                  key={banner.id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                  className="absolute inset-0 w-full h-full"
                   style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
                 >
                   <div className="max-w-[1600px] mx-auto h-full px-4 sm:px-8 md:px-16 flex flex-col md:flex-row items-center">
                     {/* Text Container */}
-                    <div className={`w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0 transition-opacity duration-700 ${isActiveContent ? 'opacity-100' : 'opacity-0'}`}>
+                    <div className="w-full md:w-1/2 flex flex-col justify-center text-center md:text-left z-10 py-8 md:py-0">
                       {banner.subtitle && (
                         <span className="text-primary font-bold tracking-widest text-sm uppercase mb-4">
                           {banner.subtitle}
@@ -214,7 +182,7 @@ export const Home = () => {
                         {banner.cta_text && (
                           <Link
                             to={banner.cta_link || '/products'}
-                            className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] h-14 px-10"
+                            className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] px-10"
                             style={{
                               height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
                               padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
@@ -226,7 +194,7 @@ export const Home = () => {
                         )}
                         <Link
                           to="/register"
-                          className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] h-14 px-10"
+                          className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] px-10"
                           style={{
                             height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
                             padding: `0 calc(${(banner.content_scale ?? 100) * 0.01} * 2.5rem)`,
@@ -239,13 +207,13 @@ export const Home = () => {
                     </div>
 
                     {/* Image Container */}
-                    <div className={`w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last transition-transform duration-1000 ${isActiveContent ? 'scale-100' : 'scale-105'}`}>
+                    <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last">
                       {banner.image ? (
                         <img
                           src={banner.image}
                           alt={banner.title}
-                          loading={index === 1 ? "eager" : "lazy"}
-                          fetchPriority={index === 1 ? "high" : "auto"}
+                          loading={index === 0 ? 'eager' : 'lazy'}
+                          fetchPriority={index === 0 ? 'high' : 'auto'}
                           className="absolute inset-0 w-full h-full"
                           style={{
                             objectFit: (banner.image_fit as any) || 'cover',
@@ -253,16 +221,16 @@ export const Home = () => {
                           }}
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center transition-colors">
+                        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
                           <Loader2 className="animate-spin text-gray-400 w-8 h-8" />
                         </div>
                       )}
                     </div>
                   </div>
-                </div>
-              )
+                </motion.div>
+              );
             })}
-          </div>
+          </AnimatePresence>
 
           {/* Navigation Arrows */}
           {heroBanners.length > 1 && (
@@ -287,23 +255,17 @@ export const Home = () => {
           {/* Navigation Dots */}
           {heroBanners.length > 1 && (
             <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-3 z-20">
-              {heroBanners.map((_, index) => {
-                const dotIndex = index + 1;
-                const isDotActive = currentHeroIndex === dotIndex ||
-                  (currentHeroIndex === heroBanners.length + 1 && dotIndex === 1) ||
-                  (currentHeroIndex === 0 && dotIndex === heroBanners.length);
-                return (
-                  <button
-                    key={index}
-                    onClick={() => goToHeroSlide(index)}
-                    className={`w-3 h-3 rounded-full transition-all duration-300 ${isDotActive
-                      ? 'bg-black w-8'
-                      : 'bg-black/30 hover:bg-black/50'
-                      }`}
-                    aria-label={`Go to slide ${index + 1}`}
-                  />
-                )
-              })}
+              {heroBanners.map((_: any, index: number) => (
+                <button
+                  key={index}
+                  onClick={() => goToHeroSlide(index)}
+                  className={`h-3 rounded-full transition-all duration-300 ${currentHeroIndex === index
+                    ? 'bg-black w-8'
+                    : 'bg-black/30 hover:bg-black/50 w-3'
+                    }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
             </div>
           )}
         </div>

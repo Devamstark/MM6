@@ -6,6 +6,7 @@ import { ProductCard } from '../components/ProductCard';
 import { SkeletonCard } from '../components/SkeletonCard';
 import { FilterPanel } from '../components/FilterPanel';
 import { Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const ProductList = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -96,11 +97,31 @@ export const ProductList = () => {
     setSearchParams({});
   };
 
+  const containerVariants = {
+    hidden: {},
+    visible: { transition: { staggerChildren: 0.06 } }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 24 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' as const } }
+  };
+
   return (
-    <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 animate-fade-up">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8"
+    >
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Dynamic Page Title */}
-        <div className="w-full mb-8 px-2 md:hidden">
+        {/* Dynamic Page Title (mobile) */}
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35 }}
+          className="w-full mb-8 px-2 md:hidden"
+        >
           <h1 className="text-3xl font-bold text-gray-900 dark:text-white capitalize">
             {filters.search ? `Results for "${filters.search}"` :
               filters.category ? filters.category :
@@ -109,10 +130,15 @@ export const ProductList = () => {
                     filters.onSale ? 'Sale Items' :
                       'All Products'}
           </h1>
-        </div>
+        </motion.div>
 
         {/* Sidebar Filters */}
-        <aside className="w-full md:w-72 shrink-0 animate-fade-up delay-100">
+        <motion.aside
+          initial={{ opacity: 0, x: -24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
+          className="w-full md:w-72 shrink-0"
+        >
           <div className="bg-white dark:bg-gray-900 p-6 rounded-3xl shadow-sm border border-gray-100 dark:border-gray-800 sticky top-24 transition-colors">
             <FilterPanel
               filters={{
@@ -125,11 +151,16 @@ export const ProductList = () => {
               onClearFilters={clearFilters}
             />
           </div>
-        </aside>
+        </motion.aside>
 
         {/* Main Content */}
-        <div className="grow animate-fade-up delay-200">
-          <div className="flex justify-between items-center mb-6 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
+        <div className="grow">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.3 }}
+            className="flex justify-between items-center mb-6 bg-white dark:bg-gray-900 p-4 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors"
+          >
             <div className="text-sm font-medium text-gray-600 dark:text-gray-300 px-2">
               Showing {products.length} of {totalCount} {totalCount === 1 ? 'item' : 'items'}
             </div>
@@ -143,38 +174,60 @@ export const ProductList = () => {
               <option value="price_asc">Price: Low to High</option>
               <option value="price_desc">Price: High to Low</option>
             </select>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {products.map((product, idx) => (
-              <ProductCard key={product.id} product={product} index={idx} priority={idx < 4} />
-            ))}
-            {loading && <SkeletonCard count={4} />}
-          </div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={searchParams.toString()}
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            >
+              {products.map((product, idx) => (
+                <motion.div key={product.id} variants={itemVariants}>
+                  <ProductCard product={product} index={idx} priority={idx < 4} />
+                </motion.div>
+              ))}
+              {loading && <SkeletonCard count={4} />}
+            </motion.div>
+          </AnimatePresence>
 
           {products.length === 0 && !loading && (
-            <div className="bg-white dark:bg-gray-900 p-16 text-center rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="bg-white dark:bg-gray-900 p-16 text-center rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors"
+            >
               <div className="w-16 h-16 bg-gray-50 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Loader2 className="w-8 h-8 text-gray-400 dark:text-gray-500" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 dark:text-white">No products found</h3>
               <p className="text-gray-500 dark:text-gray-400 mt-2">Try adjusting your filters or search terms.</p>
               <button onClick={clearFilters} className="mt-6 px-6 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-300 rounded-full text-sm font-bold hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors">Clear all filters</button>
-            </div>
+            </motion.div>
           )}
 
           {hasMore && !loading && (
-            <div className="mt-12 flex justify-center">
-              <button
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="mt-12 flex justify-center"
+            >
+              <motion.button
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 onClick={handleLoadMore}
-                className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-full font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all shadow-lg hover:shadow-indigo-200 dark:hover:shadow-white/20 hover:-translate-y-1"
+                className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 px-8 py-4 rounded-full font-bold hover:bg-indigo-600 dark:hover:bg-indigo-50 transition-all shadow-lg"
               >
                 Load More Products
-              </button>
-            </div>
+              </motion.button>
+            </motion.div>
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

@@ -33,6 +33,21 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
+  const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
+  const menuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openMenu = (menu: string) => {
+    if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current);
+    setHoveredMenu(menu);
+  };
+
+  const closeMenu = () => {
+    menuTimeoutRef.current = setTimeout(() => setHoveredMenu(null), 120);
+  };
+
+  const keepMenuOpen = () => {
+    if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current);
+  };
 
   // Close user menu when clicking outside
   React.useEffect(() => {
@@ -179,99 +194,121 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               <Link to="/products?sort=newest" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200 dark:hover:text-primary">
                 New Arrivals
               </Link>
-              <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <Link to="/products?category=Women" className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Women</Link>
-                <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
-                {/* Women's Mega Menu */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors rounded-b-3xl">
-                  <div className="grid grid-cols-4 gap-8">
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Dresses</h4>
-                      <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                        <li><Link to="/products?category=Women&subcategory=Casual+Dresses" className="hover:text-primary hover:underline">Casual Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Evening+Dresses" className="hover:text-primary hover:underline">Evening Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" className="hover:text-primary hover:underline">Maxi Dresses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Mini+Dresses" className="hover:text-primary hover:underline">Mini Dresses</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Tops</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=T-Shirts" className="hover:text-primary hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Blouses" className="hover:text-primary hover:underline">Blouses</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Sweaters" className="hover:text-primary hover:underline">Sweaters</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Crop+Tops" className="hover:text-primary hover:underline">Crop Tops</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=Jeans" className="hover:text-primary hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Skirts" className="hover:text-primary hover:underline">Skirts</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Pants" className="hover:text-primary hover:underline">Pants</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Shorts" className="hover:text-primary hover:underline">Shorts</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Women&subcategory=Jackets" className="hover:text-primary hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Coats" className="hover:text-primary hover:underline">Coats</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Blazers" className="hover:text-primary hover:underline">Blazers</Link></li>
-                        <li><Link to="/products?category=Women&subcategory=Cardigans" className="hover:text-primary hover:underline">Cardigans</Link></li>
-                      </ul>
+              {/* Women Dropdown */}
+              <div
+                className="relative flex items-center gap-1 cursor-pointer py-4 h-full"
+                onMouseEnter={() => openMenu('Women')}
+                onMouseLeave={closeMenu}
+              >
+                <Link to="/products?category=Women" className={`text-sm font-medium transition-colors dark:text-gray-200 ${hoveredMenu === 'Women' ? 'text-primary' : 'text-gray-900'}`}>Women</Link>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${hoveredMenu === 'Women' ? 'text-primary rotate-180' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+
+                {hoveredMenu === 'Women' && (
+                  <div
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-[200] rounded-2xl"
+                    onMouseEnter={keepMenuOpen}
+                    onMouseLeave={closeMenu}
+                  >
+                    <div className="grid grid-cols-4 gap-8">
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Dresses</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Women&subcategory=Casual+Dresses" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Casual Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Evening+Dresses" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Evening Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Maxi Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Mini+Dresses" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Mini Dresses</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Tops</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Women&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">T-Shirts</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Blouses" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Blouses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Sweaters</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Crop+Tops" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Crop Tops</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Bottoms</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Women&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Jeans</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Skirts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Skirts</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Pants" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Pants</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Shorts</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Outerwear</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Women&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Jackets</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Coats</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Blazers</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Cardigans" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Cardigans</Link></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
-              <div className="relative group flex items-center gap-1 cursor-pointer py-4 h-full">
-                <Link to="/products?category=Men" className="text-sm font-medium text-gray-900 group-hover:text-primary dark:text-gray-200">Men</Link>
-                <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+              {/* Men Dropdown */}
+              <div
+                className="relative flex items-center gap-1 cursor-pointer py-4 h-full"
+                onMouseEnter={() => openMenu('Men')}
+                onMouseLeave={closeMenu}
+              >
+                <Link to="/products?category=Men" className={`text-sm font-medium transition-colors dark:text-gray-200 ${hoveredMenu === 'Men' ? 'text-primary' : 'text-gray-900'}`}>Men</Link>
+                <svg className={`w-3 h-3 transition-transform duration-200 ${hoveredMenu === 'Men' ? 'text-primary rotate-180' : 'text-gray-500'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
-                {/* Men's Mega Menu */}
-                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors rounded-b-3xl">
-                  <div className="grid grid-cols-4 gap-8">
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Tops</h4>
-                      <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
-                        <li><Link to="/products?category=Men&subcategory=T-Shirts" className="hover:text-primary hover:underline">T-Shirts</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Shirts" className="hover:text-primary hover:underline">Shirts</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Polos" className="hover:text-primary hover:underline">Polos</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Sweaters" className="hover:text-primary hover:underline">Sweaters</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Bottoms</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Jeans" className="hover:text-primary hover:underline">Jeans</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Chinos" className="hover:text-primary hover:underline">Chinos</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Joggers" className="hover:text-primary hover:underline">Joggers</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Shorts" className="hover:text-primary hover:underline">Shorts</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Outerwear</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Jackets" className="hover:text-primary hover:underline">Jackets</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Coats" className="hover:text-primary hover:underline">Coats</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Hoodies" className="hover:text-primary hover:underline">Hoodies</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Blazers" className="hover:text-primary hover:underline">Blazers</Link></li>
-                      </ul>
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">Suits</h4>
-                      <ul className="space-y-3 text-sm text-gray-500">
-                        <li><Link to="/products?category=Men&subcategory=Full+Suits" className="hover:text-primary hover:underline">Full Suits</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Suit+Jackets" className="hover:text-primary hover:underline">Suit Jackets</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Dress+Pants" className="hover:text-primary hover:underline">Dress Pants</Link></li>
-                        <li><Link to="/products?category=Men&subcategory=Vests" className="hover:text-primary hover:underline">Vests</Link></li>
-                      </ul>
+                {hoveredMenu === 'Men' && (
+                  <div
+                    className="absolute top-full left-1/2 -translate-x-1/2 w-[780px] bg-white dark:bg-gray-900 shadow-2xl border border-gray-100 dark:border-gray-800 p-8 z-[200] rounded-2xl"
+                    onMouseEnter={keepMenuOpen}
+                    onMouseLeave={closeMenu}
+                  >
+                    <div className="grid grid-cols-4 gap-8">
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Tops</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Men&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">T-Shirts</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Shirts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Shirts</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Polos" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Polos</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Sweaters</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Bottoms</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Men&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Jeans</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Chinos" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Chinos</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Joggers" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Joggers</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Shorts</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Outerwear</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Men&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Jackets</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Coats</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Hoodies" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Hoodies</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Blazers</Link></li>
+                        </ul>
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Suits</h4>
+                        <ul className="space-y-3 text-sm text-gray-500 dark:text-gray-400">
+                          <li><Link to="/products?category=Men&subcategory=Full+Suits" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Full Suits</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Suit+Jackets" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Suit Jackets</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Dress+Pants" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Dress Pants</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Vests" onClick={() => setHoveredMenu(null)} className="hover:text-primary hover:underline">Vests</Link></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
+
               <Link to="/products?category=Accessories" className="text-sm font-medium text-gray-900 hover:text-primary transition-colors dark:text-gray-200">
                 Accessories
               </Link>
@@ -279,8 +316,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 Sale
               </Link>
             </div>
-
-
 
             {/* Right: Icons */}
             <div className="flex items-center gap-4 lg:gap-6">
@@ -410,155 +445,159 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </div>
 
             </div>
-          </div>
+          </div >
 
           {/* Search Overlay */}
-          {searchOpen && (
-            <div className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-2xl p-8 z-40 animate-fade-in max-h-[85vh] overflow-y-auto transition-colors">
-              <div className="max-w-4xl mx-auto">
-                <form onSubmit={handleSearch} className="relative group">
-                  <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
-                  <input
-                    autoFocus
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search for items, brands, or categories..."
-                    className="w-full text-3xl font-bold border-none pl-12 py-6 focus:outline-none placeholder:text-gray-200 dark:text-white dark:placeholder:text-gray-600"
-                  />
-                  {searchQuery && (
-                    <button type="button" onClick={() => setSearchQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
-                      <X className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+          {
+            searchOpen && (
+              <div className="absolute top-16 left-0 w-full bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 shadow-2xl p-8 z-40 animate-fade-in max-h-[85vh] overflow-y-auto transition-colors">
+                <div className="max-w-4xl mx-auto">
+                  <form onSubmit={handleSearch} className="relative group">
+                    <Search className="absolute left-0 top-1/2 -translate-y-1/2 w-8 h-8 text-gray-300 group-focus-within:text-black dark:group-focus-within:text-white transition-colors" />
+                    <input
+                      autoFocus
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search for items, brands, or categories..."
+                      className="w-full text-3xl font-bold border-none pl-12 py-6 focus:outline-none placeholder:text-gray-200 dark:text-white dark:placeholder:text-gray-600"
+                    />
+                    {searchQuery && (
+                      <button type="button" onClick={() => setSearchQuery('')} className="absolute right-12 top-1/2 -translate-y-1/2 p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
+                        <X className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+                      </button>
+                    )}
+                    <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-2xl hover:bg-gray-800 transition-all">
+                      <ArrowRight className="w-6 h-6" />
                     </button>
-                  )}
-                  <button type="submit" className="absolute right-0 top-1/2 -translate-y-1/2 bg-black text-white p-3 rounded-2xl hover:bg-gray-800 transition-all">
-                    <ArrowRight className="w-6 h-6" />
-                  </button>
-                </form>
+                  </form>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8 pt-8 border-t border-gray-50 dark:border-gray-800 transition-colors">
-                  {/* Left Column: Recent & Trending */}
-                  <div className="space-y-8">
-                    {recentSearches.length > 0 && (
-                      <div>
-                        <div className="flex items-center justify-between mb-4">
-                          <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
-                            <History className="w-3 h-3" /> Recent Searches
-                          </h4>
-                          <button onClick={() => { setRecentSearches([]); localStorage.removeItem('ss_recent_searches'); }} className="text-[10px] font-bold text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 uppercase tracking-tighter">Clear All</button>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12 mt-8 pt-8 border-t border-gray-50 dark:border-gray-800 transition-colors">
+                    {/* Left Column: Recent & Trending */}
+                    <div className="space-y-8">
+                      {recentSearches.length > 0 && (
+                        <div>
+                          <div className="flex items-center justify-between mb-4">
+                            <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                              <History className="w-3 h-3" /> Recent Searches
+                            </h4>
+                            <button onClick={() => { setRecentSearches([]); localStorage.removeItem('ss_recent_searches'); }} className="text-[10px] font-bold text-gray-300 dark:text-gray-600 hover:text-red-500 dark:hover:text-red-400 uppercase tracking-tighter">Clear All</button>
+                          </div>
+                          <div className="space-y-2">
+                            {recentSearches.map((s, idx) => (
+                              <button
+                                key={idx}
+                                onClick={() => handleSearch(undefined, s)}
+                                className="flex items-center gap-3 w-full text-left py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all group"
+                              >
+                                <Clock className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-black dark:group-hover:text-white" />
+                                <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white">{s}</span>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                        <div className="space-y-2">
-                          {recentSearches.map((s, idx) => (
+                      )}
+
+                      <div>
+                        <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-4">
+                          <TrendingUp className="w-3 h-3" /> Trending
+                        </h4>
+                        <div className="flex flex-wrap gap-2">
+                          {['New Year Specials', 'Sustainable Fashion', 'Accessories', 'Limited Drop'].map((t) => (
                             <button
-                              key={idx}
-                              onClick={() => handleSearch(undefined, s)}
-                              className="flex items-center gap-3 w-full text-left py-2 px-3 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-xl transition-all group"
+                              key={t}
+                              onClick={() => handleSearch(undefined, t)}
+                              className="px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-sm border border-gray-100 dark:border-gray-700"
                             >
-                              <Clock className="w-4 h-4 text-gray-300 dark:text-gray-600 group-hover:text-black dark:group-hover:text-white" />
-                              <span className="text-sm font-semibold text-gray-600 dark:text-gray-400 group-hover:text-black dark:group-hover:text-white">{s}</span>
+                              {t}
                             </button>
                           ))}
                         </div>
                       </div>
-                    )}
+                    </div>
 
-                    <div>
-                      <h4 className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest flex items-center gap-2 mb-4">
-                        <TrendingUp className="w-3 h-3" /> Trending
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {['New Year Specials', 'Sustainable Fashion', 'Accessories', 'Limited Drop'].map((t) => (
-                          <button
-                            key={t}
-                            onClick={() => handleSearch(undefined, t)}
-                            className="px-4 py-2 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-300 text-xs font-bold rounded-full hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-all shadow-sm border border-gray-100 dark:border-gray-700"
-                          >
-                            {t}
-                          </button>
-                        ))}
+                    {/* Middle Column: Collections (Categories) */}
+                    <div className="space-y-8">
+                      <div>
+                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Quick Collections</h4>
+                        <div className="grid grid-cols-1 gap-1">
+                          {suggestions.categories.length > 0 ? (
+                            suggestions.categories.map((c) => (
+                              <Link
+                                key={c}
+                                to={`/products?category=${encodeURIComponent(c)}`}
+                                onClick={() => setSearchOpen(false)}
+                                className="py-3 px-4 hover:bg-primary/5 text-gray-600 hover:text-primary font-bold rounded-xl transition-all flex items-center justify-between group"
+                              >
+                                {c}
+                                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
+                              </Link>
+                            ))
+                          ) : (
+                            [
+                              { name: 'New Arrivals', to: '/products?sort=newest' },
+                              { name: 'Women', to: '/products?category=Women' },
+                              { name: 'Men', to: '/products?category=Men' },
+                              { name: 'Accessories', to: '/products?category=Accessories' }
+                            ].map((item) => (
+                              <Link
+                                key={item.name}
+                                to={item.to}
+                                onClick={() => setSearchOpen(false)}
+                                className="py-3 px-4 hover:bg-gray-50 text-gray-600 hover:text-black font-bold rounded-xl transition-all flex items-center justify-between group"
+                              >
+                                {item.name}
+                                <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
+                              </Link>
+                            ))
+                          )}
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Middle Column: Collections (Categories) */}
-                  <div className="space-y-8">
-                    <div>
-                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">Quick Collections</h4>
-                      <div className="grid grid-cols-1 gap-1">
-                        {suggestions.categories.length > 0 ? (
-                          suggestions.categories.map((c) => (
+                    {/* Right Column: Featured Products */}
+                    <div className="md:col-span-1">
+                      <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
+                        {suggestions.products.length > 0 ? 'Top Results' : 'Featured Products'}
+                      </h4>
+                      <div className="space-y-4">
+                        {suggestions.products.length > 0 ? (
+                          suggestions.products.map((p) => (
                             <Link
-                              key={c}
-                              to={`/products?category=${encodeURIComponent(c)}`}
+                              key={p.id}
+                              to={`/product/${p.id}`}
                               onClick={() => setSearchOpen(false)}
-                              className="py-3 px-4 hover:bg-primary/5 text-gray-600 hover:text-primary font-bold rounded-xl transition-all flex items-center justify-between group"
+                              className="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded-2xl transition-all"
                             >
-                              {c}
-                              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
+                              <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+                                <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                              </div>
+                              <div className="flex flex-col min-w-0">
+                                <span className="text-sm font-bold text-gray-900 truncate group-hover:text-primary">{p.name}</span>
+                                <span className="text-xs text-gray-500 font-bold">${p.price}</span>
+                              </div>
                             </Link>
                           ))
                         ) : (
-                          [
-                            { name: 'New Arrivals', to: '/products?sort=newest' },
-                            { name: 'Women', to: '/products?category=Women' },
-                            { name: 'Men', to: '/products?category=Men' },
-                            { name: 'Accessories', to: '/products?category=Accessories' }
-                          ].map((item) => (
-                            <Link
-                              key={item.name}
-                              to={item.to}
-                              onClick={() => setSearchOpen(false)}
-                              className="py-3 px-4 hover:bg-gray-50 text-gray-600 hover:text-black font-bold rounded-xl transition-all flex items-center justify-between group"
-                            >
-                              {item.name}
-                              <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-all translate-x-2 group-hover:translate-x-0" />
-                            </Link>
-                          ))
+                          <p className="text-sm text-gray-400 font-medium italic">Start typing to see product matches...</p>
                         )}
                       </div>
                     </div>
                   </div>
-
-                  {/* Right Column: Featured Products */}
-                  <div className="md:col-span-1">
-                    <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-4">
-                      {suggestions.products.length > 0 ? 'Top Results' : 'Featured Products'}
-                    </h4>
-                    <div className="space-y-4">
-                      {suggestions.products.length > 0 ? (
-                        suggestions.products.map((p) => (
-                          <Link
-                            key={p.id}
-                            to={`/product/${p.id}`}
-                            onClick={() => setSearchOpen(false)}
-                            className="flex items-center gap-4 group p-2 hover:bg-gray-50 rounded-2xl transition-all"
-                          >
-                            <div className="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden shrink-0">
-                              <img src={p.imageUrl} alt={p.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                            </div>
-                            <div className="flex flex-col min-w-0">
-                              <span className="text-sm font-bold text-gray-900 truncate group-hover:text-primary">{p.name}</span>
-                              <span className="text-xs text-gray-500 font-bold">${p.price}</span>
-                            </div>
-                          </Link>
-                        ))
-                      ) : (
-                        <p className="text-sm text-gray-400 font-medium italic">Start typing to see product matches...</p>
-                      )}
-                    </div>
-                  </div>
                 </div>
               </div>
-            </div>
-          )}
-        </div>
+            )
+          }
+        </div >
 
         {/* Mobile Navigation Drawer Overlay */}
-        {mobileMenuOpen && (
-          <div
-            className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 md:hidden transition-opacity"
-            onClick={() => setMobileMenuOpen(false)}
-          />
-        )}
+        {
+          mobileMenuOpen && (
+            <div
+              className="fixed inset-0 bg-black/30 backdrop-blur-sm z-50 md:hidden transition-opacity"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+          )
+        }
 
         {/* Mobile Navigation Drawer */}
         <div
@@ -652,16 +691,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 New Arrivals
               </Link>
 
-              {/* Women Mobile Expandable */}
-              <div>
+              <div className="border-b border-gray-50 dark:border-gray-800/50">
                 <button
-                  onClick={() => setMobileExpandedCat(mobileExpandedCat === 'Women' ? null : 'Women')}
-                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMobileExpandedCat(mobileExpandedCat === 'Women' ? null : 'Women');
+                  }}
+                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
                 >
                   <span className="flex items-center gap-3">
                     <span className="text-lg">👩</span> Women
                   </span>
-                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${mobileExpandedCat === 'Women' ? 'rotate-90' : ''}`} />
+                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${mobileExpandedCat === 'Women' ? 'rotate-90' : ''}`} />
                 </button>
                 {mobileExpandedCat === 'Women' && (
                   <div className="bg-gray-50 dark:bg-black/20 px-4 py-2 space-y-1">
@@ -676,16 +719,20 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
 
-              {/* Men Mobile Expandable */}
-              <div>
+              <div className="border-b border-gray-50 dark:border-gray-800/50">
                 <button
-                  onClick={() => setMobileExpandedCat(mobileExpandedCat === 'Men' ? null : 'Men')}
-                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMobileExpandedCat(mobileExpandedCat === 'Men' ? null : 'Men');
+                  }}
+                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-bold text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
                 >
                   <span className="flex items-center gap-3">
                     <span className="text-lg">👨</span> Men
                   </span>
-                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${mobileExpandedCat === 'Men' ? 'rotate-90' : ''}`} />
+                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform duration-300 ${mobileExpandedCat === 'Men' ? 'rotate-90' : ''}`} />
                 </button>
                 {mobileExpandedCat === 'Men' && (
                   <div className="bg-gray-50 dark:bg-black/20 px-4 py-2 space-y-1">
@@ -802,137 +849,139 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
           )}
         </div>
-      </nav>
+      </nav >
 
       {/* Category Drawer */}
-      <CategoryDrawer isOpen={categoryDrawerOpen} onClose={() => setCategoryDrawerOpen(false)} />
+      < CategoryDrawer isOpen={categoryDrawerOpen} onClose={() => setCategoryDrawerOpen(false)} />
 
       {/* Cart Drawer */}
-      {cartOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
-          <div
-            className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
-            onClick={() => setCartOpen(false)}
-          ></div>
-          <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
-            <div className="w-screen max-w-md animate-slide-in-right">
-              <div className="h-full flex flex-col bg-white shadow-2xl rounded-l-3xl overflow-hidden border-l border-white/50 dark:bg-gray-900 dark:border-gray-800">
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
-                  <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3 dark:text-white">
-                    <div className="bg-primary/10 p-2 rounded-full text-primary">
-                      <ShoppingCart className="w-5 h-5" />
-                    </div>
-                    Your Cart
-                    <span className="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200 shadow-sm">{itemCount} items</span>
-                  </h2>
-                  <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
-                    <X className="h-6 w-6" />
-                  </button>
-                </div>
-
-                {/* Items List - Scrollable Area */}
-                <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/30 dark:bg-black/20 transition-colors">
-                  {items.length === 0 ? (
-                    <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-6">
-                      <div className="w-24 h-24 bg-primary/5 rounded-3xl flex items-center justify-center transform rotate-3">
-                        <ShoppingCart className="w-10 h-10 text-primary/50" />
+      {
+        cartOpen && (
+          <div className="fixed inset-0 z-50 overflow-hidden">
+            <div
+              className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
+              onClick={() => setCartOpen(false)}
+            ></div>
+            <div className="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+              <div className="w-screen max-w-md animate-slide-in-right">
+                <div className="h-full flex flex-col bg-white shadow-2xl rounded-l-3xl overflow-hidden border-l border-white/50 dark:bg-gray-900 dark:border-gray-800">
+                  {/* Header */}
+                  <div className="flex items-center justify-between px-6 py-6 border-b border-gray-100 bg-gray-50/50 dark:bg-gray-800 dark:border-gray-700">
+                    <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3 dark:text-white">
+                      <div className="bg-primary/10 p-2 rounded-full text-primary">
+                        <ShoppingCart className="w-5 h-5" />
                       </div>
-                      <div className="space-y-2">
-                        <p className="text-xl font-bold text-gray-900 dark:text-white">Your cart is empty</p>
-                        <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
-                      </div>
-                      <button
-                        onClick={() => { setCartOpen(false); navigate('/products'); }}
-                        className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-primary font-bold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md transition-all"
-                      >
-                        Start Shopping
-                      </button>
-                    </div>
-                  ) : (
-                    <ul className="space-y-4">
-                      {items.map((item) => (
-                        <li key={item.id} className="flex p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all group">
-                          <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
-                            <img
-                              src={item.imageUrl}
-                              alt={item.name}
-                              className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
-                            />
-                          </div>
+                      Your Cart
+                      <span className="text-sm font-medium text-gray-500 bg-white px-2 py-1 rounded-full border border-gray-200 shadow-sm">{itemCount} items</span>
+                    </h2>
+                    <button onClick={() => setCartOpen(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-2 hover:bg-gray-200 dark:hover:bg-gray-800 rounded-full transition-colors">
+                      <X className="h-6 w-6" />
+                    </button>
+                  </div>
 
-                          <div className="ml-4 flex flex-1 flex-col justify-between">
-                            <div>
-                              <div className="flex justify-between text-base font-medium text-gray-900 dark:text-white">
-                                <h3 className="line-clamp-2 pr-4 leading-tight">{item.name}</h3>
-                                <p className="whitespace-nowrap font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</p>
-                              </div>
-                              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.brand}</p>
+                  {/* Items List - Scrollable Area */}
+                  <div className="flex-1 overflow-y-auto px-6 py-6 bg-gray-50/30 dark:bg-black/20 transition-colors">
+                    {items.length === 0 ? (
+                      <div className="h-full flex flex-col items-center justify-center text-center text-gray-500 space-y-6">
+                        <div className="w-24 h-24 bg-primary/5 rounded-3xl flex items-center justify-center transform rotate-3">
+                          <ShoppingCart className="w-10 h-10 text-primary/50" />
+                        </div>
+                        <div className="space-y-2">
+                          <p className="text-xl font-bold text-gray-900 dark:text-white">Your cart is empty</p>
+                          <p className="text-sm text-gray-500 dark:text-gray-400 max-w-xs mx-auto">Looks like you haven't added anything to your cart yet.</p>
+                        </div>
+                        <button
+                          onClick={() => { setCartOpen(false); navigate('/products'); }}
+                          className="px-8 py-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-primary font-bold rounded-full hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md transition-all"
+                        >
+                          Start Shopping
+                        </button>
+                      </div>
+                    ) : (
+                      <ul className="space-y-4">
+                        {items.map((item) => (
+                          <li key={item.id} className="flex p-4 bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all group">
+                            <div className="h-24 w-24 shrink-0 overflow-hidden rounded-xl bg-gray-100 dark:bg-gray-800">
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="h-full w-full object-cover object-center group-hover:scale-110 transition-transform duration-700"
+                              />
                             </div>
 
-                            <div className="flex items-center justify-between mt-3">
-                              {/* Quantity Controls */}
-                              <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                  className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500 rounded-full transition-colors text-gray-400 m-1"
-                                >
-                                  {item.quantity === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
-                                </button>
-                                <span className="px-2 text-sm font-semibold text-gray-900 dark:text-white min-w-6 text-center">{item.quantity}</span>
-                                <button
-                                  onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                  className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-primary rounded-full transition-colors text-gray-400 m-1"
-                                >
-                                  <Plus className="w-4 h-4" />
-                                </button>
+                            <div className="ml-4 flex flex-1 flex-col justify-between">
+                              <div>
+                                <div className="flex justify-between text-base font-medium text-gray-900 dark:text-white">
+                                  <h3 className="line-clamp-2 pr-4 leading-tight">{item.name}</h3>
+                                  <p className="whitespace-nowrap font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</p>
+                                </div>
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.brand}</p>
+                              </div>
+
+                              <div className="flex items-center justify-between mt-3">
+                                {/* Quantity Controls */}
+                                <div className="flex items-center bg-gray-50 dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-700 shadow-sm">
+                                  <button
+                                    onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                                    className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-red-500 rounded-full transition-colors text-gray-400 m-1"
+                                  >
+                                    {item.quantity === 1 ? <Trash2 className="w-4 h-4" /> : <Minus className="w-4 h-4" />}
+                                  </button>
+                                  <span className="px-2 text-sm font-semibold text-gray-900 dark:text-white min-w-6 text-center">{item.quantity}</span>
+                                  <button
+                                    onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                                    className="p-1.5 hover:bg-white dark:hover:bg-gray-700 hover:text-primary rounded-full transition-colors text-gray-400 m-1"
+                                  >
+                                    <Plus className="w-4 h-4" />
+                                  </button>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        </li>
-                      ))}
-                    </ul>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+
+                  {/* Footer - Fixed at Bottom */}
+                  {items.length > 0 && (
+                    <div className="border-t border-gray-100 p-6 bg-white z-10 dark:bg-gray-900 dark:border-gray-800">
+                      <div className="space-y-3 mb-6">
+                        <div className="flex justify-between text-base font-medium text-gray-500">
+                          <p>Subtotal</p>
+                          <p>${cartTotal.toFixed(2)}</p>
+                        </div>
+                        <div className="flex justify-between text-base font-medium text-gray-500">
+                          <p>Shipping</p>
+                          <p>Free</p>
+                        </div>
+                        <div className="flex justify-between text-2xl font-bold text-gray-900 pt-4 border-t border-gray-100">
+                          <span>Total</span>
+                          <span>${cartTotal.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      <div className="flex flex-col gap-3">
+                        <button
+                          onClick={() => { setCartOpen(false); navigate('/cart'); }}
+                          className="w-full flex items-center justify-center gap-2 rounded-full border border-gray-900 px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] dark:border-white dark:text-white dark:hover:bg-gray-800"
+                        >
+                          View Full Bag
+                        </button>
+                        <button
+                          onClick={handleCheckout}
+                          className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-primary hover:shadow-primary/20 transition-all duration-300 active:scale-[0.98] dark:bg-primary dark:shadow-none"
+                        >
+                          Proceed to Checkout <ArrowRight className="w-5 h-5" />
+                        </button>
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                {/* Footer - Fixed at Bottom */}
-                {items.length > 0 && (
-                  <div className="border-t border-gray-100 p-6 bg-white z-10 dark:bg-gray-900 dark:border-gray-800">
-                    <div className="space-y-3 mb-6">
-                      <div className="flex justify-between text-base font-medium text-gray-500">
-                        <p>Subtotal</p>
-                        <p>${cartTotal.toFixed(2)}</p>
-                      </div>
-                      <div className="flex justify-between text-base font-medium text-gray-500">
-                        <p>Shipping</p>
-                        <p>Free</p>
-                      </div>
-                      <div className="flex justify-between text-2xl font-bold text-gray-900 pt-4 border-t border-gray-100">
-                        <span>Total</span>
-                        <span>${cartTotal.toFixed(2)}</span>
-                      </div>
-                    </div>
-                    <div className="flex flex-col gap-3">
-                      <button
-                        onClick={() => { setCartOpen(false); navigate('/cart'); }}
-                        className="w-full flex items-center justify-center gap-2 rounded-full border border-gray-900 px-6 py-4 text-base font-bold text-gray-900 hover:bg-gray-50 transition-all duration-300 active:scale-[0.98] dark:border-white dark:text-white dark:hover:bg-gray-800"
-                      >
-                        View Full Bag
-                      </button>
-                      <button
-                        onClick={handleCheckout}
-                        className="w-full flex items-center justify-center gap-2 rounded-full bg-gray-900 px-6 py-4 text-base font-bold text-white shadow-xl shadow-gray-200 hover:bg-primary hover:shadow-primary/20 transition-all duration-300 active:scale-[0.98] dark:bg-primary dark:shadow-none"
-                      >
-                        Proceed to Checkout <ArrowRight className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                )}
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <main className="grow">
         {children}
@@ -1006,6 +1055,6 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           </div>
         </div>
       </footer>
-    </div>
+    </div >
   );
 };

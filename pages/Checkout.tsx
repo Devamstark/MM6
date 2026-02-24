@@ -5,6 +5,7 @@ import { api } from '../services/api';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag, Percent, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export const Checkout = () => {
   const { items, cartTotal, clearCart } = useCart();
@@ -67,34 +68,75 @@ export const Checkout = () => {
   // 2. Success State
   if (step === 'success') {
     return (
-      <div className="max-w-2xl mx-auto py-20 px-4 text-center animate-fade-in">
-        <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10 text-green-600" />
-        </div>
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Order Placed Successfully!</h2>
-        <p className="text-gray-600 mb-8">Thank you for your purchase. You will receive an email confirmation shortly.</p>
-        
-        {lastOrderId && (
-          <p className="text-sm text-gray-500 mb-6">
-            Order #{lastOrderId}
-          </p>
-        )}
-        
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <button
-            onClick={() => navigate(`/orders/${lastOrderId}`)}
-            className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="max-w-2xl mx-auto py-20 px-4 text-center"
+      >
+        {/* Animated checkmark circle */}
+        <motion.div
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
+          className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8"
+        >
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: 'spring', stiffness: 260, damping: 18, delay: 0.35 }}
           >
-            View Order Details
-          </button>
-          <button
-            onClick={() => navigate('/products')}
-            className="border border-gray-300 text-gray-700 px-8 py-3 rounded-lg hover:bg-gray-50 font-medium"
+            <CheckCircle className="w-12 h-12 text-green-500" strokeWidth={2} />
+          </motion.div>
+        </motion.div>
+
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.4 } } }}
+        >
+          <motion.h2
+            variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
+            className="text-3xl font-bold text-gray-900 mb-3"
           >
-            Continue Shopping
-          </button>
-        </div>
-      </div>
+            Order Placed Successfully!
+          </motion.h2>
+          <motion.p
+            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+            className="text-gray-500 mb-3"
+          >
+            Thank you for your purchase. You will receive an email confirmation shortly.
+          </motion.p>
+          {lastOrderId && (
+            <motion.p
+              variants={{ hidden: { opacity: 0 }, visible: { opacity: 1 } }}
+              className="text-sm text-gray-400 mb-8 font-mono"
+            >
+              Order #{lastOrderId}
+            </motion.p>
+          )}
+          <motion.div
+            variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}
+            className="flex flex-col sm:flex-row gap-4 justify-center"
+          >
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate(`/orders/${lastOrderId}`)}
+              className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-200"
+            >
+              View Order Details
+            </motion.button>
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => navigate('/products')}
+              className="border-2 border-gray-200 text-gray-700 px-8 py-3 rounded-xl hover:bg-gray-50 font-bold"
+            >
+              Continue Shopping
+            </motion.button>
+          </motion.div>
+        </motion.div>
+      </motion.div>
     );
   }
 
@@ -188,153 +230,174 @@ export const Checkout = () => {
               <>
                 {/* Steps Indicator */}
                 <div className="flex items-center mb-8">
-                  <div className={`flex items-center ${step === 'shipping' ? 'text-indigo-600 font-bold' : 'text-gray-500'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mr-2 ${step === 'shipping' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}`}>1</div>
-                    Shipping
-                  </div>
-                  <div className="w-12 h-0.5 bg-gray-300 mx-4"></div>
-                  <div className={`flex items-center ${step === 'payment' ? 'text-indigo-600 font-bold' : 'text-gray-500'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center border-2 mr-2 ${step === 'payment' ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}`}>2</div>
-                    Payment
-                  </div>
-                </div>
-
-                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sm:p-8">
-                  {step === 'shipping' ? (
-                    <form onSubmit={(e) => { e.preventDefault(); setStep('payment'); }}>
-                      <h2 className="text-xl font-bold mb-6">Shipping Details</h2>
-
-                      {savedAddresses.length > 0 && (
-                        <div className="mb-8 animate-fade-in">
-                          <h3 className="font-bold text-gray-700 mb-3 flex items-center gap-2">
-                            <span className="bg-indigo-100 p-1 rounded text-indigo-600"><ShieldCheck className="w-4 h-4" /></span>
-                            Saved Addresses
-                          </h3>
-                          <div className="grid grid-cols-1 gap-3">
-                            {savedAddresses.map(addr => (
-                              <div key={addr.id}
-                                className={`p-4 border rounded-xl cursor-pointer flex items-center justify-between transition-all group ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}
-                                onClick={() => setShippingData({ ...shippingData, name: addr.fullName, address: addr.street, city: addr.city, state: addr.state, zip: addr.postalCode })}
-                              >
-                                <div className="flex-1">
-                                  <p className="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{addr.fullName}</p>
-                                  <p className="text-sm text-gray-600">{addr.street}</p>
-                                  <p className="text-sm text-gray-500">{addr.city}, {addr.state} {addr.postalCode}</p>
-                                </div>
-                                <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'}`}>
-                                  {shippingData.address === addr.street && shippingData.zip === addr.postalCode && <div className="w-2 h-2 rounded-full bg-white" />}
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="relative my-8">
-                            <div className="absolute inset-0 flex items-center">
-                              <div className="w-full border-t border-gray-200"></div>
-                            </div>
-                            <div className="relative flex justify-center text-sm">
-                              <span className="px-2 bg-white text-gray-500">Or use a new address</span>
-                            </div>
-                          </div>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                          <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={shippingData.name} onChange={e => setShippingData({ ...shippingData, name: e.target.value })} />
-                        </div>
-                        <div className="md:col-span-2">
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
-                          <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={shippingData.address} onChange={e => setShippingData({ ...shippingData, address: e.target.value })} placeholder="123 Main St" />
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
-                          <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={shippingData.city} onChange={e => setShippingData({ ...shippingData, city: e.target.value })} />
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
-                            <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={shippingData.state} onChange={e => setShippingData({ ...shippingData, state: e.target.value })} />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">ZIP</label>
-                            <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={shippingData.zip} onChange={e => setShippingData({ ...shippingData, zip: e.target.value })} />
-                          </div>
-                        </div>
+                  {(['shipping', 'payment'] as const).map((s, i) => (
+                    <React.Fragment key={s}>
+                      <div className={`flex items-center ${step === s ? 'text-indigo-600 font-bold' : 'text-gray-400'}`}>
+                        <motion.div
+                          animate={step === s ? { scale: 1.15, borderColor: '#4f46e5', backgroundColor: '#eef2ff' } : { scale: 1, borderColor: '#d1d5db', backgroundColor: 'transparent' }}
+                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                          className="w-8 h-8 rounded-full flex items-center justify-center border-2 mr-2 text-sm font-bold"
+                        >
+                          {s === 'payment' && step === 'payment' ? (
+                            <CreditCard className="w-4 h-4 text-indigo-600" />
+                          ) : (
+                            <span className={step === s ? 'text-indigo-600' : 'text-gray-400'}>{i + 1}</span>
+                          )}
+                        </motion.div>
+                        <span className="capitalize text-sm font-semibold">{s}</span>
                       </div>
-                      <div className="mt-8 flex justify-end">
-                        <button type="submit" className="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 font-medium">Continue to Payment</button>
-                      </div>
-                    </form>
-                  ) : (
-                    <form onSubmit={handlePlaceOrder}>
-                      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                        <CreditCard className="w-6 h-6 text-indigo-600" />
-                        Payment Method
-                      </h2>
-
-                      <div className="bg-indigo-50 p-4 rounded-lg mb-6 border border-indigo-100 flex items-start gap-3">
-                        <Lock className="w-5 h-5 text-indigo-600 mt-0.5" />
-                        <div className="text-sm text-indigo-800">
-                          <span className="font-bold">Secure Gateway:</span> In a production environment, this form would be replaced by <strong className="font-bold">Stripe Elements</strong> or a similar PCI-compliant iframe. No real card data is processed here.
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                          <input
-                            className="w-full border border-gray-300 rounded-lg p-2.5"
-                            placeholder="0000 0000 0000 0000"
-                            maxLength={19}
-                            required
-                            value={paymentData.cardNumber}
-                            onChange={e => setPaymentData({ ...paymentData, cardNumber: e.target.value })}
+                      {i < 1 && (
+                        <div className="flex-1 h-0.5 mx-4 bg-gray-200 overflow-hidden">
+                          <motion.div
+                            animate={{ width: step === 'payment' ? '100%' : '0%' }}
+                            transition={{ duration: 0.5, ease: 'easeInOut' }}
+                            className="h-full bg-indigo-500"
                           />
                         </div>
-                        <div className="grid grid-cols-2 gap-6">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                            <input
-                              className="w-full border border-gray-300 rounded-lg p-2.5"
-                              placeholder="MM/YY"
-                              maxLength={5}
-                              required
-                              value={paymentData.expiry}
-                              onChange={e => setPaymentData({ ...paymentData, expiry: e.target.value })}
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
-                            <input
-                              className="w-full border border-gray-300 rounded-lg p-2.5"
-                              placeholder="123"
-                              maxLength={3}
-                              required
-                              value={paymentData.cvc}
-                              onChange={e => setPaymentData({ ...paymentData, cvc: e.target.value })}
-                            />
-                          </div>
-                        </div>
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
-                          <input className="w-full border border-gray-300 rounded-lg p-2.5" required value={paymentData.nameOnCard} onChange={e => setPaymentData({ ...paymentData, nameOnCard: e.target.value })} />
-                        </div>
-                      </div>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </div>
 
-                      <div className="mt-8 flex justify-between items-center">
-                        <button type="button" onClick={() => setStep('shipping')} className="text-gray-600 hover:text-gray-900 font-medium">Back to Shipping</button>
-                        <button
-                          type="submit"
-                          disabled={loading}
-                          className="bg-indigo-600 text-white px-8 py-3 rounded-lg hover:bg-indigo-700 font-medium flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {step === 'shipping' ? (
+                      <motion.form
+                        key="shipping"
+                        initial={{ opacity: 0, x: 40 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -40 }}
+                        transition={{ duration: 0.35, ease: 'easeOut' }}
+                        className="p-6 sm:p-8"
+                        onSubmit={(e) => { e.preventDefault(); setStep('payment'); }}
+                      >
+                        <h2 className="text-xl font-bold mb-6">Shipping Details</h2>
+
+                        {savedAddresses.length > 0 && (
+                          <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+                            <h3 className="font-bold text-gray-700 mb-3 flex items-center gap-2">
+                              <span className="bg-indigo-100 p-1 rounded text-indigo-600"><ShieldCheck className="w-4 h-4" /></span>
+                              Saved Addresses
+                            </h3>
+                            <div className="grid grid-cols-1 gap-3">
+                              {savedAddresses.map(addr => (
+                                <div key={addr.id}
+                                  className={`p-4 border rounded-xl cursor-pointer flex items-center justify-between transition-all group ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-50 ring-1 ring-indigo-600' : 'border-gray-200 hover:border-indigo-300 hover:bg-gray-50'}`}
+                                  onClick={() => setShippingData({ ...shippingData, name: addr.fullName, address: addr.street, city: addr.city, state: addr.state, zip: addr.postalCode })}
+                                >
+                                  <div className="flex-1">
+                                    <p className="font-bold text-gray-900 group-hover:text-indigo-700 transition-colors">{addr.fullName}</p>
+                                    <p className="text-sm text-gray-600">{addr.street}</p>
+                                    <p className="text-sm text-gray-500">{addr.city}, {addr.state} {addr.postalCode}</p>
+                                  </div>
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'}`}>
+                                    {shippingData.address === addr.street && shippingData.zip === addr.postalCode && <div className="w-2 h-2 rounded-full bg-white" />}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="relative my-8">
+                              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-200"></div></div>
+                              <div className="relative flex justify-center text-sm"><span className="px-2 bg-white text-gray-500">Or use a new address</span></div>
+                            </div>
+                          </motion.div>
+                        )}
+
+                        <motion.div
+                          initial="hidden"
+                          animate="visible"
+                          variants={{ visible: { transition: { staggerChildren: 0.08, delayChildren: 0.1 } } }}
+                          className="grid grid-cols-1 md:grid-cols-2 gap-6"
                         >
-                          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${finalTotal.toFixed(2)}</>}
+                          <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }} className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={shippingData.name} onChange={e => setShippingData({ ...shippingData, name: e.target.value })} />
+                          </motion.div>
+                          <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }} className="md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={shippingData.address} onChange={e => setShippingData({ ...shippingData, address: e.target.value })} placeholder="123 Main St" />
+                          </motion.div>
+                          <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={shippingData.city} onChange={e => setShippingData({ ...shippingData, city: e.target.value })} />
+                          </motion.div>
+                          <motion.div variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }} className="grid grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
+                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={shippingData.state} onChange={e => setShippingData({ ...shippingData, state: e.target.value })} />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">ZIP</label>
+                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={shippingData.zip} onChange={e => setShippingData({ ...shippingData, zip: e.target.value })} />
+                            </div>
+                          </motion.div>
+                        </motion.div>
 
-                        </button>
-                      </div>
-                    </form>
-                  )}
+                        <div className="mt-8 flex justify-end">
+                          <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} type="submit" className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold shadow-lg shadow-indigo-200">
+                            Continue to Payment →
+                          </motion.button>
+                        </div>
+                      </motion.form>
+                    ) : (
+                      <motion.form
+                        key="payment"
+                        initial={{ opacity: 0, x: 40 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -40 }}
+                        transition={{ duration: 0.35, ease: 'easeOut' }}
+                        className="p-6 sm:p-8"
+                        onSubmit={handlePlaceOrder}
+                      >
+                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+                          <CreditCard className="w-6 h-6 text-indigo-600" />
+                          Payment Method
+                        </h2>
+
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 flex items-start gap-3">
+                          <Lock className="w-5 h-5 text-indigo-600 mt-0.5" />
+                          <div className="text-sm text-indigo-800">
+                            <span className="font-bold">Secure Gateway:</span> In a production environment, this form would be replaced by <strong className="font-bold">Stripe Elements</strong> or a similar PCI-compliant iframe. No real card data is processed here.
+                          </div>
+                        </motion.div>
+
+                        <motion.div
+                          initial="hidden"
+                          animate="visible"
+                          variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }}
+                          className="space-y-4"
+                        >
+                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="0000 0000 0000 0000" maxLength={19} required value={paymentData.cardNumber} onChange={e => setPaymentData({ ...paymentData, cardNumber: e.target.value })} />
+                          </motion.div>
+                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} className="grid grid-cols-2 gap-6">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="MM/YY" maxLength={5} required value={paymentData.expiry} onChange={e => setPaymentData({ ...paymentData, expiry: e.target.value })} />
+                            </div>
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
+                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="123" maxLength={3} required value={paymentData.cvc} onChange={e => setPaymentData({ ...paymentData, cvc: e.target.value })} />
+                            </div>
+                          </motion.div>
+                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
+                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={paymentData.nameOnCard} onChange={e => setPaymentData({ ...paymentData, nameOnCard: e.target.value })} />
+                          </motion.div>
+                        </motion.div>
+
+                        <div className="mt-8 flex justify-between items-center">
+                          <motion.button type="button" whileHover={{ x: -3 }} onClick={() => setStep('shipping')} className="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1">
+                            ← Back
+                          </motion.button>
+                          <motion.button type="submit" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} disabled={loading} className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-200">
+                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${finalTotal.toFixed(2)}</>}
+                          </motion.button>
+                        </div>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
                 </div>
               </>
             )}
