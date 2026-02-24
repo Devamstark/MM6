@@ -406,7 +406,7 @@ export const AboutUs = () => {
                         {teamMembers.map((member, index) => (
                             <div
                                 key={index}
-                                className="about-scale-in group cursor-default"
+                                className="about-scale-in group cursor-pointer"
                                 style={{ animationDelay: `${index * 0.12}s` }}
                                 onMouseEnter={() => setHoveredCard(index)}
                                 onMouseLeave={() => setHoveredCard(null)}
@@ -431,7 +431,7 @@ export const AboutUs = () => {
                                         </div>
 
                                         {/* Social Links Overlay — slides up on hover */}
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-6">
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex items-end justify-center pb-6 z-10">
                                             <div className="flex gap-3">
                                                 {member.linkedin && (
                                                     <a
@@ -442,7 +442,7 @@ export const AboutUs = () => {
                                                         style={{ animation: hoveredCard === index ? 'aboutSocial 0.4s ease-out 0.1s both' : 'none' }}
                                                         title={`${member.name} on LinkedIn`}
                                                     >
-                                                        <Linkedin className="w-4.5 h-4.5 text-white" />
+                                                        <Linkedin className="w-5 h-5 text-white" />
                                                     </a>
                                                 )}
                                                 {member.github && (
@@ -454,7 +454,7 @@ export const AboutUs = () => {
                                                         style={{ animation: hoveredCard === index ? 'aboutSocial 0.4s ease-out 0.2s both' : 'none' }}
                                                         title={`${member.name} on GitHub`}
                                                     >
-                                                        <Github className="w-4.5 h-4.5 text-white" />
+                                                        <Github className="w-5 h-5 text-white" />
                                                     </a>
                                                 )}
                                             </div>
@@ -475,16 +475,16 @@ export const AboutUs = () => {
                                             </p>
                                         )}
 
-                                        {/* Social icons below name — always visible on mobile */}
-                                        <div className="flex justify-center gap-2 mt-3 lg:hidden">
+                                        {/* Social icons below name — always visible */}
+                                        <div className="flex justify-center gap-2 mt-3">
                                             {member.linkedin && (
-                                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-[#0077B5] hover:text-white text-gray-500 dark:text-gray-400 transition-all duration-300" title="LinkedIn">
-                                                    <Linkedin className="w-3.5 h-3.5" />
+                                                <a href={member.linkedin} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-[#0077B5] hover:text-white text-gray-500 dark:text-gray-400 transition-all duration-300 hover:scale-110" title={`${member.name} on LinkedIn`}>
+                                                    <Linkedin className="w-4 h-4" />
                                                 </a>
                                             )}
                                             {member.github && (
-                                                <a href={member.github} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-[#333] hover:text-white text-gray-500 dark:text-gray-400 transition-all duration-300" title="GitHub">
-                                                    <Github className="w-3.5 h-3.5" />
+                                                <a href={member.github} target="_blank" rel="noopener noreferrer" className="w-8 h-8 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center hover:bg-[#333] hover:text-white text-gray-500 dark:text-gray-400 transition-all duration-300 hover:scale-110" title={`${member.name} on GitHub`}>
+                                                    <Github className="w-4 h-4" />
                                                 </a>
                                             )}
                                         </div>
