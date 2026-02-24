@@ -24,7 +24,13 @@ const womenSizes = [
 ];
 
 export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGuideModalProps) => {
-    const [activeTab, setActiveTab] = useState<'men' | 'women'>('men');
+    const [activeTab, setActiveTab] = useState<'men' | 'women'>(category === 'women' ? 'women' : 'men');
+
+    useEffect(() => {
+        if (isOpen && (category === 'women' || category === 'men')) {
+            setActiveTab(category);
+        }
+    }, [isOpen, category]);
 
     // Close on Escape key
     useEffect(() => {
@@ -41,20 +47,18 @@ export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGui
         };
     }, [isOpen, onClose]);
 
-    if (!isOpen) return null;
-
     const currentSizes = activeTab === 'men' ? menSizes : womenSizes;
 
     return (
         <>
             {/* Backdrop */}
-            <div 
-                className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity"
+            <div
+                className={`fixed inset-0 bg-black/50 backdrop-blur-sm z-[9998] transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
                 onClick={onClose}
             />
 
             {/* Side Modal - Slides from Right */}
-            <div 
+            <div
                 className="fixed top-0 right-0 h-full w-full max-w-md bg-white dark:bg-gray-900 shadow-2xl z-[9999] transform transition-transform duration-300 ease-in-out overflow-y-auto"
                 style={{ transform: isOpen ? 'translateX(0)' : 'translateX(100%)' }}
             >
@@ -79,21 +83,19 @@ export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGui
                     <div className="flex gap-2 border-b border-gray-200 dark:border-gray-700">
                         <button
                             onClick={() => setActiveTab('men')}
-                            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
-                                activeTab === 'men'
+                            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'men'
                                     ? 'border-indigo-600 text-indigo-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                            }`}
+                                }`}
                         >
                             Men's
                         </button>
                         <button
                             onClick={() => setActiveTab('women')}
-                            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${
-                                activeTab === 'women'
+                            className={`px-4 py-2 text-sm font-semibold border-b-2 transition-colors ${activeTab === 'women'
                                     ? 'border-indigo-600 text-indigo-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400'
-                            }`}
+                                }`}
                         >
                             Women's
                         </button>
@@ -127,13 +129,12 @@ export const SizeGuideModal = ({ isOpen, onClose, category = 'unisex' }: SizeGui
                                 </thead>
                                 <tbody>
                                     {currentSizes.map((sizeData, index) => (
-                                        <tr 
-                                            key={sizeData.size} 
-                                            className={`border-b border-gray-100 dark:border-gray-800 ${
-                                                index % 2 === 0 
-                                                    ? 'bg-gray-50 dark:bg-gray-800/50' 
+                                        <tr
+                                            key={sizeData.size}
+                                            className={`border-b border-gray-100 dark:border-gray-800 ${index % 2 === 0
+                                                    ? 'bg-gray-50 dark:bg-gray-800/50'
                                                     : 'bg-white dark:bg-gray-900'
-                                            }`}
+                                                }`}
                                         >
                                             <td className="py-3 px-3 font-bold text-gray-900 dark:text-white">
                                                 {sizeData.size}

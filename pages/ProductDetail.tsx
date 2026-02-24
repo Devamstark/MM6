@@ -306,7 +306,7 @@ export const ProductDetail = () => {
                                 <div>
                                     <div className="flex items-center justify-between mb-3">
                                         <label className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Size</label>
-                                        <button 
+                                        <button
                                             onClick={() => setIsSizeGuideOpen(true)}
                                             className="text-[9px] font-bold text-gray-400 underline uppercase tracking-wider hover:text-black dark:hover:text-white transition-colors"
                                         >
@@ -650,13 +650,13 @@ export const ProductDetail = () => {
                     </div>
                 </div>
             )}
-        </div>
 
-        {/* Size Guide Side Modal */}
-        <SizeGuideModal 
-            isOpen={isSizeGuideOpen} 
-            onClose={() => setIsSizeGuideOpen(false)}
-            category={product?.gender === 'Men' ? 'men' : product?.gender === 'Women' ? 'women' : 'unisex'}
-        />
+            {/* Size Guide Side Modal */}
+            <SizeGuideModal
+                isOpen={isSizeGuideOpen}
+                onClose={() => setIsSizeGuideOpen(false)}
+                category={product?.gender === 'Men' ? 'men' : product?.gender === 'Women' ? 'women' : 'unisex'}
+            />
+        </div>
     );
 };
