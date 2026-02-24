@@ -61,7 +61,7 @@ export const StatusOverview: React.FC<StatusOverviewProps> = ({ orders, products
                         <stat.icon className={`w-6 h-6 ${stat.label === 'Pending' ? 'animate-spin' : ''}`} />
                     </div>
                     <div>
-                        <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest leading-none mb-1">{stat.label}</p>
+                        <p className="text-[10px] font-black text-gray-500 dark:text-gray-400 uppercase tracking-widest leading-none mb-1">{stat.label}</p>
                         <p className="text-2xl font-black text-gray-900 dark:text-white">{stat.value}</p>
                     </div>
                 </div>

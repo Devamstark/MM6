@@ -901,6 +901,11 @@ export const api = {
     await client.delete(`coupons/${id}/`);
   },
 
+  updateCoupon: async (id: string, data: any): Promise<any> => {
+    const response = await client.patch(`coupons/${id}/`, data);
+    return response.data;
+  },
+
   // --- CMS (Hero Banners & Home Sections) ---
   getHeroBanners: async (): Promise<any[]> => {
     const response = await client.get('hero-banners/');

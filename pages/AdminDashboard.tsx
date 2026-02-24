@@ -263,20 +263,20 @@ export const AdminDashboard = () => {
   if (loading) return <div className="p-10 flex justify-center bg-gray-50 dark:bg-slate-950 transition-colors"><Loader2 className="w-10 h-10 animate-spin text-indigo-600 dark:text-indigo-400" /></div>;
 
   return (
-    <div className="bg-gray-50 dark:bg-slate-950 min-h-screen pb-20 font-sans transition-colors duration-300">
+    <div className="bg-gray-50 dark:bg-slate-950 min-h-screen pb-20 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
         <div className="mb-12 animate-fade-up flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
             <span className="text-indigo-600 font-semibold text-xs uppercase tracking-[0.3em] mb-3 block">Management Portal</span>
             <h1 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>Admin Dashboard</h1>
-            <p className="text-gray-400 font-normal mt-2 text-base dark:text-gray-500">Real-time insights and product management console.</p>
+            <p className="text-gray-600 font-normal mt-2 text-base dark:text-gray-400">Real-time insights and product management console.</p>
           </div>
           <div className="flex items-center gap-3 bg-white dark:bg-gray-900 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
             <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600 shadow-inner">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest leading-none">Security Status</p>
+              <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-widest leading-none">Security Status</p>
               <p className="text-sm font-medium text-gray-900 dark:text-gray-200">System Healthy</p>
             </div>
           </div>
@@ -290,7 +290,7 @@ export const AdminDashboard = () => {
               onClick={() => setActiveTab(tab as any)}
               className={`px-6 py-3 rounded-xl text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab
                 ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 -translate-y-0.5'
-                : 'bg-white text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
+                : 'bg-white text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
                 }`}
             >
               {tab}
@@ -327,10 +327,10 @@ export const AdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                   <thead className="bg-white dark:bg-gray-900">
                     <tr>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider dark:text-gray-500">Order ID</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider dark:text-gray-500">Items</th>
-                      <th className="px-6 py-4 text-left text-xs font-bold text-gray-400 uppercase tracking-wider dark:text-gray-500">Status</th>
-                      <th className="px-6 py-4 text-right text-xs font-bold text-gray-400 uppercase tracking-wider dark:text-gray-500">Total</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Order ID</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Items</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Status</th>
+                      <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Total</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
@@ -375,7 +375,7 @@ export const AdminDashboard = () => {
                   <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-800/50">
                     <div>
                       <h3 className="font-semibold text-base text-gray-800 dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Products</h3>
-                      <p className="text-xs text-gray-400 mt-0.5">{products.length} total products in catalog</p>
+                      <p className="text-xs text-gray-500 mt-0.5">{products.length} total products in catalog</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button
@@ -419,14 +419,14 @@ export const AdminDashboard = () => {
                           className={
                             `relative flex items-center gap-2 px-4 py-3.5 text-xs font-medium whitespace-nowrap border-b-2 transition-all outline-none ` +
                             `data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 ` +
-                            `data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-400 ` +
-                            `hover:text-gray-700 dark:hover:text-gray-200 dark:data-[state=active]:text-indigo-400 dark:data-[state=active]:border-indigo-400`
+                            `data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-600 ` +
+                            `hover:text-gray-800 dark:hover:text-gray-200 dark:data-[state=active]:text-indigo-400 dark:data-[state=active]:border-indigo-400`
                           }
                         >
                           {cat.label}
                           <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${productCatTab === cat.key
                             ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
-                            : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                            : 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400'
                             }`}>
                             {getCount(cat.key)}
                           </span>
@@ -445,70 +445,98 @@ export const AdminDashboard = () => {
                           />
                         ) : (
                           <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800" style={{ fontFamily: 'Inter, sans-serif' }}>
                               <thead className="bg-gray-50/60 dark:bg-gray-900/50">
                                 <tr>
-                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Product</th>
-                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Vendor</th>
-                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Price</th>
-                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Sale</th>
-                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Stock</th>
-                                  <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Actions</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Product Name</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Category</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Price</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Sale Price</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Stock</th>
+                                  <th className="px-5 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                  <th className="px-5 py-4 text-center text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">View</th>
+                                  <th className="px-5 py-4 text-center text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Published</th>
+                                  <th className="px-5 py-4 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                                 </tr>
                               </thead>
                               <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                                 {filteredByCategory.length === 0 ? (
                                   <tr>
-                                    <td colSpan={6} className="px-6 py-16 text-center">
-                                      <Package className="w-10 h-10 text-gray-200 dark:text-gray-700 mx-auto mb-3" />
-                                      <p className="text-sm text-gray-400">No products in this category yet.</p>
-                                      <button onClick={() => openForm()} className="mt-4 text-xs text-indigo-600 font-medium hover:underline">+ Add a product</button>
+                                    <td colSpan={9} className="px-6 py-16 text-center">
+                                      <Package className="w-10 h-10 text-gray-300 dark:text-gray-700 mx-auto mb-3" />
+                                      <p className="text-sm text-gray-600 dark:text-gray-400">No products in this category yet.</p>
+                                      <button onClick={() => openForm()} className="mt-4 text-xs text-indigo-600 font-semibold hover:underline">+ Add a product</button>
                                     </td>
                                   </tr>
                                 ) : filteredByCategory.map(p => {
                                   const seller = users.find(u => u.id === p.userId);
                                   return (
                                     <tr key={p.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-all group">
-                                      <td className="px-6 py-5 whitespace-nowrap">
-                                        <div className="flex items-center gap-4">
-                                          <div className="h-12 w-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                                      {/* Product Name + Image */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        <div className="flex items-center gap-3">
+                                          <div className="h-10 w-10 rounded-lg overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 shrink-0">
                                             <img className="h-full w-full object-cover" src={p.imageUrl} alt="" />
                                           </div>
-                                          <div>
-                                            <div className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">{p.name}</div>
-                                            <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-0.5">{p.brand}</div>
-                                          </div>
+                                          <span className="text-sm font-semibold text-gray-900 dark:text-white">{p.name}</span>
                                         </div>
                                       </td>
-                                      <td className="px-6 py-5 whitespace-nowrap">
-                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-md border border-gray-100 dark:border-gray-700">
-                                          {seller ? seller.name : 'ID: ' + p.userId}
+                                      {/* Category */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        <span className="text-sm text-gray-700 dark:text-gray-300">{p.category || '—'}</span>
+                                      </td>
+                                      {/* Price */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        <span className="text-sm font-semibold text-gray-900 dark:text-white">${p.price.toFixed(2)}</span>
+                                      </td>
+                                      {/* Sale Price */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                                          {p.salePrice ? `$${p.salePrice.toFixed(2)}` : '—'}
                                         </span>
                                       </td>
-                                      <td className="px-6 py-5 whitespace-nowrap">
-                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">${p.price}</div>
-                                        {p.salePrice && <div className="text-[10px] text-red-400 line-through">${p.salePrice}</div>}
+                                      {/* Stock */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        <span className="text-sm font-semibold text-gray-900 dark:text-white">{p.stock}</span>
                                       </td>
-                                      <td className="px-6 py-5 whitespace-nowrap">
-                                        {p.discountPercentage ? (
-                                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800">
-                                            {p.discountPercentage}% OFF
-                                          </span>
+                                      {/* Status Badge */}
+                                      <td className="px-5 py-4 whitespace-nowrap">
+                                        {p.stock > 0 ? (
+                                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800">Selling</span>
                                         ) : (
-                                          <span className="text-gray-300 dark:text-gray-600 text-[10px] font-medium">—</span>
+                                          <span className="px-3 py-1 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800">Out of stock</span>
                                         )}
                                       </td>
-                                      <td className="px-6 py-5 whitespace-nowrap">
-                                        <div className="flex items-center gap-2">
-                                          <div className={`w-1.5 h-1.5 rounded-full ${p.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
-                                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{p.stock} units</span>
-                                        </div>
+                                      {/* View */}
+                                      <td className="px-5 py-4 whitespace-nowrap text-center">
+                                        <button
+                                          onClick={() => window.open(`/products/${p.slug || p.id}`, '_blank')}
+                                          className="w-8 h-8 inline-flex items-center justify-center text-gray-500 hover:text-indigo-600 bg-gray-50 hover:bg-indigo-50 rounded-full transition-all dark:bg-gray-800 dark:hover:bg-indigo-900/30"
+                                          title="View Product"
+                                        >
+                                          <Search className="w-4 h-4" />
+                                        </button>
                                       </td>
-                                      <td className="px-6 py-5 whitespace-nowrap text-right">
+                                      {/* Published Toggle */}
+                                      <td className="px-5 py-4 whitespace-nowrap text-center">
+                                        <button
+                                          className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${p.isFeatured ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'}`}
+                                          onClick={async () => {
+                                            try {
+                                              await api.updateProduct(p.id, { isFeatured: !p.isFeatured });
+                                              setProducts(prev => prev.map(item => item.id === p.id ? { ...item, isFeatured: !item.isFeatured } : item));
+                                            } catch { alert('Failed to toggle'); }
+                                          }}
+                                          title={p.isFeatured ? 'Published — Click to unpublish' : 'Unpublished — Click to publish'}
+                                        >
+                                          <span className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${p.isFeatured ? 'translate-x-5' : 'translate-x-0'}`} />
+                                        </button>
+                                      </td>
+                                      {/* Actions */}
+                                      <td className="px-5 py-4 whitespace-nowrap text-right">
                                         <div className="flex justify-end gap-1.5">
-                                          <button onClick={() => setDiscountProduct(p)} className="w-8 h-8 flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-600 hover:text-white rounded-lg transition-all" title="Manage Sale"><DollarSign className="w-3.5 h-3.5" /></button>
-                                          <button onClick={() => openForm(p)} className="w-8 h-8 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all"><Edit2 className="w-3.5 h-3.5" /></button>
-                                          <button onClick={() => handleProductDelete(p.id)} className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                                          <button onClick={() => openForm(p)} className="w-8 h-8 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all" title="Edit"><Edit2 className="w-3.5 h-3.5" /></button>
+                                          <button onClick={() => handleProductDelete(p.id)} className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all" title="Delete"><Trash2 className="w-3.5 h-3.5" /></button>
                                         </div>
                                       </td>
                                     </tr>
@@ -557,17 +585,17 @@ export const AdminDashboard = () => {
             <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-all">
               <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50">
                 <h3 className="font-bold text-lg text-gray-800 dark:text-white">Seller Management</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Enable or disable seller accounts and view their inventory size.</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Enable or disable seller accounts and view their inventory size.</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                   <thead className="bg-[#fcfcfd] dark:bg-gray-900/50">
                     <tr>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Seller Identity</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Contact</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Inventory</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status</th>
-                      <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Control</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Seller Identity</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Contact</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Inventory</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Control</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
@@ -616,46 +644,69 @@ export const AdminDashboard = () => {
           {activeTab === 'users' && (
             <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-all">
               <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800" style={{ fontFamily: 'Inter, sans-serif' }}>
                   <thead className="bg-[#fcfcfd] dark:bg-gray-900/50">
                     <tr>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">User Account</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Security Role</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Activity Status</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Registration</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">ID</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Name</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Joined</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
-                    {users.map(u => (
-                      <tr key={u.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-all group">
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-black text-xs mr-3 border border-slate-200 group-hover:bg-indigo-600 group-hover:text-white transition-all duration-300">
-                              {u.name.charAt(0)}
+                    {users.map((u, idx) => {
+                      // Format ID: User-001, Seller-002, Blog-003 based on role
+                      const prefix = u.role === 'seller' ? 'Seller' : u.role === 'blogger' ? 'Blog' : u.role === 'admin' ? 'Admin' : 'User';
+                      const displayId = `${prefix}-${String(idx + 1).padStart(3, '0')}`;
+
+                      return (
+                        <tr key={u.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-all group">
+                          {/* Formatted ID */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm font-bold text-gray-900 dark:text-gray-100">{displayId}</span>
+                          </td>
+                          {/* Name */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-700 dark:text-slate-300 font-bold text-xs mr-3 border border-slate-200 dark:border-slate-700 group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-600 transition-all duration-300">
+                                {u.name.charAt(0)}
+                              </div>
+                              <span className="text-sm font-semibold text-gray-900 dark:text-white">{u.name}</span>
                             </div>
-                            <div>
-                              <div className="text-sm font-black text-gray-900">{u.name}</div>
-                              <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{u.email}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
-                                 ${u.role === 'admin' ? 'bg-purple-50 text-purple-600 border border-purple-100' :
-                              u.role === 'seller' ? 'bg-blue-50 text-blue-600 border border-blue-100' : 'bg-gray-50 text-gray-600 border border-gray-100'
-                            }`}>
-                            {u.role.toUpperCase()}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap">
-                          <span className={`px-3 py-1.5 inline-flex text-[10px] font-black uppercase tracking-widest rounded-full 
-                                 ${u.isActive !== false ? 'bg-green-50 text-green-600 border border-green-100' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
-                            {u.isActive !== false ? 'Verified Online' : 'Access Restricted'}
-                          </span>
-                        </td>
-                        <td className="px-8 py-6 whitespace-nowrap text-xs font-bold text-gray-500">{u.createdAt || 'N/A'}</td>
-                      </tr>
-                    ))}
+                          </td>
+                          {/* Email */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{u.email}</span>
+                          </td>
+                          {/* Role */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-3 py-1 inline-flex text-xs font-bold uppercase tracking-wider rounded-full 
+                                   ${u.role === 'admin' ? 'bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800' :
+                                u.role === 'seller' ? 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' :
+                                  u.role === 'blogger' ? 'bg-orange-50 text-orange-700 border border-orange-200 dark:bg-orange-900/30 dark:text-orange-400 dark:border-orange-800' :
+                                    'bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700'
+                              }`}>
+                              {u.role.toUpperCase()}
+                            </span>
+                          </td>
+                          {/* Status */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`px-3 py-1 inline-flex text-xs font-bold uppercase tracking-wider rounded-full 
+                                   ${u.isActive !== false
+                                ? 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800'
+                                : 'bg-red-50 text-red-600 border border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800'}`}>
+                              {u.isActive !== false ? 'Active' : 'Disabled'}
+                            </span>
+                          </td>
+                          {/* Joined */}
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="text-sm text-gray-700 dark:text-gray-300">{u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A'}</span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>
@@ -684,12 +735,12 @@ export const AdminDashboard = () => {
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                   <thead className="bg-[#fcfcfd] dark:bg-gray-900/50">
                     <tr>
-                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Order ID</th>
-                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Customer</th>
-                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Items</th>
-                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Total</th>
-                      <th className="px-8 py-5 text-left text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Status</th>
-                      <th className="px-8 py-5 text-right text-xs font-semibold text-gray-400 uppercase tracking-wider dark:text-gray-500">Actions</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Order ID</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Customer</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Items</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Total</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Status</th>
+                      <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-700 uppercase tracking-wider dark:text-gray-300">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
@@ -749,35 +800,35 @@ export const AdminDashboard = () => {
             <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
               <div className="p-6 border-b border-gray-100 dark:border-gray-800 bg-gray-50/50 dark:bg-gray-800/50 transition-colors">
                 <h3 className="font-bold text-lg text-gray-800 dark:text-white">Contact Messages</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Manage inquiries from users via the contact form.</p>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">Manage inquiries from users via the contact form.</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                   <thead className="bg-[#fcfcfd] dark:bg-gray-950">
                     <tr>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Transmission Date</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Originator</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Subject Matter</th>
-                      <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Priority Status</th>
-                      <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Control</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">From</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Subject</th>
+                      <th className="px-6 py-4 text-left text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-right text-[11px] font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Actions</th>
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-50">
                     {messages.map(msg => (
                       <React.Fragment key={msg.id}>
                         <tr className={`hover:bg-gray-50/80 transition-all ${!msg.isRead ? 'bg-indigo-50/20' : ''}`}>
-                          <td className="px-8 py-6 whitespace-nowrap text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                          <td className="px-8 py-6 whitespace-nowrap text-[10px] font-black text-gray-600 uppercase tracking-widest">
                             {new Date(msg.createdAt).toLocaleDateString()}
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
                             <div className={`text-sm ${!msg.isRead ? 'font-black text-gray-900' : 'font-bold text-gray-500'}`}>{msg.name}</div>
-                            <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{msg.email}</div>
+                            <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">{msg.email}</div>
                           </td>
                           <td className={`px-8 py-6 whitespace-nowrap text-sm ${!msg.isRead ? 'font-black text-indigo-600' : 'font-medium text-gray-600'}`}>
                             {msg.subject || '(No Subject Provided)'}
                           </td>
                           <td className="px-8 py-6 whitespace-nowrap">
-                            <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${msg.isRead ? 'bg-gray-50 text-gray-400 border border-gray-100' : 'bg-indigo-600 text-white border border-indigo-700'}`}>
+                            <span className={`px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest shadow-sm ${msg.isRead ? 'bg-gray-100 text-gray-600 border border-gray-200' : 'bg-indigo-600 text-white border border-indigo-700'}`}>
                               {msg.isRead ? 'Archived' : 'High Priority'}
                             </span>
                           </td>
