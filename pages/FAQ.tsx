@@ -35,7 +35,7 @@ const faqData: FAQItem[] = [
         category: 'general',
         icon: <Gift className="w-5 h-5" />
     },
-    
+
     // Shipping
     {
         question: 'What are your shipping options?',
@@ -193,10 +193,10 @@ const categoryLabels: Record<string, string> = {
 
 export const FAQ = () => {
     const [openIndex, setOpenIndex] = useState<number | null>(null);
-    const [selectedCategory, setSelectedCategory] = useState<string>('all');
+    const [selectedCategory, setSelectedCategory] = useState<string>('general');
 
-    const filteredFAQs = selectedCategory === 'all' 
-        ? faqData 
+    const filteredFAQs = selectedCategory === 'all'
+        ? faqData
         : faqData.filter(faq => faq.category === selectedCategory);
 
     const categories = ['all', ...Array.from(new Set(faqData.map(faq => faq.category)))];
@@ -226,11 +226,10 @@ export const FAQ = () => {
                                 setSelectedCategory(category);
                                 setOpenIndex(null);
                             }}
-                            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${
-                                selectedCategory === category
+                            className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all ${selectedCategory === category
                                     ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
                                     : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50 hover:border-gray-300 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700 dark:hover:bg-gray-700'
-                            }`}
+                                }`}
                         >
                             {category === 'all' ? 'All Topics' : categoryLabels[category]}
                         </button>
@@ -257,12 +256,11 @@ export const FAQ = () => {
                                     </span>
                                 </div>
                                 <ChevronDown
-                                    className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${
-                                        openIndex === index ? 'rotate-180 text-indigo-600' : ''
-                                    }`}
+                                    className={`w-5 h-5 text-gray-400 transition-transform duration-300 ${openIndex === index ? 'rotate-180 text-indigo-600' : ''
+                                        }`}
                                 />
                             </button>
-                            
+
                             {openIndex === index && (
                                 <div className="px-6 pb-5 pt-0">
                                     <div className="ml-[4.25rem] text-gray-600 leading-relaxed dark:text-gray-300">
@@ -288,24 +286,24 @@ export const FAQ = () => {
                 </div>
 
                 {/* Still Need Help Section */}
-                <div className="mt-16 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-3xl p-8 md:p-12 text-center text-white shadow-xl">
-                    <div className="inline-flex items-center justify-center w-14 h-14 bg-white/20 rounded-full mb-6">
-                        <Phone className="w-7 h-7" />
+                <div className="mt-10 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-2xl px-6 py-6 md:px-8 md:py-7 text-center text-white shadow-lg">
+                    <div className="inline-flex items-center justify-center w-10 h-10 bg-white/20 rounded-full mb-3">
+                        <Phone className="w-5 h-5" />
                     </div>
-                    <h2 className="text-3xl font-bold mb-4">Still Have Questions?</h2>
-                    <p className="text-white/90 mb-8 max-w-xl mx-auto">
-                        Can't find the answer you're looking for? Our customer support team is here to help.
+                    <h2 className="text-xl font-bold mb-2">Still Have Questions?</h2>
+                    <p className="text-white/90 mb-5 max-w-md mx-auto text-sm">
+                        Can't find the answer you're looking for? Our support team is here to help.
                     </p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <Link
                             to="/contact"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-indigo-600 rounded-full font-bold hover:bg-gray-100 transition-colors"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-white text-indigo-600 rounded-full font-bold text-sm hover:bg-gray-100 transition-colors"
                         >
                             Contact Support
                         </Link>
                         <Link
                             to="/page/how-to-order"
-                            className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-indigo-600 text-white border-2 border-white/30 rounded-full font-bold hover:bg-indigo-700 transition-colors"
+                            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 bg-indigo-600 text-white border-2 border-white/30 rounded-full font-bold text-sm hover:bg-indigo-700 transition-colors"
                         >
                             How to Order
                         </Link>
