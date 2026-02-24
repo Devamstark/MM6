@@ -55,6 +55,7 @@
 - **Role-Based Access Control (RBAC)**:
   - **User/Buyer**: Browse products, add to cart, checkout, write reviews
   - **Seller**: Manage own products, view sales analytics
+  - **Blogger**: Create and manage fashion-related blog content
   - **Admin**: Full platform control, user management, content moderation
 
 #### Technical Implementation:
@@ -278,6 +279,26 @@
 
 ---
 
+### **11. Fashion Blogger System** ✍️
+
+#### Features:
+- **Public Blog Feed**: Magazine-style layout for trend reports and style guides
+- **Blogger Dashboard**: Dedicated workflow for content creators
+- **Full-Screen Editor**: Specialized UI for writing and formatting articles
+- **Content Moderation**: Admin oversight of all blog content
+- **Engagement Stats**: View counts and reading time metrics for all posts
+
+#### Technical Implementation:
+- **Backend Models**: `BlogPost` with UUID, slug auto-generation, and author relationships
+- **Frontend Components**: `Blog`, `BloggerDashboard`
+- **Endpoints**:
+  - `GET /api/blog/` (Public feed)
+  - `GET /api/blog/{slug}/` (Post details & view increment)
+  - `POST /api/blog/` (Create - Blogger/Admin only)
+  - `PATCH /api/blog/{slug}/publish/` (Toggle visibility)
+
+---
+
 ## 🎨 Design System
 
 ### **Color Palette**
@@ -436,6 +457,16 @@ smartshop-e-commerce/
 | PATCH | `/api/admin/users/{id}/` | Update user role | Admin |
 | GET | `/api/admin/content/` | Get page content | Admin |
 | PUT | `/api/admin/content/{slug}/` | Update page content | Admin |
+
+### **Blog**
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/blog/` | List published blog posts | No |
+| GET | `/api/blog/{slug}/` | Get blog post details | No |
+| POST | `/api/blog/` | Create blog post | Blogger/Admin |
+| PUT | `/api/blog/{id}/` | Update blog post | Owner/Admin |
+| PATCH | `/api/blog/{id}/publish/` | Toggle publish status | Owner/Admin |
+| DELETE | `/api/blog/{id}/` | Delete blog post | Owner/Admin |
 
 ---
 

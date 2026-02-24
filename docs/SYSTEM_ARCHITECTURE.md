@@ -143,6 +143,20 @@
         │ 1:N                 │ 1:N
         ▼                     │
 ┌─────────────────┐           │
+│    BlogPost     │           │
+├─────────────────┤           │
+│ id (PK)         │           │
+│ author_id (FK)  │───────────┘
+│ title           │
+│ content         │
+│ slug            │
+│ category        │
+│ views           │
+└─────────────────┘
+        │                     │
+        │ 1:N                 │ 1:N
+        ▼                     │
+┌─────────────────┐           │
 │    Product      │           │
 ├─────────────────┤           │
 │ id (PK)         │           │
@@ -255,7 +269,7 @@
 │  └─ Refresh token mechanism                             │
 │                                                          │
 │  Layer 4: Role-Based Access Control (RBAC)              │
-│  ├─ User roles: admin, seller, user                     │
+│  ├─ User roles: admin, seller, blogger, user            │
 │  ├─ Permission classes on API endpoints                 │
 │  └─ Frontend route protection                           │
 │                                                          │
@@ -540,7 +554,7 @@ UI Error Display (Toast/Alert)
 ---
 
 **Last Updated**: February 2026
-**Version**: 1.2.0
+**Version**: 1.3.0
 
 ---
 

@@ -94,5 +94,5 @@ This document outlines the planned enhancements and future feature sets for the 
 ---
 
 **Last Updated**: February 2026  
-**Status**: Strategic Roadmap (v2.0 Planning)
+**Status**: Strategic Roadmap (v2.1 Planning)
 

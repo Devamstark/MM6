@@ -71,6 +71,17 @@
 - ✅ Access admin dashboard
 - ✅ Full platform control
 
+### 5. **Blogger**
+**Capabilities:**
+- ✅ Browse all public content
+- ✅ Create, edit, and delete own blog posts
+- ✅ Upload cover images for blog posts
+- ✅ Manage post status (Draft vs. Published)
+- ✅ Feature own posts (subject to admin override)
+- ✅ Access blogger dashboard
+- ❌ Cannot manage other bloggers' posts
+- ❌ Cannot access seller or admin dashboards (unless also an admin)
+
 ---
 
 ## 🔐 Authentication Features
@@ -826,7 +837,7 @@
 
 ## 📊 Feature Completion Statistics
 
-### **Total Features: 42**
+### **Total Features: 46**
 - **Authentication**: 4/4 (100%)
 - **Product**: 7/7 (100%)
 - **Shopping**: 6/6 (100%)
@@ -835,6 +846,7 @@
 - **Seller Features**: 6/6 (100%)
 - **Admin Features**: 6/6 (100%)
 - **UI/UX Features**: 5/5 (100%)
+- **Blogger Features**: 4/4 (100%)
 
 **Overall Completion: 100%** ✅
 
@@ -844,3 +856,74 @@
 **Version**: 1.1.0 (MVP + Modern Stack)
 
 
+---
+
+## ✍️ Fashion Blogger Features
+
+### Feature 42: Public Blog Feed
+**User Story:** *As a visitor, I want to read fashion articles and trend reports.*
+
+**Functionality:**
+- Magazine-style layout with featured post hero
+- Category-based filtering (All, Style, Trends, Care, News, Lookbook)
+- Responsive grid of published articles
+- Post metadata (author, date, reading time, views)
+- Skeleton loading states for smooth UX
+- Direct links to full article view
+
+**Technical Details:**
+- Endpoint: `GET /api/blog/` (lists published only)
+- Frontend: `pages/Blog.tsx`
+- Backend: `BlogPostViewSet`
+
+---
+
+### Feature 43: Blogger Dashboard
+**User Story:** *As a blogger, I want a dedicated space to manage my articles.*
+
+**Functionality:**
+- Real-time stats (Total posts, Published count, Total views)
+- Interactive list of all own posts
+- Quick toggle for Publish/Unpublish status
+- Edit and Delete actions for each post
+- Search and filter own posts
+- Welcome message with personalized greeting
+
+**Technical Details:**
+- Endpoint: `GET /api/blog/?author={id}`
+- Frontend: `pages/BloggerDashboard.tsx` (List mode)
+
+---
+
+### Feature 44: Full-Screen Blog Editor
+**User Story:** *As a blogger, I want a powerful tool to write and format my articles.*
+
+**Functionality:**
+- Intuitive title and excerpt fields
+- Rich text/HTML content editor support
+- Category selection via interactive chips
+- Cover image URL input with live preview
+- Tag management (comma-separated)
+- Draft vs. Published toggle
+- Featured post toggle
+- Instant success feedback on save
+
+**Technical Details:**
+- Endpoints: `POST /api/blog/`, `PATCH /api/blog/{id}/`
+- Frontend: `pages/BloggerDashboard.tsx` (Editor mode)
+
+---
+
+### Feature 45: Blog Moderation (Admin)
+**User Story:** *As an admin, I want to manage all blog content on the platform.*
+
+**Functionality:**
+- View all posts from all bloggers in the admin panel
+- Edit or delete any post
+- Toggle featured status across the entire platform
+- Assign/Revoke blogger roles via User management
+- SEO settings (slug auto-generation, reading time calculation)
+
+**Technical Details:**
+- Backend: Django Admin registration with customized list filters and searchable fields.
+- API: `set_role` endpoint in `UserViewSet`.

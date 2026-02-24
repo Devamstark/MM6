@@ -16,6 +16,7 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Affiliate model
 - [x] PageContent model for CMS
 - [x] PasswordResetToken model
+- [x] BlogPost model with slug, views, and reading time
 
 ### ✅ API Serializers (100% Complete)
 - [x] UserSerializer
@@ -32,6 +33,7 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Review system with verified buyer check
 - [x] Seller dashboard endpoints
 - [x] Admin dashboard endpoints
+- [x] Blog system CRUD (Public & Authenticated)
 - [x] Affiliate tracking
 
 ### ✅ Permissions & Security (100% Complete)
@@ -82,6 +84,8 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Checkout page
 - [x] OrderHistory page
 - [x] Profile page
+- [x] Blog page (Public)
+- [x] BloggerDashboard (Blogger/Admin only)
 
 ### ✅ Pages - Seller (100% Complete)
 - [x] SellerDashboard with analytics
@@ -127,6 +131,7 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Batch Product Creator (Drag & Drop)
 - [x] View all orders
 - [x] Platform statistics
+- [x] Blog moderation
 
 ---
 
@@ -341,6 +346,7 @@ All of the following must be ✅ before launch:
 - **SSL**: Traefik + Let's Encrypt (auto-renewed certificates).
 - **Storage**: MinIO self-hosted S3 for backups; local Docker volumes for media.
 - **Media serving**: Fixed production media serving via Django `serve` view.
+- **Blog System**: (v1.3.0) Added full Fashion Blogger feature set including role-based access, editor, and public feed.
 
 ### Previous Updates (v1.1.0)
 - **State Management**: Migrated from Context API to **Jotai** for atomic state updates (Cart, User, UI).
@@ -358,5 +364,5 @@ All of the following must be ✅ before launch:
 ---
 
 **Last Updated**: February 2026  
-**Status**: ✅ Live in Production  
+**Status**: ✅ Live in Production (v1.3.0)
 **URL**: https://smartshop1.us
