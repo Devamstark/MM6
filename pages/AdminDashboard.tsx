@@ -68,44 +68,42 @@ export const AdminDashboard = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [statsData, productsRes, usersData, ordersRes, categoriesData, messagesData] = await Promise.all([
+      // Use allSettled so one failing API doesn't block everything else
+      // Pass page_size=500 to get ALL products and orders in a single request
+      const [statsResult, productsResult, usersResult, ordersResult, categoriesResult, messagesResult] = await Promise.allSettled([
         api.getDashboardStats(),
-        api.getProducts({ page: 1 } as any),
+        api.getProducts({ page_size: 500 } as any),
         api.getUsers(),
         api.getRecentOrders(),
         api.getCategories(),
         api.getContactMessages(),
       ]);
-      setStats(statsData);
 
-      // Load ALL products by fetching multiple pages if needed
-      let allProducts = (productsRes as any).results || [];
-      let nextPage = (productsRes as any).next;
-      // Fetch remaining pages (up to 10 pages to avoid infinite loop)
-      let pageNum = 2;
-      while (nextPage && pageNum <= 10) {
-        const moreRes = await api.getProducts({ page: pageNum } as any);
-        const more = (moreRes as any).results || [];
-        allProducts = [...allProducts, ...more];
-        nextPage = (moreRes as any).next;
-        pageNum++;
+      if (statsResult.status === 'fulfilled') setStats(statsResult.value);
+
+      if (productsResult.status === 'fulfilled') {
+        const productsRes = productsResult.value as any;
+        const allProducts = productsRes.results || [];
+        setProducts(allProducts.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
+        setHasMoreProducts(false);
+        setProductPage(1);
       }
 
-      setProducts(allProducts.sort((a: any, b: any) => (a.display_order ?? 0) - (b.display_order ?? 0)));
-      setHasMoreProducts(false); // We loaded everything
-      setProductPage(1);
+      if (usersResult.status === 'fulfilled') setUsers(usersResult.value);
 
-      setUsers(usersData);
+      if (ordersResult.status === 'fulfilled') {
+        const ordersRes = ordersResult.value as any;
+        const ordersList = ordersRes.results || [];
+        setOrders(ordersList);
+        setHasMoreOrders(!!ordersRes.next);
+        setOrderPage(1);
+      }
 
-      const ordersList = (ordersRes as any).results || [];
-      setOrders(ordersList);
-      setHasMoreOrders(!!(ordersRes as any).next);
-      setOrderPage(1);
+      if (categoriesResult.status === 'fulfilled') setCategories(categoriesResult.value);
+      if (messagesResult.status === 'fulfilled') setMessages(messagesResult.value as any);
 
-      setCategories(categoriesData);
-      setMessages(messagesData);
     } catch (e) {
-      console.error(e);
+      console.error('loadData error:', e);
     } finally {
       setLoading(false);
     }

@@ -65,8 +65,9 @@ export const ProductDetail = () => {
                         setInWishlist(wishlist.some(p => p.id === data.id));
 
                         // Check purchase for review permission
-                        const orders = await api.getRecentOrders();
-                        const hasBought = orders.some(o => o.items?.some(i => i.id === data.id));
+                        const ordersRes = await api.getRecentOrders();
+                        const orders = (ordersRes as any).results || (Array.isArray(ordersRes) ? ordersRes : []);
+                        const hasBought = orders.some((o: any) => o.items?.some((i: any) => i.id === data.id));
                         setCanReview(hasBought);
                     }
                 }

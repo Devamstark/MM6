@@ -72,10 +72,11 @@ export const NotificationCenter = () => {
             const visitedOoSIds = JSON.parse(localStorage.getItem('cm_visited_oos') || '[]');
             if (visitedOoSIds.length > 0) {
                 try {
-                    const allProducts = await api.getProducts(); // Fetch latest stock
-                    const backInStock = allProducts.filter(p => visitedOoSIds.includes(p.id) && p.stock > 0);
+                    const productsRes = await api.getProducts(); // Fetch latest stock
+                    const allProducts = (productsRes as any).results || (Array.isArray(productsRes) ? productsRes : []);
+                    const backInStock = allProducts.filter((p: any) => visitedOoSIds.includes(p.id) && p.stock > 0);
 
-                    backInStock.forEach(p => {
+                    backInStock.forEach((p: any) => {
                         newNotifications.push({
                             id: `restock-${p.id}`,
                             type: 'restock',
@@ -97,9 +98,10 @@ export const NotificationCenter = () => {
             // 3. Admin: Low Stock Alerts (Real-time)
             if (isAdmin) {
                 try {
-                    const allProducts = await api.getProducts();
-                    const lowStock = allProducts.filter(p => p.stock < 5 && p.stock > 0);
-                    lowStock.forEach(p => {
+                    const productsRes = await api.getProducts();
+                    const allProducts = (productsRes as any).results || (Array.isArray(productsRes) ? productsRes : []);
+                    const lowStock = allProducts.filter((p: any) => p.stock < 5 && p.stock > 0);
+                    lowStock.forEach((p: any) => {
                         newNotifications.push({
                             id: `low-stock-${p.id}`,
                             type: 'restock', // Reusing restock type for stock alerts
@@ -110,10 +112,10 @@ export const NotificationCenter = () => {
                             link: '/admin'
                         });
                     });
-                    // Admin: New Orders (Simulated by checking recent orders vs last checked time)
-                    // For MVP without backend sockets, we can just show the latest pending order if it's "new"
-                    const orders = await api.getRecentOrders();
-                    const pendingOrders = orders.filter(o => o.status === 'pending');
+                    // Admin: New Orders
+                    const ordersRes = await api.getRecentOrders();
+                    const orders = (ordersRes as any).results || (Array.isArray(ordersRes) ? ordersRes : []);
+                    const pendingOrders = orders.filter((o: any) => o.status === 'pending');
                     if (pendingOrders.length > 0) {
                         const latest = pendingOrders[0];
                         // Simple dedup by ID
