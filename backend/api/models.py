@@ -354,7 +354,12 @@ class BlogPost(models.Model):
                 counter += 1
             self.slug = slug
 
-        # Set published_at when first published
+        was_published = False
+        if self.pk:
+            old_instance = BlogPost.objects.filter(pk=self.pk).first()
+            if old_instance:
+                was_published = old_instance.is_published
+
         if self.is_published and not self.published_at:
             self.published_at = timezone.now()
 
@@ -364,5 +369,56 @@ class BlogPost(models.Model):
 
         super().save(*args, **kwargs)
 
+        # Send newsletter if newly published
+        if self.is_published and not was_published:
+            self.send_newsletter_notification()
+
+    def send_newsletter_notification(self):
+        """Sends an email to all active newsletter subscribers."""
+        from django.core.mail import send_mail
+        from django.template.loader import render_to_string
+        from django.utils.html import strip_tags
+        
+        subscribers = NewsletterSubscriber.objects.filter(is_active=True)
+        recipient_list = [s.email for s in subscribers]
+        
+        if not recipient_list:
+            return
+
+        subject = f"New Blog Post: {self.title}"
+        # We can create a simple HTML template or just plain text
+        html_message = f"""
+            <h2>{self.title}</h2>
+            <p>{self.excerpt}</p>
+            <p><a href="https://smartshop1.us/blog/{self.slug}">Read more here</a></p>
+            <br>
+            <hr>
+            <p><small>You are receiving this because you signed up for the SmartShop newsletter.</small></p>
+        """
+        plain_message = strip_tags(html_message)
+        
+        try:
+            send_mail(
+                subject,
+                plain_message,
+                settings.DEFAULT_FROM_EMAIL,
+                recipient_list,
+                html_message=html_message,
+                fail_silently=True
+            )
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send newsletter: {str(e)}")
+
     def __str__(self):
         return self.title
+
+
+class NewsletterSubscriber(models.Model):
+    """Stores emails for the newsletter system."""
+    email = models.EmailField(unique=True)
+    subscribed_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.email

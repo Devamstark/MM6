@@ -13,8 +13,18 @@ from django.conf import settings
 import random
 from decimal import Decimal
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon, HeroBanner, HomePageSection, BlogPost
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer, HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer
+from .models import (
+    Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent, 
+    Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, 
+    HeroBanner, HomePageSection, BlogPost, NewsletterSubscriber
+)
+from .serializers import (
+    ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, 
+    PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, 
+    ContactMessageSerializer, AddressSerializer, CouponSerializer, 
+    HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer, 
+    NewsletterSubscriberSerializer
+)
 
 # ...
 
@@ -314,6 +324,29 @@ class ProductViewSet(viewsets.ModelViewSet):
             except Product.DoesNotExist:
                 continue
         return Response({'status': 'reordered'})
+
+    @action(detail=True, methods=['post'])
+    def publish(self, request, pk=None):
+        """Publishes a product."""
+        instance = self.get_object()
+        # Add permission check if needed, e.g., only seller/admin can publish their own product
+        if request.user != instance.seller and request.user.role != 'admin':
+            return Response({'error': 'You do not have permission to publish this product.'}, status=status.HTTP_403_FORBIDDEN)
+        
+        instance.is_published = True
+        instance.save(update_fields=['is_published'])
+        return Response({'status': 'published'})
+
+
+class NewsletterSubscriberViewSet(viewsets.ModelViewSet):
+    queryset = NewsletterSubscriber.objects.all()
+    serializer_class = NewsletterSubscriberSerializer
+    permission_classes = [permissions.AllowAny]
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve', 'update', 'partial_update', 'destroy']:
+            return [permissions.IsAdminUser()]
+        return [permissions.AllowAny()]
 
 class OrderViewSet(viewsets.ModelViewSet):
     serializer_class = OrderSerializer

@@ -979,8 +979,13 @@ export const api = {
     return response.data;
   },
   deleteBlogPost: async (id) => { await client.delete(`blog/${id}/`); },
-  publishBlogPost: async (id, publish) => {
-    const response = await client.patch(`blog/${id}/`, { is_published: publish });
+  publishBlogPost: async (id: string, publish: boolean = true) => {
+    const response = await client.patch(`blog/${id}/publish/`, { is_published: publish });
     return response.data;
+  },
+
+  // --- Newsletter ---
+  subscribeToNewsletter: async (email: string): Promise<void> => {
+    await client.post('newsletter/', { email });
   },
 };

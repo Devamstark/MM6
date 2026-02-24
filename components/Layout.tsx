@@ -35,6 +35,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
   const [hoveredMenu, setHoveredMenu] = useState<string | null>(null);
   const menuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
+  const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    setNewsletterStatus('loading');
+    try {
+      await api.subscribeToNewsletter(newsletterEmail);
+      setNewsletterStatus('success');
+      setNewsletterEmail('');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    } catch (err: any) {
+      setNewsletterStatus('error');
+      setTimeout(() => setNewsletterStatus('idle'), 3000);
+    }
+  };
 
   const openMenu = (menu: string) => {
     if (menuTimeoutRef.current) clearTimeout(menuTimeoutRef.current);
@@ -1074,14 +1092,26 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             <div className="lg:col-span-2 space-y-4">
               <h3 className="text-xs font-bold text-gray-900 dark:text-white tracking-widest uppercase">Newsletter</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 leading-relaxed">Get updates on new arrivals and special offers.</p>
-              <form onSubmit={(e) => { e.preventDefault(); }} className="flex flex-col gap-2">
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-2">
                 <input
                   type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="your@email.com"
+                  required
                   className="w-full px-3.5 py-2.5 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all"
                 />
-                <button type="submit" className="w-full px-4 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors">
-                  Subscribe
+                <button
+                  type="submit"
+                  disabled={newsletterStatus === 'loading'}
+                  className={`w-full px-4 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-colors ${newsletterStatus === 'success' ? 'bg-green-600 text-white' :
+                    newsletterStatus === 'error' ? 'bg-red-600 text-white' :
+                      'bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200'
+                    }`}
+                >
+                  {newsletterStatus === 'loading' ? 'Subscribing...' :
+                    newsletterStatus === 'success' ? 'Subscribed!' :
+                      newsletterStatus === 'error' ? 'Try Again' : 'Subscribe'}
                 </button>
               </form>
             </div>

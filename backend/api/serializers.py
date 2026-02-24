@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, BlogPost
+from .models import (
+    Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, 
+    Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, 
+    BlogPost, NewsletterSubscriber
+)
 
 User = get_user_model()
 
@@ -141,3 +145,10 @@ class BlogPostSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ('id', 'slug', 'author', 'author_id', 'author_username',
                             'published_at', 'views', 'reading_time', 'created_at', 'updated_at')
+
+
+class NewsletterSubscriberSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NewsletterSubscriber
+        fields = ['id', 'email', 'subscribed_at', 'is_active']
+        read_only_fields = ('id', 'subscribed_at')

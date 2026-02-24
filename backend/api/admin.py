@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Product, Order, OrderItem, Payment, BlogPost
+from .models import User, Product, Order, OrderItem, Payment, BlogPost, NewsletterSubscriber
 
 # Register User Custom Admin
 @admin.register(User)
@@ -49,3 +49,8 @@ class BlogPostAdmin(admin.ModelAdmin):
         ('Publishing', {'fields': ('is_published', 'is_featured', 'published_at')}),
         ('Stats', {'fields': ('views', 'reading_time', 'created_at', 'updated_at')}),
     )
+@admin.register(NewsletterSubscriber)
+class NewsletterSubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'subscribed_at', 'is_active')
+    list_filter = ('is_active', 'subscribed_at')
+    search_fields = ('email',)
