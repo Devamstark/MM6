@@ -32,6 +32,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const [density] = useAtom(densityAtom);
   const [categoryDrawerOpen, setCategoryDrawerOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [mobileExpandedCat, setMobileExpandedCat] = useState<string | null>(null);
 
   // Close user menu when clicking outside
   React.useEffect(() => {
@@ -183,7 +184,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Women's Mega Menu */}
-                <div className="absolute top-full -left-20 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors rounded-b-3xl">
                   <div className="grid grid-cols-4 gap-8">
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Dresses</h4>
@@ -230,7 +231,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <svg className="w-3 h-3 text-gray-500 group-hover:text-primary transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
 
                 {/* Men's Mega Menu */}
-                <div className="absolute top-full -left-20 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors">
+                <div className="absolute top-full left-1/2 -translate-x-1/2 w-[800px] bg-white dark:bg-gray-900 shadow-xl border-t border-gray-100 dark:border-gray-800 hidden group-hover:block p-8 z-50 animate-fade-in transition-colors rounded-b-3xl">
                   <div className="grid grid-cols-4 gap-8">
                     <div>
                       <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Tops</h4>
@@ -651,23 +652,53 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 New Arrivals
               </Link>
 
-              <Link
-                to="/products?category=Women"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
-              >
-                <span className="text-lg">👩</span>
-                Women's Collection
-              </Link>
+              {/* Women Mobile Expandable */}
+              <div>
+                <button
+                  onClick={() => setMobileExpandedCat(mobileExpandedCat === 'Women' ? null : 'Women')}
+                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-lg">👩</span> Women
+                  </span>
+                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${mobileExpandedCat === 'Women' ? 'rotate-90' : ''}`} />
+                </button>
+                {mobileExpandedCat === 'Women' && (
+                  <div className="bg-gray-50 dark:bg-black/20 px-4 py-2 space-y-1">
+                    <Link to="/products?category=Women" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-xs font-bold text-indigo-600 uppercase tracking-tighter">View All Women</Link>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-2">
+                      <Link to="/products?category=Women&subcategory=T-Shirts" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">T-Shirts</Link>
+                      <Link to="/products?category=Women&subcategory=Dresses" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Dresses</Link>
+                      <Link to="/products?category=Women&subcategory=Jeans" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Jeans</Link>
+                      <Link to="/products?category=Women&subcategory=Tops" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Tops</Link>
+                    </div>
+                  </div>
+                )}
+              </div>
 
-              <Link
-                to="/products?category=Men"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
-              >
-                <span className="text-lg">👨</span>
-                Men's Collection
-              </Link>
+              {/* Men Mobile Expandable */}
+              <div>
+                <button
+                  onClick={() => setMobileExpandedCat(mobileExpandedCat === 'Men' ? null : 'Men')}
+                  className="flex items-center justify-between w-full px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
+                >
+                  <span className="flex items-center gap-3">
+                    <span className="text-lg">👨</span> Men
+                  </span>
+                  <ChevronRight className={`w-4 h-4 text-gray-400 transition-transform ${mobileExpandedCat === 'Men' ? 'rotate-90' : ''}`} />
+                </button>
+                {mobileExpandedCat === 'Men' && (
+                  <div className="bg-gray-50 dark:bg-black/20 px-4 py-2 space-y-1">
+                    <Link to="/products?category=Men" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-xs font-bold text-indigo-600 uppercase tracking-tighter">View All Men</Link>
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 py-2">
+                      <Link to="/products?category=Men&subcategory=T-Shirts" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">T-Shirts</Link>
+                      <Link to="/products?category=Men&subcategory=Shirts" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Shirts</Link>
+                      <Link to="/products?category=Men&subcategory=Jeans" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Jeans</Link>
+                      <Link to="/products?category=Men&subcategory=Hoodies" onClick={() => setMobileMenuOpen(false)} className="text-sm text-gray-600 dark:text-gray-400">Hoodies</Link>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Categories Button - Opens Drawer */}
               <button
