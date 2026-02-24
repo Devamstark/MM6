@@ -119,19 +119,207 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'returns': {
     title: 'Returns Policy',
     content: `
-      <p class="mb-4">You can return any item within 30 days of purchase if you are not completely satisfied.</p>
-      <p>Items must be unused and in original packaging.</p>
+      <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
+
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+          <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Easy Returns & Refunds</h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">Not satisfied with your purchase? We make returns simple and hassle-free.</p>
+        </div>
+
+        <!-- Returns Policy Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- 30-Day Returns -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">30-Day Returns</h3>
+            </div>
+            <p class="text-gray-600">Return any item within 30 days of purchase if you're not completely satisfied.</p>
+          </div>
+
+          <!-- Free Returns -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Free Returns</h3>
+            </div>
+            <p class="text-gray-600">Free return shipping on all orders. We'll provide a prepaid label.</p>
+          </div>
+
+          <!-- Full Refund -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Full Refund</h3>
+            </div>
+            <p class="text-gray-600">Get a full refund to your original payment method within 5-10 business days.</p>
+          </div>
+
+        </div>
+
+        <!-- Return Conditions -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">📦 Return Conditions</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Items Must Be Unused
+              </h4>
+              <p class="text-gray-600 text-sm">Products must be in original condition with tags attached and original packaging.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Proof of Purchase Required
+              </h4>
+              <p class="text-gray-600 text-sm">Please include your order confirmation email or packing slip with the return.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Self-Service Return Form (Coming Soon) -->
+        <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-4xl border-2 border-dashed border-amber-300 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-2xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+          </div>
+          <h3 class="text-xl font-black text-gray-900 mb-2">🚀 Self-Service Return Portal</h3>
+          <p class="text-gray-600 mb-4 max-w-lg mx-auto">Coming Soon! Generate your own return labels, track return status, and get instant refunds with our new self-service return form.</p>
+          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-bold bg-amber-200 text-amber-800">
+            <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+            Coming Soon
+          </span>
+        </div>
+
+        <!-- How to Return -->
+        <div class="bg-white p-8 rounded-4xl shadow-lg shadow-gray-100 border border-gray-100">
+          <h3 class="text-2xl font-black mb-6 text-center text-gray-900">How to Return an Item</h3>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="text-center">
+              <div class="w-12 h-12 mx-auto mb-3 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-black">1</div>
+              <h4 class="font-bold text-gray-900 mb-2">Contact Support</h4>
+              <p class="text-gray-600 text-sm">Email us at returns@smartshop.com with your order number.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-12 h-12 mx-auto mb-3 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-black">2</div>
+              <h4 class="font-bold text-gray-900 mb-2">Get Label</h4>
+              <p class="text-gray-600 text-sm">We'll send you a prepaid return shipping label via email.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-12 h-12 mx-auto mb-3 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-black">3</div>
+              <h4 class="font-bold text-gray-900 mb-2">Ship It Back</h4>
+              <p class="text-gray-600 text-sm">Pack the item securely and drop it off at any shipping location.</p>
+            </div>
+            <div class="text-center">
+              <div class="w-12 h-12 mx-auto mb-3 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 font-black">4</div>
+              <h4 class="font-bold text-gray-900 mb-2">Get Refund</h4>
+              <p class="text-gray-600 text-sm">Once received, your refund will be processed within 5-10 days.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
     `
   },
   'how-to-order': {
     title: 'How to Order',
     content: `
-      <ol class="list-decimal pl-5 space-y-2">
-        <li>Browse our catalog and add items to your cart.</li>
-        <li>Proceed to checkout.</li>
-        <li>Enter your shipping and payment details.</li>
-        <li>Confirm your order.</li>
-      </ol>
+      <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
+
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+          <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Shop in 4 Easy Steps</h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">Finding and ordering your favorite products has never been easier.</p>
+        </div>
+
+        <!-- Steps Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          
+          <!-- Step 1 -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <span class="text-2xl font-black">1</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-3">Browse Products</h3>
+            <p class="text-gray-600 text-sm">Explore our catalog of trendy fashion items and accessories.</p>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <span class="text-2xl font-black">2</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-3">Add to Cart</h3>
+            <p class="text-gray-600 text-sm">Select your size and quantity, then add items to your shopping cart.</p>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <span class="text-2xl font-black">3</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-3">Checkout</h3>
+            <p class="text-gray-600 text-sm">Enter your shipping address and choose your preferred payment method.</p>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group text-center">
+            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <span class="text-2xl font-black">4</span>
+            </div>
+            <h3 class="text-lg font-bold text-gray-900 mb-3">Confirm Order</h3>
+            <p class="text-gray-600 text-sm">Review your order and confirm. You'll receive an email confirmation instantly.</p>
+          </div>
+
+        </div>
+
+        <!-- Tips Section -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">💡 Pro Tips</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                Create an Account
+              </h4>
+              <p class="text-gray-600 text-sm">Save your details for faster checkout and track your order history.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Check Size Guide
+              </h4>
+              <p class="text-gray-600 text-sm">Use our size guide to find the perfect fit before ordering.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                Free Shipping Over $50
+              </h4>
+              <p class="text-gray-600 text-sm">Add more items to your cart to qualify for free standard shipping.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Need Help Banner -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
+          <h3 class="text-2xl font-black mb-3">Need Help Ordering?</h3>
+          <p class="text-indigo-100 mb-6">Our customer support team is available 24/7 to assist you with your order.</p>
+          <a href="/contact" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-full font-bold hover:bg-indigo-50 transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+            Contact Support
+          </a>
+        </div>
+
+      </div>
     `
   },
   'size-guide': {
