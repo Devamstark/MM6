@@ -156,18 +156,16 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'payment-method': {
     title: 'Payment Methods',
     content: `
-      <div class="space-y-12 animate-fade-in">
+      <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100">
-          <div class="text-center max-w-3xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Secure & Flexible Payment Options</h2>
-            <p class="text-lg text-gray-600">Shop with confidence using our wide range of trusted payment methods. All transactions are encrypted and secure.</p>
-          </div>
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+          <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Secure & Flexible Payment Options</h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">Shop with confidence using our wide range of trusted payment methods. All transactions are encrypted and secure.</p>
         </div>
 
         <!-- Payment Methods Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           
           <!-- Credit/Debit Cards -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
@@ -254,39 +252,36 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Security Section -->
-        <div class="bg-gray-900 text-white p-10 rounded-4xl relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-br from-indigo-600/20 to-purple-600/20"></div>
-          <div class="relative z-10">
-            <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-400">🔒 Your Security is Our Priority</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div class="text-center">
-                <div class="w-16 h-16 mx-auto mb-4 bg-indigo-500/20 rounded-2xl flex items-center justify-center">
-                  <svg class="w-8 h-8 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                </div>
-                <h4 class="font-bold text-white mb-2">SSL Encrypted</h4>
-                <p class="text-gray-400 text-sm">256-bit SSL encryption protects all your data</p>
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-600">🔒 Your Security is Our Priority</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-md">
+                <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
               </div>
-              <div class="text-center">
-                <div class="w-16 h-16 mx-auto mb-4 bg-purple-500/20 rounded-2xl flex items-center justify-center">
-                  <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                </div>
-                <h4 class="font-bold text-white mb-2">PCI Compliant</h4>
-                <p class="text-gray-400 text-sm">Certified to handle credit card information securely</p>
+              <h4 class="font-bold text-gray-900 mb-2">SSL Encrypted</h4>
+              <p class="text-gray-600 text-sm">256-bit SSL encryption protects all your data</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-md">
+                <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
-              <div class="text-center">
-                <div class="w-16 h-16 mx-auto mb-4 bg-green-500/20 rounded-2xl flex items-center justify-center">
-                  <svg class="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                </div>
-                <h4 class="font-bold text-white mb-2">Fraud Protection</h4>
-                <p class="text-gray-400 text-sm">Advanced fraud detection keeps you safe</p>
+              <h4 class="font-bold text-gray-900 mb-2">PCI Compliant</h4>
+              <p class="text-gray-600 text-sm">Certified to handle credit card information securely</p>
+            </div>
+            <div class="text-center">
+              <div class="w-16 h-16 mx-auto mb-4 bg-white rounded-2xl flex items-center justify-center shadow-md">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
               </div>
+              <h4 class="font-bold text-gray-900 mb-2">Fraud Protection</h4>
+              <p class="text-gray-600 text-sm">Advanced fraud detection keeps you safe</p>
             </div>
           </div>
         </div>
 
         <!-- FAQ Section -->
-        <div class="bg-indigo-50/50 p-8 rounded-4xl border border-indigo-100">
-          <h3 class="text-2xl font-black mb-6 text-gray-900">Frequently Asked Questions</h3>
+        <div class="bg-indigo-50/50 p-6 md:p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-gray-900 text-center">Frequently Asked Questions</h3>
           <div class="space-y-4">
             <div class="bg-white p-5 rounded-2xl border border-indigo-100">
               <h4 class="font-bold text-gray-900 mb-2">Can I use multiple payment methods for one order?</h4>
