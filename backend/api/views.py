@@ -13,8 +13,8 @@ from django.conf import settings
 import random
 from decimal import Decimal
 from datetime import timedelta
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon, HeroBanner, HomePageSection
-from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer, HeroBannerSerializer, HomePageSectionSerializer
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, PasswordResetToken, Review, Wishlist, ContactMessage, Address, ReferralSignup, Coupon, HeroBanner, HomePageSection, BlogPost
+from .serializers import ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, ContactMessageSerializer, AddressSerializer, CouponSerializer, HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer
 
 # ...
 
@@ -438,9 +438,10 @@ class AffiliateViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 
-class UserViewSet(viewsets.ReadOnlyModelViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated]
+    http_method_names = ['get', 'patch', 'head', 'options']
 
     def get_queryset(self):
         user = self.request.user
@@ -448,10 +449,35 @@ class UserViewSet(viewsets.ReadOnlyModelViewSet):
             return User.objects.all()
         return User.objects.filter(id=user.id)
 
+    def partial_update(self, request, *args, **kwargs):
+        """Allow users to update their own profile, and admins to update any user."""
+        instance = self.get_object()
+        # Only admin can change role
+        if 'role' in request.data and request.user.role != 'admin':
+            return Response({'error': 'Only admins can change roles.'}, status=status.HTTP_403_FORBIDDEN)
+        serializer = self.get_serializer(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
     @action(detail=False, methods=['get'])
     def me(self, request):
         serializer = self.get_serializer(request.user)
         return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'], url_path='set_role')
+    def set_role(self, request, pk=None):
+        """Admin-only: instantly set a user's role."""
+        if request.user.role != 'admin':
+            return Response({'error': 'Admin access required.'}, status=status.HTTP_403_FORBIDDEN)
+        user = self.get_object()
+        new_role = request.data.get('role')
+        valid_roles = [r[0] for r in user.ROLE_CHOICES]
+        if new_role not in valid_roles:
+            return Response({'error': f'Invalid role. Choose from: {valid_roles}'}, status=status.HTTP_400_BAD_REQUEST)
+        user.role = new_role
+        user.save(update_fields=['role'])
+        return Response({'id': str(user.id), 'username': user.username, 'role': user.role})
 
     @action(detail=False, methods=['get'], url_path='my_earnings')
     def my_earnings(self, request):
@@ -862,3 +888,65 @@ class HomePageSectionViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
+
+
+# ── Blog ────────────────────────────────────────────────────────────────────
+
+class IsBloggerOrAdmin(permissions.BasePermission):
+    """Public can read. Bloggers/admins can write."""
+    def has_permission(self, request, view):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        return request.user.is_authenticated and request.user.role in ('blogger', 'admin')
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        if request.user.role == 'admin':
+            return True
+        return obj.author == request.user
+
+
+class BlogPostViewSet(viewsets.ModelViewSet):
+    serializer_class = BlogPostSerializer
+    permission_classes = [IsBloggerOrAdmin]
+    lookup_field = 'slug'
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['category', 'is_published', 'is_featured']
+    search_fields = ['title', 'excerpt', 'content', 'tags']
+    ordering_fields = ['created_at', 'published_at', 'views']
+
+    def get_queryset(self):
+        # Admins see all posts; bloggers see their own drafts + all published;
+        # public sees only published.
+        user = self.request.user
+        if user.is_authenticated and user.role == 'admin':
+            return BlogPost.objects.all()
+        if user.is_authenticated and user.role == 'blogger':
+            from django.db.models import Q
+            return BlogPost.objects.filter(Q(is_published=True) | Q(author=user))
+        # Filter by author id if requested (bloggers browse own posts)
+        author_id = self.request.query_params.get('author')
+        if author_id:
+            return BlogPost.objects.filter(is_published=True, author__id=author_id)
+        return BlogPost.objects.filter(is_published=True)
+
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def retrieve(self, request, *args, **kwargs):
+        """Increment view count on each retrieve."""
+        instance = self.get_object()
+        instance.views += 1
+        instance.save(update_fields=['views'])
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['patch'], url_path='publish')
+    def publish(self, request, slug=None):
+        """Toggle publish status. Blogger can only publish own posts; admin can do anything."""
+        post = self.get_object()
+        publish = request.data.get('is_published', not post.is_published)
+        post.is_published = publish
+        post.save(update_fields=['is_published', 'published_at'])
+        return Response({'is_published': post.is_published})

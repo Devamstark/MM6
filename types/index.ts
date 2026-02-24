@@ -19,7 +19,7 @@ export interface User {
     email: string;
     phoneNumber?: string;
     profilePicture?: string;
-    role: 'user' | 'seller' | 'admin';
+    role: 'user' | 'seller' | 'admin' | 'blogger';
     bio?: string;
     bonusPoints?: number;
     referralEarnings?: number;   // Accumulated referral bonus in dollars
@@ -35,6 +35,26 @@ export interface User {
 export interface AuthResponse {
     user: User;
     token: string;
+}
+
+export interface BlogPost {
+    id: string;
+    title: string;
+    slug: string;
+    excerpt: string;
+    content: string;
+    coverImage?: string;
+    author: string;          // author display name
+    authorId: string;
+    category: string;        // e.g. 'style', 'trends', 'care', 'news'
+    tags: string[];
+    isPublished: boolean;
+    isFeatured: boolean;
+    publishedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+    readingTime?: number;    // minutes
+    views?: number;
 }
 
 export interface Product {

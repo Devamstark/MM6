@@ -9,7 +9,7 @@ from .views import (
     RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
-    HeroBannerViewSet, HomePageSectionViewSet
+    HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet
 )
 
 from rest_framework.routers import SimpleRouter, DefaultRouter
@@ -30,6 +30,7 @@ router.register(r'addresses', AddressViewSet, basename='addresses')
 router.register(r'coupons', CouponViewSet, basename='coupons')
 router.register(r'hero-banners', HeroBannerViewSet, basename='hero-banners')
 router.register(r'home-sections', HomePageSectionViewSet, basename='home-sections')
+router.register(r'blog', BlogPostViewSet, basename='blog')
 
 urlpatterns = [
     path('', include(router.urls)),

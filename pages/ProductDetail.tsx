@@ -290,8 +290,8 @@ export const ProductDetail = () => {
                         <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-800 pb-4">
                             <span className={`w-2 h-2 rounded-full shrink-0 ${isOutOfStock ? 'bg-red-500' : product.stock <= 5 ? 'bg-orange-500' : 'bg-green-500'}`} />
                             <span className={`text-sm font-semibold ${isOutOfStock ? 'text-red-600 dark:text-red-400'
-                                    : product.stock <= 5 ? 'text-orange-600 dark:text-orange-400'
-                                        : 'text-green-700 dark:text-green-400'
+                                : product.stock <= 5 ? 'text-orange-600 dark:text-orange-400'
+                                    : 'text-green-700 dark:text-green-400'
                                 }`}>
                                 {isOutOfStock
                                     ? 'Out of Stock'
@@ -409,8 +409,8 @@ export const ProductDetail = () => {
                             <button
                                 onClick={handleWishlistToggle}
                                 className={`w-full flex items-center justify-center gap-2.5 py-3.5 rounded-sm text-sm font-semibold tracking-wide border-2 transition-all ${inWishlist
-                                        ? 'bg-red-50 border-red-400 text-red-600 dark:bg-red-900/20 dark:border-red-500 dark:text-red-400'
-                                        : 'bg-white border-gray-800 text-gray-800 hover:bg-gray-900 hover:text-white dark:bg-transparent dark:border-gray-300 dark:text-gray-200 dark:hover:bg-white dark:hover:text-black'
+                                    ? 'bg-red-50 border-red-400 text-red-600 dark:bg-red-900/20 dark:border-red-500 dark:text-red-400'
+                                    : 'bg-white border-gray-800 text-gray-800 hover:bg-gray-900 hover:text-white dark:bg-transparent dark:border-gray-300 dark:text-gray-200 dark:hover:bg-white dark:hover:text-black'
                                     } active:scale-[0.99]`}
                             >
                                 <Heart className={`w-4 h-4 transition-colors ${inWishlist ? 'fill-current' : ''}`} />
@@ -463,47 +463,78 @@ export const ProductDetail = () => {
                             </button>
                         ))}
                     </div>
-                    <div className="max-w-4xl mx-auto min-h-[400px] animate-fade-in">
+                    <div className="max-w-4xl mx-auto min-h-[280px]">
                         {activeTab === 'description' && (
-                            <div className="animate-fade-in py-6">
-                                <p className="text-gray-600 dark:text-gray-300 leading-relaxed text-lg max-w-3xl mx-auto text-center italic mb-12">
-                                    "{product.description}"
+                            <div className="py-5 space-y-5">
+                                {/* Actual product description */}
+                                <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                                    {product.description || 'No description available for this product.'}
                                 </p>
-                                <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <div className="bg-gray-50 p-8 rounded-2xl dark:bg-gray-800">
-                                        <h4 className="font-bold text-indigo-600 uppercase tracking-widest text-xs mb-4">Core Benefits</h4>
-                                        <ul className="space-y-4 text-base font-medium text-gray-700 dark:text-gray-300">
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> High-performance ergonomic design</li>
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> Sustainable and durable materials</li>
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-green-500 mt-0.5" /> Certified and tested for extreme conditions</li>
-                                        </ul>
-                                    </div>
-                                    <div className="bg-gray-50 p-8 rounded-2xl dark:bg-gray-800">
-                                        <h4 className="font-bold text-purple-600 uppercase tracking-widest text-xs mb-4">Craftsmanship</h4>
-                                        <ul className="space-y-4 text-base font-medium text-gray-700 dark:text-gray-300">
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Hand-finished details</li>
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Precision engineered components</li>
-                                            <li className="flex items-start gap-3"><Check className="w-5 h-5 text-purple-500 mt-0.5" /> Luxury aesthetic and feel</li>
-                                        </ul>
+
+                                {/* Feature chips */}
+                                <div className="flex flex-wrap gap-2 pt-1">
+                                    {[
+                                        product.gender && `${product.gender}'s Wear`,
+                                        product.category,
+                                        product.subcategory,
+                                        product.brand,
+                                        product.sizes && product.sizes.length > 0 && `Sizes: ${product.sizes.join(', ')}`,
+                                    ].filter(Boolean).map((tag, i) => (
+                                        <span key={i} className="text-xs font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
+                                            {tag as string}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                {/* Fashion-specific highlights grid */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3 pt-2">
+                                    {[
+                                        { icon: '✦', label: 'Fit', value: 'Regular Fit' },
+                                        { icon: '⟳', label: 'Care', value: 'Machine Wash Cold' },
+                                        { icon: '⬡', label: 'Material', value: 'Premium Fabric' },
+                                        { icon: '◎', label: 'Origin', value: 'Imported' },
+                                    ].map((item, i) => (
+                                        <div key={i} className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3 flex flex-col gap-1">
+                                            <span className="text-gray-400 text-xs">{item.icon} {item.label}</span>
+                                            <span className="text-xs font-semibold text-gray-900 dark:text-white">{item.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                {/* Care icons row */}
+                                <div className="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-800">
+                                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Care Instructions</span>
+                                    <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                                        <span className="flex items-center gap-1">🫧 Cold Wash</span>
+                                        <span className="flex items-center gap-1">🚫 No Bleach</span>
+                                        <span className="flex items-center gap-1">🔅 Low Heat Dry</span>
+                                        <span className="flex items-center gap-1">🧺 Iron Low</span>
                                     </div>
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'specs' && (
-                            <div className="space-y-6">
-                                <h3 className="text-xl font-bold mb-6 dark:text-white">Technical Specifications</h3>
-                                <div className="grid grid-cols-1 gap-2">
+                            <div className="py-4">
+                                {/* 2-column compact spec grid */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
                                     {[
                                         { label: 'Brand', value: product.brand },
                                         { label: 'Category', value: product.category },
+                                        { label: 'Sub-Category', value: product.subcategory || '—' },
                                         { label: 'Gender', value: product.gender || 'Unisex' },
-                                        { label: 'Inventory', value: `${product.stock} units` },
-                                        { label: 'SKU', value: product.id.slice(0, 12).toUpperCase() }
+                                        { label: 'Available Sizes', value: product.sizes && product.sizes.length > 0 ? product.sizes.join(', ') : '—' },
+                                        { label: 'Colours', value: product.colors && product.colors.length > 0 ? product.colors.join(', ') : '—' },
+                                        { label: 'Fit Type', value: 'Regular Fit' },
+                                        { label: 'Fabric', value: 'Premium Blend' },
+                                        { label: 'Care', value: 'Machine Wash Cold' },
+                                        { label: 'Country of Origin', value: 'Imported' },
+                                        { label: 'Season', value: 'All Season' },
+                                        { label: 'SKU', value: product.id.slice(0, 12).toUpperCase() },
                                     ].map((spec, i) => (
-                                        <div key={i} className="flex justify-between py-4 border-b border-gray-100 dark:border-gray-800 group px-4 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                                            <span className="text-sm font-bold text-gray-400 uppercase tracking-widest">{spec.label}</span>
-                                            <span className="text-sm font-medium text-gray-900 dark:text-white">{spec.value}</span>
+                                        <div key={i} className="flex justify-between items-center py-2.5 border-b border-gray-100 dark:border-gray-800">
+                                            <span className="text-[11px] font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wider">{spec.label}</span>
+                                            <span className="text-xs font-medium text-gray-800 dark:text-gray-200 text-right">{spec.value}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -511,58 +542,70 @@ export const ProductDetail = () => {
                         )}
 
                         {activeTab === 'shipping' && (
-                            <div className="prose prose-lg dark:prose-invert max-w-none">
-                                <div className="flex items-center gap-6 mb-12 p-8 bg-indigo-50 rounded-[2.5rem] dark:bg-indigo-900/10 transition-colors">
-                                    <Truck className="w-14 h-14 text-indigo-600" />
-                                    <div>
-                                        <h3 className="text-2xl font-black text-indigo-900 dark:text-white mb-2">Priority Global Logistics</h3>
-                                        <p className="text-base font-bold text-indigo-600 dark:text-indigo-400">Free delivery on all orders over $150</p>
-                                    </div>
+                            <div className="py-4 space-y-5">
+                                {/* Compact shipping option cards */}
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                    {[
+                                        { icon: <Truck className="w-4 h-4" />, title: 'Standard Shipping', time: '3–5 business days', cost: 'Free on orders over $150', color: 'text-green-600 dark:text-green-400' },
+                                        { icon: <Package className="w-4 h-4" />, title: 'Express Delivery', time: '1–2 business days', cost: 'Calculated at checkout', color: 'text-indigo-600 dark:text-indigo-400' },
+                                        { icon: <CreditCard className="w-4 h-4" />, title: 'International', time: '7–10 business days', cost: 'Duties may apply', color: 'text-gray-600 dark:text-gray-400' },
+                                    ].map((opt, i) => (
+                                        <div key={i} className="border border-gray-100 dark:border-gray-800 rounded-xl p-4 flex flex-col gap-1.5">
+                                            <div className={`flex items-center gap-2 font-semibold text-xs ${opt.color}`}>
+                                                {opt.icon}
+                                                {opt.title}
+                                            </div>
+                                            <p className="text-xs font-semibold text-gray-800 dark:text-gray-200">{opt.time}</p>
+                                            <p className="text-[11px] text-gray-400">{opt.cost}</p>
+                                        </div>
+                                    ))}
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+
+                                {/* Returns & conditions row */}
+                                <div className="flex items-start gap-3 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                                    <RotateCcw className="w-4 h-4 text-gray-500 shrink-0 mt-0.5" />
                                     <div>
-                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 dark:border-indigo-900 pb-2 inline-block dark:text-white">Dispatch Times</h4>
-                                        <ul className="space-y-4 text-gray-600 dark:text-gray-400 text-base font-medium">
-                                            <li>• Standard: 3-5 business days</li>
-                                            <li>• Express: 1-2 business days</li>
-                                            <li>• International: 7-10 business days</li>
-                                        </ul>
-                                    </div>
-                                    <div>
-                                        <h4 className="text-base font-black uppercase tracking-widest mb-6 border-b-2 border-indigo-100 pb-2 inline-block">Returns Policy</h4>
-                                        <p className="text-base text-gray-600 dark:text-gray-400 leading-relaxed font-medium">
-                                            We offer a hassle-free <strong className="font-black text-black dark:text-white">30-day return policy</strong>. Items must be returned in their original packaging and condition. Return labels are provided for all domestic orders.
+                                        <p className="text-xs font-semibold text-gray-900 dark:text-white mb-1">30-Day Returns &amp; Exchanges</p>
+                                        <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            Items must be unworn, unwashed, and in original packaging with tags attached. Return labels provided for all domestic orders. Sale items are final sale.
                                         </p>
                                     </div>
+                                </div>
+
+                                {/* Important notes */}
+                                <div className="flex items-start gap-3">
+                                    <Info className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" />
+                                    <p className="text-[11px] text-gray-400 dark:text-gray-500 leading-relaxed">
+                                        Orders placed before 2pm (Monday–Friday) are dispatched same day. Tracking information sent via email once shipped. Customs &amp; import duties are the buyer's responsibility for international orders.
+                                    </p>
                                 </div>
                             </div>
                         )}
 
                         {activeTab === 'reviews' && (
-                            <div className="space-y-12">
-                                <div className="flex flex-col md:flex-row items-center gap-12 bg-gray-50 p-10 rounded-[3rem] dark:bg-gray-800 transition-colors">
-                                    <div className="text-center md:text-left">
-                                        <p className="text-sm font-black text-gray-400 uppercase tracking-widest mb-2">Total Score</p>
-                                        <h4 className="text-7xl font-black text-gray-900 dark:text-white">{averageRating.toFixed(1)}</h4>
-                                        <div className="flex items-center gap-1 justify-center md:justify-start mt-2">
+                            <div className="py-4 space-y-5">
+                                {/* Compact rating summary */}
+                                <div className="flex items-center gap-6 bg-gray-50 dark:bg-gray-800 rounded-xl p-4">
+                                    <div className="text-center shrink-0">
+                                        <p className="text-3xl font-bold text-gray-900 dark:text-white leading-none">{averageRating.toFixed(1)}</p>
+                                        <div className="flex items-center gap-0.5 justify-center mt-1">
                                             {[1, 2, 3, 4, 5].map(s => (
-                                                <Star key={s} className={`w-5 h-5 ${s <= Math.round(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'}`} />
+                                                <Star key={s} className={`w-3 h-3 ${s <= Math.round(averageRating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200 dark:text-gray-700'}`} />
                                             ))}
                                         </div>
-                                        <p className="text-xs font-bold text-gray-400 mt-4 uppercase tracking-widest">Based on {reviews.length} reviews</p>
+                                        <p className="text-[10px] text-gray-400 mt-1">{reviews.length} reviews</p>
                                     </div>
-
-                                    <div className="flex-1 w-full space-y-3">
+                                    <div className="flex-1 space-y-1.5">
                                         {[5, 4, 3, 2, 1].map((r) => {
                                             const count = reviews.filter(rev => rev.rating === r).length;
                                             const pct = reviews.length > 0 ? (count / reviews.length) * 100 : 0;
                                             return (
-                                                <div key={r} className="flex items-center gap-4">
-                                                    <span className="text-xs font-black w-4">{r}</span>
-                                                    <div className="flex-1 h-2 bg-gray-200 rounded-full dark:bg-gray-700">
-                                                        <div className="h-full bg-indigo-600 rounded-full" style={{ width: `${pct}%` }} />
+                                                <div key={r} className="flex items-center gap-2">
+                                                    <span className="text-[10px] font-bold text-gray-400 w-2">{r}</span>
+                                                    <div className="flex-1 h-1.5 bg-gray-200 rounded-full dark:bg-gray-700">
+                                                        <div className="h-full bg-yellow-400 rounded-full" style={{ width: `${pct}%` }} />
                                                     </div>
-                                                    <span className="text-xs font-bold text-gray-400 w-8">{count}</span>
+                                                    <span className="text-[10px] text-gray-400 w-4">{count}</span>
                                                 </div>
                                             );
                                         })}
@@ -570,67 +613,58 @@ export const ProductDetail = () => {
                                 </div>
 
                                 {canReview && (
-                                    <div className="p-10 border-2 border-dashed border-gray-100 rounded-[3rem] dark:border-gray-800 transition-colors">
-                                        <h3 className="text-xl font-black mb-6 dark:text-white flex items-center gap-3">
-                                            <div className="p-2 bg-indigo-600 text-white rounded-xl"><Plus className="w-5 h-5" /></div>
-                                            Share Your Experience
-                                        </h3>
-                                        <div className="flex gap-4 mb-8">
+                                    <div className="border border-gray-100 dark:border-gray-800 rounded-xl p-4 space-y-3">
+                                        <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Write a Review</h3>
+                                        <div className="flex gap-2">
                                             {[1, 2, 3, 4, 5].map(s => (
                                                 <button
                                                     key={s}
                                                     onClick={() => setNewReviewRating(s)}
-                                                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all
-                                                        ${s <= newReviewRating ? 'bg-yellow-50 text-yellow-400 scale-110 shadow-lg' : 'bg-gray-50 text-gray-300 dark:bg-gray-800'}`}
+                                                    className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${s <= newReviewRating ? 'bg-yellow-50 text-yellow-400' : 'bg-gray-50 text-gray-300 dark:bg-gray-800'}`}
                                                 >
-                                                    <Star className={`w-6 h-6 ${s <= newReviewRating ? 'fill-current' : ''}`} />
+                                                    <Star className={`w-4 h-4 ${s <= newReviewRating ? 'fill-current' : ''}`} />
                                                 </button>
                                             ))}
                                         </div>
                                         <textarea
-                                            className="w-full p-6 border border-gray-100 rounded-4xl mb-6 focus:ring-4 focus:ring-indigo-50 dark:focus:ring-indigo-900/10 focus:border-indigo-600 transition-all dark:bg-gray-800 dark:border-gray-700 outline-none font-medium dark:text-white"
-                                            rows={5}
-                                            placeholder="What did you love about this item?"
+                                            className="w-full p-3 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 dark:bg-gray-800 dark:text-white outline-none resize-none"
+                                            rows={3}
+                                            placeholder="Share your thoughts on fit, quality &amp; style…"
                                             value={newReviewComment}
                                             onChange={e => setNewReviewComment(e.target.value)}
-                                        ></textarea>
+                                        />
                                         <button
-                                            type="submit"
-                                            className="w-full py-4 bg-indigo-600 text-white rounded-4xl font-black text-xs uppercase tracking-[0.2em] hover:bg-indigo-700 hover:shadow-xl hover:shadow-indigo-500/20 active:scale-[0.98] transition-all"
+                                            onClick={submitReview}
+                                            className="px-5 py-2 bg-black text-white text-xs font-semibold rounded-lg hover:bg-gray-800 transition-colors"
                                         >
-                                            Publish Review
+                                            Submit Review
                                         </button>
                                     </div>
                                 )}
 
-                                <div className="space-y-10">
+                                <div className="space-y-3">
                                     {reviews.length === 0 ? (
-                                        <div className="text-center py-20 bg-gray-50 rounded-[3rem] dark:bg-gray-800/50 transition-colors">
-                                            <MessageSquare className="w-12 h-12 text-gray-200 dark:text-gray-700 mx-auto mb-4" />
-                                            <p className="text-gray-400 font-bold italic tracking-wide uppercase text-[10px]">Be the first to leave a mark</p>
+                                        <div className="text-center py-10 text-gray-400 text-xs font-semibold">
+                                            No reviews yet — be the first!
                                         </div>
                                     ) : (
                                         reviews.map((rev) => (
-                                            <div key={rev.id} className="group p-8 border border-gray-50 rounded-[3rem] hover:border-indigo-100 dark:hover:border-indigo-900 hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-all dark:border-gray-800 dark:bg-gray-800/20">
-                                                <div className="flex items-center justify-between mb-8">
-                                                    <div className="flex items-center gap-5">
-                                                        <div className="w-14 h-14 bg-indigo-600 text-white rounded-2xl flex items-center justify-center font-black text-lg uppercase shadow-lg shadow-indigo-100">
-                                                            {rev.userName.slice(0, 2)}
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-base font-black text-gray-900 dark:text-white">{rev.userName}</p>
-                                                            <p className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">{new Date(rev.createdAt).toLocaleDateString()}</p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="flex text-yellow-400 scale-110">
-                                                        {[...Array(5)].map((_, i) => (
-                                                            <Star key={i} className={`w-3.5 h-3.5 ${i < rev.rating ? 'fill-current' : 'text-gray-100 dark:text-gray-700'}`} />
-                                                        ))}
-                                                    </div>
+                                            <div key={rev.id} className="flex gap-3 py-3 border-b border-gray-100 dark:border-gray-800">
+                                                <div className="w-8 h-8 shrink-0 bg-indigo-600 text-white rounded-full flex items-center justify-center font-bold text-xs uppercase">
+                                                    {rev.userName.slice(0, 2)}
                                                 </div>
-                                                <p className="text-gray-600 dark:text-gray-400 text-base font-medium leading-relaxed italic border-l-4 border-indigo-600 pl-8 py-2 bg-white/50 dark:bg-gray-900/30 rounded-r-lg">
-                                                    "{rev.comment}"
-                                                </p>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between mb-0.5">
+                                                        <p className="text-xs font-semibold text-gray-900 dark:text-white">{rev.userName}</p>
+                                                        <div className="flex text-yellow-400">
+                                                            {[...Array(5)].map((_, i) => (
+                                                                <Star key={i} className={`w-2.5 h-2.5 ${i < rev.rating ? 'fill-current' : 'text-gray-200 dark:text-gray-700'}`} />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                    <p className="text-[11px] text-gray-400 mb-1">{new Date(rev.createdAt).toLocaleDateString()}</p>
+                                                    <p className="text-xs text-gray-600 dark:text-gray-300 leading-relaxed">{rev.comment}</p>
+                                                </div>
                                             </div>
                                         ))
                                     )}

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection
+from .models import Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, BlogPost
 
 User = get_user_model()
 
@@ -124,3 +124,20 @@ class HomePageSectionSerializer(serializers.ModelSerializer):
         model = HomePageSection
         fields = '__all__'
         read_only_fields = ('id', 'created_at', 'used_count')
+
+
+class BlogPostSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='author.get_full_name')
+    author_id = serializers.ReadOnlyField(source='author.id')
+    author_username = serializers.ReadOnlyField(source='author.username')
+
+    class Meta:
+        model = BlogPost
+        fields = [
+            'id', 'title', 'slug', 'excerpt', 'content', 'cover_image',
+            'author', 'author_id', 'author_username', 'category', 'tags',
+            'is_published', 'is_featured', 'published_at',
+            'views', 'reading_time', 'created_at', 'updated_at',
+        ]
+        read_only_fields = ('id', 'slug', 'author', 'author_id', 'author_username',
+                            'published_at', 'views', 'reading_time', 'created_at', 'updated_at')

@@ -920,4 +920,34 @@ export const api = {
   deleteHomeSection: async (id: string): Promise<void> => {
     await client.delete(`home-sections/${id}/`);
   },
+  // -- Blog --
+  getBlogPosts: async (params) => {
+    const response = await client.get('blog/', { params });
+    return response.data.results && Array.isArray(response.data.results)
+      ? response.data.results
+      : Array.isArray(response.data) ? response.data : [];
+  },
+  getBlogPost: async (slug) => {
+    const response = await client.get(`blog/${slug}/`);
+    return response.data;
+  },
+  createBlogPost: async (data) => {
+    const isForm = data instanceof FormData;
+    const response = await client.post('blog/', data, {
+      headers: isForm ? { 'Content-Type': 'multipart/form-data' } : {},
+    });
+    return response.data;
+  },
+  updateBlogPost: async (id, data) => {
+    const isForm = data instanceof FormData;
+    const response = await client.patch(`blog/${id}/`, data, {
+      headers: isForm ? { 'Content-Type': 'multipart/form-data' } : {},
+    });
+    return response.data;
+  },
+  deleteBlogPost: async (id) => { await client.delete(`blog/${id}/`); },
+  publishBlogPost: async (id, publish) => {
+    const response = await client.patch(`blog/${id}/`, { is_published: publish });
+    return response.data;
+  },
 };

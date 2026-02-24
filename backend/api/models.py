@@ -21,6 +21,7 @@ class User(AbstractUser):
     ROLE_CHOICES = (
         ('admin', 'Admin'),
         ('seller', 'Seller'),
+        ('blogger', 'Blogger'),
         ('user', 'User'),
     )
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default='user')
@@ -306,3 +307,62 @@ class HomePageSection(models.Model):
 
     def __str__(self):
         return f"{self.section_type} - {self.title}"
+
+
+class BlogPost(models.Model):
+    """Fashion blog posts written by bloggers and admins."""
+    CATEGORY_CHOICES = [
+        ('Style', 'Style'),
+        ('Trends', 'Trends'),
+        ('Care', 'Care'),
+        ('News', 'News'),
+        ('Lookbook', 'Lookbook'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    title = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    excerpt = models.TextField()
+    content = models.TextField(blank=True)
+    cover_image = models.URLField(max_length=500, blank=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='blog_posts'
+    )
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='Style')
+    tags = models.JSONField(default=list, blank=True)
+    is_published = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False)
+    published_at = models.DateTimeField(null=True, blank=True)
+    views = models.IntegerField(default=0)
+    reading_time = models.IntegerField(default=3)  # estimated minutes
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def save(self, *args, **kwargs):
+        # Auto-generate slug
+        if not self.slug:
+            base_slug = slugify(self.title)
+            slug = base_slug
+            counter = 1
+            while BlogPost.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
+
+        # Set published_at when first published
+        if self.is_published and not self.published_at:
+            self.published_at = timezone.now()
+
+        # Estimate reading time (~200 words/min)
+        word_count = len(self.content.split())
+        self.reading_time = max(1, round(word_count / 200))
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.title
