@@ -6,7 +6,7 @@ import { SkeletonCard } from '../components/SkeletonCard';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Loader2, ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowRight, Zap, Clock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { CountdownTimer } from '../components/CountdownTimer';
 
 export const Home = () => {
@@ -20,11 +20,13 @@ export const Home = () => {
   const [categories, setCategories] = useState<string[]>([]);
   const [flashSaleProducts, setFlashSaleProducts] = useState<Product[]>([]);
   const [closestFlashSaleEnd, setClosestFlashSaleEnd] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [featuredPage, setFeaturedPage] = useState(1);
   const [hasMoreFeatured, setHasMoreFeatured] = useState(false);
   const [loadingMoreFeatured, setLoadingMoreFeatured] = useState(false);
+
+  const [heroLoading, setHeroLoading] = useState(true);    // controls hero skeleton only
+  const [contentLoading, setContentLoading] = useState(true); // controls product skeletons
 
   // Auto-rotate hero banners every 6 seconds
   useEffect(() => {
@@ -59,14 +61,34 @@ export const Home = () => {
   }, [user, navigate]);
 
   useEffect(() => {
-    const fetchData = async () => {
+    // ── PHASE 1: Critical path — hero + categories only ──────────────────────
+    // These render above the fold immediately. Everything else waits.
+    const fetchCritical = async () => {
       try {
-        const [banners, sections, featuredRes, popularRes, cats, allProductsRes] = await Promise.all([
+        const [banners, cats] = await Promise.all([
           api.getHeroBanners().catch(() => []),
-          api.getHomeSections().catch(() => []),
-          api.getProducts({ isFeatured: true }).catch(() => ({ results: [] })),
-          api.getProducts({ isPopular: true }).catch(() => ({ results: [] })),
           api.getCategories().catch(() => []),
+        ]);
+        setHeroBanners(
+          banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order)
+        );
+        setCategories(cats);
+      } catch (err) {
+        console.error('Critical fetch failed:', err);
+        setError('Failed to connect to the server. Please ensure the backend is running.');
+      } finally {
+        setHeroLoading(false); // hero shows immediately
+      }
+    };
+
+    // ── PHASE 2: Non-critical — products & sections (deferred) ─────────────
+    // Runs in parallel with Phase 1 but does not block the hero render.
+    const fetchContent = async () => {
+      try {
+        const [sections, featuredRes, popularRes, allProductsRes] = await Promise.all([
+          api.getHomeSections().catch(() => []),
+          api.getProducts({ isFeatured: true }).catch(() => ({ results: [], next: null })),
+          api.getProducts({ isPopular: true }).catch(() => ({ results: [] })),
           api.getProducts({}).catch(() => ({ results: [] }))
         ]);
 
@@ -74,12 +96,12 @@ export const Home = () => {
         const popular = (popularRes as any).results || [];
         const allProducts = (allProductsRes as any).results || [];
 
-        setHeroBanners(banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
-        setHomeSections(sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order));
-        setFeaturedProducts(featuredRes.results || []);
+        setHomeSections(
+          sections.filter((s: any) => s.is_active).sort((a: any, b: any) => a.display_order - b.display_order)
+        );
+        setFeaturedProducts(featured);
         setHasMoreFeatured(!!(featuredRes as any).next);
         setPopularProducts(popular.slice(0, 4));
-        setCategories(cats);
 
         const now = new Date();
         const flashSales = allProducts.filter((p: any) =>
@@ -88,18 +110,19 @@ export const Home = () => {
         setFlashSaleProducts(flashSales);
 
         if (flashSales.length > 0) {
-          const ends = flashSales.map(p => new Date(p.flashSaleEnd!).getTime());
+          const ends = flashSales.map((p: any) => new Date(p.flashSaleEnd!).getTime());
           const earliestEnd = new Date(Math.min(...ends));
           setClosestFlashSaleEnd(earliestEnd.toISOString());
         }
       } catch (err) {
-        console.error('Failed to fetch data:', err);
-        setError('Failed to connect to the server. Please ensure the backend is running.');
+        console.error('Content fetch failed:', err);
       } finally {
-        setLoading(false);
+        setContentLoading(false);
       }
     };
-    fetchData();
+
+    fetchCritical();
+    fetchContent(); // fire both in parallel — hero resolves first
   }, []);
 
   const handleLoadMoreFeatured = async () => {
@@ -120,8 +143,6 @@ export const Home = () => {
 
   if (user?.role === 'admin' || user?.role === 'seller') return null;
 
-  if (loading) return <div className="flex justify-center py-40 bg-white dark:bg-gray-950 transition-colors duration-300"><Loader2 className="animate-spin text-black dark:text-white w-10 h-10" /></div>;
-
   if (error) {
     return (
       <div className="flex flex-col items-center justify-center py-40 bg-white dark:bg-gray-950 text-center px-4 transition-colors duration-300">
@@ -140,8 +161,34 @@ export const Home = () => {
   return (
     <div className="bg-white pb-20 dark:bg-gray-900 transition-colors duration-300">
 
-      {/* Hero Section - Crossfade Carousel (no clones, no black slides) */}
-      {heroBanners.length > 0 ? (
+      {/* Hero Section — shows skeleton while loading, then crossfade carousel */}
+      {heroLoading ? (
+        // Professional shimmer skeleton — same dimensions as real hero
+        <div className="relative overflow-hidden w-full h-[420px] md:h-[500px] bg-gray-100 dark:bg-gray-800">
+          <div
+            className="absolute inset-0"
+            style={{
+              background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+              backgroundSize: '200% 100%',
+              animation: 'shimmer 1.4s infinite',
+            }}
+          />
+          {/* Skeleton content blocks */}
+          <div className="max-w-[1600px] mx-auto h-full px-8 md:px-16 flex items-center">
+            <div className="w-full md:w-1/2 space-y-4">
+              <div className="h-3 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-10 w-3/4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-10 w-1/2 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="h-4 w-4/5 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              <div className="flex gap-3 pt-4">
+                <div className="h-12 w-36 bg-gray-300 dark:bg-gray-600 rounded animate-pulse" />
+                <div className="h-12 w-36 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : heroBanners.length > 0 ? (
         <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
           <AnimatePresence mode="wait" initial={false}>
             {heroBanners.map((banner: any, index: number) => {
@@ -221,9 +268,7 @@ export const Home = () => {
                           }}
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-gray-200 flex items-center justify-center">
-                          <Loader2 className="animate-spin text-gray-400 w-8 h-8" />
-                        </div>
+                        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 animate-pulse" />
                       )}
                     </div>
                   </div>
@@ -373,7 +418,7 @@ export const Home = () => {
           <div className="w-16 h-1 bg-zinc-900 mx-auto dark:bg-white"></div>
         </div>
 
-        {loading ? (
+        {contentLoading ? (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
             <SkeletonCard count={10} />
           </div>

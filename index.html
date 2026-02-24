@@ -5,12 +5,90 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description"
+        content="SmartShop — Premium fashion e-commerce for Men, Women &amp; Accessories. Free shipping on orders over $100." />
+    <meta name="theme-color" content="#ffffff" />
     <title>SmartShop E-Commerce</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+
+    <!-- DNS prefetch for our own API server only — no Google needed -->
+    <link rel="dns-prefetch" href="https://smartshop1.us" />
+
+    <!-- Preload critical font files so they're ready before CSS renders text -->
+    <link rel="preload" href="/fonts/inter-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/outfit-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    <style>
+        /* =====================================================
+           SELF-HOSTED FONTS — zero Google, zero external call
+           ===================================================== */
+
+        /* Inter — body / UI text */
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url('/fonts/inter-400.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 500;
+            font-display: swap;
+            src: url('/fonts/inter-500.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 600;
+            font-display: swap;
+            src: url('/fonts/inter-600.woff2') format('woff2');
+        }
+
+        @font-face {
+            font-family: 'Inter';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url('/fonts/inter-700.woff2') format('woff2');
+        }
+
+        /* Outfit — headings / display (variable font, covers weight 100–900) */
+        @font-face {
+            font-family: 'Outfit';
+            font-style: normal;
+            font-weight: 100 900;
+            font-display: swap;
+            src: url('/fonts/outfit-var.woff2') format('woff2-variations');
+        }
+
+        /* =====================================================
+           CRITICAL BASE STYLES — page never looks unstyled
+           ===================================================== */
+        body {
+            margin: 0;
+            background: #fff;
+            /* System font stack while Inter loads (font-display:swap) */
+            font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+
+        #root {
+            min-height: 100vh;
+        }
+
+        /* Hero shimmer skeleton — prevents layout shift while JS hydrates */
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+    </style>
 </head>
 
 <body>
