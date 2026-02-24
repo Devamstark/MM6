@@ -13,7 +13,7 @@ import { ThemeCustomizer } from './ThemeCustomizer';
 import { CategoryDrawer } from './CategoryDrawer';
 
 export const Layout = ({ children }: { children: React.ReactNode }) => {
-  const { user, isAuthenticated, isAdmin, isSeller, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, isSeller, isBlogger, logout } = useAuth();
   const { items, itemCount, cartTotal, removeFromCart, updateQuantity } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
@@ -386,6 +386,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                           </Link>
                         )}
 
+                        {(isBlogger || isAdmin) && (
+                          <Link
+                            to="/blogger"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-green-50 text-green-600 dark:hover:bg-green-900/20 rounded-xl transition-colors"
+                          >
+                            <FileText className="w-4 h-4" /> Blogger Studio
+                          </Link>
+                        )}
+
                         <Link
                           to="/orders"
                           onClick={() => setIsUserMenuOpen(false)}
@@ -655,6 +665,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-black text-xs font-bold text-white rounded-lg hover:bg-gray-800 transition-colors"
                     >
                       <Store className="w-3.5 h-3.5" /> Seller
+                    </Link>
+                  )}
+                  {(isBlogger || isAdmin) && (
+                    <Link
+                      to="/blogger"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-600 text-xs font-bold text-white rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Blog
                     </Link>
                   )}
                 </div>

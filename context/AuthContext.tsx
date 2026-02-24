@@ -8,6 +8,7 @@ interface AuthContextType {
   isLoading: boolean;
   isAdmin: boolean;
   isSeller: boolean;
+  isBlogger: boolean;
   login: (user: User, token: string) => void;
   logout: () => void;
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
@@ -52,6 +53,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isLoading,
       isAdmin: user?.role === 'admin',
       isSeller: user?.role === 'seller',
+      isBlogger: user?.role === 'blogger',
       login,
       logout,
       setUser
