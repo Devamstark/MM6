@@ -1,46 +1,132 @@
 # Cybersecurity Implementation Report: SmartShop
 
-**Date:** February 22, 2026  
-**Subject:** University Assignment - Week 4: Security Engineering  
-**Project:** SmartShop E-Commerce Platform Deployment  
-
-## 🚀 Executive Summary
-The SmartShop application has been deployed using a **Defense in Depth** strategy. By implementing security at the network, server, and application layers, we have achieved top-tier security ratings from independent auditing tools.
-
-### 🏆 Security Certifications
-| Audit Tool | Grade | Result |
-| :--- | :--- | :--- |
-| **SecurityHeaders.com** | **A+** | Identifies advanced header implementation (HSTS, CSP, XFO). |
-| **SSLLabs (Qualys)** | **A** | Confirms high-strength encryption and secure TLS 1.3 handshake. |
+**Date:** February 24, 2026
+**Last Updated:** February 24, 2026 *(Updated after internal security audit)*
+**Subject:** University Assignment — Week 4: Security Engineering
+**Project:** SmartShop E-Commerce Platform Deployment
+**Team:** Smart Tech — Abdul Choudhary (PM), Aqveena Manoj (Backend), Vrushika Gajjar (Designer), Abdul Munshi (Security/Network), Devam Trivedi (Full Stack/DevOps)
 
 ---
 
-## 🛡️ Layer 1: Network & Perimeter Security (The Shield)
-We use a proactive firewall strategy to ensure that only intended traffic reaches the server.
-- **UFW (Uncomplicated Firewall)**: Configured with a "Default Deny" policy. Only ports 22 (SSH), 80/443 (Web), 3000 (Dokploy), and 2025 (File Browser) are accessible.
-- **Hidden Services**: Critical infrastructure such as the **PostgreSQL Database** and **Redis** are isolated within a private Docker bridge network. They are not assigned any public ports, making them invisible to external port scanners (Nmap).
-- **Subdomain Obfuscation**: Administrative tools like **MinIO Console** and **File Browser** are served via direct IP and non-standard ports (9001 and 2025) rather than public subdomains. This prevents discovery via OSINT tools like Spiderfoot or Shodan (DNS Enumeration protection).
+## 🚀 Executive Summary
 
-## 🔒 Layer 2: Transport Layer Security (The Vault)
-Encryption is enforced for all data in transit to prevent Interception/Man-in-the-Middle (MITM) attacks.
-- **Automatic HTTPS**: Traefik handles SSL/TLS termination using Let's Encrypt with 4096-bit RSA keys.
-- **HSTS Enforcement**: We implement `Strict-Transport-Security` with a 1-year duration, including subdomains and preloading. This forces browsers to communicate *only* via HTTPS.
-- **TLS 1.3 Support**: The server supports the latest TLS 1.3 protocol, providing the fastest and most secure encryption handshake available today.
+The SmartShop application is deployed using a **Defense in Depth** strategy — implementing security at the network, server, and application layers. An internal security audit was conducted on **February 23, 2026** using SpiderFoot OSINT scanning and manual code review, which identified and resolved several vulnerabilities.
 
-## 🧪 Layer 3: Application & Header Hardening (The Armor)
-We inject security instructions directly into the browser to control how it interacts with our code.
-- **Content Security Policy (CSP)**: Protects against Cross-Site Scripting (XSS) by restricting where content can be loaded from.
-- **X-Frame-Options (DENY)**: Prevents Clickjacking attacks by forbidding the site from being rendered inside an iframe.
-- **Referrer-Policy (Same-Origin)**: Protects user privacy by ensuring sensitive URL data is not leaked to external sites.
-- **Permissions-Policy**: Hardens the browser environment by disabling unauthorized access to the camera, microphone, and geolocation APIs.
+> 📄 See `SECURITY_AUDIT_2026-02-23.md` for the full methodology and findings.
 
-## 🐍 Layer 4: Backend Security (The Heart)
+### 🏆 External Security Certifications
+
+| Audit Tool | Grade | What It Tests |
+| :--- | :--- | :--- |
+| **SecurityHeaders.com** | **A+** | HTTP security headers (HSTS, CSP, XFO, Permissions-Policy) |
+| **SSLLabs (Qualys)** | **A** | TLS strength, cipher suites, certificate validity |
+
+### 📊 Internal Audit Results (2026-02-23)
+
+| Severity | Found | Fixed | Remaining |
+| :--- | :--- | :--- | :--- |
+| 🔴 Critical | 2 | 2 | 0 |
+| 🟠 High | 2 | 2 | 0 |
+| 🟡 Medium | 3 | 3 | 0 |
+| 🟢 Low/Info | 5 | 4 | 1* |
+
+*\*nginx version header — disclosed by Dokploy's infrastructure, not application code.*
+
+---
+
+## 🛡️ Layer 1: Network & Perimeter Security
+
+We use a proactive firewall strategy to ensure only intended traffic reaches the server.
+
+- **UFW (Uncomplicated Firewall):** Configured with a "Default Deny" policy. Only ports 22 (SSH), 80/443 (Web), 3000 (Dokploy), and 2025 (File Browser) are accessible.
+- **Hidden Services:** Critical infrastructure (PostgreSQL, Redis) is isolated within a private Docker bridge network. They have no public ports — invisible to external scanners like Nmap.
+- **Subdomain Obfuscation:** Administrative tools (MinIO Console, File Browser) are served via direct IP and non-standard ports rather than public subdomains. This prevents discovery via OSINT tools like SpiderFoot and Shodan.
+- **Admin URL Obfuscation:** *(Added 2026-02-24)* The Django admin panel has been moved from the predictable `/admin/` path to a non-guessable path (`/ssx/`) to prevent automated brute-force targeting.
+
+---
+
+## 🔒 Layer 2: Transport Layer Security
+
+Encryption is enforced for all data in transit to prevent Man-in-the-Middle (MITM) attacks.
+
+- **Automatic HTTPS:** Traefik handles SSL/TLS termination using Let's Encrypt with 4096-bit RSA keys.
+- **HSTS Enforcement:** `Strict-Transport-Security` is set with a 1-year duration, including subdomains and preloading. Browsers are forced to communicate **only** via HTTPS.
+- **TLS 1.3:** The server supports TLS 1.3 — the fastest and most secure handshake protocol available.
+- **HTTP/3 (QUIC):** *(Detected by SpiderFoot audit)* The `alt-svc: h3=":443"` header is served, enabling HTTP/3 for compatible browsers — improving both performance and connection security.
+
+---
+
+## 🧪 Layer 3: Application & HTTP Header Hardening
+
+Security headers instruct the browser on how to behave when rendering SmartShop content.
+
+| Header | Value | Protection |
+| :--- | :--- | :--- |
+| `Strict-Transport-Security` | `max-age=31536000; includeSubDomains; preload` | Forces HTTPS always |
+| `X-Frame-Options` | `DENY` | Prevents clickjacking via iframes |
+| `Content-Security-Policy` | Restrictive ruleset | Prevents XSS content injection |
+| `Referrer-Policy` | `same-origin` | Prevents URL leakage to third parties |
+| `Permissions-Policy` | `camera=(), microphone=(), geolocation=(), browsing-topics=()` | Blocks unauthorized browser API access |
+| `Cross-Origin-Opener-Policy` | `same-origin` | Prevents Spectre/side-channel tab attacks |
+
+> **Note:** SpiderFoot flagged these headers as "non-standard." This is a false positive — all are modern W3C/IETF security standards working as intended.
+
+---
+
+## 🐍 Layer 4: Backend Application Security
+
 The Django backend is hardened specifically for production environments.
-- **Cookie Security**: `SESSION_COOKIE_SECURE` and `CSRF_COOKIE_SECURE` are enabled, ensuring session tokens are only sent over encrypted connections.
-- **XSS Protection**: Django’s `SECURE_BROWSER_XSS_FILTER` is active to add an extra layer of detection for malicious scripts.
-- **Database Sanitization**: All queries use Django's ORM, providing native protection against SQL Injection (SQLi) attacks.
+
+### Authentication & Sessions
+- **JWT Authentication:** All API endpoints use `djangorestframework-simplejwt`. Tokens expire after 60 minutes (access) and 1 day (refresh).
+- **Cookie Security:** `SESSION_COOKIE_SECURE` and `CSRF_COOKIE_SECURE` are enabled — session tokens only travel over encrypted connections.
+- **Role-Based Access Control (RBAC):** Four user roles (`admin`, `seller`, `blogger`, `user`) with endpoint-level permission checks.
+
+### API Security
+- **Authentication Required:** Orders, users, payments, addresses, wishlists all require valid JWT.
+- **API Index Removed:** *(Fixed 2026-02-24)* Switched from `DefaultRouter` to `SimpleRouter` — the public `/api/` endpoint map is no longer exposed.
+- **Admin-Only Endpoints:** Dashboard stats and bulk product upload now enforce admin/seller-only access.
+- **Read-Only Public Access:** Products, hero banners, blog posts, and categories are intentionally public (required for e-commerce functionality).
+
+### Data Protection
+- **ORM Queries Only:** All database queries use Django's ORM — native protection against SQL Injection.
+- **Input Validation:** DRF serializers validate all incoming data before it reaches the database.
+- **Password Security:** Django's `PBKDF2` hashing with SHA-256. Password reset codes expire in 15 minutes.
+- **No Sensitive Data in Logs:** *(Fixed 2026-02-24)* Password reset codes are no longer printed to server logs.
+
+### Production Hardening
+- **`DEBUG=False` by Default:** *(Fixed 2026-02-24)* Changed default from `True` to `False` — prevents Django error pages from leaking source code.
+- **`ALLOWED_HOSTS` Hardened:** *(Fixed 2026-02-24)* Changed default from `*` (wildcard) to explicit production domain list.
+- **XSS Filter:** `SECURE_BROWSER_XSS_FILTER` active in production.
+- **Content Type Sniffing:** `SECURE_CONTENT_TYPE_NOSNIFF` prevents MIME-type confusion attacks.
+
+---
+
+## 🌐 Layer 5: SEO & Crawler Control
+
+- **`robots.txt`:** *(Added 2026-02-24)* Instructs all web crawlers to avoid indexing `/api/`, `/ssx/`, and `/media/`. Prevents API endpoints and admin login from appearing in search engines.
+- **`sitemap.xml`:** *(Added 2026-02-24)* Submitted to Google Search Console to guide indexing of product and blog pages.
+- **Dynamic Meta Tags:** Per-page title, description, Open Graph, and canonical URL tags implemented via `useSEO` hook.
+
+---
+
+## 🔍 OWASP Top 10 Coverage
+
+| OWASP Risk | Status | Implementation |
+| :--- | :--- | :--- |
+| A01 - Broken Access Control | ✅ Mitigated | RBAC with role checks on all sensitive endpoints |
+| A02 - Cryptographic Failures | ✅ Mitigated | TLS 1.3, HSTS, secure cookies, PBKDF2 password hashing |
+| A03 - Injection | ✅ Mitigated | Django ORM (no raw SQL), DRF input validation |
+| A04 - Insecure Design | ✅ Mitigated | Defense in depth, least-privilege API design |
+| A05 - Security Misconfiguration | ✅ Fixed | DEBUG=False default, admin URL obfuscated, ALLOWED_HOSTS hardened |
+| A06 - Vulnerable Components | 🟡 Monitor | Dependencies managed via pip/npm; audit periodically |
+| A07 - Auth & Session Failures | ✅ Mitigated | JWT with expiry, secure cookies, CSRF protection |
+| A08 - Software & Data Integrity | ✅ Mitigated | Docker image pinning, no untrusted CDN scripts |
+| A09 - Security Logging | 🟡 Partial | Django logging active; no SIEM integration yet |
+| A10 - SSRF | ✅ Mitigated | No server-side URL fetching; outbound limited to email SMTP |
 
 ---
 
 ## 📈 Conclusion
-The SmartShop deployment demonstrates a professional-grade security posture. By combining **Traefik’s** edge-routing security with **Django’s** robust application-level guards and **Linux UFW** network restrictions, the platform is resilient against the most common web vulnerabilities identified by the **OWASP Top 10**.
+
+The SmartShop deployment demonstrates a professional-grade security posture that exceeds typical student project standards. Following the internal audit of February 23, 2026, **all critical and high-severity vulnerabilities have been remediated**. The platform is resilient against the most common web vulnerabilities identified in the OWASP Top 10, validated by both external certification tools (SecurityHeaders.com A+, SSLLabs A) and internal code review.
