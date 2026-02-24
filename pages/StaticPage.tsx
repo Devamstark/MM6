@@ -15,8 +15,105 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'shipping-info': {
     title: 'Shipping Information',
     content: `
-      <p class="mb-4">We offer worldwide shipping. Standard shipping takes 5-7 business days.</p>
-      <p>Express shipping is available for select locations and takes 2-3 business days.</p>
+      <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
+
+        <!-- Hero Section -->
+        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+          <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Fast & Reliable Shipping</h2>
+          <p class="text-lg text-gray-600 max-w-2xl mx-auto">We offer multiple shipping options to get your order to you quickly and safely.</p>
+        </div>
+
+        <!-- Shipping Options Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Standard Shipping -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Standard</h3>
+            </div>
+            <p class="text-gray-600 mb-3">5-7 business days</p>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-700">FREE over $50</span>
+          </div>
+
+          <!-- Express Shipping -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Express</h3>
+            </div>
+            <p class="text-gray-600 mb-3">2-3 business days</p>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-purple-100 text-purple-700">$9.99</span>
+          </div>
+
+          <!-- Overnight Shipping -->
+          <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group">
+            <div class="flex items-center gap-4 mb-4">
+              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+              </div>
+              <h3 class="text-xl font-bold text-gray-900">Overnight</h3>
+            </div>
+            <p class="text-gray-600 mb-3">Next business day</p>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-700">$19.99</span>
+          </div>
+
+        </div>
+
+        <!-- Shipping Coverage -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">🌍 Worldwide Shipping</h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                Domestic (US)
+              </h4>
+              <p class="text-gray-600 text-sm">Free standard shipping on orders over $50. All 50 states covered.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2 flex items-center gap-2">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                International
+              </h4>
+              <p class="text-gray-600 text-sm">Shipping to 100+ countries. Rates calculated at checkout based on location.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tracking Section -->
+        <div class="bg-white p-8 rounded-4xl shadow-lg shadow-gray-100 border border-gray-100 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 bg-indigo-100 rounded-2xl flex items-center justify-center">
+            <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+          </div>
+          <h3 class="text-xl font-black text-gray-900 mb-2">Track Your Order</h3>
+          <p class="text-gray-600 mb-4">Once your order ships, you'll receive a tracking number via email to monitor your package in real-time.</p>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-indigo-50/50 p-6 md:p-8 rounded-4xl border border-indigo-100">
+          <h3 class="text-2xl font-black mb-6 text-gray-900 text-center">Frequently Asked Questions</h3>
+          <div class="space-y-4">
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">Do you ship to my country?</h4>
+              <p class="text-gray-600 text-sm">We ship to over 100 countries worldwide. Enter your address at checkout to see available shipping options and rates.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">Can I change my shipping address after ordering?</h4>
+              <p class="text-gray-600 text-sm">Contact us within 24 hours of placing your order and we'll do our best to update the shipping address before it ships.</p>
+            </div>
+            <div class="bg-white p-5 rounded-2xl border border-indigo-100">
+              <h4 class="font-bold text-gray-900 mb-2">What if my package is lost or damaged?</h4>
+              <p class="text-gray-600 text-sm">All shipments are insured. If your package is lost or damaged, contact our support team and we'll resolve it immediately.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
     `
   },
   'returns': {
