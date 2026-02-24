@@ -7,7 +7,7 @@ import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
 import { AdminAnalytics } from '../components/AdminAnalytics';
-
+import * as RadixTabs from '@radix-ui/react-tabs';
 
 import { SalesOverview } from '../components/dashboard/SalesOverview';
 import { StatusOverview } from '../components/dashboard/StatusOverview';
@@ -51,6 +51,7 @@ export const AdminDashboard = () => {
 
   const [isReordering, setIsReordering] = useState(false);
   const [savingReorder, setSavingReorder] = useState(false);
+  const [productCatTab, setProductCatTab] = useState('all');
 
   const formRef = React.useRef<HTMLDivElement>(null);
 
@@ -256,30 +257,30 @@ export const AdminDashboard = () => {
       <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
         <div className="mb-12 animate-fade-up flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div>
-            <span className="text-indigo-600 font-black text-xs uppercase tracking-[0.3em] mb-3 block">Management Portal</span>
-            <h1 className="text-5xl font-black text-gray-900 dark:text-white tracking-tight">Admin Dashboard</h1>
-            <p className="text-gray-400 font-medium mt-3 text-lg dark:text-gray-500">Real-time insights and product management console.</p>
+            <span className="text-indigo-600 font-semibold text-xs uppercase tracking-[0.3em] mb-3 block">Management Portal</span>
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-white tracking-tight" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>Admin Dashboard</h1>
+            <p className="text-gray-400 font-normal mt-2 text-base dark:text-gray-500">Real-time insights and product management console.</p>
           </div>
           <div className="flex items-center gap-3 bg-white dark:bg-gray-900 p-2 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-800 transition-colors">
-            <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600 font-black shadow-inner">
+            <div className="w-12 h-12 bg-green-50 dark:bg-green-900/20 rounded-xl flex items-center justify-center text-green-600 shadow-inner">
               <CheckCircle className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">Security Status</p>
-              <p className="text-sm font-bold text-gray-900 dark:text-gray-200">System Healthy</p>
+              <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest leading-none">Security Status</p>
+              <p className="text-sm font-medium text-gray-900 dark:text-gray-200">System Healthy</p>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="flex flex-wrap gap-3 mb-12 w-full animate-fade-up delay-100 overflow-x-auto pb-2 scrollbar-hide">
+        <div className="flex flex-wrap gap-2 mb-12 w-full animate-fade-up delay-100 overflow-x-auto pb-2">
           {['overview', 'products', 'sellers', 'users', 'orders', 'coupons', 'messages', 'analytics', 'staff', 'cms'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-8 py-4 rounded-2xl text-[11px] font-black uppercase tracking-widest transition-all duration-500 whitespace-nowrap ${activeTab === tab
-                ? 'bg-indigo-600 text-white shadow-[0_20px_40px_-15px_rgba(79,70,229,0.4)] transform -translate-y-1'
-                : 'bg-white text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-500 dark:hover:text-indigo-400'
+              className={`px-6 py-3 rounded-xl text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 -translate-y-0.5'
+                  : 'bg-white text-gray-500 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
                 }`}
             >
               {tab}
@@ -343,146 +344,203 @@ export const AdminDashboard = () => {
             </div>
           )}
 
-          {activeTab === 'products' && (
-            <>
-              <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
-                <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
-                  <h3 className="font-bold text-lg text-gray-800 dark:text-white">All Products</h3>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => setIsBatchCreatorOpen(true)}
-                      className="bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all"
-                    >
-                      <Images className="w-4 h-4" /> Batch Creator
-                    </button>
+          {activeTab === 'products' && (() => {
+            const PRODUCT_CATS = [
+              { key: 'all', label: 'All Products' },
+              { key: 'Men', label: 'Men' },
+              { key: 'Women', label: 'Women' },
+              { key: 'Accessories', label: 'Accessories' },
+            ];
+            const filteredByCategory = productCatTab === 'all'
+              ? products
+              : products.filter(p => (p.category || '').toLowerCase() === productCatTab.toLowerCase());
 
-                    <input
-                      type="file"
-                      accept=".zip"
-                      className="hidden"
-                      ref={fileInputRef}
-                      onChange={handleBulkUpload}
-                    />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all disabled:opacity-50"
-                    >
-                      {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                      Import ZIP
-                    </button>
-                    <button onClick={() => setIsReordering(!isReordering)} className={`px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 transition-all shadow-sm ${isReordering ? 'bg-gray-900 text-white dark:bg-indigo-600' : 'bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'} `}>
-                      <Move className="w-4 h-4" /> {isReordering ? 'Done' : 'Reorder'}
-                    </button>
-                    <button onClick={() => openForm()} className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
-                      <Plus className="w-4 h-4" /> Add Product
-                    </button>
+            const getCount = (key: string) =>
+              key === 'all' ? products.length : products.filter(p => (p.category || '').toLowerCase() === key.toLowerCase()).length;
+
+            return (
+              <>
+                <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden transition-colors">
+                  {/* Header row */}
+                  <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-gray-50/50 dark:bg-gray-800/50">
+                    <div>
+                      <h3 className="font-semibold text-base text-gray-800 dark:text-white" style={{ fontFamily: 'Outfit, sans-serif' }}>Products</h3>
+                      <p className="text-xs text-gray-400 mt-0.5">{products.length} total products in catalog</p>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <button
+                        onClick={() => setIsBatchCreatorOpen(true)}
+                        className="bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3.5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all"
+                      >
+                        <Images className="w-4 h-4" /> Batch Creator
+                      </button>
+                      <input type="file" accept=".zip" className="hidden" ref={fileInputRef} onChange={handleBulkUpload} />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isUploading}
+                        className="bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300 px-3.5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all disabled:opacity-50"
+                      >
+                        {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
+                        Import ZIP
+                      </button>
+                      <button
+                        onClick={() => setIsReordering(!isReordering)}
+                        className={`px-3.5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 transition-all ${isReordering ? 'bg-gray-900 text-white dark:bg-indigo-600' : 'bg-white dark:bg-gray-800 border dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+                          }`}
+                      >
+                        <Move className="w-4 h-4" /> {isReordering ? 'Done' : 'Reorder'}
+                      </button>
+                      <button
+                        onClick={() => openForm()}
+                        className="bg-indigo-600 hover:bg-indigo-700 text-white px-3.5 py-2 rounded-lg text-xs font-medium flex items-center gap-2 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5"
+                      >
+                        <Plus className="w-4 h-4" /> Add Product
+                      </button>
+                    </div>
                   </div>
+
+                  {/* Radix Category Tabs */}
+                  <RadixTabs.Root value={productCatTab} onValueChange={setProductCatTab}>
+                    <RadixTabs.List className="flex gap-0 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900 px-5 overflow-x-auto" aria-label="Product categories">
+                      {PRODUCT_CATS.map(cat => (
+                        <RadixTabs.Trigger
+                          key={cat.key}
+                          value={cat.key}
+                          className={
+                            `relative flex items-center gap-2 px-4 py-3.5 text-xs font-medium whitespace-nowrap border-b-2 transition-all outline-none ` +
+                            `data-[state=active]:border-indigo-600 data-[state=active]:text-indigo-600 ` +
+                            `data-[state=inactive]:border-transparent data-[state=inactive]:text-gray-400 ` +
+                            `hover:text-gray-700 dark:hover:text-gray-200 dark:data-[state=active]:text-indigo-400 dark:data-[state=active]:border-indigo-400`
+                          }
+                        >
+                          {cat.label}
+                          <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${productCatTab === cat.key
+                              ? 'bg-indigo-100 text-indigo-600 dark:bg-indigo-900/40 dark:text-indigo-400'
+                              : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
+                            }`}>
+                            {getCount(cat.key)}
+                          </span>
+                        </RadixTabs.Trigger>
+                      ))}
+                    </RadixTabs.List>
+
+                    {PRODUCT_CATS.map(cat => (
+                      <RadixTabs.Content key={cat.key} value={cat.key}>
+                        {isReordering ? (
+                          <SortableProductList
+                            products={filteredByCategory}
+                            onReorder={setProducts}
+                            onSave={handleReorderSave}
+                            saving={savingReorder}
+                          />
+                        ) : (
+                          <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
+                              <thead className="bg-gray-50/60 dark:bg-gray-900/50">
+                                <tr>
+                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Product</th>
+                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Vendor</th>
+                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Price</th>
+                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Sale</th>
+                                  <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Stock</th>
+                                  <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Actions</th>
+                                </tr>
+                              </thead>
+                              <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
+                                {filteredByCategory.length === 0 ? (
+                                  <tr>
+                                    <td colSpan={6} className="px-6 py-16 text-center">
+                                      <Package className="w-10 h-10 text-gray-200 dark:text-gray-700 mx-auto mb-3" />
+                                      <p className="text-sm text-gray-400">No products in this category yet.</p>
+                                      <button onClick={() => openForm()} className="mt-4 text-xs text-indigo-600 font-medium hover:underline">+ Add a product</button>
+                                    </td>
+                                  </tr>
+                                ) : filteredByCategory.map(p => {
+                                  const seller = users.find(u => u.id === p.userId);
+                                  return (
+                                    <tr key={p.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-all group">
+                                      <td className="px-6 py-5 whitespace-nowrap">
+                                        <div className="flex items-center gap-4">
+                                          <div className="h-12 w-12 rounded-xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 shrink-0 group-hover:scale-105 transition-transform duration-300">
+                                            <img className="h-full w-full object-cover" src={p.imageUrl} alt="" />
+                                          </div>
+                                          <div>
+                                            <div className="text-sm font-medium text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">{p.name}</div>
+                                            <div className="text-[10px] font-medium text-gray-400 dark:text-gray-500 uppercase tracking-wider mt-0.5">{p.brand}</div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td className="px-6 py-5 whitespace-nowrap">
+                                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-2.5 py-1 rounded-md border border-gray-100 dark:border-gray-700">
+                                          {seller ? seller.name : 'ID: ' + p.userId}
+                                        </span>
+                                      </td>
+                                      <td className="px-6 py-5 whitespace-nowrap">
+                                        <div className="text-sm font-semibold text-gray-900 dark:text-white">${p.price}</div>
+                                        {p.salePrice && <div className="text-[10px] text-red-400 line-through">${p.salePrice}</div>}
+                                      </td>
+                                      <td className="px-6 py-5 whitespace-nowrap">
+                                        {p.discountPercentage ? (
+                                          <span className="px-2.5 py-1 rounded-full text-[10px] font-semibold bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800">
+                                            {p.discountPercentage}% OFF
+                                          </span>
+                                        ) : (
+                                          <span className="text-gray-300 dark:text-gray-600 text-[10px] font-medium">—</span>
+                                        )}
+                                      </td>
+                                      <td className="px-6 py-5 whitespace-nowrap">
+                                        <div className="flex items-center gap-2">
+                                          <div className={`w-1.5 h-1.5 rounded-full ${p.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
+                                          <span className="text-xs font-medium text-gray-600 dark:text-gray-400">{p.stock} units</span>
+                                        </div>
+                                      </td>
+                                      <td className="px-6 py-5 whitespace-nowrap text-right">
+                                        <div className="flex justify-end gap-1.5">
+                                          <button onClick={() => setDiscountProduct(p)} className="w-8 h-8 flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-600 hover:text-white rounded-lg transition-all" title="Manage Sale"><DollarSign className="w-3.5 h-3.5" /></button>
+                                          <button onClick={() => openForm(p)} className="w-8 h-8 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-lg transition-all"><Edit2 className="w-3.5 h-3.5" /></button>
+                                          <button onClick={() => handleProductDelete(p.id)} className="w-8 h-8 flex items-center justify-center text-red-500 bg-red-50 hover:bg-red-600 hover:text-white rounded-lg transition-all"><Trash2 className="w-3.5 h-3.5" /></button>
+                                        </div>
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
+                              </tbody>
+                            </table>
+                            {hasMoreProducts && productCatTab === 'all' && (
+                              <div className="p-5 border-t border-gray-100 dark:border-gray-800 flex justify-center">
+                                <button
+                                  onClick={handleLoadMoreProducts}
+                                  disabled={loadingMoreProducts}
+                                  className="text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 disabled:opacity-50"
+                                >
+                                  {loadingMoreProducts ? 'Loading...' : 'Load More Products'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </RadixTabs.Content>
+                    ))}
+                  </RadixTabs.Root>
                 </div>
 
-                {isReordering ? (
-                  <SortableProductList
-                    products={products}
-                    onReorder={setProducts}
-                    onSave={handleReorderSave}
-                    saving={savingReorder}
-                  />
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
-                      <thead className="bg-[#fcfcfd] dark:bg-gray-900/50">
-                        <tr>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Product Details</th>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Vendor</th>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Valuation</th>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Campaign</th>
-                          <th className="px-8 py-5 text-left text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Stock</th>
-                          <th className="px-8 py-5 text-right text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Command</th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
-                        {products.map(p => {
-                          const seller = users.find(u => u.id === p.userId);
-                          return (
-                            <tr key={p.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-all group">
-                              <td className="px-8 py-6 whitespace-nowrap">
-                                <div className="flex items-center">
-                                  <div className="h-14 w-14 rounded-2xl overflow-hidden shadow-sm border border-gray-100 dark:border-gray-800 shrink-0 group-hover:scale-110 transition-transform duration-500">
-                                    <img className="h-full w-full object-cover" src={p.imageUrl} alt="" />
-                                  </div>
-                                  <div className="ml-5">
-                                    <div className="text-sm font-black text-gray-900 dark:text-white group-hover:text-indigo-600 transition-colors">{p.name}</div>
-                                    <div className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">{p.brand}</div>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="px-8 py-6 whitespace-nowrap">
-                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg border border-gray-100 dark:border-gray-700 transition-colors">
-                                  {seller ? seller.name : 'ID: ' + p.userId}
-                                </span>
-                              </td>
-                              <td className="px-8 py-6 whitespace-nowrap">
-                                <div className="text-sm font-black text-gray-900 dark:text-white">${p.price}</div>
-                                {p.salePrice && <div className="text-[10px] text-red-500 font-bold line-through ml-0.5">${p.price}</div>}
-                              </td>
-                              <td className="px-8 py-6 whitespace-nowrap">
-                                {p.discountPercentage ? (
-                                  <span className="px-3 py-1 rounded-full text-[10px] font-black bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 border border-green-100 dark:border-green-800">
-                                    {p.discountPercentage}% OFF
-                                  </span>
-                                ) : (
-                                  <span className="text-gray-300 dark:text-gray-600 font-bold text-[10px]">NO SALE</span>
-                                )}
-                              </td>
-                              <td className="px-8 py-6 whitespace-nowrap">
-                                <div className="flex items-center gap-2">
-                                  <div className={`w-1.5 h-1.5 rounded-full ${p.stock < 10 ? 'bg-red-500 animate-pulse' : 'bg-green-500'}`}></div>
-                                  <span className="text-xs font-black text-gray-600 dark:text-gray-400 uppercase tracking-wider">{p.stock} Units</span>
-                                </div>
-                              </td>
-                              <td className="px-8 py-6 whitespace-nowrap text-right text-xs font-medium">
-                                <div className="flex justify-end gap-2">
-                                  <button onClick={() => setDiscountProduct(p)} className="w-9 h-9 flex items-center justify-center text-green-600 bg-green-50 hover:bg-green-600 hover:text-white rounded-xl transition-all shadow-sm" title="Manage Sale"><DollarSign className="w-4 h-4" /></button>
-                                  <button onClick={() => openForm(p)} className="w-9 h-9 flex items-center justify-center text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white rounded-xl transition-all shadow-sm"><Edit2 className="w-4 h-4" /></button>
-                                  <button onClick={() => handleProductDelete(p.id)} className="w-9 h-9 flex items-center justify-center text-red-600 bg-red-50 hover:bg-red-600 hover:text-white rounded-xl transition-all shadow-sm"><Trash2 className="w-4 h-4" /></button>
-                                </div>
-                              </td>
-                            </tr>
-                          )
-                        })}
-                      </tbody>
-                    </table>
-                    {hasMoreProducts && (
-                      <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-center">
-                        <button
-                          onClick={handleLoadMoreProducts}
-                          disabled={loadingMoreProducts}
-                          className="text-xs font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 disabled:opacity-50"
-                        >
-                          {loadingMoreProducts ? 'Syncing...' : 'Load More Products'}
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div ref={formRef}>
-                {isFormOpen && (
-                  <ProductForm
-                    isInline={true}
-                    initialData={editingProduct}
-                    onClose={() => setIsFormOpen(false)}
-                    onSubmit={() => {
-                      setIsFormOpen(false);
-                      loadData();
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                  />
-                )}
-              </div>
-            </>
-          )}
+                <div ref={formRef}>
+                  {isFormOpen && (
+                    <ProductForm
+                      isInline={true}
+                      initialData={editingProduct}
+                      onClose={() => setIsFormOpen(false)}
+                      onSubmit={() => {
+                        setIsFormOpen(false);
+                        loadData();
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    />
+                  )}
+                </div>
+              </>
+            );
+          })()}
 
           {/* Sellers Management Tab */}
           {activeTab === 'sellers' && (
