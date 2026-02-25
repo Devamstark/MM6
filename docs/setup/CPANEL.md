@@ -1,56 +1,47 @@
-# cPanel DNS Migration Guide
+# Professional Email DNS Guide (EwallHost)
 
-**Goal**: Move your website (`smartshop1.us`) to the new VPS while keeping your email on the old cPanel server (`<MAIL_SERVER_IP>`).
-
----
-
-## 🛑 STEP 1: DO THIS NOW (Before Buying VPS)
-*Log in to your cPanel -> **Zone Editor** -> **Manage**.*
-
-### 1. Fix the "Mail" Record
-Currently, your mail record is a "CNAME" that follows your main domain. If you move the main domain to the VPS, email will break. You must "pin" it to the old server.
-
-1.  Find the record named: `mail.smartshop1.us`
-    *   Type: **CNAME**
-    *   Value: `smartshop1.us`
-2.  **DELETE** this record.
-3.  **CREATE A NEW RECORD**:
-    *   **Name**: `mail.smartshop1.us`
-    *   **Type**: **A** (Address)
-    *   **Value/IP**: `<MAIL_SERVER_IP>` (Address of your current cPanel)
-    *   **TTL**: `14400`
-
-### 2. Check the MX Record
-1.  Find the record of Type: **MX**
-2.  Ensure it points to: `mail.smartshop1.us`
-3.  Priority: `0`
-
-**Result**: Your email is now safe. It is permanently pointed to `<MAIL_SERVER_IP>`, regardless of where the website goes.
+**Goal**: Host your website (`smartshop1.us`) on the VPS while using **EwallHost** for professional email (`support@smartshop1.us`).
 
 ---
 
-## 🚀 STEP 2: DO THIS AFTER BUYING VPS
-*Once HostAsia gives you your **New VPS IP Address** (let's call it `NEW_VPS_IP`).*
+## � DNS Configuration Logic
 
-### 1. Point the Website to VPS
-1.  Find the record named: `smartshop1.us` (The root domain)
-    *   Type: **A**
-2.  **EDIT** this record:
-    *   **Old Value**: `<MAIL_SERVER_IP>`
-    *   **New Value**: `<VPS_IP>` (e.g. 123.45.67.89)
+Since the website and email are on different servers, follow these rules in your **cPanel Zone Editor**:
 
-### 2. Point "www" to VPS
-1.  Find the record named: `www.smartshop1.us`
-    *   Type: **CNAME**
-    *   Ensure it points to `smartshop1.us`. (This usually updates automatically, but check it).
+### 1. The Website (VPS)
+Keep these pointed to your VPS IP (`157.90.149.223`):
+*   **A Record** (`smartshop1.us`) -> `157.90.149.223`
+*   **CNAME** (`www`) -> `smartshop1.us`
+*   **A Records** (`api`, `db`, `minio`, `s3`) -> `157.90.149.223`
+
+### 2. The Email (EwallHost)
+Add these records to route mail to EwallHost's professional servers:
+
+#### **MX Records (For Receiving Email)**
+| Priority | Destination |
+| :--- | :--- |
+| 10 | `us2.mx1.mailhostbox.com` |
+| 20 | `us2.mx2.mailhostbox.com` |
+| 30 | `us2.mx3.mailhostbox.com` |
+
+#### **SPF Record (For Deliverability)**
+*   **Type**: TXT
+*   **Name**: `smartshop1.us`
+*   **Value**: `"v=spf1 redirect=_spf.mailhostbox.com"`
+
+#### **SMTP Endpoint (For the Website to Send Mail)**
+*   **Type**: CNAME
+*   **Name**: `smtp`
+*   **Value**: `us2.smtp.mailhostbox.com`
 
 ---
 
-## Summary of Final Records
+## 📧 Application Settings (Dokploy)
 
-| Name | Type | Value / IP | Purpose |
-| :--- | :--- | :--- | :--- |
-| `mail.smartshop1.us` | **A** | `<MAIL_SERVER_IP>` | **Email** stays on cPanel |
-| `smartshop1.us` | **A** | `<VPS_IP>` | **Website** goes to VPS |
-| `www.smartshop1.us` | **CNAME** | `smartshop1.us` | **Website** goes to VPS |
-| `MX Record` | **MX** | `mail.smartshop1.us` | Routes email to the mail server |
+Configure these in your backend environment variables to connect the shop:
+
+*   **EMAIL_HOST**: `us2.smtp.mailhostbox.com`
+*   **EMAIL_PORT**: `587`
+*   **EMAIL_USE_TLS**: `True`
+*   **EMAIL_HOST_USER**: `support@smartshop1.us`
+*   **DEFAULT_FROM_EMAIL**: `support@smartshop1.us`
