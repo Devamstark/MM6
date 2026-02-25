@@ -157,6 +157,12 @@ class RegisterView(APIView):
             import logging
             logging.getLogger(__name__).error(f"Failed to send registration welcome email to {user.email}: {str(e)}")
 
+        except Exception as e:
+            import traceback
+            import logging
+            logging.getLogger(__name__).error(f"Registration Error for {email}: {traceback.format_exc()}")
+            return Response({'error': 'An internal error occurred during registration.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
 
@@ -652,48 +658,54 @@ class RequestPasswordResetView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        email = request.data.get('email')
-        if not email:
-            return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
-        
         try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            # For security, don't reveal that the user doesn't exist
-            return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
+            email = request.data.get('email')
+            if not email:
+                return Response({'error': 'Email is required'}, status=status.HTTP_400_BAD_REQUEST)
+            
+            try:
+                user = User.objects.get(email=email)
+            except User.DoesNotExist:
+                # For security, don't reveal that the user doesn't exist
+                return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
 
-        if user.role == 'admin':
-             return Response({'error': 'Password reset is not allowed for admin accounts.'}, status=status.HTTP_403_FORBIDDEN)
+            if user.role == 'admin':
+                 return Response({'error': 'Password reset is not allowed for admin accounts.'}, status=status.HTTP_403_FORBIDDEN)
 
-        # Generate 6-digit code
-        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-        
-        # Save token
-        # Invalidate old tokens for this user
-        PasswordResetToken.objects.filter(user=user).delete()
-        
-        PasswordResetToken.objects.create(
-            user=user,
-            token=code,
-            expires_at=timezone.now() + timedelta(minutes=15)
-        )
-        
-        # Send password reset email via configured email backend
-        try:
-            from django.core.mail import send_mail
-            send_mail(
-                subject='SmartShop — Your Password Reset Code',
-                message=f'Your 6-digit password reset code is: {code}\n\nThis code expires in 15 minutes. Do not share it with anyone.',
-                from_email=settings.DEFAULT_FROM_EMAIL or 'support@smartshop1.us',
-                recipient_list=[email],
-                fail_silently=False,
+            # Generate 6-digit code
+            code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+            
+            # Save token
+            # Invalidate old tokens for this user
+            PasswordResetToken.objects.filter(user=user).delete()
+            
+            PasswordResetToken.objects.create(
+                user=user,
+                token=code,
+                expires_at=timezone.now() + timedelta(minutes=15)
             )
-        except Exception as e:
-            # Log server-side only — never expose the code in the response
-            import logging
-            logging.getLogger(__name__).error(f'Failed to send password reset email to {email}: {str(e)}')
+            
+            # Send password reset email via configured email backend
+            try:
+                from django.core.mail import send_mail
+                send_mail(
+                    subject='SmartShop — Your Password Reset Code',
+                    message=f'Your 6-digit password reset code is: {code}\n\nThis code expires in 15 minutes. Do not share it with anyone.',
+                    from_email=settings.DEFAULT_FROM_EMAIL or 'support@smartshop1.us',
+                    recipient_list=[email],
+                    fail_silently=False,
+                )
+            except Exception as e:
+                # Log server-side only — never expose the code in the response
+                import logging
+                logging.getLogger(__name__).error(f'Failed to send password reset email to {email}: {str(e)}')
 
-        return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
+            return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
+        except Exception as e:
+            import traceback
+            import logging
+            logging.getLogger(__name__).error(f"Password Reset Request Crash: {traceback.format_exc()}")
+            return Response({'error': 'Internal Server Error'}, status=500)
 
 class VerifyResetCodeView(APIView):
     permission_classes = [permissions.AllowAny]
