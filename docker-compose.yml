@@ -139,7 +139,7 @@ services:
     ports:
       - "8025:80"
     environment:
-      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://us3.imap.mailhostbox.com
+      - ROUNDCUBEMAIL_DEFAULT_HOST=ssl://us2.imap.mailhostbox.com
       - ROUNDCUBEMAIL_DEFAULT_PORT=993
       - ROUNDCUBEMAIL_SMTP_SERVER=tls://us2.smtp.mailhostbox.com
       - ROUNDCUBEMAIL_SMTP_PORT=587
