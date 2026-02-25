@@ -6,16 +6,32 @@
 
 ## 🌐 Live Services & URLs
 
+### 🔓 Public (Internet Accessible)
 | Service | URL | Purpose |
 |:---|:---|:---|
 | 🛍️ **SmartShop Store** | [https://smartshop1.us](https://smartshop1.us) | Main customer-facing e-commerce website |
 | 🌐 **WWW Redirect** | [https://www.smartshop1.us](https://www.smartshop1.us) | Redirects to main store |
-| ⚙️ **Django Admin** | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Admin panel to manage products, orders, users, categories |
+| ⚙️ **Django Admin** | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Admin panel (products, orders, users) |
 | 🔌 **REST API** | [https://api.smartshop1.us/api/](https://api.smartshop1.us/api/) | Backend API consumed by the frontend |
-| 🗄️ **Adminer** | [https://db.smartshop1.us](https://db.smartshop1.us) | Web UI to browse and query the PostgreSQL database |
-| 📁 **FileBrowser** | *(accessible via VPS IP — internal only)* | Browse and manage uploaded product media files |
-| 🪣 **MinIO Console** | *(accessible via VPS IP:9001 — internal only)* | Self-hosted S3-compatible object storage web UI |
-| 🔗 **MinIO S3 API** | *(accessible via VPS IP:9000 — internal only)* | S3-compatible API endpoint used for Dokploy backups |
+| 🗄️ **Adminer (DB UI)** | [https://db.smartshop1.us](https://db.smartshop1.us) | Browse and query the PostgreSQL database |
+| 🪣 **MinIO Console** | [https://minio.smartshop1.us](https://minio.smartshop1.us) | S3-compatible object storage web UI |
+| 🔗 **MinIO S3 API** | [https://s3.smartshop1.us](https://s3.smartshop1.us) | S3 API endpoint used by Dokploy backups |
+
+### 🔐 Private (VPS IP — Admin Only, No Public Domain)
+| Service | URL | Purpose |
+|:---|:---|:---|
+| 🚀 **Dokploy Dashboard** | `http://157.90.149.223:3000` | Container management & deployment platform |
+| 📁 **FileBrowser** | `http://157.90.149.223:2025` | Browse and manage uploaded product images |
+| 📧 **Roundcube Webmail** | `http://157.90.149.223:8025` | Self-hosted webmail to manage `support@smartshop1.us` |
+
+### 📬 Email Services
+| Service | URL | Purpose |
+|:---|:---|:---|
+| 📨 **EwallHost Webmail** | [https://us3.webmail.mailhostbox.com](https://us3.webmail.mailhostbox.com) | EwallHost's own webmail for `support@smartshop1.us` |
+| � **SMTP Server** | `us2.smtp.mailhostbox.com:587` | Outbound email (password resets, welcome emails) |
+| 📥 **IMAP Server** | `us2.imap.mailhostbox.com:993` | Incoming email (used by Roundcube) |
+
+> ⚠️ Private links are accessible only from devices that know the VPS IP. No credentials are stored in this document.
 
 ---
 
