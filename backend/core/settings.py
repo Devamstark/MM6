@@ -157,14 +157,19 @@ if not DEBUG:
 # Email Configuration
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'us2.smtp.mailhostbox.com')
-EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+
+# Safe port parsing
+try:
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+except (ValueError, TypeError):
+    EMAIL_PORT = 465
+
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER)
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
 
-# Port 465 uses SSL, Port 587 uses TLS. They are mutually exclusive.
-# This logic is hardcoded to PREVENT site crashes (CORS errors)
+# Mutually exclusive security settings
 if EMAIL_PORT == 465:
     EMAIL_USE_TLS = False
     EMAIL_USE_SSL = True
