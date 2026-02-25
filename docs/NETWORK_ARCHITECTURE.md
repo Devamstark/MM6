@@ -83,6 +83,8 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 │  │  db               │ db                │ 5432 (internal)  │   │
 │  │  adminer          │ adminer           │ 8080 (internal)  │   │
 │  │  minio            │ minio             │ 9000, 9001 (int) │   │
+│  │  roundcube        │ roundcube         │ 8025 (direct)    │   │
+│  │  filebrowser      │ filebrowser       │ 2025 (direct)    │   │
 │  └──────────────────────────────────────────────────────────┘   │
 │                                                                  │
 │  Containers reference each other by service name:               │
@@ -159,10 +161,12 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 | 80 | TCP | Traefik | ✅ Yes (redirects to 443) |
 | 443 | TCP | Traefik | ✅ Yes (HTTPS) |
 | 5432 | TCP | PostgreSQL | ❌ Internal only |
-| 8000 | TCP | Gunicorn (Django) | ❌ Internal only |
+| 8000 | TCP | Gunicorn (Django) | ❌ Internal only (via Traefik) |
+| 8025 | TCP | Roundcube Webmail | ⚠️ Direct IP access (admin only) |
 | 8080 | TCP | Adminer | ❌ Internal only (via Traefik) |
 | 9000 | TCP | MinIO S3 API | ❌ Internal only (via Traefik) |
 | 9001 | TCP | MinIO Console | ❌ Internal only (via Traefik) |
+| 2025 | TCP | FileBrowser | ⚠️ Direct IP access (admin only) |
 
 ---
 
@@ -251,11 +255,14 @@ New version is live at https://smartshop1.us
 
 | Service | Used For | Protocol / Port |
 |:---|:---|:---|
-| **cPanel Mail Server** | Sending OTPs for new user registration and password resets | SMTP (465/587) |
+| **EwallHost SMTP** | Sending password reset codes, welcome emails, newsletter emails | SMTP Port 587 (TLS) |
+| **Roundcube** | Admin webmail client to manage `support@smartshop1.us` inbox | HTTP Port 8025 (direct IP) |
 | **Unsplash API** | Placeholder images for Bloggers and Home Categories | HTTPS (443) |
+
+> **Email**: Hosted on EwallHost (`us2.smtp.mailhostbox.com`). Webmail accessible at `http://[VPS-IP]:8025` — login with `support@smartshop1.us`. Credentials stored securely in Dokploy environment variables only.
 
 ---
 
-**Version**: 1.3.0  
+**Version**: 1.4.0  
 **Last Updated**: February 2026  
 **Infrastructure**: HostAsia VPS, Docker, Dokploy, Traefik  
