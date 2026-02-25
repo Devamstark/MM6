@@ -158,23 +158,23 @@ if not DEBUG:
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ.get('EMAIL_HOST', 'us2.smtp.mailhostbox.com')
 
-# Safe port parsing
+# Port 587 (TLS) is confirmed reachable from this VPS. Port 465 (SSL) is blocked.
 try:
-    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 465))
+    EMAIL_PORT = int(os.environ.get('EMAIL_PORT', 587))
 except (ValueError, TypeError):
-    EMAIL_PORT = 465
+    EMAIL_PORT = 587
 
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
 DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
 SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
 
-# Mutually exclusive security settings
+# Mutually exclusive security settings — auto-detected from port
 if EMAIL_PORT == 465:
     EMAIL_USE_TLS = False
     EMAIL_USE_SSL = True
 else:
-    EMAIL_USE_TLS = True
+    EMAIL_USE_TLS = True   # 587 uses STARTTLS
     EMAIL_USE_SSL = False
 
-EMAIL_TIMEOUT = 10 # Seconds (prevents worker timeout)
+EMAIL_TIMEOUT = 15  # Seconds before giving up on SMTP connection
