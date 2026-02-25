@@ -684,14 +684,14 @@ class RequestPasswordResetView(APIView):
             send_mail(
                 subject='SmartShop — Your Password Reset Code',
                 message=f'Your 6-digit password reset code is: {code}\n\nThis code expires in 15 minutes. Do not share it with anyone.',
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=settings.DEFAULT_FROM_EMAIL or 'support@smartshop1.us',
                 recipient_list=[email],
                 fail_silently=False,
             )
-        except Exception:
+        except Exception as e:
             # Log server-side only — never expose the code in the response
             import logging
-            logging.getLogger(__name__).error('Failed to send password reset email to %s', email)
+            logging.getLogger(__name__).error(f'Failed to send password reset email to {email}: {str(e)}')
 
         return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
 
