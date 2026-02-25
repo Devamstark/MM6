@@ -985,7 +985,8 @@ export const api = {
   },
 
   // --- Newsletter ---
-  subscribeToNewsletter: async (email: string): Promise<void> => {
-    await client.post('newsletter/', { email });
+  subscribeToNewsletter: async (email: string): Promise<any> => {
+    const response = await client.post('newsletter/', { email });
+    return response.data;
   },
 };

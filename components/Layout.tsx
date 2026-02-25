@@ -37,6 +37,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
   const menuTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterStatus, setNewsletterStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [newsletterMessage, setNewsletterMessage] = useState('');
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,13 +45,24 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
     setNewsletterStatus('loading');
     try {
-      await api.subscribeToNewsletter(newsletterEmail);
+      const res = await api.subscribeToNewsletter(newsletterEmail);
       setNewsletterStatus('success');
+      setNewsletterMessage(res.message || 'Subscribed successfully!');
       setNewsletterEmail('');
-      setTimeout(() => setNewsletterStatus('idle'), 3000);
+      setTimeout(() => {
+        setNewsletterStatus('idle');
+        setNewsletterMessage('');
+      }, 4000);
     } catch (err: any) {
       setNewsletterStatus('error');
-      setTimeout(() => setNewsletterStatus('idle'), 3000);
+      // If backend returns a 400 with a specific error (like a malformed email)
+      const errorData = err.response?.data;
+      const errorMsg = errorData?.email?.[0] || errorData?.detail || 'Something went wrong. Please try again.';
+      setNewsletterMessage(errorMsg);
+      setTimeout(() => {
+        setNewsletterStatus('idle');
+        setNewsletterMessage('');
+      }, 4000);
     }
   };
 
@@ -1113,6 +1125,11 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     newsletterStatus === 'success' ? 'Subscribed!' :
                       newsletterStatus === 'error' ? 'Try Again' : 'Subscribe'}
                 </button>
+                {newsletterMessage && (
+                  <p className={`text-[10px] text-center mt-1 font-medium ${newsletterStatus === 'success' ? 'text-green-600' : 'text-red-500'}`}>
+                    {newsletterMessage}
+                  </p>
+                )}
               </form>
             </div>
           </div>

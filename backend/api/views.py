@@ -343,6 +343,12 @@ class NewsletterSubscriberViewSet(viewsets.ModelViewSet):
     serializer_class = NewsletterSubscriberSerializer
     permission_classes = [permissions.AllowAny]
 
+    def create(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        if email and NewsletterSubscriber.objects.filter(email=email).exists():
+            return Response({'message': 'You are already subscribed!'}, status=status.HTTP_200_OK)
+        return super().create(request, *args, **kwargs)
+
     def get_permissions(self):
         if self.action in ['list', 'retrieve', 'update', 'partial_update', 'destroy']:
             return [permissions.IsAdminUser()]
