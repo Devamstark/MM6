@@ -139,7 +139,7 @@ class RegisterView(APIView):
                 message=f"Your account has been successfully created. Welcome to the SmartShop family!",
                 from_email=settings.DEFAULT_FROM_EMAIL,
                 recipient_list=[user.email],
-                fail_silently=True,
+                fail_silently=False, # Changed to False for better debugging
                 html_message=f"""
                     <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
                         <h2 style="color: #333;">Welcome to SmartShop, {user.first_name or user.username}!</h2>
@@ -153,8 +153,9 @@ class RegisterView(APIView):
                     </div>
                 """
             )
-        except:
-            pass
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to send registration welcome email to {user.email}: {str(e)}")
 
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
@@ -384,7 +385,7 @@ class NewsletterSubscriberViewSet(viewsets.ModelViewSet):
                     message="Thank you for subscribing to our newsletter! Use code WELCOME10 for 10% off your first order.",
                     from_email=settings.DEFAULT_FROM_EMAIL,
                     recipient_list=[email],
-                    fail_silently=True,
+                    fail_silently=False, # Changed to False for better debugging
                     html_message=f"""
                         <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
                             <h2 style="color: #333;">Welcome to the family!</h2>
@@ -400,8 +401,9 @@ class NewsletterSubscriberViewSet(viewsets.ModelViewSet):
                         </div>
                     """
                 )
-            except:
-                pass
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send newsletter welcome email to {email}: {str(e)}")
         return response
 
     def get_permissions(self):
