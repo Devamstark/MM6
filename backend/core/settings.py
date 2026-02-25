@@ -176,3 +176,5 @@ if EMAIL_PORT == 465:
 else:
     EMAIL_USE_TLS = True
     EMAIL_USE_SSL = False
+
+EMAIL_TIMEOUT = 10 # Seconds (prevents worker timeout)
