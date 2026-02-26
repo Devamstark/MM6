@@ -32,21 +32,49 @@ export const MarketingTab: React.FC = () => {
         }
     };
 
-    const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSave = async () => {
+        if (!formData.name?.trim() || !formData.subject?.trim() || !formData.message?.trim()) {
+            alert('Please fill out all required fields: Name, Subject, and Message.');
+            return;
+        }
+
         try {
             let created;
-            if (formData.id) {
-                created = await api.updateCampaign(formData.id, formData);
+            const dataToSave = { ...formData };
+
+            if (!sendNow && dataToSave.scheduled_date) {
+                dataToSave.status = 'scheduled';
+            } else if (sendNow) {
+                dataToSave.status = 'draft'; // Backend needs it as draft before sending
             } else {
-                created = await api.createCampaign(formData);
+                dataToSave.status = 'draft';
             }
+
+            if (dataToSave.id) {
+                created = await api.updateCampaign(dataToSave.id, dataToSave);
+            } else {
+                created = await api.createCampaign(dataToSave);
+            }
+
+            if (sendNow && created?.id) {
+                await api.sendCampaign(created.id, true);
+                alert('Campaign saved and sent immediately!');
+            } else if (!sendNow && dataToSave.scheduled_date && created?.id) {
+                // If backend requires hitting send for schedule we can call it with false
+                try {
+                    await api.sendCampaign(created.id, false);
+                } catch (e) { /* ignore or handle */ }
+                alert('Campaign saved and scheduled!');
+            } else {
+                alert('Campaign saved successfully!');
+            }
+
             setShowModal(false);
             setFormData({ name: '', subject: '', message: '', discount_code: '', status: 'draft' });
             loadCampaigns();
-        } catch (error) {
+        } catch (error: any) {
             console.error(error);
-            alert('Failed to save campaign. Check fields.');
+            alert(error?.response?.data?.message || error?.response?.data?.detail || 'Failed to save campaign. Check fields.');
         }
     };
 
@@ -151,18 +179,18 @@ export const MarketingTab: React.FC = () => {
                             <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-white">✕</button>
                         </div>
                         <div className="p-6 overflow-y-auto">
-                            <form id="campaignForm" onSubmit={handleSave} className="space-y-6">
+                            <div className="space-y-6">
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Campaign Name</label>
-                                    <input required type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Campaign Name <span className="text-red-500">*</span></label>
+                                    <input type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Email Subject</label>
-                                    <input required type="text" value={formData.subject || ''} onChange={e => setFormData({ ...formData, subject: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Email Subject <span className="text-red-500">*</span></label>
+                                    <input type="text" value={formData.subject || ''} onChange={e => setFormData({ ...formData, subject: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Promotional Message (Text or HTML)</label>
-                                    <textarea required rows={5} value={formData.message || ''} onChange={e => setFormData({ ...formData, message: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono" placeholder="<h1>Special Offer!</h1>..."></textarea>
+                                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Promotional Message (Text or HTML) <span className="text-red-500">*</span></label>
+                                    <textarea rows={5} value={formData.message || ''} onChange={e => setFormData({ ...formData, message: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all font-mono" placeholder="<h1>Special Offer!</h1>..."></textarea>
                                 </div>
                                 <div>
                                     <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Discount Code (Optional)</label>
@@ -180,20 +208,15 @@ export const MarketingTab: React.FC = () => {
                                     {!sendNow && (
                                         <div>
                                             <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">Scheduled Date & Time</label>
-                                            <input type="datetime-local" value={formData.scheduled_date ? new Date(formData.scheduled_date).toISOString().slice(0, 16) : ''} onChange={e => setFormData({ ...formData, scheduled_date: new Date(e.target.value).toISOString() })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
+                                            <input type="datetime-local" value={formData.scheduled_date && !isNaN(new Date(formData.scheduled_date).getTime()) ? new Date(formData.scheduled_date).toISOString().slice(0, 16) : ''} onChange={e => setFormData({ ...formData, scheduled_date: e.target.value ? new Date(e.target.value).toISOString() : '' })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all" />
                                         </div>
                                     )}
                                 </div>
-                            </form>
+                            </div>
                         </div>
                         <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-end gap-4 bg-gray-50/50 dark:bg-gray-800/50">
                             <button onClick={() => setShowModal(false)} className="px-6 py-3 font-bold text-gray-600 hover:bg-gray-200 dark:text-gray-300 dark:hover:bg-gray-700 rounded-xl transition-colors">Cancel</button>
-                            <button type="submit" form="campaignForm" onClick={() => {
-                                // If they click save, prepare the status based on sendNow and schedule Date. This will be handled in DB mostly but we can pre-set it here if we want.
-                                // Actually, it's better to just save it as draft, and then have the user click "Send" from the table.
-                                // Or, we can give a UI option to "Save" vs "Send Campaign".
-                                // Let's make this button save, and if sendNow is true, we trigger the handleSend after save.
-                            }} className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                            <button onClick={handleSave} className="bg-indigo-600 hover:bg-indigo-700 text-white font-black px-6 py-3 rounded-xl transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
                                 Save Campaign
                             </button>
                         </div>
