@@ -16,14 +16,15 @@ from .models import (
     Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent, 
     Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, 
     HeroBanner, HomePageSection, BlogPost, NewsletterSubscriber,
-    MarketingCampaign
+    MarketingCampaign, EmailDeliveryLog, CampaignRecipient
 )
 from .serializers import (
     ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, 
     PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, 
     ContactMessageSerializer, AddressSerializer, CouponSerializer, 
     HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer, 
-    NewsletterSubscriberSerializer, MarketingCampaignSerializer
+    NewsletterSubscriberSerializer, MarketingCampaignSerializer,
+    EmailDeliveryLogSerializer, CampaignRecipientSerializer
 )
 
 # ...
@@ -1080,34 +1081,213 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         if self.request.user.role == 'admin':
-            return super().get_queryset()
+            qs = super().get_queryset()
+            # Filtering
+            status_filter = self.request.query_params.get('status')
+            campaign_type = self.request.query_params.get('campaign_type')
+            if status_filter:
+                qs = qs.filter(status=status_filter)
+            if campaign_type:
+                qs = qs.filter(campaign_type=campaign_type)
+            return qs
         return MarketingCampaign.objects.none()
+
+    def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
 
     @action(detail=True, methods=['post'], url_path='send')
     def send_campaign(self, request, pk=None):
-        if self.request.user.role != 'admin':
+        if request.user.role != 'admin':
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("Only admins can send campaigns.")
-            
+
         campaign = self.get_object()
-        
-        if campaign.status == 'sent':
-            return Response({'error': 'Campaign is already sent.'}, status=status.HTTP_400_BAD_REQUEST)
-        
+
+        if campaign.status in ('sent', 'sending'):
+            return Response({'error': f'Campaign is already {campaign.status}.'}, status=status.HTTP_400_BAD_REQUEST)
+
         from .tasks import send_marketing_campaign
-        
+
         send_now = request.data.get('send_now', True)
-        
+
         if send_now or not campaign.scheduled_date:
-            campaign.status = 'sent' # Assuming sending is fast or handled rapidly.
+            campaign.status = 'sending'
             campaign.save(update_fields=['status'])
-            send_marketing_campaign.delay(campaign.id)
+            send_marketing_campaign.delay(str(campaign.id))
             return Response({'status': 'Campaign sending initiated'})
         else:
             if campaign.scheduled_date > timezone.now():
                 campaign.status = 'scheduled'
                 campaign.save(update_fields=['status'])
-                send_marketing_campaign.apply_async(args=[campaign.id], eta=campaign.scheduled_date)
+                send_marketing_campaign.apply_async(args=[str(campaign.id)], eta=campaign.scheduled_date)
                 return Response({'status': 'Campaign scheduled successfully'})
             else:
                 return Response({'error': 'Scheduled date must be in the future.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], url_path='pause')
+    def pause_campaign(self, request, pk=None):
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        campaign = self.get_object()
+        if campaign.status in ('sending', 'scheduled'):
+            campaign.status = 'paused'
+            campaign.save(update_fields=['status'])
+            return Response({'status': 'Campaign paused'})
+        return Response({'error': 'Campaign cannot be paused from this state.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], url_path='resume')
+    def resume_campaign(self, request, pk=None):
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        campaign = self.get_object()
+        if campaign.status == 'paused':
+            from .tasks import send_marketing_campaign
+            campaign.status = 'sending'
+            campaign.save(update_fields=['status'])
+            send_marketing_campaign.delay(str(campaign.id))
+            return Response({'status': 'Campaign resumed'})
+        return Response({'error': 'Only paused campaigns can be resumed.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'], url_path='duplicate')
+    def duplicate_campaign(self, request, pk=None):
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        campaign = self.get_object()
+        new_campaign = MarketingCampaign.objects.create(
+            name=f"{campaign.name} (Copy)",
+            subject=campaign.subject,
+            preheader=campaign.preheader,
+            message=campaign.message,
+            plain_text=campaign.plain_text,
+            banner_image_url=campaign.banner_image_url,
+            cta_text=campaign.cta_text,
+            cta_url=campaign.cta_url,
+            discount_code=campaign.discount_code,
+            campaign_type=campaign.campaign_type,
+            audience_type=campaign.audience_type,
+            audience_days=campaign.audience_days,
+            manual_user_ids=campaign.manual_user_ids,
+            batch_size=campaign.batch_size,
+            created_by=request.user,
+        )
+        serializer = self.get_serializer(new_campaign)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+    @action(detail=True, methods=['get'], url_path='logs')
+    def delivery_logs(self, request, pk=None):
+        """Get delivery logs for a specific campaign."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        campaign = self.get_object()
+        logs = EmailDeliveryLog.objects.filter(campaign=campaign).select_related('user')
+        log_status = request.query_params.get('log_status')
+        if log_status:
+            logs = logs.filter(status=log_status)
+        serializer = EmailDeliveryLogSerializer(logs[:500], many=True)
+        # Also return summary
+        from django.db.models import Count
+        summary = logs.values('status').annotate(count=Count('id'))
+        return Response({
+            'logs': serializer.data,
+            'summary': {item['status']: item['count'] for item in summary},
+            'total': logs.count(),
+        })
+
+    @action(detail=False, methods=['get'], url_path='audience-preview')
+    def audience_preview(self, request):
+        """Preview audience count based on targeting criteria."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        from .tasks import _resolve_audience
+
+        # Create a temporary mock campaign object for audience resolution
+        class MockCampaign:
+            pass
+        mock = MockCampaign()
+        mock.audience_type = request.query_params.get('audience_type', 'all_users')
+        mock.audience_days = int(request.query_params.get('audience_days', 30))
+        manual_ids = request.query_params.get('manual_user_ids', '')
+        mock.manual_user_ids = manual_ids.split(',') if manual_ids else []
+
+        users = _resolve_audience(mock)
+        count = users.count()
+        sample_users = users[:10].values('id', 'username', 'email', 'date_joined')
+
+        return Response({
+            'count': count,
+            'sample': list(sample_users),
+        })
+
+    @action(detail=False, methods=['get'], url_path='analytics')
+    def analytics(self, request):
+        """Enterprise marketing analytics dashboard."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+
+        from django.db.models import Count, Sum, Avg, Q
+
+        campaigns = MarketingCampaign.objects.all()
+        total_campaigns = campaigns.count()
+        total_sent = campaigns.filter(status='sent').count()
+        total_emails_sent = campaigns.aggregate(s=Sum('emails_sent'))['s'] or 0
+        total_emails_failed = campaigns.aggregate(s=Sum('emails_failed'))['s'] or 0
+        total_opens = campaigns.aggregate(s=Sum('emails_opened'))['s'] or 0
+        total_clicks = campaigns.aggregate(s=Sum('emails_clicked'))['s'] or 0
+        total_recipients = campaigns.aggregate(s=Sum('total_recipients'))['s'] or 0
+
+        avg_delivery_rate = round((total_emails_sent / total_recipients * 100), 1) if total_recipients > 0 else 0
+        avg_open_rate = round((total_opens / total_emails_sent * 100), 1) if total_emails_sent > 0 else 0
+        avg_click_rate = round((total_clicks / total_emails_sent * 100), 1) if total_emails_sent > 0 else 0
+
+        # Active users count (with role=user)
+        active_users = User.objects.filter(role='user', is_active=True).count()
+
+        # Last campaign
+        last_campaign = campaigns.first()
+        last_campaign_data = None
+        if last_campaign:
+            last_campaign_data = {
+                'id': str(last_campaign.id),
+                'name': last_campaign.name,
+                'status': last_campaign.status,
+                'sent_at': last_campaign.sent_at,
+                'emails_sent': last_campaign.emails_sent,
+            }
+
+        # Campaign stats by status
+        status_breakdown = dict(campaigns.values_list('status').annotate(c=Count('id')).values_list('status', 'c'))
+
+        # Campaign stats by type
+        type_breakdown = dict(campaigns.values_list('campaign_type').annotate(c=Count('id')).values_list('campaign_type', 'c'))
+
+        return Response({
+            'total_campaigns': total_campaigns,
+            'total_sent_campaigns': total_sent,
+            'total_emails_sent': total_emails_sent,
+            'total_emails_failed': total_emails_failed,
+            'total_opens': total_opens,
+            'total_clicks': total_clicks,
+            'total_recipients': total_recipients,
+            'avg_delivery_rate': avg_delivery_rate,
+            'avg_open_rate': avg_open_rate,
+            'avg_click_rate': avg_click_rate,
+            'active_users': active_users,
+            'last_campaign': last_campaign_data,
+            'status_breakdown': status_breakdown,
+            'type_breakdown': type_breakdown,
+        })
+
+    @action(detail=False, methods=['get'], url_path='users-list')
+    def users_list(self, request):
+        """Get list of users for manual audience selection."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+        users = User.objects.filter(role='user', is_active=True).values('id', 'username', 'email', 'first_name', 'last_name')
+        return Response(list(users[:500]))

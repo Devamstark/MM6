@@ -15,12 +15,77 @@ export interface MarketingCampaign {
     id: string;
     name: string;
     subject: string;
+    preheader?: string;
     message: string;
+    plain_text?: string;
+    banner_image_url?: string;
+    cta_text?: string;
+    cta_url?: string;
     discount_code?: string;
-    status: 'draft' | 'scheduled' | 'sent';
+    status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'failed';
+    campaign_type: 'promotional' | 'abandoned_cart' | 're_engagement' | 'thank_you' | 'upsell';
+    audience_type: 'all_users' | 'ordered_once' | 'never_ordered' | 'recent_signups' | 'abandoned_cart' | 'manual';
+    audience_days?: number;
+    manual_user_ids?: string[];
     scheduled_date?: string;
+    sent_at?: string;
+    total_recipients: number;
     emails_sent: number;
+    emails_failed: number;
+    emails_opened: number;
+    emails_clicked: number;
+    batch_size: number;
+    delivery_rate: number;
+    open_rate: number;
+    click_rate: number;
+    created_by?: number;
+    created_by_name?: string;
     created_at: string;
+    updated_at?: string;
+}
+
+export interface EmailDeliveryLog {
+    id: string;
+    campaign: string;
+    campaign_name: string;
+    user: number;
+    user_name: string;
+    email: string;
+    user_email: string;
+    status: 'pending' | 'sent' | 'failed' | 'opened' | 'clicked';
+    sent_at?: string;
+    opened_at?: string;
+    clicked_at?: string;
+    error_message?: string;
+    retry_count: number;
+}
+
+export interface MarketingAnalytics {
+    total_campaigns: number;
+    total_sent_campaigns: number;
+    total_emails_sent: number;
+    total_emails_failed: number;
+    total_opens: number;
+    total_clicks: number;
+    total_recipients: number;
+    avg_delivery_rate: number;
+    avg_open_rate: number;
+    avg_click_rate: number;
+    active_users: number;
+    last_campaign: {
+        id: string;
+        name: string;
+        status: string;
+        sent_at?: string;
+        emails_sent: number;
+    } | null;
+    status_breakdown: Record<string, number>;
+    type_breakdown: Record<string, number>;
+}
+
+export interface AudiencePreview {
+    count: number;
+    sample: Array<{ id: string; username: string; email: string; date_joined: string }>;
 }
 
 export interface User {

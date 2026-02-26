@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import (
     Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, 
     Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, 
-    BlogPost, NewsletterSubscriber, MarketingCampaign
+    BlogPost, NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog, CampaignRecipient
 )
 
 User = get_user_model()
@@ -154,7 +154,49 @@ class NewsletterSubscriberSerializer(serializers.ModelSerializer):
         read_only_fields = ('id', 'subscribed_at')
 
 class MarketingCampaignSerializer(serializers.ModelSerializer):
+    delivery_rate = serializers.ReadOnlyField()
+    open_rate = serializers.ReadOnlyField()
+    click_rate = serializers.ReadOnlyField()
+    created_by_name = serializers.ReadOnlyField(source='created_by.username')
+
     class Meta:
         model = MarketingCampaign
-        fields = '__all__'
-        read_only_fields = ('id', 'emails_sent', 'created_at', 'updated_at')
+        fields = [
+            'id', 'name', 'subject', 'preheader', 'message', 'plain_text',
+            'banner_image_url', 'cta_text', 'cta_url', 'discount_code',
+            'status', 'campaign_type', 'audience_type', 'audience_days',
+            'manual_user_ids', 'scheduled_date', 'sent_at',
+            'total_recipients', 'emails_sent', 'emails_failed',
+            'emails_opened', 'emails_clicked', 'batch_size',
+            'delivery_rate', 'open_rate', 'click_rate',
+            'created_by', 'created_by_name', 'created_at', 'updated_at',
+        ]
+        read_only_fields = (
+            'id', 'emails_sent', 'emails_failed', 'emails_opened',
+            'emails_clicked', 'total_recipients', 'sent_at',
+            'created_by', 'created_at', 'updated_at',
+        )
+
+
+class EmailDeliveryLogSerializer(serializers.ModelSerializer):
+    user_email = serializers.ReadOnlyField(source='user.email')
+    user_name = serializers.ReadOnlyField(source='user.username')
+    campaign_name = serializers.ReadOnlyField(source='campaign.name')
+
+    class Meta:
+        model = EmailDeliveryLog
+        fields = [
+            'id', 'campaign', 'campaign_name', 'user', 'user_name',
+            'email', 'user_email', 'status', 'sent_at', 'opened_at',
+            'clicked_at', 'error_message', 'retry_count',
+        ]
+        read_only_fields = ('id',)
+
+
+class CampaignRecipientSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.username')
+
+    class Meta:
+        model = CampaignRecipient
+        fields = ['id', 'campaign', 'user', 'user_name', 'email', 'added_at']
+        read_only_fields = ('id', 'added_at')

@@ -1004,9 +1004,9 @@ export const api = {
     return response.data;
   },
 
-  // --- Marketing Campaigns ---
-  getCampaigns: async (): Promise<any[]> => {
-    const response = await client.get('marketing-campaigns/');
+  // --- Marketing Campaigns (Enterprise) ---
+  getCampaigns: async (params?: Record<string, string>): Promise<any[]> => {
+    const response = await client.get('marketing-campaigns/', { params });
     return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
   },
 
@@ -1027,5 +1027,45 @@ export const api = {
   sendCampaign: async (id: string, sendNow: boolean = true): Promise<any> => {
     const response = await client.post(`marketing-campaigns/${id}/send/`, { send_now: sendNow });
     return response.data;
-  }
+  },
+
+  pauseCampaign: async (id: string): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${id}/pause/`);
+    return response.data;
+  },
+
+  resumeCampaign: async (id: string): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${id}/resume/`);
+    return response.data;
+  },
+
+  duplicateCampaign: async (id: string): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${id}/duplicate/`);
+    return response.data;
+  },
+
+  getCampaignLogs: async (id: string, logStatus?: string): Promise<any> => {
+    const params: Record<string, string> = {};
+    if (logStatus) params.log_status = logStatus;
+    const response = await client.get(`marketing-campaigns/${id}/logs/`, { params });
+    return response.data;
+  },
+
+  getMarketingAnalytics: async (): Promise<any> => {
+    const response = await client.get('marketing-campaigns/analytics/');
+    return response.data;
+  },
+
+  getAudiencePreview: async (audienceType: string, audienceDays?: number, manualUserIds?: string[]): Promise<any> => {
+    const params: Record<string, string> = { audience_type: audienceType };
+    if (audienceDays) params.audience_days = String(audienceDays);
+    if (manualUserIds?.length) params.manual_user_ids = manualUserIds.join(',');
+    const response = await client.get('marketing-campaigns/audience-preview/', { params });
+    return response.data;
+  },
+
+  getMarketingUsersList: async (): Promise<any[]> => {
+    const response = await client.get('marketing-campaigns/users-list/');
+    return response.data;
+  },
 };

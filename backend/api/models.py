@@ -427,22 +427,130 @@ class MarketingCampaign(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Draft'),
         ('scheduled', 'Scheduled'),
+        ('sending', 'Sending'),
         ('sent', 'Sent'),
+        ('paused', 'Paused'),
+        ('failed', 'Failed'),
     )
-    
+    AUDIENCE_CHOICES = (
+        ('all_users', 'All Users'),
+        ('ordered_once', 'Ordered At Least Once'),
+        ('never_ordered', 'Never Ordered'),
+        ('recent_signups', 'Recent Signups'),
+        ('abandoned_cart', 'Abandoned Cart'),
+        ('manual', 'Manual Selection'),
+    )
+    CAMPAIGN_TYPE_CHOICES = (
+        ('promotional', 'Promotional'),
+        ('abandoned_cart', 'Abandoned Cart'),
+        ('re_engagement', 'Re-engagement'),
+        ('thank_you', 'First Purchase Thank You'),
+        ('upsell', 'Post-purchase Upsell'),
+    )
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
     subject = models.CharField(max_length=255)
-    message = models.TextField()  # Stores text or HTML
-    discount_code = models.CharField(max_length=50, blank=True, null=True)
+    preheader = models.CharField(max_length=255, blank=True, default='')
+    message = models.TextField()  # HTML content
+    plain_text = models.TextField(blank=True, default='')  # Plain text fallback
+    banner_image_url = models.URLField(max_length=500, blank=True, default='')
+    cta_text = models.CharField(max_length=100, blank=True, default='')
+    cta_url = models.URLField(max_length=500, blank=True, default='')
+    discount_code = models.CharField(max_length=50, blank=True, default='')
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    campaign_type = models.CharField(max_length=30, choices=CAMPAIGN_TYPE_CHOICES, default='promotional')
+    audience_type = models.CharField(max_length=30, choices=AUDIENCE_CHOICES, default='all_users')
+    audience_days = models.IntegerField(default=30, help_text='For recent_signups: users registered within X days')
+    manual_user_ids = models.JSONField(default=list, blank=True, help_text='List of user IDs for manual selection')
     scheduled_date = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    total_recipients = models.IntegerField(default=0)
     emails_sent = models.IntegerField(default=0)
+    emails_failed = models.IntegerField(default=0)
+    emails_opened = models.IntegerField(default=0)
+    emails_clicked = models.IntegerField(default=0)
+    batch_size = models.IntegerField(default=200)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='campaigns_created')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status']),
+            models.Index(fields=['campaign_type']),
+            models.Index(fields=['created_at']),
+        ]
 
     def __str__(self):
         return self.name
+
+    @property
+    def delivery_rate(self):
+        if self.total_recipients == 0:
+            return 0
+        return round((self.emails_sent / self.total_recipients) * 100, 1)
+
+    @property
+    def open_rate(self):
+        if self.emails_sent == 0:
+            return 0
+        return round((self.emails_opened / self.emails_sent) * 100, 1)
+
+    @property
+    def click_rate(self):
+        if self.emails_sent == 0:
+            return 0
+        return round((self.emails_clicked / self.emails_sent) * 100, 1)
+
+
+class CampaignRecipient(models.Model):
+    """Snapshot of recipients at send time."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    campaign = models.ForeignKey(MarketingCampaign, on_delete=models.CASCADE, related_name='recipients')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='campaign_recipients')
+    email = models.EmailField()
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('campaign', 'user')
+        indexes = [
+            models.Index(fields=['campaign', 'user']),
+        ]
+
+    def __str__(self):
+        return f"{self.email} - {self.campaign.name}"
+
+
+class EmailDeliveryLog(models.Model):
+    """Log each individual email delivery status."""
+    STATUS_CHOICES = (
+        ('pending', 'Pending'),
+        ('sent', 'Sent'),
+        ('failed', 'Failed'),
+        ('opened', 'Opened'),
+        ('clicked', 'Clicked'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    campaign = models.ForeignKey(MarketingCampaign, on_delete=models.CASCADE, related_name='delivery_logs')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='email_logs')
+    email = models.EmailField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    sent_at = models.DateTimeField(null=True, blank=True)
+    opened_at = models.DateTimeField(null=True, blank=True)
+    clicked_at = models.DateTimeField(null=True, blank=True)
+    error_message = models.TextField(blank=True, default='')
+    retry_count = models.IntegerField(default=0)
+
+    class Meta:
+        ordering = ['-sent_at']
+        indexes = [
+            models.Index(fields=['campaign', 'status']),
+            models.Index(fields=['user']),
+            models.Index(fields=['status']),
+        ]
+
+    def __str__(self):
+        return f"{self.email} - {self.status}"
