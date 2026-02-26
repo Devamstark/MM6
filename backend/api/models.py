@@ -422,3 +422,27 @@ class NewsletterSubscriber(models.Model):
 
     def __str__(self):
         return self.email
+
+class MarketingCampaign(models.Model):
+    STATUS_CHOICES = (
+        ('draft', 'Draft'),
+        ('scheduled', 'Scheduled'),
+        ('sent', 'Sent'),
+    )
+    
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    subject = models.CharField(max_length=255)
+    message = models.TextField()  # Stores text or HTML
+    discount_code = models.CharField(max_length=50, blank=True, null=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='draft')
+    scheduled_date = models.DateTimeField(null=True, blank=True)
+    emails_sent = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name

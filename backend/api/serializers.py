@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from .models import (
     Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, 
     Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, 
-    BlogPost, NewsletterSubscriber
+    BlogPost, NewsletterSubscriber, MarketingCampaign
 )
 
 User = get_user_model()
@@ -152,3 +152,9 @@ class NewsletterSubscriberSerializer(serializers.ModelSerializer):
         model = NewsletterSubscriber
         fields = ['id', 'email', 'subscribed_at', 'is_active']
         read_only_fields = ('id', 'subscribed_at')
+
+class MarketingCampaignSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = MarketingCampaign
+        fields = '__all__'
+        read_only_fields = ('id', 'emails_sent', 'created_at', 'updated_at')

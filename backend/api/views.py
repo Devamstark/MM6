@@ -15,14 +15,15 @@ from datetime import timedelta
 from .models import (
     Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent, 
     Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, 
-    HeroBanner, HomePageSection, BlogPost, NewsletterSubscriber
+    HeroBanner, HomePageSection, BlogPost, NewsletterSubscriber,
+    MarketingCampaign
 )
 from .serializers import (
     ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, 
     PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, 
     ContactMessageSerializer, AddressSerializer, CouponSerializer, 
     HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer, 
-    NewsletterSubscriberSerializer
+    NewsletterSubscriberSerializer, MarketingCampaignSerializer
 )
 
 # ...
@@ -1071,3 +1072,42 @@ class BlogPostViewSet(viewsets.ModelViewSet):
         post.is_published = publish
         post.save(update_fields=['is_published', 'published_at'])
         return Response({'is_published': post.is_published})
+
+class MarketingCampaignViewSet(viewsets.ModelViewSet):
+    queryset = MarketingCampaign.objects.all().order_by('-created_at')
+    serializer_class = MarketingCampaignSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        if self.request.user.role == 'admin':
+            return super().get_queryset()
+        return MarketingCampaign.objects.none()
+
+    @action(detail=True, methods=['post'], url_path='send')
+    def send_campaign(self, request, pk=None):
+        if self.request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied("Only admins can send campaigns.")
+            
+        campaign = self.get_object()
+        
+        if campaign.status == 'sent':
+            return Response({'error': 'Campaign is already sent.'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        from .tasks import send_marketing_campaign
+        
+        send_now = request.data.get('send_now', True)
+        
+        if send_now or not campaign.scheduled_date:
+            campaign.status = 'sent' # Assuming sending is fast or handled rapidly.
+            campaign.save(update_fields=['status'])
+            send_marketing_campaign.delay(campaign.id)
+            return Response({'status': 'Campaign sending initiated'})
+        else:
+            if campaign.scheduled_date > timezone.now():
+                campaign.status = 'scheduled'
+                campaign.save(update_fields=['status'])
+                send_marketing_campaign.apply_async(args=[campaign.id], eta=campaign.scheduled_date)
+                return Response({'status': 'Campaign scheduled successfully'})
+            else:
+                return Response({'error': 'Scheduled date must be in the future.'}, status=status.HTTP_400_BAD_REQUEST)

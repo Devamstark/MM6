@@ -9,7 +9,8 @@ from .views import (
     RegisterView, PageContentViewSet, AffiliateViewSet, CategoryViewSet,
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
-    HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet
+    HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
+    MarketingCampaignViewSet
 )
 
 from rest_framework.routers import SimpleRouter
@@ -34,6 +35,7 @@ router.register(r'hero-banners', HeroBannerViewSet, basename='hero-banners')
 router.register(r'home-sections', HomePageSectionViewSet, basename='home-sections')
 router.register(r'blog', BlogPostViewSet, basename='blog')
 router.register(r'newsletter', NewsletterSubscriberViewSet, basename='newsletter')
+router.register(r'marketing-campaigns', MarketingCampaignViewSet, basename='marketing-campaigns')
 
 urlpatterns = [
     path('', include(router.urls)),

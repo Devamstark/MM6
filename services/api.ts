@@ -1003,4 +1003,29 @@ export const api = {
     const response = await client.post('newsletter/', { email });
     return response.data;
   },
+
+  // --- Marketing Campaigns ---
+  getCampaigns: async (): Promise<any[]> => {
+    const response = await client.get('marketing-campaigns/');
+    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+  },
+
+  createCampaign: async (data: any): Promise<any> => {
+    const response = await client.post('marketing-campaigns/', data);
+    return response.data;
+  },
+
+  updateCampaign: async (id: string, data: any): Promise<any> => {
+    const response = await client.patch(`marketing-campaigns/${id}/`, data);
+    return response.data;
+  },
+
+  deleteCampaign: async (id: string): Promise<void> => {
+    await client.delete(`marketing-campaigns/${id}/`);
+  },
+
+  sendCampaign: async (id: string, sendNow: boolean = true): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${id}/send/`, { send_now: sendNow });
+    return response.data;
+  }
 };

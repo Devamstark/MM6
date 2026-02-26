@@ -11,6 +11,18 @@ export interface Address {
     type: 'shipping' | 'billing';
 }
 
+export interface MarketingCampaign {
+    id: string;
+    name: string;
+    subject: string;
+    message: string;
+    discount_code?: string;
+    status: 'draft' | 'scheduled' | 'sent';
+    scheduled_date?: string;
+    emails_sent: number;
+    created_at: string;
+}
+
 export interface User {
     id: string;
     name: string;

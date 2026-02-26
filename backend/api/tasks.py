@@ -5,7 +5,7 @@ from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.utils import timezone
-from .models import Order, Product, User, NewsletterSubscriber, Affiliate, BlogPost
+from .models import Order, Product, User, NewsletterSubscriber, Affiliate, BlogPost, MarketingCampaign
 from decimal import Decimal
 
 logger = logging.getLogger(__name__)
@@ -219,3 +219,45 @@ def aggregate_analytics():
     # In a real app, you might save this to an AnalyticsSummary model
     logger.info(f"Daily Analytics for {today}: Orders: {daily_orders}, Revenue: {daily_revenue}")
     return f"Analytics aggregated for {today}"
+
+@shared_task
+def send_marketing_campaign(campaign_id):
+    try:
+        campaign = MarketingCampaign.objects.get(id=campaign_id)
+        if campaign.status != 'draft' and campaign.status != 'scheduled':
+            return "Campaign already sent or not ready."
+        
+        # Mark as sending, we just change status to sent here
+        campaign.status = 'sent'
+        campaign.save(update_fields=['status'])
+
+        users = User.objects.filter(role='user')
+        recipient_list = [u.email for u in users if u.email]
+        
+        if not recipient_list:
+            return "No valid recipients found."
+
+        subject = campaign.subject
+        html_message = campaign.message
+        
+        # Append discount code if provided
+        if campaign.discount_code:
+            html_message += f'<br><br><p>Use discount code: <strong>{campaign.discount_code}</strong></p>'
+
+        text_message = strip_tags(html_message)
+        
+        send_mail(
+            subject,
+            text_message,
+            settings.DEFAULT_FROM_EMAIL,
+            recipient_list,
+            html_message=html_message,
+            fail_silently=True
+        )
+
+        campaign.emails_sent = len(recipient_list)
+        campaign.save(update_fields=['emails_sent'])
+
+        return f"Campaign {campaign_id} sent to {len(recipient_list)} users."
+    except MarketingCampaign.DoesNotExist:
+        logger.error(f"Campaign {campaign_id} not found.")
