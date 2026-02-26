@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { 
-    Layout, Type, Image as ImageIcon, Button, Palette, 
-    Move, Trash2, Copy, Eye, Save, Mail, Link, 
-    ShoppingBag, Star, Gift, ArrowRight, Monitor, Smartphone
+import {
+    Layout, Type, Image as ImageIcon, Palette,
+    Move, Trash2, Copy, Eye, Save, Mail, Link,
+    ShoppingBag, Star, Gift, ArrowRight, Monitor, Smartphone,
+    Square
 } from 'lucide-react';
 
 export interface EmailBlock {
@@ -83,7 +84,7 @@ const BLOCK_ICONS: Record<string, any> = {
     header: Layout,
     text: Type,
     image: ImageIcon,
-    button: Button,
+    button: Square,
     product: ShoppingBag,
     divider: Move,
     footer: Mail,
