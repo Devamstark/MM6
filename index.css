@@ -68,6 +68,15 @@ html {
     .animate-delay-300 {
         animation-delay: 300ms;
     }
+
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
 }
 
 /* Base Styles */

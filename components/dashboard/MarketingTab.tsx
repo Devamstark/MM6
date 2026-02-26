@@ -5,6 +5,7 @@ import { MarketingCampaign, MarketingAnalytics, AudiencePreview, EmailDeliveryLo
 import { ConversionAnalyticsTab } from './ConversionAnalyticsTab';
 import { EmailTemplateBuilder, EmailTemplate } from './EmailTemplateBuilder';
 import { CampaignCalendar } from './CampaignCalendar';
+import { CustomDateTimePicker } from './CustomDateTimePicker';
 
 const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700',
@@ -31,6 +32,54 @@ const TYPE_LABELS: Record<string, string> = {
     thank_you: 'Thank You',
     upsell: 'Post-purchase Upsell',
 };
+
+// Stat Card Component
+function StatCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
+    const colorMap: Record<string, string> = {
+        indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
+        green: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+    };
+
+    return (
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all group">
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.indigo} group-hover:scale-110 transition-transform`}>
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{value}</p>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// Metric Card Component
+function MetricCard({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) {
+    const colorMap: Record<string, string> = {
+        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+        green: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+        purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+    };
+
+    return (
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.blue}`}>
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white">{value}</p>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 export const MarketingTab: React.FC = () => {
     const [campaigns, setCampaigns] = useState<MarketingCampaign[]>([]);
@@ -707,7 +756,7 @@ export const MarketingTab: React.FC = () => {
                                     value={formData.message || ''}
                                     onChange={e => setFormData({ ...formData, message: e.target.value })}
                                     className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 font-sans text-sm"
-                                    placeholder="Write your email message here...
+                                    placeholder={`Write your email message here...
 
 Example:
 <h2>🎉 Big Summer Sale!</h2>
@@ -715,7 +764,7 @@ Example:
 <p>We're excited to offer you <strong>50% OFF</strong> on all summer collection items!</p>
 <p>Use code: <strong>SUMMER50</strong> at checkout.</p>
 <p>Don't miss out on this amazing opportunity to refresh your wardrobe at unbeatable prices.</p>
-<p>Happy Shopping!<br/>The SmartShop Team</p>"
+<p>Happy Shopping!<br/>The SmartShop Team</p>`}
                                 />
                                 <div className="mt-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl">
                                     <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-2">📝 Formatting Tips:</p>
@@ -848,35 +897,48 @@ Example:
                                     </button>
                                 </div>
                                 {!sendNow && (
-                                    <div>
+                                    <div className="space-y-4">
                                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Scheduled Date & Time</label>
-                                        <input
-                                            type="datetime-local"
-                                            min={new Date().toISOString().slice(0, 16)}
-                                            value={formData.scheduled_date ? new Date(formData.scheduled_date).toISOString().slice(0, 16) : ''}
-                                            onChange={e => {
-                                                const selectedDate = e.target.value ? new Date(e.target.value).toISOString() : '';
-                                                console.log('Scheduled date selected:', selectedDate);
-                                                setFormData({ ...formData, scheduled_date: selectedDate });
+
+                                        <CustomDateTimePicker
+                                            value={formData.scheduled_date || ''}
+                                            onChange={(date) => {
+                                                console.log('Scheduled date selected:', date);
+                                                setFormData({ ...formData, scheduled_date: date });
                                             }}
-                                            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20"
                                         />
+
                                         {formData.scheduled_date && (
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                                📅 Will be sent on: {new Date(formData.scheduled_date).toLocaleString()}
-                                            </p>
+                                            <div className="flex items-center gap-3 p-4 bg-green-50 dark:bg-green-900/20 border border-green-100 dark:border-green-800 rounded-2xl animate-fade-in">
+                                                <div className="w-10 h-10 bg-white dark:bg-gray-800 rounded-xl flex items-center justify-center shadow-sm">
+                                                    <CheckCircle className="w-5 h-5 text-green-600" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-[10px] font-black text-green-500 uppercase tracking-widest">Confirmed Schedule</p>
+                                                    <p className="text-sm font-black text-green-900 dark:text-green-200">
+                                                        {new Date(formData.scheduled_date).toLocaleString(undefined, {
+                                                            weekday: 'long',
+                                                            year: 'numeric',
+                                                            month: 'long',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </p>
+                                                </div>
+                                            </div>
                                         )}
                                     </div>
                                 )}
                             </div>
-                        </div>
-                        <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-between gap-4 bg-gray-50/50 dark:bg-gray-800/50">
-                            <button onClick={() => { handleSave(); }} disabled={saving} className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50" >
-                                {saving ? 'Saving...' : 'Save as Draft'}
-                            </button>
-                            <button onClick={handleSave} disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50">
-                                {saving ? 'Processing...' : sendNow ? '🚀 Save & Send' : '📅 Save & Schedule'}
-                            </button>
+                            <div className="p-6 border-t border-gray-100 dark:border-gray-800 flex justify-between gap-4 bg-gray-50/50 dark:bg-gray-800/50">
+                                <button onClick={() => { handleSave(); }} disabled={saving} className="flex-1 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 font-bold py-3 rounded-xl hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors disabled:opacity-50" >
+                                    {saving ? 'Saving...' : 'Save as Draft'}
+                                </button>
+                                <button onClick={handleSave} disabled={saving} className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50">
+                                    {saving ? 'Processing...' : sendNow ? '🚀 Save & Send' : '📅 Save & Schedule'}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1050,52 +1112,6 @@ Example:
                     </div>
                 </div>
             )}
-        </div>
-    );
-};
-
-const MetricCard = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) => {
-    const colorMap: Record<string, string> = {
-        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-        green: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
-        purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
-    };
-
-    return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.blue}`}>
-                    {icon}
-                </div>
-                <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-                    <p className="text-2xl font-black text-gray-900 dark:text-white">{value}</p>
-                </div>
-            </div>
-        </div>
-    );
-};
-
-const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) => {
-    const colorMap: Record<string, string> = {
-        indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400',
-        green: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
-        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
-        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
-    };
-
-    return (
-        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm hover:shadow-md transition-all group">
-            <div className="flex items-center gap-3">
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.indigo} group-hover:scale-110 transition-transform`}>
-                    {icon}
-                </div>
-                <div>
-                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
-                    <p className="text-2xl font-black text-gray-900 dark:text-white tracking-tight">{value}</p>
-                </div>
-            </div>
         </div>
     );
 };
