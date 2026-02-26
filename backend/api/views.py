@@ -1093,7 +1093,60 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
         return MarketingCampaign.objects.none()
 
     def perform_create(self, serializer):
-        serializer.save(created_by=self.request.user)
+        campaign = serializer.save(created_by=self.request.user)
+        # Auto-create coupon if discount_code is provided
+        self._create_or_update_coupon(campaign)
+
+    def perform_update(self, serializer):
+        campaign = serializer.save()
+        # Update coupon if discount_code changed
+        self._create_or_update_coupon(campaign)
+
+    def perform_destroy(self, instance):
+        # Delete associated coupon if exists
+        if instance.coupon:
+            instance.coupon.delete()
+        instance.delete()
+
+    def _create_or_update_coupon(self, campaign):
+        """Auto-create or update coupon when campaign has discount_code."""
+        from decimal import Decimal
+        from django.utils import timezone
+        from datetime import timedelta
+
+        if not campaign.discount_code or not campaign.discount_value:
+            return  # No coupon to create
+
+        # Calculate expiry date based on campaign
+        expiry_date = None
+        if campaign.sent_at:
+            expiry_date = campaign.sent_at + timedelta(days=campaign.discount_expiry_days)
+        elif campaign.scheduled_date:
+            expiry_date = campaign.scheduled_date + timedelta(days=campaign.discount_expiry_days)
+
+        # Check if coupon already exists for this campaign
+        if campaign.coupon:
+            # Update existing coupon
+            campaign.coupon.discount_type = campaign.discount_type or 'percentage'
+            campaign.coupon.discount_value = Decimal(str(campaign.discount_value))
+            campaign.coupon.min_purchase = Decimal(str(campaign.discount_min_purchase or 0))
+            campaign.coupon.usage_limit = campaign.discount_usage_limit
+            campaign.coupon.end_date = expiry_date
+            campaign.coupon.save()
+        else:
+            # Create new coupon if code doesn't exist
+            if not Coupon.objects.filter(code=campaign.discount_code).exists():
+                coupon = Coupon.objects.create(
+                    code=campaign.discount_code,
+                    discount_type=campaign.discount_type or 'percentage',
+                    discount_value=Decimal(str(campaign.discount_value)),
+                    min_purchase=Decimal(str(campaign.discount_min_purchase or 0)),
+                    usage_limit=campaign.discount_usage_limit,
+                    end_date=expiry_date,
+                    is_active=True
+                )
+                campaign.coupon = coupon
+                campaign.save(update_fields=['coupon'])
 
     @action(detail=True, methods=['post'], url_path='send')
     def send_campaign(self, request, pk=None):
@@ -1111,8 +1164,17 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
         send_now = request.data.get('send_now', True)
 
         if send_now or not campaign.scheduled_date:
+            # Set sent_at and update coupon expiry
+            campaign.sent_at = timezone.now()
             campaign.status = 'sending'
-            campaign.save(update_fields=['status'])
+            campaign.save(update_fields=['sent_at', 'status'])
+
+            # Update coupon expiry based on sent_at
+            if campaign.coupon:
+                from datetime import timedelta
+                campaign.coupon.end_date = timezone.now() + timedelta(days=campaign.discount_expiry_days)
+                campaign.coupon.save()
+
             send_marketing_campaign.delay(str(campaign.id))
             return Response({'status': 'Campaign sending initiated'})
         else:

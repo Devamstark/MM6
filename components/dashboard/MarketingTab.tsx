@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../services/api';
-import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter } from 'lucide-react';
+import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter, Tag, DollarSign } from 'lucide-react';
 import { MarketingCampaign, MarketingAnalytics, AudiencePreview, EmailDeliveryLog } from '../../types';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -47,6 +47,8 @@ export const MarketingTab: React.FC = () => {
     const [formData, setFormData] = useState<Partial<MarketingCampaign>>({
         name: '', subject: '', preheader: '', message: '', plain_text: '',
         banner_image_url: '', cta_text: '', cta_url: '', discount_code: '',
+        discount_type: 'percentage', discount_value: 0, discount_min_purchase: 0,
+        discount_usage_limit: null, discount_expiry_days: 7,
         status: 'draft', campaign_type: 'promotional', audience_type: 'all_users',
         audience_days: 30, manual_user_ids: [], batch_size: 200,
     });
@@ -124,6 +126,8 @@ export const MarketingTab: React.FC = () => {
         setFormData({
             name: '', subject: '', preheader: '', message: '', plain_text: '',
             banner_image_url: '', cta_text: '', cta_url: '', discount_code: '',
+            discount_type: 'percentage', discount_value: 0, discount_min_purchase: 0,
+            discount_usage_limit: null, discount_expiry_days: 7,
             status: 'draft', campaign_type: 'promotional', audience_type: 'all_users',
             audience_days: 30, manual_user_ids: [], batch_size: 200,
         });
@@ -349,6 +353,7 @@ export const MarketingTab: React.FC = () => {
                                             <th className="px-4 py-4">Type</th>
                                             <th className="px-4 py-4">Audience</th>
                                             <th className="px-4 py-4">Status</th>
+                                            <th className="px-4 py-4">Coupon</th>
                                             <th className="px-4 py-4">Recipients</th>
                                             <th className="px-4 py-4">Sent</th>
                                             <th className="px-4 py-4">Delivery %</th>
@@ -371,6 +376,27 @@ export const MarketingTab: React.FC = () => {
                                                 </td>
                                                 <td className="px-4 py-4">
                                                     <span className={`px-3 py-1 text-[10px] font-black uppercase tracking-widest rounded-lg border ${STATUS_COLORS[c.status] || ''}`}>{c.status}</span>
+                                                </td>
+                                                <td className="px-4 py-4">
+                                                    {c.coupon_code ? (
+                                                        <div className="flex items-center gap-2">
+                                                            <Tag className="w-3.5 h-3.5 text-indigo-600" />
+                                                            <span className="text-xs font-bold text-gray-900 dark:text-white">{c.coupon_code}</span>
+                                                            {c.coupon_active ? (
+                                                                <CheckCircle className="w-3.5 h-3.5 text-green-500" />
+                                                            ) : (
+                                                                <X className="w-3.5 h-3.5 text-red-500" />
+                                                            )}
+                                                        </div>
+                                                    ) : c.discount_code ? (
+                                                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                                                            <Tag className="w-3 h-3" />
+                                                            <span>{c.discount_code}</span>
+                                                            <span className="text-[10px]">(pending)</span>
+                                                        </div>
+                                                    ) : (
+                                                        <span className="text-xs text-gray-400">—</span>
+                                                    )}
                                                 </td>
                                                 <td className="px-4 py-4 font-bold">{c.total_recipients.toLocaleString()}</td>
                                                 <td className="px-4 py-4 font-bold">{c.emails_sent.toLocaleString()}</td>
@@ -490,11 +516,45 @@ export const MarketingTab: React.FC = () => {
                                 </div>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Discount Code</label>
-                                    <input type="text" value={formData.discount_code || ''} onChange={e => setFormData({ ...formData, discount_code: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20" placeholder="SUMMER25" />
+                            {/* Discount Configuration */}
+                            <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl border border-green-100 dark:border-green-800">
+                                <h4 className="text-xs font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Tag className="w-4 h-4" /> Coupon / Discount</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Discount Code</label>
+                                        <input type="text" value={formData.discount_code || ''} onChange={e => setFormData({ ...formData, discount_code: e.target.value.toUpperCase() })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20 uppercase" placeholder="SUMMER25" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Discount Type</label>
+                                        <select value={formData.discount_type || 'percentage'} onChange={e => setFormData({ ...formData, discount_type: e.target.value as 'percentage' | 'fixed' })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20">
+                                            <option value="percentage">Percentage (%)</option>
+                                            <option value="fixed">Fixed Amount ($)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Discount Value</label>
+                                        <input type="number" value={formData.discount_value || 0} onChange={e => setFormData({ ...formData, discount_value: parseFloat(e.target.value) || 0 })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20" placeholder="25" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Min. Purchase ($)</label>
+                                        <input type="number" value={formData.discount_min_purchase || 0} onChange={e => setFormData({ ...formData, discount_min_purchase: parseFloat(e.target.value) || 0 })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20" placeholder="50" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Usage Limit</label>
+                                        <input type="number" value={formData.discount_usage_limit || ''} onChange={e => setFormData({ ...formData, discount_usage_limit: parseInt(e.target.value) || null })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20" placeholder="1000 (leave empty for unlimited)" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2">Expiry (Days after send)</label>
+                                        <input type="number" value={formData.discount_expiry_days || 7} onChange={e => setFormData({ ...formData, discount_expiry_days: parseInt(e.target.value) || 7 })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-green-500/20" placeholder="7" />
+                                    </div>
                                 </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-3 flex items-center gap-1">
+                                    <CheckCircle className="w-3 h-3" />
+                                    Coupon will be auto-created when campaign is saved. Deleted when campaign is removed.
+                                </p>
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Batch Size</label>
                                     <input type="number" value={formData.batch_size || 200} onChange={e => setFormData({ ...formData, batch_size: parseInt(e.target.value) || 200 })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20" />

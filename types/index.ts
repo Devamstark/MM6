@@ -22,6 +22,14 @@ export interface MarketingCampaign {
     cta_text?: string;
     cta_url?: string;
     discount_code?: string;
+    discount_type?: 'percentage' | 'fixed';
+    discount_value?: number;
+    discount_min_purchase?: number;
+    discount_usage_limit?: number;
+    discount_expiry_days?: number;
+    coupon?: string;
+    coupon_code?: string;
+    coupon_active?: boolean;
     status: 'draft' | 'scheduled' | 'sending' | 'sent' | 'paused' | 'failed';
     campaign_type: 'promotional' | 'abandoned_cart' | 're_engagement' | 'thank_you' | 'upsell';
     audience_type: 'all_users' | 'ordered_once' | 'never_ordered' | 'recent_signups' | 'abandoned_cart' | 'manual';

@@ -158,12 +158,22 @@ class MarketingCampaignSerializer(serializers.ModelSerializer):
     open_rate = serializers.ReadOnlyField()
     click_rate = serializers.ReadOnlyField()
     created_by_name = serializers.ReadOnlyField(source='created_by.username')
+    coupon_code = serializers.ReadOnlyField(source='coupon.code')
+    coupon_active = serializers.SerializerMethodField()
+
+    def get_coupon_active(self, obj):
+        if obj.coupon:
+            return obj.coupon.is_active
+        return None
 
     class Meta:
         model = MarketingCampaign
         fields = [
             'id', 'name', 'subject', 'preheader', 'message', 'plain_text',
             'banner_image_url', 'cta_text', 'cta_url', 'discount_code',
+            'discount_type', 'discount_value', 'discount_min_purchase',
+            'discount_usage_limit', 'discount_expiry_days',
+            'coupon', 'coupon_code', 'coupon_active',
             'status', 'campaign_type', 'audience_type', 'audience_days',
             'manual_user_ids', 'scheduled_date', 'sent_at',
             'total_recipients', 'emails_sent', 'emails_failed',
@@ -174,7 +184,7 @@ class MarketingCampaignSerializer(serializers.ModelSerializer):
         read_only_fields = (
             'id', 'emails_sent', 'emails_failed', 'emails_opened',
             'emails_clicked', 'total_recipients', 'sent_at',
-            'created_by', 'created_at', 'updated_at',
+            'created_by', 'created_at', 'updated_at', 'coupon', 'coupon_code', 'coupon_active',
         )
 
 
