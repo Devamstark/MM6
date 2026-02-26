@@ -624,7 +624,7 @@ Example:
                                         <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;h2&gt;Your Heading&lt;/h2&gt;</code> for headings</li>
                                         <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;p&gt;Your paragraph&lt;/p&gt;</code> for paragraphs</li>
                                         <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;strong&gt;bold text&lt;/strong&gt;</code> for emphasis</li>
-                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">{{'{{customer_name}}'}}</code> to personalize with customer's name</li>
+                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">{"{{customer_name}}"}</code> to personalize with customer's name</li>
                                     </ul>
                                     <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-2">
                                         💡 The SmartShop branding (logo, header, footer, unsubscribe) will be added automatically to every email.
