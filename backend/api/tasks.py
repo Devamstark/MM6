@@ -11,6 +11,54 @@ from decimal import Decimal
 logger = logging.getLogger(__name__)
 
 @shared_task
+def send_welcome_email(user_id):
+    """Sends a visually rich welcome email to a newly registered user."""
+    try:
+        user = User.objects.get(id=user_id)
+        subject = f"Welcome to SmartShop, {user.first_name or user.username}! ✨"
+        
+        html_content = render_to_string('emails/welcome.html', {
+            'user': user,
+            'title': subject
+        })
+        text_content = strip_tags(html_content)
+        
+        send_mail(
+            subject,
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+            html_message=html_content,
+            fail_silently=True,
+        )
+        return f"Welcome email sent to {user.email}"
+    except User.DoesNotExist:
+        logger.error(f"User {user_id} not found for welcome email")
+
+@shared_task
+def send_newsletter_welcome_email(email):
+    """Sends a welcome discount code to a new newsletter subscriber."""
+    try:
+        subject = "Welcome to SmartShop! 🛍️"
+        
+        html_content = render_to_string('emails/newsletter_welcome.html', {
+            'title': subject
+        })
+        text_content = strip_tags(html_content)
+        
+        send_mail(
+            subject,
+            text_content,
+            settings.DEFAULT_FROM_EMAIL,
+            [email],
+            html_message=html_content,
+            fail_silently=True,
+        )
+        return f"Newsletter welcome email sent to {email}"
+    except Exception as e:
+        logger.error(f"Newsletter welcome email failed for {email}: {str(e)}")
+
+@shared_task
 def send_order_confirmation_email(order_id):
     """Sends a visually rich email confirmation to the customer after a successful order."""
     try:

@@ -1,0 +1,27 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin-top: 0; font-weight: 800; color: #1e293b; font-size: 24px;">Welcome to SMARTSHOP, {{
+    user.first_name|default:user.username }}! ✨</h2>
+<p>We're thrilled to have you as part of our exclusive community. You can now manage your orders, save items to your
+    wishlist, and enjoy a faster, premium checkout experience.</p>
+
+<div style="background-color: #f8fafc; border-radius: 12px; padding: 30px; margin: 30px 0; text-align: center;">
+    <p
+        style="margin: 0; font-size: 14px; text-transform: uppercase; color: #64748b; letter-spacing: 0.1em; font-weight: bold; margin-bottom: 8px;">
+        Get Started
+    </p>
+    <p style="color: #475569; font-size: 16px;">
+        Discover the latest arrivals and premium selections tailored just for you.
+    </p>
+</div>
+
+<center>
+    <a href="https://smartshop1.us/login" class="button"
+        style="text-decoration: none !important; color: #ffffff !important;">Visit Your Account</a>
+</center>
+
+<p style="margin-top: 30px; font-size: 14px; color: #1e293b; font-weight: 500;">
+    If you didn't create this account, please contact <a href="mailto:support@smartshop1.us">support@smartshop1.us</a>.
+</p>
+{% endblock %}

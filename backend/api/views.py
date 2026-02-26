@@ -130,29 +130,13 @@ class RegisterView(APIView):
                 except Affiliate.DoesNotExist:
                     pass  # Invalid code – silently ignore
 
-        # Send Welcome Email in background thread so it never blocks the response
-        import threading
-        def send_welcome_email():
-            try:
-                from django.core.mail import send_mail
-                subject = f"Welcome to SmartShop, {user.first_name or user.username}! ✨"
-                html_content = f"""
-                    <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
-                        <h2 style="color: #333;">Welcome to SmartShop, {user.first_name or user.username}!</h2>
-                        <p>We're thrilled to have you as part of our community.</p>
-                        <p>You can now manage your orders, save items to your wishlist, and enjoy a faster checkout experience.</p>
-                        <div style="padding: 20px 0;">
-                            <a href="https://smartshop1.us/login" style="background: #000; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px;">Visit Your Account</a>
-                        </div>
-                        <hr style="border: none; border-top: 1px solid #eee; margin: 30px 0;">
-                        <p style="color: #666; font-size: 12px;">If you didn't create this account, please contact support@smartshop1.us</p>
-                    </div>
-                """
-                send_mail(subject=subject, message="Welcome to SmartShop!", from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[user.email], fail_silently=True, html_message=html_content)
-            except Exception as e:
-                import logging
-                logging.getLogger(__name__).error(f"Welcome email failed: {str(e)}")
-        threading.Thread(target=send_welcome_email, daemon=True).start()
+        # Send Welcome Email via Celery
+        try:
+            from .tasks import send_welcome_email
+            send_welcome_email.delay(user.id)
+        except Exception as e:
+            import logging
+            logging.getLogger(__name__).error(f"Failed to queue welcome email: {str(e)}")
 
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
 
@@ -373,33 +357,14 @@ class NewsletterSubscriberViewSet(viewsets.ModelViewSet):
         
         response = super().create(request, *args, **kwargs)
 
-        # Send Newsletter Welcome Email in background thread
+        # Send Newsletter Welcome Email via Celery
         if response.status_code == status.HTTP_201_CREATED:
-            import threading
-            _email = email
-            def send_newsletter_email():
-                try:
-                    from django.core.mail import send_mail
-                    subject = "Welcome to SmartShop! 🛍️"
-                    html_message = f"""
-                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee;">
-                            <h2 style="color: #333;">Welcome to the family!</h2>
-                            <p>Thank you for subscribing. We're excited to share our latest arrivals with you.</p>
-                            <p>As a special thank you, enjoy 10% off your first order:</p>
-                            <div style="background: #f9fafb; padding: 25px; text-align: center; border-radius: 12px; margin: 20px 0; border: 2px dashed #e5e7eb;">
-                                <h3 style="margin: 0; color: #4f46e5; font-size: 24px; letter-spacing: 2px;">WELCOME10</h3>
-                                <p style="margin: 5px 0 0 0; font-size: 12px; color: #6b7280;">USE THIS CODE AT CHECKOUT</p>
-                            </div>
-                            <div style="text-align: center; padding: 10px 0;">
-                                <a href="https://smartshop1.us" style="background: #000; color: #fff; padding: 12px 25px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 14px;">Shop Now</a>
-                            </div>
-                        </div>
-                    """
-                    send_mail(subject=subject, message="Use WELCOME10 for 10% off!", from_email=settings.DEFAULT_FROM_EMAIL, recipient_list=[_email], fail_silently=True, html_message=html_message)
-                except Exception as e:
-                    import logging
-                    logging.getLogger(__name__).error(f"Newsletter email failed for {_email}: {str(e)}")
-            threading.Thread(target=send_newsletter_email, daemon=True).start()
+            try:
+                from .tasks import send_newsletter_welcome_email
+                send_newsletter_welcome_email.delay(email)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to queue newsletter email for {email}: {str(e)}")
         return response
 
     def get_permissions(self):
@@ -696,24 +661,13 @@ class RequestPasswordResetView(APIView):
                 expires_at=timezone.now() + timedelta(minutes=15)
             )
             
-            # Send password reset email in background thread — never blocks the worker
-            import threading
-            _code = code
-            _email = email
-            def send_reset_email():
-                try:
-                    from django.core.mail import send_mail
-                    send_mail(
-                        subject='SmartShop — Your Password Reset Code',
-                        message=f'Your 6-digit password reset code is: {_code}\n\nThis code expires in 15 minutes.',
-                        from_email=settings.DEFAULT_FROM_EMAIL,
-                        recipient_list=[_email],
-                        fail_silently=True,
-                    )
-                except Exception as e:
-                    import logging
-                    logging.getLogger(__name__).error(f'Reset email failed for {_email}: {str(e)}')
-            threading.Thread(target=send_reset_email, daemon=True).start()
+            # Send password reset email via Celery
+            try:
+                from .tasks import send_password_reset_email
+                send_password_reset_email.delay(user.id, code)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to queue password reset email: {str(e)}")
 
             return Response({'message': 'If an account exists, a reset code has been sent.'}, status=status.HTTP_200_OK)
         except Exception as e:
