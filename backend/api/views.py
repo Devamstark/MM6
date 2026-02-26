@@ -1122,11 +1122,7 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             # If this is the last campaign using this coupon, delete it
             if instance.coupon.campaigns.count() <= 1:
                 instance.coupon.delete()
-            else:
-                # Just unlink it
-                instance.coupon = None
-                instance.save(update_fields=['coupon'])
-
+        
         instance.delete()
 
     def _create_or_update_coupon(self, campaign):
