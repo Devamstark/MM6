@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../services/api';
-import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter, Tag } from 'lucide-react';
+import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter, Tag, Layout } from 'lucide-react';
 import { MarketingCampaign, MarketingAnalytics, AudiencePreview, EmailDeliveryLog } from '../../types';
 import { ConversionAnalyticsTab } from './ConversionAnalyticsTab';
+import { EmailTemplateBuilder, EmailTemplate } from './EmailTemplateBuilder';
 
 const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700',
@@ -37,6 +38,7 @@ export const MarketingTab: React.FC = () => {
     const [showModal, setShowModal] = useState(false);
     const [showLogsModal, setShowLogsModal] = useState(false);
     const [showConversionModal, setShowConversionModal] = useState(false);
+    const [showTemplateBuilder, setShowTemplateBuilder] = useState(false);
     const [selectedCampaign, setSelectedCampaign] = useState<MarketingCampaign | null>(null);
     const [conversionAnalytics, setConversionAnalytics] = useState<any>(null);
     const [conversionLoading, setConversionLoading] = useState(false);
@@ -231,6 +233,35 @@ export const MarketingTab: React.FC = () => {
         } finally {
             setConversionLoading(false);
         }
+    };
+
+    const handleTemplateSelect = (template: EmailTemplate) => {
+        setFormData({
+            ...formData,
+            subject: template.subject,
+            preheader: template.previewText,
+            // Generate simple HTML from template blocks
+            message: generateHtmlFromBlocks(template.blocks),
+        });
+        setShowTemplateBuilder(false);
+    };
+
+    const generateHtmlFromBlocks = (blocks: any[]) => {
+        // Simple HTML generation from blocks - can be enhanced
+        let html = '<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">';
+        blocks.forEach(block => {
+            if (block.type === 'header') {
+                html += `<div style="background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; padding: 32px; text-align: center;"><h1 style="margin: 0; font-size: 28px;">${block.content.text}</h1></div>`;
+            } else if (block.type === 'text') {
+                html += `<div style="padding: 16px; text-align: ${block.content.alignment};"><p style="margin: 0; font-size: 16px; color: #374151; white-space: pre-line;">${block.content.text}</p></div>`;
+            } else if (block.type === 'button') {
+                html += `<div style="padding: 16px; text-align: center;"><a href="${block.content.url}" style="display: inline-block; padding: 12px 32px; background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; text-decoration: none; border-radius: 8px; font-weight: bold;">${block.content.text}</a></div>`;
+            } else if (block.type === 'footer') {
+                html += `<div style="background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; padding: 24px; text-align: center;"><p style="margin: 0; font-size: 14px;">${block.content.text}</p></div>`;
+            }
+        });
+        html += '</div>';
+        return html;
     };
 
     return (
@@ -521,8 +552,19 @@ export const MarketingTab: React.FC = () => {
 
                             {/* Content */}
                             <div>
-                                <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">HTML Content <span className="text-red-500">*</span></label>
+                                <div className="flex items-center justify-between mb-2">
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email Content <span className="text-red-500">*</span></label>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowTemplateBuilder(true)}
+                                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:-translate-y-0.5"
+                                    >
+                                        <Layout className="w-4 h-4" />
+                                        Use Template Builder
+                                    </button>
+                                </div>
                                 <textarea rows={6} value={formData.message || ''} onChange={e => setFormData({ ...formData, message: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 font-mono text-sm" placeholder="<h1>Big Sale!</h1><p>Shop now...</p>"></textarea>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">💡 Pro tip: Use the Template Builder to create professional emails visually, or paste your HTML code directly here.</p>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Plain Text Fallback</label>
@@ -856,6 +898,35 @@ export const MarketingTab: React.FC = () => {
                         ) : (
                             <p className="text-gray-500 dark:text-gray-400 text-center py-10">No conversion data available.</p>
                         )}
+                    </div>
+                </div>
+            )}
+        </div>
+
+            {/* Email Template Builder Modal */}
+            {showTemplateBuilder && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-7xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+                            <div>
+                                <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                                    <Layout className="w-6 h-6 text-indigo-600" />
+                                    Email Template Builder
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Design your email visually with drag-and-drop blocks</p>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <button
+                                    onClick={() => setShowTemplateBuilder(false)}
+                                    className="text-gray-400 hover:text-gray-600 dark:hover:text-white p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                                >
+                                    <X className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </div>
+                        <div className="flex-1 overflow-hidden">
+                            <EmailTemplateBuilder onTemplateSelect={handleTemplateSelect} />
+                        </div>
                     </div>
                 </div>
             )}
