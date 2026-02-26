@@ -72,7 +72,6 @@ services:
       - "traefik.http.routers.backend.entrypoints=websecure"
       - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
       - "traefik.http.services.backend.loadbalancer.server.port=8000"
-      # Security Headers
       - "traefik.http.middlewares.security-headers.headers.framedeny=true"
       - "traefik.http.middlewares.security-headers.headers.contenttypenosniff=true"
       - "traefik.http.middlewares.security-headers.headers.browserxssfilter=true"
@@ -83,11 +82,60 @@ services:
       - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Content-Security-Policy=upgrade-insecure-requests; block-all-mixed-content;"
       - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Permissions-Policy=camera=(), microphone=(), geolocation=(), browsing-topics=()"
       - "traefik.http.routers.backend.middlewares=security-headers"
-      # HTTPS Redirect
       - "traefik.http.middlewares.redirect-https.redirectscheme.scheme=https"
       - "traefik.http.routers.backend-http.rule=Host(`api.smartshop1.us`)"
       - "traefik.http.routers.backend-http.entrypoints=web"
       - "traefik.http.routers.backend-http.middlewares=redirect-https"
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379/1
+      - EMAIL_HOST=${EMAIL_HOST}
+      - EMAIL_PORT=${EMAIL_PORT}
+      - EMAIL_HOST_USER=${EMAIL_HOST_USER}
+      - EMAIL_HOST_PASSWORD=${EMAIL_HOST_PASSWORD}
+      - DEFAULT_FROM_EMAIL=${DEFAULT_FROM_EMAIL}
+    depends_on:
+      - db
+      - redis
+    command: celery -A core worker --loglevel=info
+    networks:
+      - dokploy-network
+    deploy:
+      resources:
+        resources:
+          limits:
+            memory: 512M
+            cpus: '0.5'
+
+  celery_beat:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    restart: always
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - DATABASE_URL=${DATABASE_URL}
+      - REDIS_URL=redis://redis:6379/1
+    depends_on:
+      - db
+      - redis
+    command: celery -A core beat --loglevel=info --scheduler django_celery_beat.schedulers:DatabaseScheduler
+    networks:
+      - dokploy-network
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: '0.2'
 
   frontend:
     build:

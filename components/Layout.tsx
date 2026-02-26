@@ -1143,9 +1143,14 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
           {/* Bottom Bar */}
           <div className="py-6 flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-400 dark:text-gray-500">
-              &copy; 2026 SmartShop Inc. All rights reserved.
-            </p>
+            <div className="text-center md:text-left">
+              <p className="text-xs text-gray-400 dark:text-gray-500">
+                &copy; 2026 SmartShop Inc. All rights reserved.
+              </p>
+              <p className="text-[10px] text-gray-400 dark:text-gray-500 mt-1 uppercase tracking-wider">
+                434 Main St, New Rochelle, NY 10801
+              </p>
+            </div>
             <div className="flex items-center gap-6">
               <Link to="/page/privacy-policy" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy Policy</Link>
               <Link to="/page/terms-of-service" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Terms of Service</Link>

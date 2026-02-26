@@ -1,0 +1,36 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin-top: 0; font-weight: 800; color: #1e293b; font-size: 24px;">Just Published: {{ post.title }}</h2>
+<p>Hi there,</p>
+<p>We've just published a new article on <strong>SMARTSHOP</strong> that we think you'll love. Discover the latest
+    styles, trends, and expert tips from our team.</p>
+
+<div
+    style="background-color: #f8fafc; border-radius: 12px; margin: 30px 0; overflow: hidden; border: 1px solid #e2e8f0;">
+    {% if post.cover_image %}
+    <img src="{{ post.cover_image }}" alt="{{ post.title }}"
+        style="width: 100%; height: auto; display: block; object-fit: cover;">
+    {% endif %}
+    <div style="padding: 30px;">
+        <p
+            style="margin-top: 0; font-size: 14px; text-transform: uppercase; color: #4f46e5; letter-spacing: 0.1em; font-weight: 800; margin-bottom: 8px;">
+            {{ post.category }}</p>
+        <h3 style="margin-top: 0; font-size: 20px; font-weight: 800; color: #1e293b; margin-bottom: 12px;">{{ post.title
+            }}</h3>
+        <p style="margin: 0; font-size: 14px; color: #64748b; line-height: 1.6;">{{ post.excerpt }}</p>
+        <center>
+            <a href="https://smartshop1.us/blog/{{ post.slug }}" class="button" style="margin-top: 24px;">Read Full
+                Article</a>
+        </center>
+    </div>
+</div>
+
+<center>
+    <p style="margin-top: 30px; font-size: 12px; color: #64748b;">
+        Don't want to receive these updates?
+        <a href="https://smartshop1.us/newsletter-unsubscribe"
+            style="color: #4f46e5; text-decoration: none;">Unsubscribe here</a>
+    </p>
+</center>
+{% endblock %}
