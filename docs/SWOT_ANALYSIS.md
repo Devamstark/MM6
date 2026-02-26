@@ -10,6 +10,7 @@ This document outlines the internal strengths and weaknesses, and external oppor
 *   **Advanced Feature Set (MVP+)**: Includes specialized modules like an **Affiliate/Referral Earnings system**, a built-in **Blog**, and **Social Commerce** hooks.
 *   **Cost-Efficiency**: Self-hosting on a VPS via **Dokploy/Docker** provides full control and significantly lower running costs than SaaS platforms like Shopify.
 *   **Private Infrastructure**: Uses a **private SMTP mailbox** for communications instead of third-party API dependencies like Resend, increasing data ownership.
+*   **GDPR & Privacy Compliance**: Built-in data portability (JSON export) and account erasure (Right to be Forgotten) features ensure high standards of user trust.
 *   **Scalable Logistics**: Built-in order status flows (Pending → Dispatched → Delivered) and inventory management are ready for real-world shipping.
 
 ## **⚠️ WEAKNESSES (Internal)**
@@ -27,7 +28,6 @@ This document outlines the internal strengths and weaknesses, and external oppor
 ## **🛑 THREATS (External)**
 *   **Big Tech Competition**: Competing with Amazon or Shein on logistics and price-cutting.
 *   **Cybersecurity Evolution**: Requires constant server updates to stay safe against new zero-day vulnerabilities.
-*   **Data Compliance**: International expansion will require manual implementation of regional data laws (GDPR, CCPA).
 *   **Dependency Risks**: Reliance on foundational APIs and services (Hosting, CDN) poses a risk if pricing or terms change.
 
 ---

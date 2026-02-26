@@ -305,6 +305,15 @@ export const api = {
     });
   },
 
+  deleteSelf: async (): Promise<void> => {
+    await client.delete('users/delete_self/');
+  },
+
+  exportData: async (): Promise<any> => {
+    const response = await client.get('users/export_data/');
+    return response.data;
+  },
+
   // --- Addresses ---
   getAddresses: async (): Promise<import('../types').Address[]> => {
     const response = await client.get('addresses/');

@@ -130,6 +130,40 @@ export const UserProfile = () => {
         }
     };
 
+    const handleExportData = async () => {
+        setLoading(true);
+        try {
+            const data = await api.exportData();
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `smartshop_data_${user?.id}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        } catch (error) {
+            setMessage({ type: 'error', text: 'Failed to export data.' });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (window.confirm('Are you absolutely sure? This will permanently delete your account and all associated data. This action cannot be undone.')) {
+            setLoading(true);
+            try {
+                await api.deleteSelf();
+                logout();
+                navigate('/');
+            } catch (error) {
+                setMessage({ type: 'error', text: 'Failed to delete account. Note: Admins cannot delete themselves via this endpoint.' });
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+
     const handleAddressSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!editingAddress) return;
@@ -422,6 +456,39 @@ export const UserProfile = () => {
                                 {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Update Password'}
                             </button>
                         </form>
+
+                        <div className="mt-12 pt-8 border-t border-gray-100 dark:border-gray-700">
+                            <h2 className="text-xl font-bold mb-4 dark:text-white">Privacy & Data</h2>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-6">
+                                In compliance with GDPR and privacy regulations, you have full control over your data.
+                            </p>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div className="p-4 border border-gray-100 rounded-2xl dark:border-gray-700">
+                                    <h3 className="font-bold mb-1 dark:text-white">Portable Copy</h3>
+                                    <p className="text-xs text-gray-500 mb-4">Download all your personal data in JSON format.</p>
+                                    <button
+                                        onClick={handleExportData}
+                                        disabled={loading}
+                                        className="text-sm font-bold text-blue-600 hover:text-blue-700 flex items-center gap-2"
+                                    >
+                                        <ShoppingBag className="w-4 h-4" /> Export My Data
+                                    </button>
+                                </div>
+
+                                <div className="p-4 border border-red-50 rounded-2xl bg-red-50/10 dark:border-red-900/30">
+                                    <h3 className="font-bold text-red-600 mb-1">Delete Account</h3>
+                                    <p className="text-xs text-red-500/70 mb-4">Permanently erase your account and data.</p>
+                                    <button
+                                        onClick={handleDeleteAccount}
+                                        disabled={loading}
+                                        className="text-sm font-bold text-red-600 hover:text-red-700 flex items-center gap-2"
+                                    >
+                                        <Trash2 className="w-4 h-4" /> Delete Account
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 

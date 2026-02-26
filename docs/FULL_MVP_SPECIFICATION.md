@@ -300,6 +300,24 @@
 
 ---
 
+### **12. GDPR & Privacy** 🔒
+
+#### Features:
+- **Right to Access**: Users can download a full copy of their personal data (Profile, Orders, Addresses, Reviews) in JSON format.
+- **Right to Erasure**: Users can permanently delete their own account and all associated personal data ("Right to be Forgotten").
+- **Transparency**: Dedicated Static Pages for Comprehensive Privacy Policy and Terms of Service.
+- **Data Security**: Hashed passwords, HTTPS encryption, and private SMTP infrastructure for communication.
+
+#### Technical Implementation:
+- **Backend**: `export_data` and `delete_self` actions in `UserViewSet`.
+- **Frontend**: Privacy controls in `UserProfile` > `Security` tab.
+- **Documentation**: `GDPR_COMPLIANCE.md` and updated `Privacy Policy` static page.
+- **Endpoints**:
+  - `GET /api/users/export_data/` (Download data)
+  - `DELETE /api/users/delete_self/` (Account erasure)
+
+---
+
 ## 🎨 Design System
 
 ### **Color Palette**

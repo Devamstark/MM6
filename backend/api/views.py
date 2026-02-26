@@ -550,8 +550,29 @@ class UserViewSet(viewsets.ModelViewSet):
             return Response({'error': 'You cannot delete your own account.'}, status=status.HTTP_400_BAD_REQUEST)
         instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    @action(detail=False, methods=['delete'])
+    def delete_self(self, request):
+        """GDPR: Allow a user to delete their own account."""
+        user = request.user
+        if user.role == 'admin':
+             return Response({'error': 'Admins cannot delete themselves via this endpoint.'}, status=status.HTTP_400_BAD_REQUEST)
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
-
+    @action(detail=False, methods=['get'])
+    def export_data(self, request):
+        """GDPR: Allow a user to download their data."""
+        from .serializers import OrderSerializer, AddressSerializer, ReviewSerializer
+        from .models import Order, Address, Review
+        
+        user = request.user
+        data = {
+            'profile': UserSerializer(user).data,
+            'addresses': AddressSerializer(Address.objects.filter(user=user), many=True).data,
+            'orders': OrderSerializer(Order.objects.filter(user=user), many=True).data,
+            'reviews': ReviewSerializer(Review.objects.filter(user=user), many=True).data,
+        }
+        return Response(data)
 
     def partial_update(self, request, *args, **kwargs):
         """Allow users to update their own profile, and admins to update any user."""

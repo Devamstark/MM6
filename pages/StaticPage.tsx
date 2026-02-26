@@ -770,6 +770,76 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
       </div>
     `
+  },
+  'privacy-policy': {
+    title: 'Privacy Policy',
+    content: `
+      <div class="space-y-8 animate-fade-in max-w-4xl mx-auto">
+        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 mb-8">
+          <p class="text-indigo-900 font-medium">Last Updated: February 25, 2026. This policy outlines how SmartShop collects, uses, and protects your personal data in compliance with GDPR and international privacy standards.</p>
+        </div>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900">1. Data We Collect</h3>
+          <p class="text-gray-600">We collect information you provide directly to us (name, email, shipping address) and technical data automatically collected when you visit our site (IP address, device info via Cloudflare).</p>
+        </section>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900">2. How We Use Your Data</h3>
+          <ul class="list-disc pl-5 text-gray-600 space-y-2">
+            <li>To process and ship your orders.</li>
+            <li>To maintain your account and security.</li>
+            <li>To send you transactional emails (order confirmations, shipping updates).</li>
+            <li>With your consent, to send marketing newsletters.</li>
+          </ul>
+        </section>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900">3. Your Rights (GDPR)</h3>
+          <p class="text-gray-600">Under GDPR, you have the following rights:</p>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
+              <h4 class="font-bold text-indigo-600 mb-1">Right to Access</h4>
+              <p class="text-sm text-gray-500">Download a copy of your personal data at any time from your profile.</p>
+            </div>
+            <div class="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
+              <h4 class="font-bold text-indigo-600 mb-1">Right to Erasure</h4>
+              <p class="text-sm text-gray-500">Request the permanent deletion of your account and personal info.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900">4. Data Security</h3>
+          <p class="text-gray-600">We use industry-standard encryption (SSL/TLS) for data in transit and secure hashing for passwords at rest. Your data is stored on our private, self-hosted infrastructure.</p>
+        </section>
+      </div>
+    `
+  },
+  'terms-of-service': {
+    title: 'Terms of Service',
+    content: `
+      <div class="space-y-8 animate-fade-in max-w-4xl mx-auto">
+        <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8">
+          <p class="text-gray-700 font-medium font-serif">By using SmartShop, you agree to these terms. Please read them carefully.</p>
+        </div>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">1. User Accounts</h3>
+          <p class="text-gray-600">You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to make a purchase.</p>
+        </section>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">2. Orders & Payments</h3>
+          <p class="text-gray-600">All orders are subject to acceptance and availability. Prices are subject to change without notice. Payments are processed securely via third-party providers.</p>
+        </section>
+
+        <section class="space-y-4">
+          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">3. Intellectual Property</h3>
+          <p class="text-gray-600">The content, logos, and design of SmartShop are the property of SmartShop Inc. and are protected by copyright laws.</p>
+        </section>
+      </div>
+    `
   }
 };
 
