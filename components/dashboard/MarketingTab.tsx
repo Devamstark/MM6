@@ -901,7 +901,6 @@ export const MarketingTab: React.FC = () => {
                     </div>
                 </div>
             )}
-        </div>
 
             {/* Email Template Builder Modal */}
             {showTemplateBuilder && (
