@@ -297,11 +297,40 @@ def _send_batch(campaign_id, log_ids):
 
         # Build SmartShop branded email template
         base_url = 'https://smartshop1.us'
-        logo_url = f'{base_url}/logo.png'  # You can update this to your actual logo URL
+
+        # Build CTA button section if cta_text exists
+        cta_section = ''
+        if campaign.cta_text:
+            cta_section = f'''
+            <tr>
+                <td align="center" style="padding: 0 32px 40px;">
+                    <a href="{{{{CTA_URL}}}}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.02em;">
+                        {campaign.cta_text or 'Shop Now'}
+                    </a>
+                </td>
+            </tr>
+            '''
+
+        # Build discount code section if exists
+        discount_section = ''
+        if campaign.discount_code:
+            discount_section = f'''
+            <tr>
+                <td align="center" style="padding: 0 32px 32px;">
+                    <table cellpadding="0" cellspacing="0">
+                        <tr>
+                            <td style="border: 2px dashed #4F46E5; border-radius: 8px; padding: 16px 32px; background-color: #EEF2FF;">
+                                <p style="margin: 0; font-size: 12px; color: #6B7280; font-weight: 600; text-transform: uppercase;">Use Code</p>
+                                <p style="margin: 8px 0 0 0; font-size: 24px; font-weight: 900; color: #4F46E5; letter-spacing: 0.05em;">{campaign.discount_code}</p>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            '''
 
         # Start with branded header
-        html_message = f'''
-        <!DOCTYPE html>
+        html_message = f'''<!DOCTYPE html>
         <html lang="en">
         <head>
             <meta charset="UTF-8">
@@ -320,41 +349,14 @@ def _send_batch(campaign_id, log_ids):
                                     <p style="margin: 8px 0 0 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); letter-spacing: 0.05em;">EST. 2026</p>
                                 </td>
                             </tr>
-
                             <!-- Main Content -->
                             <tr>
                                 <td style="padding: 40px 32px;">
                                     {campaign.message}
                                 </td>
                             </tr>
-
-                            <!-- CTA Button -->
-                            {f'''
-                            <tr>
-                                <td align="center" style="padding: 0 32px 40px;">
-                                    <a href="{{{{CTA_URL}}}}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.02em;">
-                                        {campaign.cta_text or 'Shop Now'}
-                                    </a>
-                                </td>
-                            </tr>
-                            ''' if campaign.cta_text else ''}
-
-                            <!-- Discount Code -->
-                            {f'''
-                            <tr>
-                                <td align="center" style="padding: 0 32px 32px;">
-                                    <table cellpadding="0" cellspacing="0">
-                                        <tr>
-                                            <td style="border: 2px dashed #4F46E5; border-radius: 8px; padding: 16px 32px; background-color: #EEF2FF;">
-                                                <p style="margin: 0; font-size: 12px; color: #6B7280; font-weight: 600; text-transform: uppercase;">Use Code</p>
-                                                <p style="margin: 8px 0 0 0; font-size: 24px; font-weight: 900; color: #4F46E5; letter-spacing: 0.05em;">{campaign.discount_code}</p>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            ''' if campaign.discount_code else ''}
-
+                            {cta_section}
+                            {discount_section}
                             <!-- Footer -->
                             <tr>
                                 <td style="background-color: #1F2937; padding: 32px 24px; text-align: center;">
@@ -376,7 +378,7 @@ def _send_batch(campaign_id, log_ids):
                                         <tr>
                                             <td align="center" style="padding-top: 16px;">
                                                 <p style="margin: 0; font-size: 11px; color: #6B7280;">
-                                                    © 2026 SmartShop. All rights reserved.
+                                                    &copy; 2026 SmartShop. All rights reserved.
                                                 </p>
                                             </td>
                                         </tr>
@@ -384,7 +386,6 @@ def _send_batch(campaign_id, log_ids):
                                 </td>
                             </tr>
                         </table>
-
                         <!-- Mailing Address (CAN-SPAM Compliance) -->
                         <table width="600" cellpadding="0" cellspacing="0">
                             <tr>
@@ -399,8 +400,7 @@ def _send_batch(campaign_id, log_ids):
                 </tr>
             </table>
         </body>
-        </html>
-        '''
+        </html>'''
 
         # Add tracking to CTA URL
         if campaign.cta_url:
@@ -414,6 +414,7 @@ def _send_batch(campaign_id, log_ids):
         html_message = html_message.replace('{{{{UNSUBSCRIBE_URL}}}}', unsubscribe_url)
 
         # Replace user-specific placeholders
+        from django.utils.html import strip_tags
         text_message = campaign.plain_text or strip_tags(html_message)
 
         logs = EmailDeliveryLog.objects.filter(id__in=log_ids)
@@ -431,7 +432,7 @@ def _send_batch(campaign_id, log_ids):
                 personalized_html = personalized_html.replace('{{customer_name}}', user_name)
 
                 send_mail(
-                    subject,
+                    campaign.subject,
                     text_message,
                     settings.DEFAULT_FROM_EMAIL,
                     [log.email],
@@ -475,6 +476,8 @@ def _send_batch(campaign_id, log_ids):
         logger.error(f"Campaign {campaign_id} not found for batch send.")
     except Exception as e:
         logger.error(f"Batch send failed for campaign {campaign_id}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
 
 
 def _resolve_audience(campaign):
