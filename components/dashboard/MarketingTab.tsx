@@ -35,7 +35,10 @@ export const MarketingTab: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showLogsModal, setShowLogsModal] = useState(false);
+    const [showConversionModal, setShowConversionModal] = useState(false);
     const [selectedCampaign, setSelectedCampaign] = useState<MarketingCampaign | null>(null);
+    const [conversionAnalytics, setConversionAnalytics] = useState<any>(null);
+    const [conversionLoading, setConversionLoading] = useState(false);
     const [logs, setLogs] = useState<{ logs: EmailDeliveryLog[]; summary: Record<string, number>; total: number } | null>(null);
     const [logsLoading, setLogsLoading] = useState(false);
     const [audiencePreview, setAudiencePreview] = useState<AudiencePreview | null>(null);
@@ -213,6 +216,20 @@ export const MarketingTab: React.FC = () => {
     const handleEditCampaign = (c: MarketingCampaign) => {
         setFormData({ ...c });
         setShowModal(true);
+    };
+
+    const handleViewConversions = async (campaign: MarketingCampaign) => {
+        setSelectedCampaign(campaign);
+        setShowConversionModal(true);
+        setConversionLoading(true);
+        try {
+            const data = await api.getCampaignConversionAnalytics(campaign.id);
+            setConversionAnalytics(data);
+        } catch (e) {
+            console.error('Failed to load conversion analytics', e);
+        } finally {
+            setConversionLoading(false);
+        }
     };
 
     return (
@@ -429,9 +446,14 @@ export const MarketingTab: React.FC = () => {
                                                             </button>
                                                         )}
                                                         {(c.status === 'sent' || c.status === 'sending') && (
-                                                            <button onClick={() => handleViewLogs(c)} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all" title="View Logs">
-                                                                <Eye className="w-3.5 h-3.5" />
-                                                            </button>
+                                                            <>
+                                                                <button onClick={() => handleViewConversions(c)} className="p-2 text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/30 rounded-lg transition-all" title="View Conversions">
+                                                                    <TrendingUp className="w-3.5 h-3.5" />
+                                                                </button>
+                                                                <button onClick={() => handleViewLogs(c)} className="p-2 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-all" title="View Logs">
+                                                                    <Eye className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </>
                                                         )}
                                                         <button onClick={() => handleDuplicate(c.id)} className="p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-all" title="Duplicate">
                                                             <Copy className="w-3.5 h-3.5" />
@@ -696,6 +718,163 @@ export const MarketingTab: React.FC = () => {
                     </div>
                 </div>
             )}
+
+            {/* Conversion Analytics Modal */}
+            {showConversionModal && selectedCampaign && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
+                        <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
+                            <div>
+                                <h3 className="text-xl font-black text-gray-900 dark:text-white flex items-center gap-2">
+                                    <TrendingUp className="w-5 h-5 text-purple-600" />
+                                    Conversion Analytics
+                                </h3>
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{selectedCampaign.name}</p>
+                            </div>
+                            <button onClick={() => setShowConversionModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-white p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors">
+                                <X className="w-5 h-5" />
+                            </button>
+                        </div>
+
+                        {conversionLoading ? (
+                            <div className="p-20 flex justify-center">
+                                <div className="w-10 h-10 border-4 border-purple-600 border-t-transparent animate-spin rounded-full"></div>
+                            </div>
+                        ) : conversionAnalytics ? (
+                            <div className="p-6 overflow-y-auto space-y-6">
+                                {/* Key Metrics */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <MetricCard
+                                        icon={<Send className="w-5 h-5" />}
+                                        label="Click-Through Rate"
+                                        value={`${conversionAnalytics.click_through_rate}%`}
+                                        color="blue"
+                                    />
+                                    <MetricCard
+                                        icon={<TrendingUp className="w-5 h-5" />}
+                                        label="Conversion Rate"
+                                        value={`${conversionAnalytics.conversion_rate}%`}
+                                        color="green"
+                                    />
+                                    <MetricCard
+                                        icon={<DollarSign className="w-5 h-5" />}
+                                        label="Total Revenue"
+                                        value={`$${conversionAnalytics.total_revenue}`}
+                                        color="emerald"
+                                    />
+                                    <MetricCard
+                                        icon={<Users className="w-5 h-5" />}
+                                        label="Total Conversions"
+                                        value={conversionAnalytics.total_conversions}
+                                        color="purple"
+                                    />
+                                </div>
+
+                                {/* Revenue Metrics */}
+                                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-2xl p-6 border border-purple-100 dark:border-purple-800">
+                                    <h4 className="text-xs font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-4">Revenue Metrics</h4>
+                                    <div className="grid grid-cols-3 gap-6">
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Revenue Per Email</p>
+                                            <p className="text-2xl font-black text-gray-900 dark:text-white">${conversionAnalytics.revenue_per_email}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Avg Order Value</p>
+                                            <p className="text-2xl font-black text-gray-900 dark:text-white">${conversionAnalytics.avg_order_value}</p>
+                                        </div>
+                                        <div>
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Unique Clicks</p>
+                                            <p className="text-2xl font-black text-gray-900 dark:text-white">{conversionAnalytics.unique_clicks}</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Top Performing Links */}
+                                {conversionAnalytics.top_links && conversionAnalytics.top_links.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Top Performing Links</h4>
+                                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                                            <table className="w-full text-sm">
+                                                <thead className="bg-gray-50 dark:bg-gray-700 text-xs uppercase tracking-wider text-gray-500 font-black">
+                                                    <tr>
+                                                        <th className="px-4 py-3 text-left">URL</th>
+                                                        <th className="px-4 py-3 text-center">Clicks</th>
+                                                        <th className="px-4 py-3 text-center">Conversions</th>
+                                                        <th className="px-4 py-3 text-right">Revenue</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                    {conversionAnalytics.top_links.map((link: any, idx: number) => (
+                                                        <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                                            <td className="px-4 py-3 text-gray-700 dark:text-gray-300 max-w-[300px] truncate">{link.url}</td>
+                                                            <td className="px-4 py-3 text-center font-bold text-gray-900 dark:text-white">{link.clicks}</td>
+                                                            <td className="px-4 py-3 text-center font-bold text-green-600">{link.conversions || 0}</td>
+                                                            <td className="px-4 py-3 text-right font-bold text-emerald-600">${link.revenue || '0.00'}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Recent Conversions */}
+                                {conversionAnalytics.recent_conversions && conversionAnalytics.recent_conversions.length > 0 && (
+                                    <div>
+                                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Recent Conversions</h4>
+                                        <div className="space-y-2">
+                                            {conversionAnalytics.recent_conversions.map((conv: any) => (
+                                                <div key={conv.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
+                                                            <DollarSign className="w-4 h-4" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-gray-900 dark:text-white">{conv.user_name}</p>
+                                                            <p className="text-xs text-gray-500 dark:text-gray-400">
+                                                                {conv.time_to_convert ? `Converted in ${Math.floor(conv.time_to_convert / 60)}m ${conv.time_to_convert % 60}s` : 'Direct conversion'}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-right">
+                                                        <p className="text-lg font-black text-emerald-600">${conv.conversion_value}</p>
+                                                        <p className="text-xs text-gray-400">{new Date(conv.converted_at).toLocaleString()}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <p className="text-gray-500 dark:text-gray-400 text-center py-10">No conversion data available.</p>
+                        )}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+};
+
+const MetricCard = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string | number; color: string }) => {
+    const colorMap: Record<string, string> = {
+        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400',
+        green: 'bg-green-50 text-green-600 dark:bg-green-900/30 dark:text-green-400',
+        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400',
+        purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/30 dark:text-purple-400',
+    };
+
+    return (
+        <div className="bg-white dark:bg-gray-900 rounded-2xl border border-gray-100 dark:border-gray-800 p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${colorMap[color] || colorMap.blue}`}>
+                    {icon}
+                </div>
+                <div>
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">{label}</p>
+                    <p className="text-2xl font-black text-gray-900 dark:text-white">{value}</p>
+                </div>
+            </div>
         </div>
     );
 };

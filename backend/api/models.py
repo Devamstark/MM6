@@ -560,3 +560,51 @@ class EmailDeliveryLog(models.Model):
 
     def __str__(self):
         return f"{self.email} - {self.status}"
+
+
+class EmailClickLog(models.Model):
+    """Track individual link clicks from emails."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    campaign = models.ForeignKey(MarketingCampaign, on_delete=models.CASCADE, related_name='click_logs')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='email_clicks')
+    email = models.EmailField()
+    url = models.URLField(max_length=2000)
+    clicked_at = models.DateTimeField(auto_now_add=True)
+    user_agent = models.CharField(max_length=500, blank=True, default='')
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    converted = models.BooleanField(default=False)  # True if user made a purchase
+    converted_at = models.DateTimeField(null=True, blank=True)
+    conversion_value = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+
+    class Meta:
+        ordering = ['-clicked_at']
+        indexes = [
+            models.Index(fields=['campaign', 'clicked_at']),
+            models.Index(fields=['user']),
+            models.Index(fields=['converted']),
+        ]
+
+    def __str__(self):
+        return f"{self.email} clicked {self.url}"
+
+
+class EmailConversion(models.Model):
+    """Track conversions (purchases) from email campaigns."""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    campaign = models.ForeignKey(MarketingCampaign, on_delete=models.CASCADE, related_name='conversions')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    order = models.OneToOneField('Order', on_delete=models.CASCADE, null=True, blank=True)
+    click_log = models.ForeignKey(EmailClickLog, on_delete=models.SET_NULL, null=True, blank=True)
+    conversion_value = models.DecimalField(max_digits=10, decimal_places=2)
+    converted_at = models.DateTimeField(auto_now_add=True)
+    time_to_convert = models.IntegerField(null=True, blank=True, help_text='Seconds from click to conversion')
+
+    class Meta:
+        ordering = ['-converted_at']
+        indexes = [
+            models.Index(fields=['campaign', 'converted_at']),
+            models.Index(fields=['user']),
+        ]
+
+    def __str__(self):
+        return f"{self.user.email} - ${self.conversion_value} from {self.campaign.name}"

@@ -13,18 +13,20 @@ import random
 from decimal import Decimal
 from datetime import timedelta
 from .models import (
-    Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent, 
-    Affiliate, Review, Wishlist, ContactMessage, Address, Coupon, 
+    Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent,
+    Affiliate, Review, Wishlist, ContactMessage, Address, Coupon,
     HeroBanner, HomePageSection, BlogPost, NewsletterSubscriber,
-    MarketingCampaign, EmailDeliveryLog, CampaignRecipient
+    MarketingCampaign, EmailDeliveryLog, CampaignRecipient,
+    EmailClickLog, EmailConversion
 )
 from .serializers import (
-    ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer, 
-    PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer, 
-    ContactMessageSerializer, AddressSerializer, CouponSerializer, 
-    HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer, 
+    ProductSerializer, OrderSerializer, UserSerializer, PaymentSerializer,
+    PageContentSerializer, AffiliateSerializer, ReviewSerializer, WishlistSerializer,
+    ContactMessageSerializer, AddressSerializer, CouponSerializer,
+    HeroBannerSerializer, HomePageSectionSerializer, BlogPostSerializer,
     NewsletterSubscriberSerializer, MarketingCampaignSerializer,
-    EmailDeliveryLogSerializer, CampaignRecipientSerializer
+    EmailDeliveryLogSerializer, CampaignRecipientSerializer,
+    EmailClickLogSerializer, EmailConversionSerializer, CampaignConversionAnalyticsSerializer
 )
 
 # ...
@@ -1343,6 +1345,187 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             'last_campaign': last_campaign_data,
             'status_breakdown': status_breakdown,
             'type_breakdown': type_breakdown,
+        })
+
+    @action(detail=True, methods=['get'], url_path='conversion-analytics')
+    def conversion_analytics(self, request, pk=None):
+        """Get real-time conversion analytics for a campaign."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+
+        from django.db.models import Count, Sum, Avg, Q, F
+
+        campaign = self.get_object()
+
+        # Email delivery stats
+        delivery_logs = EmailDeliveryLog.objects.filter(campaign=campaign)
+        total_sent = delivery_logs.filter(status='sent').count()
+        total_delivered = total_sent
+        total_opens = delivery_logs.filter(status__in=['sent', 'opened', 'clicked']).filter(opened_at__isnull=False).count()
+
+        # Click tracking
+        click_logs = EmailClickLog.objects.filter(campaign=campaign)
+        unique_clicks = click_logs.values('user').distinct().count()
+        total_link_clicks = click_logs.count()
+
+        # Click-through rate
+        click_through_rate = round((unique_clicks / total_sent * 100), 2) if total_sent > 0 else 0
+
+        # Conversion stats
+        conversions = EmailConversion.objects.filter(campaign=campaign)
+        total_conversions = conversions.count()
+        total_revenue = conversions.aggregate(Sum('conversion_value'))['conversion_value__sum'] or Decimal('0')
+
+        # Conversion rate (from clicks)
+        conversion_rate = round((total_conversions / unique_clicks * 100), 2) if unique_clicks > 0 else 0
+
+        # Revenue metrics
+        revenue_per_email = round((total_revenue / total_sent), 2) if total_sent > 0 else Decimal('0')
+        avg_order_value = round((total_revenue / total_conversions), 2) if total_conversions > 0 else Decimal('0')
+
+        # Top performing links
+        top_links = click_logs.values('url').annotate(
+            clicks=Count('id'),
+            conversions=Count('id', filter=Q(converted=True)),
+            revenue=Sum('conversion_value', filter=Q(converted=True))
+        ).order_by('-clicks')[:10]
+
+        # Recent conversions
+        recent_conversions = conversions.select_related('user', 'order').order_by('-converted_at')[:20]
+
+        data = {
+            'campaign_id': str(campaign.id),
+            'campaign_name': campaign.name,
+            'total_sent': total_sent,
+            'total_delivered': total_delivered,
+            'total_opens': total_opens,
+            'total_clicks': total_link_clicks,
+            'unique_clicks': unique_clicks,
+            'total_link_clicks': total_link_clicks,
+            'click_through_rate': click_through_rate,
+            'total_conversions': total_conversions,
+            'conversion_rate': conversion_rate,
+            'total_revenue': str(total_revenue),
+            'revenue_per_email': str(revenue_per_email),
+            'avg_order_value': str(avg_order_value),
+            'top_links': list(top_links),
+            'recent_conversions': EmailConversionSerializer(recent_conversions, many=True).data,
+        }
+
+        return Response(data)
+
+    @action(detail=True, methods=['post'], url_path='track-click')
+    def track_click(self, request, pk=None):
+        """Track link click from email."""
+        from django.utils import timezone
+
+        campaign = self.get_object()
+        user_id = request.data.get('user_id')
+        email = request.data.get('email')
+        url = request.data.get('url')
+        user_agent = request.META.get('HTTP_USER_AGENT', '')
+        ip_address = request.META.get('REMOTE_ADDR')
+
+        if not user_id or not email or not url:
+            return Response({'error': 'Missing required fields'}, status=400)
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=400)
+
+        # Create click log
+        click_log = EmailClickLog.objects.create(
+            campaign=campaign,
+            user=user,
+            email=email,
+            url=url,
+            user_agent=user_agent,
+            ip_address=ip_address,
+        )
+
+        # Update campaign click count
+        campaign.emails_clicked += 1
+        campaign.save(update_fields=['emails_clicked'])
+
+        # Update delivery log
+        delivery_log = EmailDeliveryLog.objects.filter(
+            campaign=campaign,
+            user=user
+        ).first()
+        if delivery_log and delivery_log.status not in ['clicked', 'opened']:
+            delivery_log.status = 'clicked'
+            delivery_log.clicked_at = timezone.now()
+            delivery_log.save()
+
+        return Response({
+            'status': 'tracked',
+            'click_id': str(click_log.id),
+        })
+
+    @action(detail=True, methods=['post'], url_path='track-conversion')
+    def track_conversion(self, request, pk=None):
+        """Track conversion (purchase) from email campaign."""
+        from django.utils import timezone
+
+        campaign = self.get_object()
+        user_id = request.data.get('user_id')
+        order_id = request.data.get('order_id')
+        conversion_value = request.data.get('conversion_value', 0)
+        click_id = request.data.get('click_id')
+
+        if not user_id or not conversion_value:
+            return Response({'error': 'Missing required fields'}, status=400)
+
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            return Response({'error': 'User not found'}, status=400)
+
+        # Find the click log if click_id provided
+        click_log = None
+        if click_id:
+            try:
+                click_log = EmailClickLog.objects.get(id=click_id)
+            except EmailClickLog.DoesNotExist:
+                pass
+
+        # Calculate time to convert
+        time_to_convert = None
+        if click_log and click_log.clicked_at:
+            time_to_convert = int((timezone.now() - click_log.clicked_at).total_seconds())
+
+        # Create conversion
+        conversion = EmailConversion.objects.create(
+            campaign=campaign,
+            user=user,
+            conversion_value=conversion_value,
+            click_log=click_log,
+            time_to_convert=time_to_convert,
+        )
+
+        # Link order if provided
+        if order_id:
+            try:
+                from .models import Order
+                order = Order.objects.get(id=order_id)
+                conversion.order = order
+                conversion.save()
+            except Order.DoesNotExist:
+                pass
+
+        # Mark click log as converted
+        if click_log:
+            click_log.converted = True
+            click_log.converted_at = timezone.now()
+            click_log.conversion_value = conversion_value
+            click_log.save()
+
+        return Response({
+            'status': 'conversion_tracked',
+            'conversion_id': str(conversion.id),
+            'conversion_value': str(conversion_value),
         })
 
     @action(detail=False, methods=['get'], url_path='users-list')

@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import (
-    Product, Order, OrderItem, Payment, PageContent, Affiliate, Review, 
-    Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection, 
-    BlogPost, NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog, CampaignRecipient
+    Product, Order, OrderItem, Payment, PageContent, Affiliate, Review,
+    Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection,
+    BlogPost, NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog, CampaignRecipient,
+    EmailClickLog, EmailConversion
 )
 
 User = get_user_model()
@@ -210,3 +211,62 @@ class CampaignRecipientSerializer(serializers.ModelSerializer):
         model = CampaignRecipient
         fields = ['id', 'campaign', 'user', 'user_name', 'email', 'added_at']
         read_only_fields = ('id', 'added_at')
+
+
+class EmailClickLogSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.username')
+    campaign_name = serializers.ReadOnlyField(source='campaign.name')
+
+    class Meta:
+        model = EmailClickLog
+        fields = [
+            'id', 'campaign', 'campaign_name', 'user', 'user_name',
+            'email', 'url', 'clicked_at', 'user_agent', 'ip_address',
+            'converted', 'converted_at', 'conversion_value',
+        ]
+        read_only_fields = ('id', 'clicked_at')
+
+
+class EmailConversionSerializer(serializers.ModelSerializer):
+    user_name = serializers.ReadOnlyField(source='user.username')
+    campaign_name = serializers.ReadOnlyField(source='campaign.name')
+    order_id = serializers.ReadOnlyField(source='order.id') if hasattr(serializers, 'ReadOnlyField') else None
+
+    class Meta:
+        model = EmailConversion
+        fields = [
+            'id', 'campaign', 'campaign_name', 'user', 'user_name',
+            'order', 'order_id', 'click_log', 'conversion_value',
+            'converted_at', 'time_to_convert',
+        ]
+        read_only_fields = ('id', 'converted_at')
+
+
+class CampaignConversionAnalyticsSerializer(serializers.Serializer):
+    """Real-time conversion analytics for a campaign."""
+    campaign_id = serializers.UUIDField()
+    campaign_name = serializers.CharField()
+
+    # Email stats
+    total_sent = serializers.IntegerField()
+    total_delivered = serializers.IntegerField()
+    total_opens = serializers.IntegerField()
+    total_clicks = serializers.IntegerField()
+
+    # Click tracking
+    unique_clicks = serializers.IntegerField()
+    total_link_clicks = serializers.IntegerField()
+    click_through_rate = serializers.FloatField()
+
+    # Conversion stats
+    total_conversions = serializers.IntegerField()
+    conversion_rate = serializers.FloatField()
+    total_revenue = serializers.DecimalField(max_digits=10, decimal_places=2)
+    revenue_per_email = serializers.DecimalField(max_digits=10, decimal_places=2)
+    avg_order_value = serializers.DecimalField(max_digits=10, decimal_places=2)
+
+    # Top performing links
+    top_links = serializers.ListField()
+
+    # Recent conversions
+    recent_conversions = EmailConversionSerializer(many=True)

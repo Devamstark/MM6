@@ -303,9 +303,10 @@ def _send_batch(campaign_id, log_ids):
         if campaign.discount_code:
             html_message += f'<br><br><p style="text-align:center;font-size:18px;">Use code: <strong>{campaign.discount_code}</strong></p>'
 
-        # Add CTA button if present
+        # Add CTA button with tracking if present
         if campaign.cta_text and campaign.cta_url:
-            html_message += f'<br><p style="text-align:center;"><a href="{campaign.cta_url}" style="background:#4f46e5;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">{campaign.cta_text}</a></p>'
+            # We'll replace the URL with tracked version in the per-user loop
+            html_message += f'<br><p style="text-align:center;"><a href="{{{{CTA_URL}}}}" style="background:#4f46e5;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">{campaign.cta_text}</a></p>'
 
         # Add unsubscribe footer (GDPR compliance)
         html_message += '<br><hr style="border:none;border-top:1px solid #eee;margin:32px 0 16px;"><p style="text-align:center;font-size:11px;color:#999;">You are receiving this email because you are a registered user of SmartShop. If you wish to stop receiving these emails, please update your email preferences in your account settings.</p>'
@@ -318,12 +319,24 @@ def _send_batch(campaign_id, log_ids):
 
         for log in logs:
             try:
+                # Build tracked CTA URL
+                cta_url = campaign.cta_url or ''
+                if cta_url:
+                    # Add tracking parameters
+                    from django.conf import settings
+                    base_url = settings.API_URL.replace('/api', '') if hasattr(settings, 'API_URL') else 'http://localhost:8000'
+                    tracked_url = f"{base_url}/api/campaigns/{campaign.id}/track-click/?user_id={log.user.id}&email={log.email}&url={cta_url}"
+                    # Replace placeholder
+                    email_html = html_message.replace('{{{{CTA_URL}}}}', tracked_url)
+                else:
+                    email_html = html_message.replace('{{{{CTA_URL}}}}', campaign.cta_url or '#')
+
                 send_mail(
                     subject,
                     text_message,
                     settings.DEFAULT_FROM_EMAIL,
                     [log.email],
-                    html_message=html_message,
+                    html_message=email_html,
                     fail_silently=False,
                 )
                 log.status = 'sent'

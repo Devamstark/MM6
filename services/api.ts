@@ -1068,4 +1068,29 @@ export const api = {
     const response = await client.get('marketing-campaigns/users-list/');
     return response.data;
   },
+
+  // --- Conversion Tracking ---
+  getCampaignConversionAnalytics: async (campaignId: string): Promise<any> => {
+    const response = await client.get(`marketing-campaigns/${campaignId}/conversion-analytics/`);
+    return response.data;
+  },
+
+  trackEmailClick: async (campaignId: string, userId: string, email: string, url: string): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${campaignId}/track-click/`, {
+      user_id: userId,
+      email,
+      url,
+    });
+    return response.data;
+  },
+
+  trackEmailConversion: async (campaignId: string, userId: string, conversionValue: number, orderId?: string, clickId?: string): Promise<any> => {
+    const response = await client.post(`marketing-campaigns/${campaignId}/track-conversion/`, {
+      user_id: userId,
+      order_id: orderId,
+      conversion_value: conversionValue,
+      click_id: click_id,
+    });
+    return response.data;
+  },
 };
