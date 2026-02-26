@@ -2,7 +2,20 @@ import axios from 'axios';
 import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions, PaginatedResponse } from '../types';
 
 // @ts-ignore
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+// @ts-ignore
+const getInitialApiUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl) return envUrl;
+  
+  // If no env variable, check if we're on the production domain
+  if (typeof window !== 'undefined' && window.location.hostname.includes('smartshop1.us')) {
+    return 'https://api.smartshop1.us/api';
+  }
+  
+  return 'http://localhost:8000/api';
+};
+
+const API_URL = getInitialApiUrl();
 
 const client = axios.create({
   baseURL: API_URL,
