@@ -220,7 +220,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </Link>
 
             {/* Center: Navigation Links */}
-            <div className="hidden lg:flex items-center space-x-8">
+            <div className="hidden lg:flex items-center space-x-6">
+              <button
+                onClick={() => setCategoryDrawerOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-all group"
+              >
+                <Menu className="w-4 h-4 text-gray-500 group-hover:text-primary transition-colors" />
+                <span>All Categories</span>
+              </button>
+
               <Link to="/products?sort=newest" className="px-4 py-2 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-all">
                 New Arrivals
               </Link>

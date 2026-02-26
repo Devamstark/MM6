@@ -46,14 +46,14 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
     <>
       {/* Backdrop - Only visible on mobile/tablet */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-60 transition-opacity md:hidden"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-1100 transition-opacity"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Drawer - Only visible on mobile/tablet */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-61 shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
+        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-1101 shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 ${isOpen ? 'translate-x-0' : '-translate-x-full'
           }`}
       >
         {/* Header with Gradient */}
