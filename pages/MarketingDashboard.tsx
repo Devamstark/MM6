@@ -66,66 +66,66 @@ export const MarketingDashboard: React.FC = () => {
     return (
         <div className="bg-gray-50 dark:bg-slate-950 min-h-screen pb-20 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
             <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
-                {/* Header - Floating Sticky & Compact */}
-                <div className="sticky top-20 z-30 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md pt-3 pb-4 mb-8 px-5 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-indigo-500/5 animate-fade-up transition-all duration-300">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-9 h-9 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
-                                <Mail className="w-4 h-4 text-white" />
+                {/* Header - Large & Stationary */}
+                <div className="bg-white dark:bg-gray-900 pt-8 pb-8 mb-10 px-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-indigo-500/5 animate-fade-up">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+                        <div className="flex items-center gap-6">
+                            <div className="w-14 h-14 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <Mail className="w-7 h-7 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-2xl font-black text-gray-900 dark:text-white tracking-tight leading-tight" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
+                                <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight mb-1" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
                                     Marketing Command Center
                                 </h1>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-indigo-600 dark:text-indigo-400 font-bold text-[9px] uppercase tracking-[0.2em] opacity-80">Enterprise Marketing</span>
-                                    <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                                    <span className="text-gray-400 font-bold text-[9px] uppercase tracking-[0.2em]">Dashboard</span>
+                                <div className="flex items-center gap-3">
+                                    <span className="text-indigo-600 dark:text-indigo-400 font-black text-[11px] uppercase tracking-[0.3em] opacity-80">Enterprise Marketing</span>
+                                    <span className="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                                    <span className="text-gray-400 font-black text-[11px] uppercase tracking-[0.3em]">Dashboard</span>
                                 </div>
                             </div>
                         </div>
-                        <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-lg border border-indigo-100/50 dark:border-indigo-800/30">
-                            <Sparkles className="w-3 h-3 text-indigo-500" />
-                            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400">Enterprise Edition</span>
+                        <div className="hidden md:flex items-center gap-3 px-5 py-2.5 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-xl border border-indigo-100 dark:border-indigo-800/30">
+                            <Sparkles className="w-5 h-5 text-indigo-500" />
+                            <span className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Enterprise Edition</span>
                         </div>
                     </div>
 
-                    {/* Compact Quick Stats Grid */}
+                    {/* Large Quick Stats Grid */}
                     {!loading && stats && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
                             <StatCard
-                                icon={<Users className="w-3.5 h-3.5" />}
+                                icon={<Users className="w-5 h-5" />}
                                 label="Subscribers"
                                 value={stats.total_subscribers.toLocaleString()}
                                 color="blue"
                             />
                             <StatCard
-                                icon={<Send className="w-3.5 h-3.5" />}
-                                label="Sent"
+                                icon={<Send className="w-5 h-5" />}
+                                label="Emails Sent"
                                 value={stats.emails_sent_this_month.toLocaleString()}
                                 color="indigo"
                             />
                             <StatCard
-                                icon={<TrendingUp className="w-3.5 h-3.5" />}
-                                label="Open Rate"
+                                icon={<TrendingUp className="w-5 h-5" />}
+                                label="Avg Open Rate"
                                 value={`${stats.avg_open_rate}%`}
                                 color="green"
                             />
                             <StatCard
-                                icon={<Activity className="w-3.5 h-3.5" />}
-                                label="Click Rate"
+                                icon={<Activity className="w-5 h-5" />}
+                                label="Avg Click Rate"
                                 value={`${stats.avg_click_rate}%`}
                                 color="purple"
                             />
                             <StatCard
-                                icon={<Tag className="w-3.5 h-3.5" />}
-                                label="Coupons"
+                                icon={<Tag className="w-5 h-5" />}
+                                label="Active Coupons"
                                 value={stats.active_coupons.toLocaleString()}
                                 color="orange"
                             />
                             <StatCard
-                                icon={<DollarSign className="w-3.5 h-3.5" />}
-                                label="Revenue"
+                                icon={<DollarSign className="w-5 h-5" />}
+                                label="Total Revenue"
                                 value={`$${stats.revenue_from_campaigns.toLocaleString()}`}
                                 color="emerald"
                             />
@@ -187,14 +187,14 @@ const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode; label:
     };
 
     return (
-        <div className={`p-2.5 rounded-xl border ${colorClasses[color] || colorClasses.blue} flex items-center gap-3 transition-all hover:scale-[1.02]`}>
-            <div className="shrink-0 p-1.5 bg-white/40 dark:bg-black/20 rounded-lg">
-                {icon}
+        <div className={`p-5 rounded-2xl border ${colorClasses[color] || colorClasses.blue} transition-all hover:shadow-md group`}>
+            <div className="flex items-center gap-3 mb-3">
+                <div className="p-2 bg-white/40 dark:bg-black/20 rounded-xl group-hover:scale-110 transition-transform">
+                    {icon}
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{label}</span>
             </div>
-            <div className="min-w-0">
-                <p className="text-[9px] font-bold uppercase tracking-tighter opacity-70 truncate">{label}</p>
-                <p className="text-sm font-black truncate">{value}</p>
-            </div>
+            <p className="text-2xl font-black tracking-tight">{value}</p>
         </div>
     );
 };
