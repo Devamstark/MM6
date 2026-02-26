@@ -326,9 +326,9 @@ export const AdminDashboard = () => {
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-6 py-3 rounded-xl text-[11px] font-semibold uppercase tracking-widest transition-all duration-300 whitespace-nowrap ${activeTab === tab
-                ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/30 -translate-y-0.5'
-                : 'bg-white text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-100 dark:bg-gray-900 dark:border-gray-800 dark:text-gray-400 dark:hover:text-indigo-400'
+              className={`px-5 py-2.5 rounded-xl text-sm font-semibold capitalize transition-all duration-200 whitespace-nowrap ${activeTab === tab
+                ? 'bg-indigo-600 text-white shadow-md shadow-indigo-300/50 dark:shadow-indigo-900/40'
+                : 'bg-white text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 border border-gray-200 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20'
                 }`}
             >
               {tab}
