@@ -202,22 +202,15 @@
 ### **7. Admin Dashboard** 🛡️
 
 #### Features:
-- **Platform Overview**:
-  - Total users, products, orders
-  - Revenue metrics
-  - Recent activity
-- **User Management**:
-  - View all users
-  - Change user roles
-  - Deactivate accounts
-- **Product Moderation**:
-  - Approve/reject new products
-  - Feature products
-  - Bulk delete
-- **Content Management**:
-  - Edit homepage content
-  - Manage static pages (About, Terms, Privacy)
-- **Order Management**: View and manage all orders
+- **Platform Overview**: Today's revenue, yesterday close, MTD growth, total lifetime earnings, plus quick stats (total orders, pending, inventory, low stock, delivered)
+- **User Management**: View all users, change user roles, deactivate accounts
+- **Product Moderation**: Approve/reject new products, feature products, bulk delete
+- **Content Management (CMS)**: Edit homepage content, manage static pages (About, Terms, Privacy)
+- **Order Management**: View and manage all orders across all sellers
+- **Staff Management**: Admin staff oversight and permissions
+- **Analytics**: Advanced sales charts, revenue breakdowns, order trends
+
+> **Note**: Coupon management has been moved to the **Marketing tab** (Section 13) for a more cohesive marketing workflow.
 
 #### Technical Implementation:
 - **Backend**: Admin-only viewsets with permission classes
@@ -329,8 +322,14 @@
 - **Auto-Retry**: Failed emails automatically retry up to 3 times.
 - **Delivery Logging**: Each email tracked individually (pending, sent, failed, opened, clicked) with error messages.
 - **Analytics Dashboard**: Total campaigns, emails sent, delivery rate, open rate, click rate, status/type breakdowns.
+- **Conversion Analytics**: Per-campaign revenue, click-through, and conversion tracking modal.
+- **Campaign Calendar View**: Visual calendar showing scheduled and sent campaigns by date.
+- **Custom Calendar Date-Time Picker**: Fully custom date-time scheduler replacing native `datetime-local` input — includes monthly calendar navigation, past-date disabling, manual hour/minute selection, and a confirmation banner.
+- **Email Template Builder**: Visual drag-and-drop style template builder with live HTML preview that auto-populates the email body field.
 - **Audience Preview**: Live preview of recipient count before sending.
 - **Campaign Actions**: Send Now, Schedule Later, Pause, Resume, Duplicate.
+- **Coupon Management** *(moved from Admin Dashboard)*: Create, activate/deactivate, and delete promo codes — now fully integrated within the Marketing tab as the "Coupons" view for a unified marketing workflow.
+- **Marketing Command Center**: Dedicated Marketing Dashboard page (`/marketing`) with enterprise-grade quick stats panel (Subscribers, Emails Sent, Avg Open Rate, Avg Click Rate, Active Coupons, Total Revenue).
 - **GDPR Compliance**: Unsubscribe footer automatically appended to every marketing email.
 - **Security**: Only users with `role='user'` receive emails; Admin and Seller accounts are always excluded.
 
@@ -760,4 +759,4 @@ For questions or issues:
 ---
 
 **Last Updated**: February 26, 2026
-**Version**: 1.7.0 (Enterprise Marketing System)
+**Version**: 1.8.0 (UI/UX Polish, Coupons in Marketing, Custom DateTime Picker)

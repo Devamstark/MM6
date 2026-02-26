@@ -24,14 +24,14 @@
 #### **Backend (Django + Django REST Framework)**
 - 🔐 Secure JWT authentication
 - 👥 Role-based access control (Admin, Seller, User)
-- 📊 RESTful API with 30+ endpoints
+- 📊 RESTful API with 50+ endpoints
 - 🗄️ Robust database models with relationships
 - 🖼️ Image upload with Cloudinary integration
 - ✅ Input validation and error handling
 - 🚀 Production-ready with Gunicorn + WhiteNoise
 
 #### **Database (PostgreSQL/SQLite)**
-- 📦 8 core models (User, Product, Order, Review, etc.)
+- 📦 10+ core models (User, Product, Order, Review, MarketingCampaign, EmailDeliveryLog, etc.)
 - 🔗 Proper foreign key relationships
 - 📈 Optimized with indexes
 - 🔄 Migration system for version control
@@ -40,7 +40,7 @@
 
 ## 📚 Documentation Package
 
-You now have **5 comprehensive documentation files**:
+You now have **7 comprehensive documentation files**:
 
 ### 1. **FULL_MVP_SPECIFICATION.md** (Main Spec)
 - Complete technology stack breakdown
@@ -77,7 +77,7 @@ You now have **5 comprehensive documentation files**:
 - Scalability considerations
 
 ### 5. **COMPLETE_FEATURE_LIST.md** (Feature Catalog)
-- All 47 features with user stories
+- All 53 features with user stories
 - Functionality descriptions
 - Technical implementation details
 - Feature categorization
@@ -145,12 +145,15 @@ You now have **5 comprehensive documentation files**:
 - Low stock alerts
 
 ### **8. Admin Dashboard** 🛡️
-- Platform-wide statistics
+- Platform-wide statistics (Revenue cards, order counts, inventory alerts)
 - User management (view, edit roles, deactivate)
 - Product moderation (all sellers)
 - Order management (all orders)
-- Content management (static pages)
-- Feature products control
+- Content management (CMS static pages)
+- Staff management tab
+- Analytics tab with charts
+
+> 🏷️ **Coupon management** has been consolidated into the **Marketing tab** for a unified workflow.
 
 ### **9. Advanced Search & Filtering** 🔍
 - Text search (name, description, brand)
@@ -179,11 +182,26 @@ You now have **5 comprehensive documentation files**:
 - Error handling
 - Toast notifications
 
-### **12. Background Tasks & Emails** 📨
-- Asynchronous processing via Celery and Redis
-- Celery-Beat for scheduled jobs (database cleanups, alerts)
-- Premium Transactional HTML emails with crisp typography logos
-- Password reset, order confirmation, and newsletter support
+### **13. Enterprise Marketing System** 📧
+- Dedicated Marketing Command Center at `/marketing`
+- Quick stats panel: Subscribers, Emails Sent, Avg Open/Click Rate, Active Coupons, Revenue
+- Campaign management (5 types, 6 statuses) with full CRUD
+- **Views**: Campaigns list, Analytics, Conversions, Campaign Calendar, **Coupons**
+- Custom Calendar Date-Time Picker for scheduling (replaces broken native input)
+- Email Template Builder with live HTML preview
+- Audience targeting (6 strategies) with live recipient preview
+- Celery + Redis powered batch email sending (200/batch default)
+- Per-email delivery logs with status tracking (pending/sent/failed/opened/clicked)
+- Conversion analytics modal per campaign
+- GDPR-compliant unsubscribe footer on every marketing email
+- Admin-only, buyers excluded from receiving admin/seller account emails
+
+### **14. Navbar & UI/UX Consistency** ✨
+- Consistent `font-medium` weight across all navbar links (no more bold/regular mix)
+- Equal icon spacing in the right-side icon bar
+- Fixed subcategory dropdown hover: text color now correctly transitions to indigo on hover
+- MarketingDashboard header layout fixed: responsive padding, overflow-hidden, xl:grid-cols-6 stat cards
+- Responsive title scaling (text-2xl on mobile → text-4xl on desktop)
 
 ---
 
@@ -238,13 +256,13 @@ Certs:     Let's Encrypt (auto-renewed by Traefik)
 ## 📊 Project Statistics
 
 ### **Code Metrics**
-- **Total Files**: 50+ files
-- **Lines of Code**: ~15,000+ lines
-- **Components**: 15+ React components
-- **Pages**: 14+ route pages
-- **API Endpoints**: 30+ endpoints
-- **Database Models**: 9 models
-- **Features**: 47 complete features
+- **Total Files**: 60+ files
+- **Lines of Code**: ~20,000+ lines
+- **Components**: 20+ React components
+- **Pages**: 16+ route pages
+- **API Endpoints**: 50+ endpoints
+- **Database Models**: 10+ models
+- **Features**: 53 complete features
 
 ### **Feature Coverage**
 - **Authentication**: 4/4 features (100%)
@@ -253,10 +271,11 @@ Certs:     Let's Encrypt (auto-renewed by Traefik)
 - **Orders**: 4/4 features (100%)
 - **Reviews**: 4/4 features (100%)
 - **Seller Tools**: 6/6 features (100%)
-- **Admin Tools**: 5/5 features (100%)
+- **Admin Tools**: 6/6 features (100%)
 - **Blogger Features**: 4/4 features (100%)
 - **Background Tasks**: 1/1 features (100%)
 - **UI/UX**: 6/6 features (100%)
+- **Enterprise Marketing**: 5/5 features (100%)
 
 **Overall Completion: 100%** ✅
 
@@ -427,9 +446,9 @@ See `setup/QUICK_START_GUIDE.md` for detailed instructions including:
 
 ### **Phase 2** (Next 3 months)
 - [ ] Real payment integration (Stripe)
-- [ ] Email notifications (SendGrid)
+- [x] Email notifications — ✅ Done (Celery + HTML templates)
 - [ ] Advanced analytics dashboard
-- [ ] Wishlist functionality
+- [x] Wishlist functionality  — ✅ Done
 - [ ] Product recommendations (AI)
 - [ ] Live chat support
 - [ ] Multi-language support (i18n)
@@ -439,7 +458,7 @@ See `setup/QUICK_START_GUIDE.md` for detailed instructions including:
 - [ ] Seller verification system
 - [ ] Product comparison tool
 - [ ] Inventory forecasting
-- [ ] Marketing automation
+- [x] Automated marketing campaigns — ✅ Done (Enterprise Marketing System)
 - [ ] Social media integration
 - [ ] Progressive Web App (PWA)
 
@@ -532,7 +551,7 @@ cloudmart-e-commerce/
    - Scalable and maintainable
 
 2. **Complete Feature Set**
-   - 42 fully implemented features
+   - 53 fully implemented features
    - No placeholders or mocks (except payment)
    - Real-world functionality
 
@@ -602,7 +621,7 @@ cloudmart-e-commerce/
 - `FULL_MVP_SPECIFICATION.md` - Complete feature spec
 - `setup/QUICK_START_GUIDE.md` - Setup instructions
 - `SYSTEM_ARCHITECTURE.md` - Technical architecture
-- `COMPLETE_FEATURE_LIST.md` - All 42 features
+- `COMPLETE_FEATURE_LIST.md` - All 53 features
 - `MVP_IMPLEMENTATION_CHECKLIST.md` - Progress tracker
 - `setup/DEPLOYMENT_GUIDE.md` - Production deployment
 
@@ -619,7 +638,7 @@ cloudmart-e-commerce/
 
 **You now have a complete, production-ready, full-stack e-commerce MVP** with:
 
-✅ **42 fully implemented features**  
+✅ **53 fully implemented features**  
 ✅ **Modern tech stack** (React, Jotai, Django, PostgreSQL)  
 ✅ **Comprehensive documentation** (5 detailed files)  
 ✅ **Professional design** (Responsive, accessible)  
@@ -643,8 +662,8 @@ For any questions, refer to the documentation files or the inline code comments.
 ---
 
 **Project**: SmartShop E-Commerce Platform  
-**Version**: 1.6.0 (Background Tasks & Celery)  
-**Last Updated**: February 25, 2026  
+**Version**: 1.8.0 (UI/UX Polish, Coupons in Marketing, Custom DateTime Picker)  
+**Last Updated**: February 26, 2026  
 **Status**: ✅ Live in Production  
 **URL**: [https://smartshop1.us](https://smartshop1.us)  
 **Completion**: 100%  

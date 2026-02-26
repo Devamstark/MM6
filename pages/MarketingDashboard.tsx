@@ -92,7 +92,7 @@ export const MarketingDashboard: React.FC = () => {
 
                     {/* Large Quick Stats Grid */}
                     {!loading && stats && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-5">
                             <StatCard
                                 icon={<Users className="w-5 h-5" />}
                                 label="Subscribers"
@@ -177,24 +177,47 @@ export const MarketingDashboard: React.FC = () => {
 
 // Stat Card Component
 const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: string; color: string }) => {
-    const colorClasses: Record<string, string> = {
-        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400 border-blue-100 dark:border-blue-800',
-        indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400 border-indigo-100 dark:border-indigo-800',
-        green: 'bg-green-50 text-green-600 dark:bg-green-900/20 dark:text-green-400 border-green-100 dark:border-green-800',
-        purple: 'bg-purple-50 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400 border-purple-100 dark:border-purple-800',
-        orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400 border-orange-100 dark:border-orange-800',
-        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
+    // Background + border tints — subtle, not overwhelming
+    const bgClasses: Record<string, string> = {
+        blue: 'bg-blue-50 border-blue-100 dark:bg-blue-900/10 dark:border-blue-800/40',
+        indigo: 'bg-indigo-50 border-indigo-100 dark:bg-indigo-900/10 dark:border-indigo-800/40',
+        green: 'bg-green-50 border-green-100 dark:bg-green-900/10 dark:border-green-800/40',
+        purple: 'bg-purple-50 border-purple-100 dark:bg-purple-900/10 dark:border-purple-800/40',
+        orange: 'bg-orange-50 border-orange-100 dark:bg-orange-900/10 dark:border-orange-800/40',
+        emerald: 'bg-emerald-50 border-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-800/40',
+    };
+    // Icon accent color — only applied to the icon box
+    const iconClasses: Record<string, string> = {
+        blue: 'bg-blue-100 text-blue-600 dark:bg-blue-800/40 dark:text-blue-400',
+        indigo: 'bg-indigo-100 text-indigo-600 dark:bg-indigo-800/40 dark:text-indigo-400',
+        green: 'bg-green-100 text-green-600 dark:bg-green-800/40 dark:text-green-400',
+        purple: 'bg-purple-100 text-purple-600 dark:bg-purple-800/40 dark:text-purple-400',
+        orange: 'bg-orange-100 text-orange-600 dark:bg-orange-800/40 dark:text-orange-400',
+        emerald: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-800/40 dark:text-emerald-400',
+    };
+    // Label accent color — subtle
+    const labelClasses: Record<string, string> = {
+        blue: 'text-blue-500 dark:text-blue-400',
+        indigo: 'text-indigo-500 dark:text-indigo-400',
+        green: 'text-green-600 dark:text-green-400',
+        purple: 'text-purple-500 dark:text-purple-400',
+        orange: 'text-orange-500 dark:text-orange-400',
+        emerald: 'text-emerald-600 dark:text-emerald-400',
     };
 
     return (
-        <div className={`p-4 rounded-2xl border ${colorClasses[color] || colorClasses.blue} transition-all hover:shadow-md group`}>
-            <div className="flex items-center gap-2 mb-3">
-                <div className="p-1.5 bg-white/50 dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform shrink-0">
+        <div className={`p-5 rounded-2xl border ${bgClasses[color] || bgClasses.blue} transition-all hover:shadow-md group`}>
+            {/* Icon + Label row */}
+            <div className="flex items-center gap-2.5 mb-3">
+                <div className={`p-2 rounded-xl shrink-0 group-hover:scale-110 transition-transform ${iconClasses[color] || iconClasses.blue}`}>
                     {icon}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-wider leading-tight opacity-80">{label}</span>
+                <span className={`text-[11px] font-bold uppercase tracking-wide leading-tight ${labelClasses[color] || labelClasses.blue}`}>
+                    {label}
+                </span>
             </div>
-            <p className="text-2xl font-black tracking-tight">{value}</p>
+            {/* Value — always dark, readable */}
+            <p className="text-2xl font-black tracking-tight text-gray-900 dark:text-white">{value}</p>
         </div>
     );
 };
