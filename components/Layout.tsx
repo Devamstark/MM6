@@ -221,7 +221,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
-              <Link to="/products?sort=newest" className="px-4 py-2 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-all">
+              <Link to="/products?sort=newest" className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                 New Arrivals
               </Link>
 
@@ -231,8 +231,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 onMouseEnter={() => openMenu('Women')}
                 onMouseLeave={closeMenu}
               >
-                <div className={`flex items-center gap-1 px-4 py-2 rounded-xl cursor-pointer transition-all ${hoveredMenu === 'Women' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'}`}>
-                  <Link to="/products?category=Women" className="text-sm font-bold tracking-tight">Women</Link>
+                <div className={`flex items-center gap-1 px-4 py-2 rounded-xl cursor-pointer transition-all ${hoveredMenu === 'Women' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}>
+                  <Link to="/products?category=Women" className="text-sm font-medium">Women</Link>
                   <svg className={`w-3 h-3 transition-transform duration-200 ${hoveredMenu === 'Women' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
                 </div>
 
@@ -245,38 +245,38 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div className="grid grid-cols-4 gap-8">
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Dresses</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Women&subcategory=Casual+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Casual Dresses</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Evening+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Evening Dresses</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Maxi Dresses</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Mini+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Mini Dresses</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Women&subcategory=Casual+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Casual Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Evening+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Evening Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Maxi+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Maxi Dresses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Mini+Dresses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Mini Dresses</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Tops</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Women&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">T-Shirts</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Blouses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Blouses</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Sweaters</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Crop+Tops" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Crop Tops</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Women&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">T-Shirts</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Blouses" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Blouses</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Sweaters</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Crop+Tops" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Crop Tops</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Bottoms</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Women&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Jeans</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Skirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Skirts</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Pants" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Pants</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Shorts</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Women&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Jeans</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Skirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Skirts</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Pants" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Pants</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Shorts</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Outerwear</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Women&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Jackets</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Coats</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Blazers</Link></li>
-                          <li><Link to="/products?category=Women&subcategory=Cardigans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Cardigans</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Women&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Jackets</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Coats</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Blazers</Link></li>
+                          <li><Link to="/products?category=Women&subcategory=Cardigans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Cardigans</Link></li>
                         </ul>
                       </div>
                     </div>
@@ -290,8 +290,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 onMouseEnter={() => openMenu('Men')}
                 onMouseLeave={closeMenu}
               >
-                <div className={`flex items-center gap-1 px-4 py-2 rounded-xl cursor-pointer transition-all ${hoveredMenu === 'Men' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800'}`}>
-                  <Link to="/products?category=Men" className="text-sm font-bold tracking-tight">Men</Link>
+                <div className={`flex items-center gap-1 px-4 py-2 rounded-xl cursor-pointer transition-all ${hoveredMenu === 'Men' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400' : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'}`}>
+                  <Link to="/products?category=Men" className="text-sm font-medium">Men</Link>
                   <svg className={`w-3 h-3 transition-transform duration-200 ${hoveredMenu === 'Men' ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" /></svg>
                 </div>
 
@@ -304,38 +304,38 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                     <div className="grid grid-cols-4 gap-8">
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 dark:border-gray-800 pb-2 dark:text-white">Tops</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Men&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">T-Shirts</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Shirts</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Polos" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Polos</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Sweaters</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Men&subcategory=T-Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">T-Shirts</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Shirts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Shirts</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Polos" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Polos</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Sweaters" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Sweaters</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Bottoms</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Men&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Jeans</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Chinos" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Chinos</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Joggers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Joggers</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Shorts</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Men&subcategory=Jeans" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Jeans</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Chinos" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Chinos</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Joggers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Joggers</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Shorts" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Shorts</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Outerwear</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Men&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Jackets</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Coats</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Hoodies" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Hoodies</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Blazers</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Men&subcategory=Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Jackets</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Coats" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Coats</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Hoodies" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Hoodies</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Blazers" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Blazers</Link></li>
                         </ul>
                       </div>
                       <div>
                         <h4 className="font-bold text-xs text-black uppercase tracking-wider mb-4 border-b border-gray-100 pb-2 dark:text-white dark:border-gray-800">Suits</h4>
-                        <ul className="space-y-1 text-sm text-gray-500 dark:text-gray-400">
-                          <li><Link to="/products?category=Men&subcategory=Full+Suits" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Full Suits</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Suit+Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Suit Jackets</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Dress+Pants" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Dress Pants</Link></li>
-                          <li><Link to="/products?category=Men&subcategory=Vests" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-bold text-sm">Vests</Link></li>
+                        <ul className="space-y-1 text-sm">
+                          <li><Link to="/products?category=Men&subcategory=Full+Suits" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Full Suits</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Suit+Jackets" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Suit Jackets</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Dress+Pants" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Dress Pants</Link></li>
+                          <li><Link to="/products?category=Men&subcategory=Vests" onClick={() => setHoveredMenu(null)} className="block py-2 px-4 -mx-4 rounded-xl hover:bg-slate-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all font-medium text-sm">Vests</Link></li>
                         </ul>
                       </div>
                     </div>
@@ -343,16 +343,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 )}
               </div>
 
-              <Link to="/products?category=Accessories" className="px-4 py-2 rounded-xl text-sm font-medium text-gray-900 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-800 transition-all">
+              <Link to="/products?category=Accessories" className="px-4 py-2 rounded-xl text-sm font-medium text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800 transition-all">
                 Accessories
               </Link>
-              <Link to="/products?on_sale=true" className="px-4 py-2 rounded-xl text-sm font-bold text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
+              <Link to="/products?on_sale=true" className="px-4 py-2 rounded-xl text-sm font-medium text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all">
                 Sale
               </Link>
             </div>
 
             {/* Right: Icons */}
-            <div className="flex items-center gap-4 lg:gap-6">
+            <div className="flex items-center gap-5">
               <button
                 onClick={() => setIsThemeOpen(true)}
                 className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200"

@@ -6,6 +6,7 @@ import { ConversionAnalyticsTab } from './ConversionAnalyticsTab';
 import { EmailTemplateBuilder, EmailTemplate } from './EmailTemplateBuilder';
 import { CampaignCalendar } from './CampaignCalendar';
 import { CustomDateTimePicker } from './CustomDateTimePicker';
+import { CouponsTab } from './CouponsTab';
 
 const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700',
@@ -97,7 +98,7 @@ export const MarketingTab: React.FC = () => {
     const [audiencePreview, setAudiencePreview] = useState<AudiencePreview | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
-    const [activeView, setActiveView] = useState<'campaigns' | 'analytics' | 'conversions' | 'calendar'>('campaigns');
+    const [activeView, setActiveView] = useState<'campaigns' | 'analytics' | 'conversions' | 'calendar' | 'coupons'>('campaigns');
     const [sendNow, setSendNow] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -425,6 +426,9 @@ export const MarketingTab: React.FC = () => {
                     <button onClick={() => setActiveView('calendar')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeView === 'calendar' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
                         <Calendar className="w-4 h-4 inline mr-1" /> Calendar
                     </button>
+                    <button onClick={() => setActiveView('coupons')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeView === 'coupons' ? 'bg-green-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
+                        <Tag className="w-4 h-4 inline mr-1" /> Coupons
+                    </button>
                 </div>
                 <button
                     onClick={() => { resetForm(); setShowModal(true); }}
@@ -492,7 +496,7 @@ export const MarketingTab: React.FC = () => {
                         </div>
                     </div>
                     {analytics.last_campaign && (
-                        <div className="md:col-span-3 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-3xl border border-indigo-100 dark:border-indigo-800 p-6">
+                        <div className="md:col-span-3 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-3xl border border-indigo-100 dark:border-indigo-800 p-6">
                             <h4 className="text-xs font-black text-indigo-400 uppercase tracking-widest mb-2">Last Campaign</h4>
                             <p className="text-lg font-black text-gray-900 dark:text-white">{analytics.last_campaign.name}</p>
                             <div className="flex gap-4 mt-2 text-sm text-gray-600 dark:text-gray-400">
@@ -704,6 +708,11 @@ export const MarketingTab: React.FC = () => {
                 </>
             )}
 
+            {/* Coupons View */}
+            {activeView === 'coupons' && (
+                <CouponsTab />
+            )}
+
             {/* Campaign Creation/Edit Modal */}
             {showModal && (
                 <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
@@ -745,7 +754,7 @@ export const MarketingTab: React.FC = () => {
                                     <button
                                         type="button"
                                         onClick={() => setShowTemplateBuilder(true)}
-                                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:-translate-y-0.5"
+                                        className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:-translate-y-0.5"
                                     >
                                         <Layout className="w-4 h-4" />
                                         Use Template Builder
@@ -801,7 +810,7 @@ Example:
                             </div>
 
                             {/* Discount Configuration */}
-                            <div className="p-5 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl border border-green-100 dark:border-green-800">
+                            <div className="p-5 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-900/10 dark:to-emerald-900/10 rounded-2xl border border-green-100 dark:border-green-800">
                                 <h4 className="text-xs font-black text-green-600 dark:text-green-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Tag className="w-4 h-4" /> Coupon / Discount</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
@@ -846,7 +855,7 @@ Example:
                             </div>
 
                             {/* Audience Targeting */}
-                            <div className="p-5 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800">
+                            <div className="p-5 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/10 dark:to-purple-900/10 rounded-2xl border border-indigo-100 dark:border-indigo-800">
                                 <h4 className="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mb-4 flex items-center gap-2"><Target className="w-4 h-4" /> Audience Targeting</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>

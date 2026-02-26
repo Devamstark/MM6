@@ -855,82 +855,296 @@
 
 ---
 
-## 📧 Enterprise Marketing System
+## 📧 Enterprise Marketing System (Admin Only)
 
-### Feature 46: Campaign Management
-**User Story:** *As an admin, I want to create and manage email marketing campaigns.*
-
-**Functionality:**
-- Create campaigns with name, subject, preheader, HTML content, and plain text fallback
-- 5 campaign types: Promotional, Abandoned Cart, Re-engagement, Thank You, Upsell
-- 6 statuses: Draft, Scheduled, Sending, Sent, Paused, Failed
-- Optional: Banner image URL, CTA button (text + URL), discount code
-- Configurable batch size (default 200 emails per batch)
-- Duplicate existing campaigns
-- Edit, delete, pause, and resume campaigns
-
-**Technical Details:**
-- Backend: `MarketingCampaign` model with UUID, 20+ fields
-- Frontend: Enterprise MarketingTab component with modal-based creation form
-- Endpoints: `POST/PATCH/DELETE /api/marketing-campaigns/`, `POST .../pause/`, `POST .../resume/`, `POST .../duplicate/`
+> **Location**: Admin Dashboard → Marketing Tab (`components/dashboard/MarketingTab.tsx`)  
+> **Access**: Admin role only. Sellers and regular users cannot see this tab.
 
 ---
 
-### Feature 47: Advanced Audience Targeting
-**User Story:** *As an admin, I want to target specific user segments for campaigns.*
+### 🖥️ Marketing Tab — Overview
 
-**Functionality:**
-- 6 audience segments: All Users, Ordered At Least Once, Never Ordered, Recent Signups (X days), Abandoned Cart, Manual Selection
-- Live audience preview showing recipient count and sample emails
-- Only targets users with `role='user'` — Admin and Seller accounts always excluded
-- Recipient snapshot stored at send time for audit trail
+The Marketing Tab is a full SaaS-grade **Email Marketing Command Center** embedded directly into the admin dashboard. It allows the admin to create, schedule, send, pause, track, and analyze email marketing campaigns — all without leaving the dashboard.
 
-**Technical Details:**
-- Backend: `_resolve_audience()` function, `CampaignRecipient` model
-- Frontend: Audience targeting section with live preview
-- Endpoints: `GET /api/marketing-campaigns/audience-preview/`, `GET .../users-list/`
+The tab has **two switchable views**:
+1. **📊 Analytics View** — Platform-wide campaign performance summary
+2. **📋 Campaigns View** — Campaign list, filters, and management actions
 
 ---
 
-### Feature 48: Enterprise Email Delivery & Logging
-**User Story:** *As an admin, I want reliable batch email delivery with per-email tracking.*
+### Feature 46: Quick Stats Header
 
-**Functionality:**
-- Batch email sending via Celery (configurable batch size, default 200)
-- Per-email delivery logging (status: pending, sent, failed, opened, clicked)
-- Auto-retry failed emails up to 3 times
-- Error message logging for debugging
-- GDPR-compliant unsubscribe footer in every email
-- CTA button and discount code auto-appended to emails
+**What it shows (always visible at the top):**
+
+| Stat Card | What It Displays |
+|---|---|
+| 📧 Total Campaigns | Count of all campaigns ever created |
+| 📬 Emails Sent | Total individual emails delivered across all campaigns |
+| 👥 Active Users | Number of eligible recipients (role=`user`) on the platform |
+| ✅ Delivery Rate | % of sent emails that were successfully delivered |
+
+- Each card has a color-coded icon and a large number
+- Cards animate on hover (icon scales up)
+- Data is fetched from `GET /api/marketing-campaigns/analytics/`
 
 **Technical Details:**
-- Backend: `EmailDeliveryLog` model, `send_marketing_campaign` task (orchestrator), `_send_batch` task
-- Frontend: Delivery Logs modal with status summary badges + full log table
-- Endpoint: `GET /api/marketing-campaigns/{id}/logs/`
+- Component: `StatCard` (defined in `MarketingTab.tsx`)
+- Data source: `loadAnalytics()` → `api.getMarketingAnalytics()`
 
 ---
 
-### Feature 49: Marketing Analytics Dashboard
-**User Story:** *As an admin, I want analytics on my email marketing performance.*
+### Feature 47: Analytics View
 
-**Functionality:**
-- Summary cards: Total campaigns, emails sent, active users, delivery rate
-- Campaign table with filters by status and type
-- Per-campaign metrics: recipients, sent, failed, delivery/open/click rates
-- Status and type breakdown charts
-- Performance progress bars (delivery rate, open rate, click rate)
-- Last campaign quick-view banner
+Triggered by clicking the **"Analytics"** button in the view switcher.
+
+**What it shows:**
+
+#### Campaign Status Breakdown
+- **Horizontal progress bars** for each status: Draft, Scheduled, Sending, Sent, Paused, Failed
+- Each bar shows count + % of total, color-coded per status
+- Uses `STATUS_COLORS` constant for consistent color theming
+
+#### Campaign Type Breakdown
+- Grid of boxes for each campaign type: Promotional, Abandoned Cart, Re-engagement, Thank You, Post-purchase Upsell
+- Count displayed per type
+
+#### Performance Metrics
+- **Delivery Rate** progress bar (green)
+- **Open Rate** progress bar (blue)
+- **Click Rate** progress bar (purple)
+- Percentages with colored fill bars
+
+#### Last Campaign Banner
+- Highlighted indigo gradient banner showing the most recent campaign
+- Displays: campaign name, status badge, total recipients, emails sent, failed count
+- Only shown if at least one campaign exists
 
 **Technical Details:**
-- Backend: Custom `analytics` action in `MarketingCampaignViewSet`
-- Frontend: Analytics tab with switchable views
 - Endpoint: `GET /api/marketing-campaigns/analytics/`
+- Frontend: `analytics` state populated by `loadAnalytics()`
 
 ---
+
+### Feature 48: Campaign List View
+
+Triggered by clicking the **"Campaigns"** button in the view switcher.
+
+**Filter Bar:**
+- 🔍 **Search** — Filter campaigns by name (live, client-side)
+- **Status filter** dropdown — All / Draft / Scheduled / Sending / Sent / Paused / Failed
+- **Type filter** dropdown — All / Promotional / Abandoned Cart / Re-engagement / Thank You / Upsell
+- **"+ Create Campaign"** button (opens the campaign creation modal)
+
+**Campaign Table columns:**
+| Column | Details |
+|---|---|
+| Campaign Name | Bold name + campaign type badge below |
+| Status | Color-coded pill badge (6 possible statuses) |
+| Recipients | Count of resolved recipients |
+| Sent | Emails successfully sent |
+| Failed | Failed delivery count (shown in red) |
+| Scheduled | Formatted date/time if scheduled, otherwise "—" |
+| Actions | Contextual action buttons depending on status |
+
+**Action Buttons per Campaign (contextual by status):**
+| Button | When Shown | What It Does |
+|---|---|---|
+| 🚀 Send | Draft only | Immediately sends the campaign |
+| ✏️ Edit | Draft / Scheduled | Opens creation modal pre-filled |
+| ⏸ Pause | Sending only | Pauses the ongoing send |
+| ▶️ Resume | Paused only | Resumes sending |
+| 📋 Duplicate | Always | Creates a draft copy of the campaign |
+| 📬 Logs | Always | Opens Delivery Logs modal |
+| 📊 Analytics | Always | Opens Conversion Analytics modal |
+| 🗑 Delete | Always (with confirm) | Permanently deletes campaign |
+
+**Technical Details:**
+- Data: `loadCampaigns()` → `api.getCampaigns()`
+- All mutations use the API service: `api.sendCampaign`, `api.pauseCampaign`, `api.resumeCampaign`, `api.duplicateCampaign`, `api.deleteCampaign`
+
+---
+
+### Feature 49: Campaign Creation / Edit Modal
+
+Opened by clicking **"+ Create Campaign"** or **"✏️ Edit"**.
+
+**Form Sections:**
+
+#### 1. Basic Info
+- **Campaign Name** (required) — text input
+- **Campaign Type** — dropdown: Promotional / Abandoned Cart / Re-engagement / Thank You / Upsell
+
+#### 2. Email Content
+- **Subject Line** (required) — appears in the recipient's inbox
+- **Preheader Text** — short preview text shown below subject in email clients
+- **"Use Template Builder" button** — opens the full Email Template Builder modal (visual drag-and-drop email designer)
+- **Message Body** — large textarea for HTML email content with a multi-line placeholder showing an example HTML email
+- **Formatting Tips** panel — inline guide showing how to use `<h2>`, `<p>`, `<strong>`, and `{{customer_name}}` placeholders
+- **Plain Text Fallback** — textarea for non-HTML email clients
+
+#### 3. CTA & Extras
+- **Banner Image URL** — URL to a header image displayed in the email
+- **CTA Button Text** — e.g. "Shop Now"
+- **CTA Button URL** — link the CTA button points to
+
+#### 4. Coupon / Discount Configuration
+- **Discount Code** — auto-uppercased, e.g. `SUMMER25`
+- **Discount Type** — Percentage (%) or Fixed Amount ($)
+- **Discount Value** — numeric
+- **Minimum Purchase ($)** — minimum cart value to apply the code
+- **Usage Limit** — max redemptions (blank = unlimited)
+- **Expiry (Days after send)** — auto-expires the coupon N days after the campaign sends
+- ℹ️ Coupon is **auto-created** in the system when campaign is saved and **auto-deleted** when campaign is removed
+
+#### 5. Batch Size
+- **Batch Size** — how many emails to send per Celery task batch (default: 200)
+
+#### 6. Audience Targeting
+- **Target Audience** dropdown:
+  | Segment | Description |
+  |---|---|
+  | All Users | Every registered user with `role='user'` |
+  | Ordered At Least Once | Users who have completed at least 1 order |
+  | Never Ordered | Users who have never placed an order |
+  | Recent Signups (X days) | Users who registered within the last X days |
+  | Abandoned Cart | Users flagged as having abandoned a cart |
+  | Manual Selection | Admin manually picks recipients |
+- **Registered Within (Days)** — appears only when "Recent Signups" is selected
+- **Live Audience Preview** — shows count + sample emails of who will receive the campaign (fetched from `GET /api/marketing-campaigns/audience-preview/`)
+
+#### 7. Scheduling
+- **Send Now** / **Schedule Later** toggle buttons
+- When **Schedule Later** is selected → the `CustomDateTimePicker` appears:
+  - **Calendar tab**: Visual month calendar, navigate months with arrows, click any future date to select it, past dates are grayed out and disabled
+  - **Time tab**: Scrollable 00–23 hours + scrollable 5-minute interval minutes (00, 05, 10...55)
+  - **Confirmed Schedule banner**: Green confirmation box showing the full selected date and time in human-readable format
+
+#### 8. Save Buttons
+- **"Save as Draft"** — saves without sending or scheduling
+- **"Save & Send" / "Save & Schedule"** — saves and immediately sends or schedules based on the Send Now / Schedule Later selection
+
+**Technical Details:**
+- Endpoints: `POST /api/marketing-campaigns/` (create), `PATCH /api/marketing-campaigns/{id}/` (update)
+- Component: Campaign creation modal in `MarketingTab.tsx`
+
+---
+
+### Feature 50: Delivery Logs Modal
+
+Opened by clicking the **"📬 Logs"** button on any campaign.
+
+**What it shows:**
+- **Summary badges** at the top: count per status (Pending / Sent / Failed / Opened / Clicked)
+- **Total count** badge
+- **Full log table** with columns:
+  | Column | Details |
+  |---|---|
+  | User | Recipient's display name |
+  | Email | Recipient's email address |
+  | Status | Color-coded status pill |
+  | Sent At | Formatted timestamp of delivery attempt |
+  | Retries | Number of retry attempts (0–3) |
+  | Error | Error message if failed (truncated at 200px) |
+- Empty state message if no logs exist
+- Loading spinner while fetching
+
+**Technical Details:**
+- Endpoint: `GET /api/marketing-campaigns/{id}/logs/`
+- State: `logs`, `logsLoading`, `showLogsModal`
+
+---
+
+### Feature 51: Conversion Analytics Modal
+
+Opened by clicking the **"📊 Analytics"** button on any campaign.
+
+**What it shows:**
+- **4 Metric Cards**:
+  - Click-Through Rate (%)
+  - Conversion Rate (%)
+  - Total Revenue Generated ($)
+  - Total Conversions (count)
+- Empty state with chart icon if no conversion data is yet recorded
+- Loading spinner while fetching
+
+**Technical Details:**
+- Endpoint: `GET /api/marketing-campaigns/{id}/conversion-analytics/`
+- Component: `ConversionAnalyticsTab` imported from `./ConversionAnalyticsTab`
+
+---
+
+### Feature 52: Email Template Builder Modal
+
+Opened by clicking **"Use Template Builder"** inside the campaign creation modal.
+
+**What it shows:**
+- Full-screen visual email designer
+- Drag-and-drop email block builder
+- Allows creating professional-looking emails without writing HTML
+- On template selection, the HTML is auto-inserted into the Message Body field
+
+**Technical Details:**
+- Component: `EmailTemplateBuilder` imported from `./EmailTemplateBuilder`
+- Callback: `handleTemplateSelect` sets `formData.message` with the generated HTML
+
+---
+
+### Feature 53: Campaign Calendar View
+
+A visual calendar component available within the marketing system.
+
+**Technical Details:**
+- Component: `CampaignCalendar` imported from `./CampaignCalendar`
+- Shows scheduled campaigns on their scheduled dates
+
+---
+
+### 🔌 All Marketing API Endpoints
+
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/api/marketing-campaigns/` | List all campaigns |
+| `POST` | `/api/marketing-campaigns/` | Create new campaign |
+| `PATCH` | `/api/marketing-campaigns/{id}/` | Update campaign |
+| `DELETE` | `/api/marketing-campaigns/{id}/` | Delete campaign |
+| `POST` | `/api/marketing-campaigns/{id}/send/` | Send campaign immediately |
+| `POST` | `/api/marketing-campaigns/{id}/pause/` | Pause active send |
+| `POST` | `/api/marketing-campaigns/{id}/resume/` | Resume paused send |
+| `POST` | `/api/marketing-campaigns/{id}/duplicate/` | Clone campaign as draft |
+| `GET` | `/api/marketing-campaigns/{id}/logs/` | Delivery logs for campaign |
+| `GET` | `/api/marketing-campaigns/{id}/conversion-analytics/` | Conversion data |
+| `GET` | `/api/marketing-campaigns/analytics/` | Platform-wide analytics |
+| `GET` | `/api/marketing-campaigns/audience-preview/` | Live audience count preview |
+| `GET` | `/api/marketing-campaigns/users-list/` | All eligible users list |
+
+---
+
+### Feature 50: Custom Calendar Date-Time Picker
+**User Story:** *As an admin, I want to easily and accurately schedule a campaign by picking a date from a visual calendar and choosing a time without typing.*
+
+**Functionality:**
+- Inline **visual monthly calendar** with Su–Sa day headers
+- Navigate between months with `‹` / `›` arrow buttons
+- **Past dates are disabled** — cannot accidentally schedule in the past
+- Today's date is highlighted in indigo for quick orientation
+- Selected date shown with a filled indigo circle
+- Tab switch to **Time Picker** with scrollable hours (00–23) and minutes (00, 05...55 in 5-min increments)
+- Selected hour/minute highlighted with indigo button
+- **"Planned Delivery"** preview box showing the chosen time in real time
+- After selecting both date and time, a green **"Confirmed Schedule"** banner appears showing the full human-readable date and time
+- Replaces the broken native `<input type="datetime-local">` which caused formatting errors across browsers
+
+**Technical Details:**
+- Component: `components/dashboard/CustomDateTimePicker.tsx`
+- Props: `value: string` (ISO 8601), `onChange: (value: string) => void`, `minDate?: Date`
+- Used in: `MarketingTab.tsx` → Campaign creation/edit modal → Schedule Later section
+
+---
+
 
 ## 📊 Feature Completion Statistics
 
-### **Total Features: 50**
+### **Total Features: 51**
 - **Authentication**: 4/4 (100%)
 - **Product**: 7/7 (100%)
 - **Shopping**: 6/6 (100%)
@@ -938,17 +1152,17 @@
 - **Review System**: 4/4 (100%)
 - **Seller Features**: 6/6 (100%)
 - **Admin Features**: 6/6 (100%)
-- **UI/UX Features**: 5/5 (100%)
+- **UI/UX Features**: 6/6 (100%)
 - **Blogger Features**: 4/4 (100%)
 - **Background Tasks & Emails**: 1/1 (100%)
-- **Enterprise Marketing**: 4/4 (100%)
+- **Enterprise Marketing**: 5/5 (100%)
 
 **Overall Completion: 100%** ✅
 
 ---
 
 **Last Updated**: February 26, 2026  
-**Version**: 1.7.0 (Enterprise Marketing System)
+**Version**: 1.8.0 (Marketing Tab UI/UX Overhaul + Custom Calendar Date Picker)
 
 ---
 

@@ -65,16 +65,16 @@ export const MarketingDashboard: React.FC = () => {
 
     return (
         <div className="bg-gray-50 dark:bg-slate-950 min-h-screen pb-20 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
-            <div className="max-w-7xl mx-auto px-6 lg:px-8 py-10">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
                 {/* Header - Large & Stationary */}
-                <div className="bg-white dark:bg-gray-900 pt-8 pb-8 mb-10 px-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-indigo-500/5 animate-fade-up">
+                <div className="bg-white dark:bg-gray-900 pt-8 pb-8 mb-10 px-4 sm:px-8 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-xl shadow-indigo-500/5 animate-fade-up overflow-hidden">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
                         <div className="flex items-center gap-6">
                             <div className="w-14 h-14 bg-linear-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
                                 <Mail className="w-7 h-7 text-white" />
                             </div>
                             <div>
-                                <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight mb-1" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
+                                <h1 className="text-2xl sm:text-4xl font-black text-gray-900 dark:text-white tracking-tight leading-tight mb-1" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
                                     Marketing Command Center
                                 </h1>
                                 <div className="flex items-center gap-3">
@@ -92,7 +92,7 @@ export const MarketingDashboard: React.FC = () => {
 
                     {/* Large Quick Stats Grid */}
                     {!loading && stats && (
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                        <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4">
                             <StatCard
                                 icon={<Users className="w-5 h-5" />}
                                 label="Subscribers"
@@ -187,12 +187,12 @@ const StatCard = ({ icon, label, value, color }: { icon: React.ReactNode; label:
     };
 
     return (
-        <div className={`p-5 rounded-2xl border ${colorClasses[color] || colorClasses.blue} transition-all hover:shadow-md group`}>
-            <div className="flex items-center gap-3 mb-3">
-                <div className="p-2 bg-white/40 dark:bg-black/20 rounded-xl group-hover:scale-110 transition-transform">
+        <div className={`p-4 rounded-2xl border ${colorClasses[color] || colorClasses.blue} transition-all hover:shadow-md group`}>
+            <div className="flex items-center gap-2 mb-3">
+                <div className="p-1.5 bg-white/50 dark:bg-black/20 rounded-lg group-hover:scale-110 transition-transform shrink-0">
                     {icon}
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">{label}</span>
+                <span className="text-[10px] font-black uppercase tracking-wider leading-tight opacity-80">{label}</span>
             </div>
             <p className="text-2xl font-black tracking-tight">{value}</p>
         </div>

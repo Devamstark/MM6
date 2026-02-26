@@ -122,6 +122,15 @@
 - **GDPR Compliance**: Unsubscribe footer automatically appended to every marketing email. Admin & seller accounts always excluded.
 - **Frontend**: Complete SaaS-grade Marketing Command Center with filterable campaign table, creation modal with audience targeting, delivery logs modal, and analytics view.
 
+### 12. 🗓️ Marketing Tab UI/UX Overhaul (Feb 26, 2026)
+- **Custom Calendar Date-Time Picker**: Replaced the broken native `<input type="datetime-local">` with a fully custom `CustomDateTimePicker` component featuring a visual month-by-month calendar for date selection, scrollable hour (00–23) and minute (00, 05...55) pickers, past-date disabling, and a green "Confirmed Schedule" confirmation banner.
+- **JSX Structure Fix**: Resolved a cascading JSX nesting bug where a multi-line string placeholder in a `<textarea>` was causing the entire campaign modal and all sibling modals (Delivery Logs, Conversion Analytics, Email Template Builder) to be incorrectly nested. Fixed by converting the placeholder to a template literal and removing a spurious `</div>` + `)}` pair.
+- **Modal Sizing**: Capped the campaign creation modal at `max-h-[90vh]` with `overflow-y-auto` on the body to prevent it from exceeding the viewport and cutting off the header.
+- **Static Header (Non-Scrolling)**: Made the quick stats header section `position: sticky` / part of a non-scrolling layout so it stays visible while the admin scrolls the campaign table below.
+- **Page Width Readability**: Reduced the maximum content width of the marketing tab for better readability on wide-screen monitors.
+- **Tailwind v4 Compatibility**: Updated 4 deprecated `bg-gradient-to-r` class occurrences to the Tailwind v4 equivalent `bg-linear-to-r` to suppress IDE warnings without any visual change.
+- **Code Cleanup**: Removed junk/duplicate code at the end of `MarketingTab.tsx` and corrected indentation of all modal JSX blocks to be proper siblings inside the root container.
+
 ---
 
 ## 🔄 Deployment Workflow
