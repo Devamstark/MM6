@@ -75,7 +75,10 @@ export const ConversionAnalyticsTab: React.FC = () => {
     const loadConversionData = useCallback(async () => {
         setLoading(true);
         try {
-            // Load all campaigns and their conversion data
+            // 1. Fetch overall analytics for global counts
+            const globalStats = await api.getMarketingAnalytics();
+
+            // 2. Load all campaigns and their individual conversion data
             const allCampaigns = await api.getCampaigns({});
             const campaignsWithConversions = await Promise.all(
                 allCampaigns
@@ -103,31 +106,22 @@ export const ConversionAnalyticsTab: React.FC = () => {
                     })
             );
 
-            const validCampaigns = campaignsWithConversions.filter(Boolean);
+            const validCampaigns = campaignsWithConversions.filter(Boolean) as CampaignConversionData[];
             setCampaigns(validCampaigns);
 
-            // Calculate overall stats
-            const totalRevenue = validCampaigns.reduce((sum, c: any) => sum + parseFloat(c.total_revenue), 0);
-            const totalConversions = validCampaigns.reduce((sum, c: any) => sum + c.total_conversions, 0);
-            const avgConvRate = validCampaigns.length > 0
-                ? validCampaigns.reduce((sum, c: any) => sum + c.conversion_rate, 0) / validCampaigns.length
-                : 0;
-            const avgCTR = validCampaigns.length > 0
-                ? validCampaigns.reduce((sum, c: any) => sum + c.click_through_rate, 0) / validCampaigns.length
-                : 0;
-
+            // Use global stats for header if available, otherwise calculate from validCampaigns
             setOverallStats({
-                total_campaigns: validCampaigns.length,
-                total_revenue: totalRevenue,
-                avg_conversion_rate: avgConvRate,
-                avg_click_through_rate: avgCTR,
-                total_conversions: totalConversions,
-                total_emails_sent: validCampaigns.reduce((sum, c: any) => sum + c.total_sent, 0),
+                total_campaigns: globalStats.total_sent_campaigns || validCampaigns.length,
+                total_revenue: parseFloat(globalStats.total_revenue) || validCampaigns.reduce((sum, c) => sum + parseFloat(c.total_revenue), 0),
+                avg_conversion_rate: globalStats.avg_click_rate || (validCampaigns.length > 0 ? validCampaigns.reduce((sum, c) => sum + c.conversion_rate, 0) / validCampaigns.length : 0),
+                avg_click_through_rate: globalStats.avg_click_rate || (validCampaigns.length > 0 ? validCampaigns.reduce((sum, c) => sum + c.click_through_rate, 0) / validCampaigns.length : 0),
+                total_conversions: globalStats.total_conversions || validCampaigns.reduce((sum, c) => sum + c.total_conversions, 0),
+                total_emails_sent: globalStats.total_emails_sent || validCampaigns.reduce((sum, c) => sum + c.total_sent, 0),
             });
 
-            // Generate trend data (mock for now - can be enhanced with backend endpoint)
-            const trends = generateTrendData(validCampaigns, dateRange);
-            setTrendData(trends);
+            // Generate trend data from actual campaign data (NOT random)
+            const chartsTrend = generateTrendData(validCampaigns, dateRange);
+            setTrendData(chartsTrend);
 
         } catch (error) {
             console.error('Failed to load conversion analytics', error);
@@ -140,20 +134,39 @@ export const ConversionAnalyticsTab: React.FC = () => {
         loadConversionData();
     }, [loadConversionData]);
 
-    // Generate mock trend data based on campaigns
-    const generateTrendData = (campaigns: any[], range: string): TrendData[] => {
+    // Generate trend data based on actual campaign dates
+    const generateTrendData = (campaigns: CampaignConversionData[], range: string): TrendData[] => {
         const days = range === '7d' ? 7 : range === '30d' ? 30 : range === '90d' ? 90 : 180;
         const data: TrendData[] = [];
         const now = new Date();
 
+        // Group actual data by date
+        const dailyStats: Record<string, { conversions: number, revenue: number, emails_sent: number }> = {};
+
+        campaigns.forEach(c => {
+            if (!c.sent_at) return;
+            const dateStr = new Date(c.sent_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            if (!dailyStats[dateStr]) {
+                dailyStats[dateStr] = { conversions: 0, revenue: 0, emails_sent: 0 };
+            }
+            dailyStats[dateStr].conversions += c.total_conversions;
+            dailyStats[dateStr].revenue += parseFloat(c.total_revenue);
+            dailyStats[dateStr].emails_sent += c.total_sent;
+        });
+
+        // Fill in the range with actual data or zeroes
         for (let i = days; i >= 0; i--) {
             const date = new Date(now);
             date.setDate(date.getDate() - i);
+            const dateStr = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            const stats = dailyStats[dateStr] || { conversions: 0, revenue: 0, emails_sent: 0 };
+
             data.push({
-                date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-                conversions: Math.floor(Math.random() * 20),
-                revenue: Math.floor(Math.random() * 2000),
-                emails_sent: Math.floor(Math.random() * 500),
+                date: dateStr,
+                conversions: stats.conversions,
+                revenue: stats.revenue,
+                emails_sent: stats.emails_sent,
             });
         }
         return data;
@@ -282,8 +295,8 @@ export const ConversionAnalyticsTab: React.FC = () => {
                                 key={range}
                                 onClick={() => setDateRange(range)}
                                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${dateRange === range
-                                        ? 'bg-purple-600 text-white'
-                                        : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                                    ? 'bg-purple-600 text-white'
+                                    : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                                     }`}
                             >
                                 {range === 'all' ? 'All Time' : range.toUpperCase()}
@@ -449,10 +462,10 @@ export const ConversionAnalyticsTab: React.FC = () => {
                                             <td className="px-4 py-3 text-center">
                                                 <div className="flex items-center justify-center gap-1">
                                                     <span className={`font-bold ${campaign.conversion_rate >= 5
-                                                            ? 'text-green-600'
-                                                            : campaign.conversion_rate >= 2
-                                                                ? 'text-blue-600'
-                                                                : 'text-orange-600'
+                                                        ? 'text-green-600'
+                                                        : campaign.conversion_rate >= 2
+                                                            ? 'text-blue-600'
+                                                            : 'text-orange-600'
                                                         }`}>
                                                         {campaign.conversion_rate.toFixed(2)}%
                                                     </span>
@@ -470,8 +483,8 @@ export const ConversionAnalyticsTab: React.FC = () => {
                                                 </span>
                                             </td>
                                             <td className="px-4 py-3 text-right font-bold text-gray-600 dark:text-gray-400">
-                                                    ${parseFloat(campaign.revenue_per_email).toFixed(2)}
-                                                </td>
+                                                ${parseFloat(campaign.revenue_per_email).toFixed(2)}
+                                            </td>
                                         </tr>
                                     ))}
                             </tbody>

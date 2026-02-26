@@ -1056,6 +1056,13 @@ export const api = {
     return response.data;
   },
 
+  getCampaignCalendar: async (year: number, month: number): Promise<any> => {
+    const response = await client.get('marketing-campaigns/calendar/', {
+      params: { year, month }
+    });
+    return response.data;
+  },
+
   getAudiencePreview: async (audienceType: string, audienceDays?: number, manualUserIds?: string[]): Promise<any> => {
     const params: Record<string, string> = { audience_type: audienceType };
     if (audienceDays) params.audience_days = String(audienceDays);
