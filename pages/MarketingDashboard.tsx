@@ -61,15 +61,17 @@ export const MarketingDashboard: React.FC = () => {
         fetchDashboardData();
     }, []);
 
+    if (loading) return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><Activity className="animate-spin text-indigo-600" /></div>;
+
     return (
         <div className="bg-gray-50 dark:bg-slate-950 min-h-screen pb-20 transition-colors duration-300" style={{ fontFamily: 'Inter, sans-serif' }}>
             <div className="max-w-[1440px] mx-auto px-6 lg:px-12 py-12">
-                {/* Header */}
-                <div className="mb-10 animate-fade-up">
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                {/* Header - Sticky */}
+                <div className="sticky top-16 z-30 bg-gray-50/80 dark:bg-slate-950/80 backdrop-blur-md pt-4 pb-4 mb-4 -mx-4 px-4 rounded-b-3xl border-b border-gray-200 dark:border-gray-800 animate-fade-up">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
                         <div>
                             <div className="flex items-center gap-3 mb-2">
-                                <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                                <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
                                     <Mail className="w-5 h-5 text-white" />
                                 </div>
                                 <span className="text-indigo-600 dark:text-indigo-400 font-black text-xs uppercase tracking-[0.3em]">Enterprise Marketing</span>
@@ -77,58 +79,55 @@ export const MarketingDashboard: React.FC = () => {
                             <h1 className="text-4xl font-black text-gray-900 dark:text-white tracking-tight" style={{ fontFamily: 'Outfit, Inter, sans-serif' }}>
                                 Marketing Command Center
                             </h1>
-                            <p className="text-gray-500 dark:text-gray-400 font-medium mt-2 text-base">
-                                Create campaigns, target audiences, track deliveries, and analyze performance — all in one place.
-                            </p>
                         </div>
-                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800">
+                        <div className="flex items-center gap-2 px-4 py-2 bg-linear-to-r from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800">
                             <Sparkles className="w-4 h-4 text-indigo-500" />
                             <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">Enterprise Edition</span>
                         </div>
                     </div>
-                </div>
 
-                {/* Quick Stats Cards */}
-                {!loading && stats && (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8 animate-fade-up" style={{ animationDelay: '50ms' }}>
-                        <StatCard
-                            icon={<Users className="w-5 h-5" />}
-                            label="Subscribers"
-                            value={stats.total_subscribers.toLocaleString()}
-                            color="blue"
-                        />
-                        <StatCard
-                            icon={<Send className="w-5 h-5" />}
-                            label="Emails Sent"
-                            value={stats.emails_sent_this_month.toLocaleString()}
-                            color="indigo"
-                        />
-                        <StatCard
-                            icon={<TrendingUp className="w-5 h-5" />}
-                            label="Avg Open Rate"
-                            value={`${stats.avg_open_rate}%`}
-                            color="green"
-                        />
-                        <StatCard
-                            icon={<Activity className="w-5 h-5" />}
-                            label="Avg Click Rate"
-                            value={`${stats.avg_click_rate}%`}
-                            color="purple"
-                        />
-                        <StatCard
-                            icon={<Tag className="w-5 h-5" />}
-                            label="Active Coupons"
-                            value={stats.active_coupons.toLocaleString()}
-                            color="orange"
-                        />
-                        <StatCard
-                            icon={<TrendingUp className="w-5 h-5" />}
-                            label="Revenue"
-                            value={`$${stats.revenue_from_campaigns.toLocaleString()}`}
-                            color="emerald"
-                        />
-                    </div>
-                )}
+                    {/* Quick Stats Cards inside sticky header */}
+                    {!loading && stats && (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 animate-fade-up">
+                            <StatCard
+                                icon={<Users className="w-4 h-4" />}
+                                label="Subscribers"
+                                value={stats.total_subscribers.toLocaleString()}
+                                color="blue"
+                            />
+                            <StatCard
+                                icon={<Send className="w-4 h-4" />}
+                                label="Emails Sent"
+                                value={stats.emails_sent_this_month.toLocaleString()}
+                                color="indigo"
+                            />
+                            <StatCard
+                                icon={<TrendingUp className="w-4 h-4" />}
+                                label="Avg Open Rate"
+                                value={`${stats.avg_open_rate}%`}
+                                color="green"
+                            />
+                            <StatCard
+                                icon={<Activity className="w-4 h-4" />}
+                                label="Avg Click Rate"
+                                value={`${stats.avg_click_rate}%`}
+                                color="purple"
+                            />
+                            <StatCard
+                                icon={<Tag className="w-4 h-4" />}
+                                label="Active Coupons"
+                                value={stats.active_coupons.toLocaleString()}
+                                color="orange"
+                            />
+                            <StatCard
+                                icon={<TrendingUp className="w-4 h-4" />}
+                                label="Revenue"
+                                value={`$${stats.revenue_from_campaigns.toLocaleString()}`}
+                                color="emerald"
+                            />
+                        </div>
+                    )}
+                </div>
 
                 {/* Main Content */}
                 <div className="animate-fade-up" style={{ animationDelay: '100ms' }}>
@@ -145,16 +144,15 @@ export const MarketingDashboard: React.FC = () => {
                             <div className="space-y-3">
                                 {recentActivity.map((activity) => (
                                     <div key={activity.id} className="flex items-start gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                                            activity.type === 'campaign_sent' ? 'bg-green-100 text-green-600' :
-                                            activity.type === 'coupon_created' ? 'bg-blue-100 text-blue-600' :
-                                            activity.type === 'subscriber_added' ? 'bg-purple-100 text-purple-600' :
-                                            'bg-gray-100 text-gray-600'
-                                        }`}>
+                                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${activity.type === 'campaign_sent' ? 'bg-green-100 text-green-600' :
+                                                activity.type === 'coupon_created' ? 'bg-blue-100 text-blue-600' :
+                                                    activity.type === 'subscriber_added' ? 'bg-purple-100 text-purple-600' :
+                                                        'bg-gray-100 text-gray-600'
+                                            }`}>
                                             {activity.type === 'campaign_sent' ? <Send className="w-4 h-4" /> :
-                                             activity.type === 'coupon_created' ? <Tag className="w-4 h-4" /> :
-                                             activity.type === 'subscriber_added' ? <Users className="w-4 h-4" /> :
-                                             <Mail className="w-4 h-4" />}
+                                                activity.type === 'coupon_created' ? <Tag className="w-4 h-4" /> :
+                                                    activity.type === 'subscriber_added' ? <Users className="w-4 h-4" /> :
+                                                        <Mail className="w-4 h-4" />}
                                         </div>
                                         <div className="flex-1">
                                             <p className="text-sm font-bold text-gray-900 dark:text-white">{activity.message}</p>

@@ -62,6 +62,23 @@ export const MarketingTab: React.FC = () => {
         scheduled_date: '',
     });
 
+    // Body scroll lock effect
+    useEffect(() => {
+        const anyModalOpen = showModal || showLogsModal || showConversionModal || showTemplateBuilder;
+        if (anyModalOpen) {
+            document.body.style.overflow = 'hidden';
+            // Add padding to prevent layout shift if scrollbar disappears
+            document.body.style.paddingRight = '15px';
+        } else {
+            document.body.style.overflow = 'unset';
+            document.body.style.paddingRight = '0px';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+            document.body.style.paddingRight = '0px';
+        };
+    }, [showModal, showLogsModal, showConversionModal, showTemplateBuilder]);
+
     const loadCampaigns = useCallback(async () => {
         setLoading(true);
         try {
