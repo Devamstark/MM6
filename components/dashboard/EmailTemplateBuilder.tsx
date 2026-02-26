@@ -27,9 +27,8 @@ const TEMPLATES: EmailTemplate[] = [
         subject: 'Welcome to SmartShop! 🎉',
         previewText: 'We\'re excited to have you on board',
         blocks: [
-            { id: '1', type: 'header', content: { text: 'Welcome!', backgroundColor: '#4F46E5' } },
-            { id: '2', type: 'text', content: { text: 'Hi {{customer_name}},\n\nThank you for joining SmartShop! We\'re thrilled to have you as part of our community.', alignment: 'left' } },
-            { id: '3', type: 'button', content: { text: 'Start Shopping', url: '/products', backgroundColor: '#4F46E5' } },
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #4F46E5; margin-bottom: 16px;">Welcome to SmartShop! 🎉</h2>\n\n<p>Hi {{customer_name}},</p>\n\n<p>Thank you for joining SmartShop! We\'re thrilled to have you as part of our community.</p>\n\n<p>As a welcome gift, use code <strong>WELCOME10</strong> for 10% off your first order.</p>\n\n<p>Happy Shopping!<br/>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Start Shopping', url: '/products', backgroundColor: '#4F46E5' } },
         ]
     },
     {
@@ -38,10 +37,8 @@ const TEMPLATES: EmailTemplate[] = [
         subject: 'Flash Sale - 50% Off! 🔥',
         previewText: 'Don\'t miss out on these amazing deals',
         blocks: [
-            { id: '1', type: 'header', content: { text: 'FLASH SALE', backgroundColor: '#EF4444' } },
-            { id: '2', type: 'image', content: { url: '', alt: 'Sale Banner' } },
-            { id: '3', type: 'text', content: { text: 'Get up to 50% off on selected items. Use code: FLASH50', alignment: 'center' } },
-            { id: '4', type: 'button', content: { text: 'Shop Now', url: '/products?sale=true', backgroundColor: '#EF4444' } },
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #EF4444; margin-bottom: 16px;">🔥 FLASH SALE ALERT! 🔥</h2>\n\n<p>Dear Valued Customer,</p>\n\n<p>For the next 48 hours only, enjoy <strong>up to 50% OFF</strong> on selected items!</p>\n\n<p>Use code: <strong style="color: #EF4444; font-size: 18px;">FLASH50</strong></p>\n\n<p>Don\'t wait - these deals won\'t last long!</p>\n\n<p>Happy Shopping!<br/>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Shop the Sale', url: '/products?sale=true', backgroundColor: '#EF4444' } },
         ]
     },
     {
@@ -50,10 +47,8 @@ const TEMPLATES: EmailTemplate[] = [
         subject: 'You left something in your cart 🛒',
         previewText: 'Complete your purchase before it\'s gone',
         blocks: [
-            { id: '1', type: 'header', content: { text: 'Forgot Something?', backgroundColor: '#F59E0B' } },
-            { id: '2', type: 'product', content: { productId: null } },
-            { id: '3', type: 'text', content: { text: 'Your items are waiting! Complete your checkout now.', alignment: 'center' } },
-            { id: '4', type: 'button', content: { text: 'Complete Purchase', url: '/cart', backgroundColor: '#F59E0B' } },
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #F59E0B; margin-bottom: 16px;">Forgot Something? 🛒</h2>\n\n<p>Hi {{customer_name}},</p>\n\n<p>We noticed you left some items in your cart. Don\'t worry, we\'ve saved them for you!</p>\n\n<p>Complete your purchase now before items sell out.</p>\n\n<p>Need help? Reply to this email and we\'ll assist you.</p>\n\n<p>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Complete Purchase', url: '/cart', backgroundColor: '#F59E0B' } },
         ]
     },
     {
@@ -62,9 +57,8 @@ const TEMPLATES: EmailTemplate[] = [
         subject: 'Thank you for your order! ❤️',
         previewText: 'Your order has been confirmed',
         blocks: [
-            { id: '1', type: 'header', content: { text: 'Thank You!', backgroundColor: '#10B981' } },
-            { id: '2', type: 'text', content: { text: 'Hi {{customer_name}},\n\nYour order #{{order_id}} has been confirmed and will be shipped soon.', alignment: 'left' } },
-            { id: '3', type: 'button', content: { text: 'Track Order', url: '/orders', backgroundColor: '#10B981' } },
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #10B981; margin-bottom: 16px;">Thank You! ❤️</h2>\n\n<p>Hi {{customer_name}},</p>\n\n<p>Great news! Your order <strong>#{{order_id}}</strong> has been confirmed and will be shipped soon.</p>\n\n<p>We\'ll send you another email with tracking information once your order ships.</p>\n\n<p>Thank you for choosing SmartShop!</p>\n\n<p>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Track Your Order', url: '/orders', backgroundColor: '#10B981' } },
         ]
     },
     {
@@ -73,9 +67,18 @@ const TEMPLATES: EmailTemplate[] = [
         subject: 'We miss you! Come back 🎁',
         previewText: 'Here\'s a special gift just for you',
         blocks: [
-            { id: '1', type: 'header', content: { text: 'We Miss You!', backgroundColor: '#8B5CF6' } },
-            { id: '2', type: 'text', content: { text: 'It\'s been a while! Here\'s 20% off your next order. Use code: COMEBACK20', alignment: 'center' } },
-            { id: '3', type: 'button', content: { text: 'Claim Offer', url: '/products', backgroundColor: '#8B5CF6' } },
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #8B5CF6; margin-bottom: 16px;">We Miss You! 🎁</h2>\n\n<p>Hi {{customer_name}},</p>\n\n<p>It\'s been a while since we last saw you, and we wanted to reach out with a special gift.</p>\n\n<p>Use code <strong style="color: #8B5CF6; font-size: 18px;">COMEBACK20</strong> for 20% off your next order!</p>\n\n<p>We\'d love to have you back.</p>\n\n<p>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Claim Your Offer', url: '/products', backgroundColor: '#8B5CF6' } },
+        ]
+    },
+    {
+        id: 'new-arrival',
+        name: 'New Arrivals Announcement',
+        subject: 'New Arrivals Just For You! ✨',
+        previewText: 'Check out the latest trends',
+        blocks: [
+            { id: '1', type: 'text', content: { text: '<h2 style="color: #4F46E5; margin-bottom: 16px;">✨ New Arrivals Are Here! ✨</h2>\n\n<p>Hi {{customer_name}},</p>\n\n<p>Be the first to discover our latest collection! We\'ve just added hundreds of new styles.</p>\n\n<p>From trending pieces to timeless classics, there\'s something for everyone.</p>\n\n<p>Shop now and stay ahead of the fashion curve!</p>\n\n<p>The SmartShop Team</p>', alignment: 'left' } },
+            { id: '2', type: 'button', content: { text: 'Shop New Arrivals', url: '/products?sort=newest', backgroundColor: '#4F46E5' } },
         ]
     },
 ];

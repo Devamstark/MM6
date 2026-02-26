@@ -65,10 +65,13 @@ export const MarketingTab: React.FC = () => {
             const params: Record<string, string> = {};
             if (statusFilter) params.status = statusFilter;
             if (typeFilter) params.campaign_type = typeFilter;
+            console.log('Loading campaigns with params:', params);
             const data = await api.getCampaigns(params);
+            console.log('Loaded campaigns:', data);
             setCampaigns(data);
         } catch (e) {
             console.error('Failed to load campaigns', e);
+            alert('Failed to load campaigns. Check console for details.');
         } finally {
             setLoading(false);
         }
@@ -99,14 +102,19 @@ export const MarketingTab: React.FC = () => {
                 dataToSave.status = 'draft';
             }
 
+            console.log('Saving campaign with data:', dataToSave);
+
             let created;
             if (dataToSave.id) {
                 created = await api.updateCampaign(dataToSave.id, dataToSave);
+                console.log('Campaign updated:', created);
             } else {
                 created = await api.createCampaign(dataToSave);
+                console.log('Campaign created:', created);
             }
 
             if (sendNow && created?.id) {
+                console.log('Sending campaign:', created.id);
                 await api.sendCampaign(created.id, true);
                 alert('Campaign saved and sending initiated!');
             } else if (!sendNow && dataToSave.scheduled_date && created?.id) {
@@ -116,12 +124,14 @@ export const MarketingTab: React.FC = () => {
                 alert('Campaign saved as draft!');
             }
 
+            console.log('Reloading campaigns...');
             setShowModal(false);
             resetForm();
-            loadCampaigns();
-            loadAnalytics();
+            await loadCampaigns();
+            await loadAnalytics();
         } catch (error: any) {
-            console.error(error);
+            console.error('Save error:', error);
+            console.error('Error response:', error?.response?.data);
             alert(error?.response?.data?.message || error?.response?.data?.detail || error?.response?.data?.error || 'Failed to save campaign.');
         } finally {
             setSaving(false);
@@ -247,21 +257,18 @@ export const MarketingTab: React.FC = () => {
     };
 
     const generateHtmlFromBlocks = (blocks: any[]) => {
-        // Simple HTML generation from blocks - can be enhanced
-        let html = '<div style="max-width: 600px; margin: 0 auto; font-family: Arial, sans-serif;">';
+        // Generate HTML content from template blocks
+        let html = '';
         blocks.forEach(block => {
-            if (block.type === 'header') {
-                html += `<div style="background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; padding: 32px; text-align: center;"><h1 style="margin: 0; font-size: 28px;">${block.content.text}</h1></div>`;
-            } else if (block.type === 'text') {
-                html += `<div style="padding: 16px; text-align: ${block.content.alignment};"><p style="margin: 0; font-size: 16px; color: #374151; white-space: pre-line;">${block.content.text}</p></div>`;
+            if (block.type === 'text') {
+                // Text blocks already contain formatted HTML
+                html += block.content.text + '\n\n';
             } else if (block.type === 'button') {
-                html += `<div style="padding: 16px; text-align: center;"><a href="${block.content.url}" style="display: inline-block; padding: 12px 32px; background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; text-decoration: none; border-radius: 8px; font-weight: bold;">${block.content.text}</a></div>`;
-            } else if (block.type === 'footer') {
-                html += `<div style="background-color: ${block.content.backgroundColor}; color: ${block.content.textColor}; padding: 24px; text-align: center;"><p style="margin: 0; font-size: 14px;">${block.content.text}</p></div>`;
+                // Button will be added by backend template
+                html += `[Button: ${block.content.text} → ${block.content.url}]\n\n`;
             }
         });
-        html += '</div>';
-        return html;
+        return html.trim();
     };
 
     return (
@@ -388,6 +395,17 @@ export const MarketingTab: React.FC = () => {
                             <option value="">All Types</option>
                             {Object.entries(TYPE_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
                         </select>
+                        {(statusFilter || typeFilter) && (
+                            <button
+                                onClick={() => { setStatusFilter(''); setTypeFilter(''); }}
+                                className="flex items-center gap-1 px-3 py-2 bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold hover:bg-red-100 dark:hover:bg-red-900/30 transition-all"
+                            >
+                                <X className="w-3 h-3" /> Clear Filters
+                            </button>
+                        )}
+                        <div className="ml-auto text-xs text-gray-500 dark:text-gray-400">
+                            Showing {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}
+                        </div>
                     </div>
 
                     {loading ? (
@@ -395,8 +413,30 @@ export const MarketingTab: React.FC = () => {
                     ) : campaigns.length === 0 ? (
                         <div className="text-center py-20 bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800">
                             <Mail className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">No campaigns found</h3>
-                            <p className="text-gray-500 dark:text-gray-400 mt-2">Get started by creating your first marketing campaign.</p>
+                            <h3 className="text-xl font-bold text-gray-900 dark:text-white">
+                                {statusFilter || typeFilter ? 'No campaigns match your filters' : 'No campaigns found'}
+                            </h3>
+                            <p className="text-gray-500 dark:text-gray-400 mt-2">
+                                {statusFilter || typeFilter
+                                    ? 'Try clearing your filters or creating a new campaign.'
+                                    : 'Get started by creating your first marketing campaign.'}
+                            </p>
+                            {(statusFilter || typeFilter) && (
+                                <button
+                                    onClick={() => { setStatusFilter(''); setTypeFilter(''); }}
+                                    className="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all"
+                                >
+                                    Clear All Filters
+                                </button>
+                            )}
+                            {!statusFilter && !typeFilter && (
+                                <button
+                                    onClick={() => { resetForm(); setShowModal(true); }}
+                                    className="mt-4 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 mx-auto"
+                                >
+                                    <Plus className="w-4 h-4" /> Create Campaign
+                                </button>
+                            )}
                         </div>
                     ) : (
                         <div className="bg-white dark:bg-gray-900 rounded-3xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
@@ -553,7 +593,7 @@ export const MarketingTab: React.FC = () => {
                             {/* Content */}
                             <div>
                                 <div className="flex items-center justify-between mb-2">
-                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email Content <span className="text-red-500">*</span></label>
+                                    <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider">Email Message <span className="text-red-500">*</span></label>
                                     <button
                                         type="button"
                                         onClick={() => setShowTemplateBuilder(true)}
@@ -563,8 +603,33 @@ export const MarketingTab: React.FC = () => {
                                         Use Template Builder
                                     </button>
                                 </div>
-                                <textarea rows={6} value={formData.message || ''} onChange={e => setFormData({ ...formData, message: e.target.value })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 font-mono text-sm" placeholder="<h1>Big Sale!</h1><p>Shop now...</p>"></textarea>
-                                <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">💡 Pro tip: Use the Template Builder to create professional emails visually, or paste your HTML code directly here.</p>
+                                <textarea
+                                    rows={8}
+                                    value={formData.message || ''}
+                                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                                    className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20 font-sans text-sm"
+                                    placeholder="Write your email message here...
+
+Example:
+<h2>🎉 Big Summer Sale!</h2>
+<p>Dear Valued Customer,</p>
+<p>We're excited to offer you <strong>50% OFF</strong> on all summer collection items!</p>
+<p>Use code: <strong>SUMMER50</strong> at checkout.</p>
+<p>Don't miss out on this amazing opportunity to refresh your wardrobe at unbeatable prices.</p>
+<p>Happy Shopping!<br/>The SmartShop Team</p>"
+                                />
+                                <div className="mt-3 p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-xl">
+                                    <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400 mb-2">📝 Formatting Tips:</p>
+                                    <ul className="text-xs text-indigo-600 dark:text-indigo-500 space-y-1">
+                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;h2&gt;Your Heading&lt;/h2&gt;</code> for headings</li>
+                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;p&gt;Your paragraph&lt;/p&gt;</code> for paragraphs</li>
+                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">&lt;strong&gt;bold text&lt;/strong&gt;</code> for emphasis</li>
+                                        <li>• Use <code className="bg-white dark:bg-gray-800 px-1.5 py-0.5 rounded">{{'{{customer_name}}'}}</code> to personalize with customer's name</li>
+                                    </ul>
+                                    <p className="text-xs text-indigo-500 dark:text-indigo-400 mt-2">
+                                        💡 The SmartShop branding (logo, header, footer, unsubscribe) will be added automatically to every email.
+                                    </p>
+                                </div>
                             </div>
                             <div>
                                 <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Plain Text Fallback</label>

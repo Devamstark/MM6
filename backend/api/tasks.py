@@ -295,22 +295,125 @@ def _send_batch(campaign_id, log_ids):
     try:
         campaign = MarketingCampaign.objects.get(id=campaign_id)
 
-        # Build email content
-        subject = campaign.subject
-        html_message = campaign.message
+        # Build SmartShop branded email template
+        base_url = 'https://smartshop1.us'
+        logo_url = f'{base_url}/logo.png'  # You can update this to your actual logo URL
 
-        # Add discount code if present
-        if campaign.discount_code:
-            html_message += f'<br><br><p style="text-align:center;font-size:18px;">Use code: <strong>{campaign.discount_code}</strong></p>'
+        # Start with branded header
+        html_message = f'''
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>{campaign.subject}</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f3f4f6;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f3f4f6; padding: 40px 0;">
+                <tr>
+                    <td align="center">
+                        <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            <!-- Header with Logo -->
+                            <tr>
+                                <td style="background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%); padding: 32px 24px; text-align: center;">
+                                    <h1 style="margin: 0; font-size: 28px; font-weight: 900; letter-spacing: 0.1em; color: #ffffff;">SMARTSHOP</h1>
+                                    <p style="margin: 8px 0 0 0; font-size: 12px; font-weight: 600; color: rgba(255,255,255,0.8); letter-spacing: 0.05em;">EST. 2026</p>
+                                </td>
+                            </tr>
 
-        # Add CTA button with tracking if present
-        if campaign.cta_text and campaign.cta_url:
-            # We'll replace the URL with tracked version in the per-user loop
-            html_message += f'<br><p style="text-align:center;"><a href="{{{{CTA_URL}}}}" style="background:#4f46e5;color:#fff;padding:14px 28px;border-radius:8px;text-decoration:none;font-weight:bold;display:inline-block;">{campaign.cta_text}</a></p>'
+                            <!-- Main Content -->
+                            <tr>
+                                <td style="padding: 40px 32px;">
+                                    {campaign.message}
+                                </td>
+                            </tr>
 
-        # Add unsubscribe footer (GDPR compliance)
-        html_message += '<br><hr style="border:none;border-top:1px solid #eee;margin:32px 0 16px;"><p style="text-align:center;font-size:11px;color:#999;">You are receiving this email because you are a registered user of SmartShop. If you wish to stop receiving these emails, please update your email preferences in your account settings.</p>'
+                            <!-- CTA Button -->
+                            {f'''
+                            <tr>
+                                <td align="center" style="padding: 0 32px 40px;">
+                                    <a href="{{{{CTA_URL}}}}" style="display: inline-block; background-color: #4F46E5; color: #ffffff; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 16px; letter-spacing: 0.02em;">
+                                        {campaign.cta_text or 'Shop Now'}
+                                    </a>
+                                </td>
+                            </tr>
+                            ''' if campaign.cta_text else ''}
 
+                            <!-- Discount Code -->
+                            {f'''
+                            <tr>
+                                <td align="center" style="padding: 0 32px 32px;">
+                                    <table cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td style="border: 2px dashed #4F46E5; border-radius: 8px; padding: 16px 32px; background-color: #EEF2FF;">
+                                                <p style="margin: 0; font-size: 12px; color: #6B7280; font-weight: 600; text-transform: uppercase;">Use Code</p>
+                                                <p style="margin: 8px 0 0 0; font-size: 24px; font-weight: 900; color: #4F46E5; letter-spacing: 0.05em;">{campaign.discount_code}</p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            ''' if campaign.discount_code else ''}
+
+                            <!-- Footer -->
+                            <tr>
+                                <td style="background-color: #1F2937; padding: 32px 24px; text-align: center;">
+                                    <p style="margin: 0 0 16px 0; font-size: 14px; font-weight: 700; color: #ffffff; letter-spacing: 0.05em;">SMARTSHOP</p>
+                                    <p style="margin: 0 0 24px 0; font-size: 12px; color: #9CA3AF; line-height: 1.6;">
+                                        You are receiving this email because you are a registered user of SmartShop.<br>
+                                        We respect your privacy and will never share your information.
+                                    </p>
+                                    <table width="100%" cellpadding="0" cellspacing="0">
+                                        <tr>
+                                            <td align="center" style="padding: 12px 0; border-top: 1px solid #374151;">
+                                                <a href="{{{{UNSUBSCRIBE_URL}}}}" style="color: #9CA3AF; font-size: 12px; text-decoration: underline;">Unsubscribe</a>
+                                                <span style="color: #4B5563; margin: 0 8px;">|</span>
+                                                <a href="{base_url}/profile" style="color: #9CA3AF; font-size: 12px; text-decoration: underline;">Update Preferences</a>
+                                                <span style="color: #4B5563; margin: 0 8px;">|</span>
+                                                <a href="{base_url}" style="color: #9CA3AF; font-size: 12px; text-decoration: underline;">View in Browser</a>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td align="center" style="padding-top: 16px;">
+                                                <p style="margin: 0; font-size: 11px; color: #6B7280;">
+                                                    © 2026 SmartShop. All rights reserved.
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Mailing Address (CAN-SPAM Compliance) -->
+                        <table width="600" cellpadding="0" cellspacing="0">
+                            <tr>
+                                <td align="center" style="padding: 24px 0; color: #9CA3AF; font-size: 11px;">
+                                    SmartShop Inc.<br>
+                                    123 Commerce Street<br>
+                                    Digital City, DC 12345
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        '''
+
+        # Add tracking to CTA URL
+        if campaign.cta_url:
+            tracked_url = f"{base_url}/api/campaigns/{campaign.id}/track-click/?user_id={{{{USER_ID}}}}&email={{{{EMAIL}}}}&url={campaign.cta_url}"
+            html_message = html_message.replace('{{{{CTA_URL}}}}', tracked_url)
+        else:
+            html_message = html_message.replace('{{{{CTA_URL}}}}', '#')
+
+        # Add unsubscribe URL
+        unsubscribe_url = f"{base_url}/profile?unsubscribe=campaign-{campaign.id}"
+        html_message = html_message.replace('{{{{UNSUBSCRIBE_URL}}}}', unsubscribe_url)
+
+        # Replace user-specific placeholders
         text_message = campaign.plain_text or strip_tags(html_message)
 
         logs = EmailDeliveryLog.objects.filter(id__in=log_ids)
@@ -319,24 +422,20 @@ def _send_batch(campaign_id, log_ids):
 
         for log in logs:
             try:
-                # Build tracked CTA URL
-                cta_url = campaign.cta_url or ''
-                if cta_url:
-                    # Add tracking parameters
-                    from django.conf import settings
-                    base_url = settings.API_URL.replace('/api', '') if hasattr(settings, 'API_URL') else 'http://localhost:8000'
-                    tracked_url = f"{base_url}/api/campaigns/{campaign.id}/track-click/?user_id={log.user.id}&email={log.email}&url={cta_url}"
-                    # Replace placeholder
-                    email_html = html_message.replace('{{{{CTA_URL}}}}', tracked_url)
-                else:
-                    email_html = html_message.replace('{{{{CTA_URL}}}}', campaign.cta_url or '#')
+                # Personalize email for each user
+                personalized_html = html_message.replace('{{{{USER_ID}}}}', str(log.user.id))
+                personalized_html = personalized_html.replace('{{{{EMAIL}}}}', log.email)
+
+                # Try to personalize with user's name if available
+                user_name = getattr(log.user, 'first_name', None) or log.email.split('@')[0]
+                personalized_html = personalized_html.replace('{{customer_name}}', user_name)
 
                 send_mail(
                     subject,
                     text_message,
                     settings.DEFAULT_FROM_EMAIL,
                     [log.email],
-                    html_message=email_html,
+                    html_message=personalized_html,
                     fail_silently=False,
                 )
                 log.status = 'sent'
