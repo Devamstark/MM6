@@ -110,10 +110,9 @@ services:
       - dokploy-network
     deploy:
       resources:
-        resources:
-          limits:
-            memory: 512M
-            cpus: '0.5'
+        limits:
+          memory: 512M
+          cpus: '0.5'
 
   celery_beat:
     build:
