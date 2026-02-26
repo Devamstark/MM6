@@ -122,13 +122,13 @@ class CampaignRecipientAdmin(admin.ModelAdmin):
 
 @admin.register(EmailClickLog)
 class EmailClickLogAdmin(admin.ModelAdmin):
-    list_display = ('campaign', 'user', 'email', 'clicked_url', 'clicked_at')
+    list_display = ('campaign', 'user', 'email', 'url', 'clicked_at')
     list_filter = ('campaign', 'clicked_at')
-    search_fields = ('email', 'clicked_url', 'campaign__name')
+    search_fields = ('email', 'url', 'campaign__name')
 
 @admin.register(EmailConversion)
 class EmailConversionAdmin(admin.ModelAdmin):
     list_display = ('campaign', 'user', 'conversion_value', 'converted_at', 'time_to_convert')
     list_filter = ('campaign', 'converted_at')
     search_fields = ('user__email', 'campaign__name')
-    readonly_fields = ('id', 'campaign', 'user', 'click', 'conversion_value', 'converted_at', 'time_to_convert', 'order')
+    readonly_fields = ('id', 'campaign', 'user', 'click_log', 'conversion_value', 'converted_at', 'time_to_convert', 'order')
