@@ -1,6 +1,10 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import User, Product, Order, OrderItem, Payment, BlogPost, NewsletterSubscriber
+from .models import (
+    User, Product, Order, OrderItem, Payment, BlogPost,
+    NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog,
+    CampaignRecipient, EmailClickLog, EmailConversion
+)
 
 # Register User Custom Admin
 @admin.register(User)
@@ -49,8 +53,82 @@ class BlogPostAdmin(admin.ModelAdmin):
         ('Publishing', {'fields': ('is_published', 'is_featured', 'published_at')}),
         ('Stats', {'fields': ('views', 'reading_time', 'created_at', 'updated_at')}),
     )
+
 @admin.register(NewsletterSubscriber)
 class NewsletterSubscriberAdmin(admin.ModelAdmin):
     list_display = ('email', 'subscribed_at', 'is_active')
     list_filter = ('is_active', 'subscribed_at')
     search_fields = ('email',)
+
+# Marketing Admin
+class EmailDeliveryLogInline(admin.TabularInline):
+    model = EmailDeliveryLog
+    extra = 0
+    readonly_fields = ('user', 'email', 'status', 'sent_at', 'opened_at', 'clicked_at', 'error_message')
+    can_delete = False
+    verbose_name = 'Email Delivery Log'
+    verbose_name_plural = 'Email Delivery Logs'
+
+@admin.register(MarketingCampaign)
+class MarketingCampaignAdmin(admin.ModelAdmin):
+    list_display = ('name', 'status', 'campaign_type', 'total_recipients', 'emails_sent', 'delivery_rate', 'created_at')
+    list_filter = ('status', 'campaign_type', 'created_at')
+    search_fields = ('name', 'subject')
+    readonly_fields = ('id', 'created_at', 'updated_at', 'sent_at', 'total_recipients', 'emails_sent', 'emails_failed', 'emails_opened', 'emails_clicked', 'delivery_rate', 'open_rate', 'click_rate')
+    fieldsets = (
+        ('Basic Info', {'fields': ('id', 'name', 'subject', 'preheader', 'status', 'campaign_type')}),
+        ('Content', {'fields': ('message', 'plain_text', 'banner_image_url', 'cta_text', 'cta_url')}),
+        ('Discount', {'fields': ('discount_code', 'discount_type', 'discount_value', 'discount_min_purchase', 'discount_usage_limit', 'discount_expiry_days', 'coupon')}),
+        ('Audience', {'fields': ('audience_type', 'audience_days', 'manual_user_ids')}),
+        ('Scheduling', {'fields': ('scheduled_date', 'sent_at')}),
+        ('Statistics', {'fields': ('total_recipients', 'emails_sent', 'emails_failed', 'emails_opened', 'emails_clicked', 'delivery_rate', 'open_rate', 'click_rate')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+    inlines = [EmailDeliveryLogInline]
+
+    def has_delete_permission(self, request, obj=None):
+        # Prevent deletion of sent campaigns
+        if obj and obj.status == 'sent':
+            return False
+        return True
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # Editing existing object
+            return self.readonly_fields + ('status', 'campaign_type', 'audience_type')
+        return self.readonly_fields
+
+@admin.register(EmailDeliveryLog)
+class EmailDeliveryLogAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'user', 'email', 'status', 'sent_at', 'retry_count')
+    list_filter = ('status', 'campaign', 'sent_at')
+    search_fields = ('email', 'user__email', 'campaign__name')
+    readonly_fields = ('id', 'campaign', 'user', 'email', 'status', 'sent_at', 'opened_at', 'clicked_at', 'error_message', 'retry_count')
+    can_delete = False
+
+    def has_delete_permission(self, request, obj=None):
+        return False  # Never allow deletion of delivery logs
+
+    def has_add_permission(self, request):
+        return False  # Logs are created automatically
+
+    def has_change_permission(self, request, obj=None):
+        return False  # Logs are read-only
+
+@admin.register(CampaignRecipient)
+class CampaignRecipientAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'user', 'email')
+    list_filter = ('campaign',)
+    search_fields = ('email', 'user__email', 'campaign__name')
+
+@admin.register(EmailClickLog)
+class EmailClickLogAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'user', 'email', 'clicked_url', 'clicked_at')
+    list_filter = ('campaign', 'clicked_at')
+    search_fields = ('email', 'clicked_url', 'campaign__name')
+
+@admin.register(EmailConversion)
+class EmailConversionAdmin(admin.ModelAdmin):
+    list_display = ('campaign', 'user', 'conversion_value', 'converted_at', 'time_to_convert')
+    list_filter = ('campaign', 'converted_at')
+    search_fields = ('user__email', 'campaign__name')
+    readonly_fields = ('id', 'campaign', 'user', 'click', 'conversion_value', 'converted_at', 'time_to_convert', 'order')
