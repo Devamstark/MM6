@@ -1302,6 +1302,63 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             'sample': list(sample_users),
         })
 
+    @action(detail=False, methods=['get'], url_path='calendar')
+    def calendar(self, request):
+        """Get campaigns for calendar view."""
+        if request.user.role != 'admin':
+            from rest_framework.exceptions import PermissionDenied
+            raise PermissionDenied()
+
+        from datetime import datetime, timedelta
+        from django.utils import timezone
+
+        # Get date range from query params
+        year = int(request.query_params.get('year', timezone.now().year))
+        month = int(request.query_params.get('month', timezone.now().month))
+
+        # Calculate month start and end with proper time boundaries
+        # month_start is first day of month at 00:00:00
+        month_start = timezone.make_aware(datetime(year, month, 1))
+        
+        # month_end is first day of NEXT month at 00:00:00, then subtract 1 second
+        if month == 12:
+            next_month_start = timezone.make_aware(datetime(year + 1, 1, 1))
+        else:
+            next_month_start = timezone.make_aware(datetime(year, month + 1, 1))
+        
+        month_end = next_month_start - timedelta(seconds=1)
+
+        # Get all campaigns in this month
+        campaigns = MarketingCampaign.objects.filter(
+            created_at__range=(month_start, month_end)
+        ).order_by('created_at')
+
+        calendar_data = []
+        for campaign in campaigns:
+            calendar_data.append({
+                'id': str(campaign.id),
+                'title': campaign.name,
+                'start': campaign.scheduled_date or campaign.created_at,
+                'end': campaign.sent_at or campaign.scheduled_date,
+                'status': campaign.status,
+                'campaign_type': campaign.campaign_type,
+                'emails_sent': campaign.emails_sent,
+                'delivery_rate': campaign.delivery_rate,
+                'subject': campaign.subject,
+            })
+
+        return Response({
+            'year': year,
+            'month': month,
+            'campaigns': calendar_data,
+            'total_campaigns': len(calendar_data),
+            'by_status': {
+                'draft': len([c for c in calendar_data if c['status'] == 'draft']),
+                'scheduled': len([c for c in calendar_data if c['status'] == 'scheduled']),
+                'sent': len([c for c in calendar_data if c['status'] == 'sent']),
+            }
+        })
+
     @action(detail=False, methods=['get'], url_path='analytics')
     def analytics(self, request):
         """Enterprise marketing analytics dashboard."""
@@ -1310,6 +1367,8 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
 
         from django.db.models import Count, Sum, Avg, Q
+        from django.db.models.functions import TruncDate
+        from .models import EmailConversion
 
         campaigns = MarketingCampaign.objects.all()
         total_campaigns = campaigns.count()
@@ -1324,11 +1383,15 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
         avg_open_rate = round((total_opens / total_emails_sent * 100), 1) if total_emails_sent > 0 else 0
         avg_click_rate = round((total_clicks / total_emails_sent * 100), 1) if total_emails_sent > 0 else 0
 
+        # Global conversion stats
+        total_conversions = EmailConversion.objects.count()
+        total_revenue = EmailConversion.objects.aggregate(s=Sum('conversion_value'))['s'] or 0
+
         # Active users count (with role=user)
         active_users = User.objects.filter(role='user', is_active=True).count()
 
         # Last campaign
-        last_campaign = campaigns.first()
+        last_campaign = campaigns.order_by('-created_at').first()
         last_campaign_data = None
         if last_campaign:
             last_campaign_data = {
@@ -1338,6 +1401,15 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
                 'sent_at': last_campaign.sent_at,
                 'emails_sent': last_campaign.emails_sent,
             }
+
+        # Daily Trend (Last 30 days)
+        from django.utils import timezone
+        thirty_days_ago = timezone.now() - timedelta(days=30)
+        daily_trends = EmailConversion.objects.filter(converted_at__gte=thirty_days_ago) \
+            .annotate(day=TruncDate('converted_at')) \
+            .values('day') \
+            .annotate(conversions=Count('id'), revenue=Sum('conversion_value')) \
+            .order_by('day')
 
         # Campaign stats by status
         status_breakdown = dict(campaigns.values_list('status').annotate(c=Count('id')).values_list('status', 'c'))
@@ -1356,6 +1428,9 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             'avg_delivery_rate': avg_delivery_rate,
             'avg_open_rate': avg_open_rate,
             'avg_click_rate': avg_click_rate,
+            'total_conversions': total_conversions,
+            'total_revenue': str(total_revenue),
+            'daily_trends': list(daily_trends),
             'active_users': active_users,
             'last_campaign': last_campaign_data,
             'status_breakdown': status_breakdown,

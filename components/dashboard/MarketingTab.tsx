@@ -4,6 +4,7 @@ import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, Chevr
 import { MarketingCampaign, MarketingAnalytics, AudiencePreview, EmailDeliveryLog } from '../../types';
 import { ConversionAnalyticsTab } from './ConversionAnalyticsTab';
 import { EmailTemplateBuilder, EmailTemplate } from './EmailTemplateBuilder';
+import { CampaignCalendar } from './CampaignCalendar';
 
 const STATUS_COLORS: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-600 border-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-700',
@@ -47,7 +48,7 @@ export const MarketingTab: React.FC = () => {
     const [audiencePreview, setAudiencePreview] = useState<AudiencePreview | null>(null);
     const [statusFilter, setStatusFilter] = useState('');
     const [typeFilter, setTypeFilter] = useState('');
-    const [activeView, setActiveView] = useState<'campaigns' | 'analytics' | 'conversions'>('campaigns');
+    const [activeView, setActiveView] = useState<'campaigns' | 'analytics' | 'conversions' | 'calendar'>('campaigns');
     const [sendNow, setSendNow] = useState(true);
     const [saving, setSaving] = useState(false);
     const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -207,8 +208,15 @@ export const MarketingTab: React.FC = () => {
             console.error('Error response:', error?.response?.data);
 
             let errorMsg = 'Failed to delete campaign.';
-            if (error?.response?.status === 502) {
-                errorMsg = 'Server timeout while deleting local data. The campaign might have too many logs to delete instantly. Please wait a moment and refresh.';
+            const status = error?.response?.status;
+
+            if (status === 404) {
+                // If 404, the item is already gone from DB, so we should refresh the UI
+                errorMsg = 'Campaign already deleted or not found. Refreshing list...';
+                loadCampaigns();
+                loadAnalytics();
+            } else if (status === 502) {
+                errorMsg = 'Server timeout while deleting data. It might have too many logs to delete instantly. Please wait a moment and refresh.';
             } else if (error?.response?.data?.message || error?.response?.data?.detail) {
                 errorMsg = error.response.data.message || error.response.data.detail;
             } else if (error.message === 'Network Error') {
@@ -320,6 +328,9 @@ export const MarketingTab: React.FC = () => {
                     <button onClick={() => setActiveView('conversions')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeView === 'conversions' ? 'bg-purple-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
                         <TrendingUp className="w-4 h-4 inline mr-1" /> Conversions
                     </button>
+                    <button onClick={() => setActiveView('calendar')} className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${activeView === 'calendar' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-700'}`}>
+                        <Calendar className="w-4 h-4 inline mr-1" /> Calendar
+                    </button>
                 </div>
                 <button
                     onClick={() => { resetForm(); setShowModal(true); }}
@@ -402,6 +413,9 @@ export const MarketingTab: React.FC = () => {
 
             {/* Conversion Analytics View */}
             {activeView === 'conversions' && <ConversionAnalyticsTab />}
+
+            {/* Campaign Calendar View */}
+            {activeView === 'calendar' && <CampaignCalendar />}
 
             {/* Campaign List View */}
             {activeView === 'campaigns' && (
