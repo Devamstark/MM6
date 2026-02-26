@@ -92,7 +92,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
         <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1 dark:text-gray-200">Categories</h3>
         <div className="space-y-2">
           <div
-            className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.category === '' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'}`}
+            className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${filters.category === '' ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300'}`}
             onClick={() => onFilterChange('category', '')}
           >
             All Departments
@@ -100,7 +100,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
           {categories.map(cat => (
             <div
               key={cat}
-              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.category === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'}`}
+              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${filters.category === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300'}`}
               onClick={() => onFilterChange('category', cat)}
             >
               {cat}
@@ -115,7 +115,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
           <h3 className="font-bold text-gray-900 mb-4 text-sm uppercase tracking-wide px-1 dark:text-gray-200">Subcategories</h3>
           <div className="space-y-2">
             <div
-              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${!filters.subcategory ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'}`}
+              className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${!filters.subcategory ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300'}`}
               onClick={() => onFilterChange('subcategory', '')}
             >
               All {filters.category}
@@ -123,7 +123,7 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({ filters, onFilterChang
             {subcategories.map(sub => (
               <div
                 key={sub}
-                className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-medium transition-all ${filters.subcategory === sub ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200'}`}
+                className={`cursor-pointer px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${filters.subcategory === sub ? 'bg-indigo-600 text-white shadow-md shadow-indigo-200 dark:shadow-none' : 'text-gray-600 hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-400 dark:hover:bg-indigo-900/30 dark:hover:text-indigo-300'}`}
                 onClick={() => onFilterChange('subcategory', sub)}
               >
                 {sub}

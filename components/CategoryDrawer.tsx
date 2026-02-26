@@ -46,19 +46,18 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
     <>
       {/* Backdrop - Only visible on mobile/tablet */}
       <div
-        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60] transition-opacity md:hidden"
+        className="fixed inset-0 bg-black/40 backdrop-blur-sm z-60 transition-opacity md:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
 
       {/* Drawer - Only visible on mobile/tablet */}
       <div
-        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-[61] shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 md:hidden ${
-          isOpen ? 'translate-x-0' : '-translate-x-full'
-        }`}
+        className={`fixed top-0 left-0 h-full w-80 max-w-[85vw] bg-white z-61 shadow-2xl transform transition-transform duration-300 ease-out dark:bg-gray-900 dark:border-r dark:border-gray-800 md:hidden ${isOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
       >
         {/* Header with Gradient */}
-        <div className="relative p-5 bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
+        <div className="relative p-5 bg-linear-to-br from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-xl font-black text-white uppercase tracking-wider">
@@ -77,14 +76,14 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
 
         {/* Categories List */}
         <div className="overflow-y-auto h-[calc(100vh-100px)] bg-gray-50 dark:bg-gray-900">
-          
+
           {/* Quick Access - All Products */}
           <Link
             to="/products"
             onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3.5 bg-white border-b border-gray-100 hover:bg-gray-50 transition-colors dark:bg-gray-800 dark:border-gray-700"
+            className="flex items-center gap-3 px-4 py-3.5 bg-white border-b border-gray-100 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all dark:bg-gray-800 dark:border-gray-700 group"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+            <div className="w-10 h-10 bg-linear-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-white shrink-0">
               <Sparkles className="w-5 h-5" />
             </div>
             <div className="flex-1">
@@ -98,21 +97,21 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
           <div className="border-b border-gray-100 dark:border-gray-800">
             <button
               onClick={() => handleCategoryClick('Women')}
-              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-800"
+              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all dark:bg-gray-800 group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-10 h-10 bg-linear-to-br from-pink-400 to-rose-500 rounded-xl flex items-center justify-center text-white shrink-0">
                   <span className="text-lg font-bold">👩</span>
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">Women</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Women</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{CATEGORIES['Women'].length} subcategories</p>
                 </div>
               </div>
               {expandedCategory === 'Women' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-indigo-500" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-500" />
               )}
             </button>
 
@@ -139,7 +138,7 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
                             key={item}
                             to={`/products?category=Women&subcategory=${encodeURIComponent(item)}`}
                             onClick={onClose}
-                            className="px-3 py-2 text-xs font-medium text-gray-700 bg-white rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                            className="px-3 py-2 text-xs font-bold text-gray-700 bg-white rounded-lg hover:bg-indigo-600 hover:text-white hover:scale-105 active:scale-95 transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
                           >
                             {item}
                           </Link>
@@ -156,21 +155,21 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
           <div className="border-b border-gray-100 dark:border-gray-800">
             <button
               onClick={() => handleCategoryClick('Men')}
-              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-800"
+              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all dark:bg-gray-800 group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-10 h-10 bg-linear-to-br from-blue-400 to-indigo-500 rounded-xl flex items-center justify-center text-white shrink-0">
                   <span className="text-lg font-bold">👨</span>
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">Men</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Men</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{CATEGORIES['Men'].length} subcategories</p>
                 </div>
               </div>
               {expandedCategory === 'Men' ? (
-                <ChevronDown className="w-5 h-5 text-gray-400" />
+                <ChevronDown className="w-5 h-5 text-gray-400 group-hover:text-indigo-500" />
               ) : (
-                <ChevronRight className="w-5 h-5 text-gray-400" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-indigo-500" />
               )}
             </button>
 
@@ -197,7 +196,7 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
                             key={item}
                             to={`/products?category=Men&subcategory=${encodeURIComponent(item)}`}
                             onClick={onClose}
-                            className="px-3 py-2 text-xs font-medium text-gray-700 bg-white rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                            className="px-3 py-2 text-xs font-bold text-gray-700 bg-white rounded-lg hover:bg-indigo-600 hover:text-white hover:scale-105 active:scale-95 transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
                           >
                             {item}
                           </Link>
@@ -214,14 +213,14 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
           <div className="border-b border-gray-100 dark:border-gray-800">
             <button
               onClick={() => handleCategoryClick('Accessories')}
-              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-gray-50 transition-colors dark:bg-gray-800"
+              className="flex items-center justify-between w-full px-4 py-3.5 bg-white hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-all dark:bg-gray-800 group"
             >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                <div className="w-10 h-10 bg-linear-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center text-white shrink-0">
                   <span className="text-lg font-bold">👜</span>
                 </div>
                 <div className="text-left">
-                  <p className="text-sm font-bold text-gray-900 dark:text-white">Accessories</p>
+                  <p className="text-sm font-bold text-gray-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400">Accessories</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{ACCESSORIES_LIST.length} items</p>
                 </div>
               </div>
@@ -240,7 +239,7 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
                     key={item}
                     to={`/products?category=Accessories&subcategory=${encodeURIComponent(item)}`}
                     onClick={onClose}
-                    className="px-3 py-2 text-xs font-medium text-gray-700 bg-white rounded-lg hover:bg-primary hover:text-white transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
+                    className="px-3 py-2 text-xs font-bold text-gray-700 bg-white rounded-lg hover:bg-indigo-600 hover:text-white hover:scale-105 active:scale-95 transition-all shadow-sm border border-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700"
                   >
                     {item}
                   </Link>
@@ -253,9 +252,9 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
           <Link
             to="/products?on_sale=true"
             onClick={onClose}
-            className="flex items-center gap-3 px-4 py-3.5 bg-gradient-to-r from-red-50 to-pink-50 border-b border-red-100 hover:from-red-100 hover:to-pink-100 transition-all dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-900/30"
+            className="flex items-center gap-3 px-4 py-3.5 bg-linear-to-r from-red-50 to-pink-50 border-b border-red-100 hover:from-red-100 hover:to-pink-100 transition-all dark:from-red-900/20 dark:to-pink-900/20 dark:border-red-900/30"
           >
-            <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-red-500/30">
+            <div className="w-10 h-10 bg-linear-to-br from-red-500 to-pink-600 rounded-xl flex items-center justify-center text-white shrink-0 shadow-lg shadow-red-500/30">
               <span className="text-lg font-bold">🔥</span>
             </div>
             <div className="flex-1">
@@ -274,21 +273,21 @@ export const CategoryDrawer: React.FC<CategoryDrawerProps> = ({ isOpen, onClose 
               <Link
                 to="/products?sort=newest"
                 onClick={onClose}
-                className="px-3 py-1.5 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 text-xs font-bold rounded-full hover:from-indigo-100 hover:to-purple-100 transition-all border border-indigo-100 dark:from-indigo-900/30 dark:to-purple-900/30 dark:text-indigo-300 dark:border-indigo-800"
+                className="px-3 py-1.5 bg-linear-to-r from-indigo-50 to-purple-50 text-indigo-700 text-xs font-bold rounded-full hover:from-indigo-100 hover:to-purple-100 transition-all border border-indigo-100 dark:from-indigo-900/30 dark:to-purple-900/30 dark:text-indigo-300 dark:border-indigo-800"
               >
                 ✨ New
               </Link>
               <Link
                 to="/products?isFeatured=true"
                 onClick={onClose}
-                className="px-3 py-1.5 bg-gradient-to-r from-amber-50 to-yellow-50 text-amber-700 text-xs font-bold rounded-full hover:from-amber-100 hover:to-yellow-100 transition-all border border-amber-100 dark:from-amber-900/30 dark:to-yellow-900/30 dark:text-amber-300 dark:border-amber-800"
+                className="px-3 py-1.5 bg-linear-to-r from-amber-50 to-yellow-50 text-amber-700 text-xs font-bold rounded-full hover:from-amber-100 hover:to-yellow-100 transition-all border border-amber-100 dark:from-amber-900/30 dark:to-yellow-900/30 dark:text-amber-300 dark:border-amber-800"
               >
                 ⭐ Featured
               </Link>
               <Link
                 to="/products?isPopular=true"
                 onClick={onClose}
-                className="px-3 py-1.5 bg-gradient-to-r from-emerald-50 to-teal-50 text-emerald-700 text-xs font-bold rounded-full hover:from-emerald-100 hover:to-teal-100 transition-all border border-emerald-100 dark:from-emerald-900/30 dark:to-teal-900/30 dark:text-emerald-300 dark:border-emerald-800"
+                className="px-3 py-1.5 bg-linear-to-r from-emerald-50 to-teal-50 text-emerald-700 text-xs font-bold rounded-full hover:from-emerald-100 hover:to-teal-100 transition-all border border-emerald-100 dark:from-emerald-900/30 dark:to-teal-900/30 dark:text-emerald-300 dark:border-emerald-800"
               >
                 🔥 Trending
               </Link>
