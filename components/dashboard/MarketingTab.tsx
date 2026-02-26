@@ -657,8 +657,8 @@ export const MarketingTab: React.FC = () => {
 
             {/* Campaign Creation/Edit Modal */}
             {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
-                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-3xl overflow-hidden flex flex-col max-h-[90vh]">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                             <h3 className="text-xl font-black text-gray-900 dark:text-white">{formData.id ? 'Edit Campaign' : 'Create Campaign'}</h3>
                             <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600 dark:hover:text-white p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"><X className="w-5 h-5" /></button>
@@ -884,7 +884,7 @@ Example:
 
             {/* Delivery Logs Modal */}
             {showLogsModal && selectedCampaign && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                             <div>
@@ -949,7 +949,7 @@ Example:
 
             {/* Conversion Analytics Modal */}
             {showConversionModal && selectedCampaign && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-5xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                             <div>
@@ -1025,7 +1025,7 @@ Example:
 
             {/* Email Template Builder Modal */}
             {showTemplateBuilder && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm animate-fade-in">
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-7xl overflow-hidden flex flex-col max-h-[90vh]">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-gray-50/50 dark:bg-gray-800/50">
                             <div>

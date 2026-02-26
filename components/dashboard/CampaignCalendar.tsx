@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../services/api';
-import { 
-    Calendar as CalendarIcon, ChevronLeft, ChevronRight, 
+import {
+    Calendar as CalendarIcon, ChevronLeft, ChevronRight,
     Mail, Send, Clock, FileText, TrendingUp, X
 } from 'lucide-react';
 
@@ -82,14 +82,14 @@ export const CampaignCalendar: React.FC = () => {
     const generateCalendarDays = () => {
         const year = currentDate.getFullYear();
         const month = currentDate.getMonth();
-        
+
         const firstDay = new Date(year, month, 1);
         const lastDay = new Date(year, month + 1, 0);
         const startingDay = firstDay.getDay();
         const totalDays = lastDay.getDate();
-        
+
         const days = [];
-        
+
         // Previous month's days
         const prevMonthLastDay = new Date(year, month, 0).getDate();
         for (let i = startingDay - 1; i >= 0; i--) {
@@ -99,7 +99,7 @@ export const CampaignCalendar: React.FC = () => {
                 date: new Date(year, month - 1, prevMonthLastDay - i)
             });
         }
-        
+
         // Current month's days
         for (let i = 1; i <= totalDays; i++) {
             days.push({
@@ -109,7 +109,7 @@ export const CampaignCalendar: React.FC = () => {
                 isToday: i === new Date().getDate() && month === new Date().getMonth() && year === new Date().getFullYear()
             });
         }
-        
+
         // Next month's days
         const remainingDays = 42 - days.length; // 6 rows * 7 days
         for (let i = 1; i <= remainingDays; i++) {
@@ -119,7 +119,7 @@ export const CampaignCalendar: React.FC = () => {
                 date: new Date(year, month + 1, i)
             });
         }
-        
+
         return days;
     };
 
@@ -219,17 +219,15 @@ export const CampaignCalendar: React.FC = () => {
                             return (
                                 <div
                                     key={idx}
-                                    className={`min-h-[120px] p-2 border-b border-r border-gray-100 dark:border-gray-800 ${
-                                        !dayInfo.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50' : ''
-                                    }`}
+                                    className={`min-h-[120px] p-2 border-b border-r border-gray-100 dark:border-gray-800 ${!dayInfo.isCurrentMonth ? 'bg-gray-50 dark:bg-gray-800/50' : ''
+                                        }`}
                                 >
-                                    <div className={`text-sm font-bold mb-2 ${
-                                        dayInfo.isToday 
-                                            ? 'w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center' 
-                                            : dayInfo.isCurrentMonth
+                                    <div className={`text-sm font-bold mb-2 ${dayInfo.isToday
+                                        ? 'w-7 h-7 bg-indigo-600 text-white rounded-full flex items-center justify-center'
+                                        : dayInfo.isCurrentMonth
                                             ? 'text-gray-900 dark:text-white'
                                             : 'text-gray-400 dark:text-gray-600'
-                                    }`}>
+                                        }`}>
                                         {dayInfo.day}
                                     </div>
                                     <div className="space-y-1">
@@ -237,9 +235,8 @@ export const CampaignCalendar: React.FC = () => {
                                             <button
                                                 key={campaign.id}
                                                 onClick={() => setSelectedCampaign(campaign)}
-                                                className={`w-full text-left text-xs px-2 py-1.5 rounded-lg border truncate transition-all hover:scale-105 ${
-                                                    STATUS_COLORS[campaign.status]
-                                                }`}
+                                                className={`w-full text-left text-xs px-2 py-1.5 rounded-lg border truncate transition-all hover:scale-105 ${STATUS_COLORS[campaign.status]
+                                                    }`}
                                             >
                                                 {campaign.title}
                                             </button>
@@ -259,7 +256,7 @@ export const CampaignCalendar: React.FC = () => {
 
             {/* Campaign Detail Modal */}
             {selectedCampaign && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+                <div className="fixed inset-0 z-1100 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
                     <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl w-full max-w-lg overflow-hidden">
                         <div className="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                             <div>
@@ -275,9 +272,8 @@ export const CampaignCalendar: React.FC = () => {
                         </div>
                         <div className="p-6 space-y-4">
                             <div className="flex items-center gap-3">
-                                <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-lg border ${
-                                    STATUS_COLORS[selectedCampaign.status]
-                                }`}>
+                                <span className={`px-3 py-1 text-xs font-black uppercase tracking-wider rounded-lg border ${STATUS_COLORS[selectedCampaign.status]
+                                    }`}>
                                     {selectedCampaign.status}
                                 </span>
                                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 capitalize">
