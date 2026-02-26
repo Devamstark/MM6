@@ -319,6 +319,41 @@
 
 ---
 
+### **13. Enterprise Marketing System** 📧
+
+#### Features:
+- **Campaign Management**: Create, edit, duplicate, and delete marketing campaigns with 6 statuses (Draft, Scheduled, Sending, Sent, Paused, Failed).
+- **5 Campaign Types**: Promotional, Abandoned Cart, Re-engagement, First Purchase Thank You, Post-purchase Upsell.
+- **Advanced Audience Targeting**: All users, ordered at least once, never ordered, recent signups (last X days), abandoned cart, manual selection.
+- **Enterprise Email Sending**: Batch processing (configurable, default 200/batch) via Celery + Redis with per-email delivery logging.
+- **Auto-Retry**: Failed emails automatically retry up to 3 times.
+- **Delivery Logging**: Each email tracked individually (pending, sent, failed, opened, clicked) with error messages.
+- **Analytics Dashboard**: Total campaigns, emails sent, delivery rate, open rate, click rate, status/type breakdowns.
+- **Audience Preview**: Live preview of recipient count before sending.
+- **Campaign Actions**: Send Now, Schedule Later, Pause, Resume, Duplicate.
+- **GDPR Compliance**: Unsubscribe footer automatically appended to every marketing email.
+- **Security**: Only users with `role='user'` receive emails; Admin and Seller accounts are always excluded.
+
+#### Technical Implementation:
+- **Backend Models**: `MarketingCampaign`, `CampaignRecipient`, `EmailDeliveryLog` with DB indexes on `campaign_id`, `user_id`, `status`.
+- **Celery Tasks**: `send_marketing_campaign` (orchestrator), `_send_batch` (per-batch worker), `_resolve_audience` (audience segmentation).
+- **Frontend**: Enterprise MarketingTab component with SaaS-grade UI, Analytics view, Delivery Logs modal.
+- **Endpoints**:
+  - `GET /api/marketing-campaigns/` (List, filter by status/type)
+  - `POST /api/marketing-campaigns/` (Create)
+  - `PATCH /api/marketing-campaigns/{id}/` (Update)
+  - `DELETE /api/marketing-campaigns/{id}/` (Delete)
+  - `POST /api/marketing-campaigns/{id}/send/` (Send or schedule)
+  - `POST /api/marketing-campaigns/{id}/pause/` (Pause)
+  - `POST /api/marketing-campaigns/{id}/resume/` (Resume)
+  - `POST /api/marketing-campaigns/{id}/duplicate/` (Duplicate)
+  - `GET /api/marketing-campaigns/{id}/logs/` (Delivery logs)
+  - `GET /api/marketing-campaigns/analytics/` (Dashboard analytics)
+  - `GET /api/marketing-campaigns/audience-preview/` (Audience preview)
+  - `GET /api/marketing-campaigns/users-list/` (Users for manual selection)
+
+---
+
 ## 🎨 Design System
 
 ### **Color Palette**
@@ -487,6 +522,22 @@ smartshop-e-commerce/
 | PUT | `/api/blog/{id}/` | Update blog post | Owner/Admin |
 | PATCH | `/api/blog/{id}/publish/` | Toggle publish status | Owner/Admin |
 | DELETE | `/api/blog/{id}/` | Delete blog post | Owner/Admin |
+
+### **Marketing Campaigns**
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/marketing-campaigns/` | List campaigns (filterable) | Admin |
+| POST | `/api/marketing-campaigns/` | Create campaign | Admin |
+| PATCH | `/api/marketing-campaigns/{id}/` | Update campaign | Admin |
+| DELETE | `/api/marketing-campaigns/{id}/` | Delete campaign | Admin |
+| POST | `/api/marketing-campaigns/{id}/send/` | Send or schedule | Admin |
+| POST | `/api/marketing-campaigns/{id}/pause/` | Pause campaign | Admin |
+| POST | `/api/marketing-campaigns/{id}/resume/` | Resume campaign | Admin |
+| POST | `/api/marketing-campaigns/{id}/duplicate/` | Duplicate campaign | Admin |
+| GET | `/api/marketing-campaigns/{id}/logs/` | Delivery logs | Admin |
+| GET | `/api/marketing-campaigns/analytics/` | Dashboard analytics | Admin |
+| GET | `/api/marketing-campaigns/audience-preview/` | Preview audience | Admin |
+| GET | `/api/marketing-campaigns/users-list/` | Users for selection | Admin |
 
 ---
 
@@ -674,7 +725,7 @@ Frontend will run at `http://localhost:5173`
 - [ ] Product comparison tool
 - [ ] Advanced analytics dashboard
 - [ ] Inventory forecasting
-- [ ] Automated marketing campaigns
+- [x] Automated marketing campaigns
 - [ ] Social media integration
 - [ ] Progressive Web App (PWA)
 
@@ -708,5 +759,5 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 25, 2026
-**Version**: 1.6.0 (Celery & Branded Transactional Emails)
+**Last Updated**: February 26, 2026
+**Version**: 1.7.0 (Enterprise Marketing System)

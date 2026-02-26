@@ -112,6 +112,16 @@
 - **Transactional Emails**: Created fully branded HTML email templates (`base.html`, `order_confirmation.html`, `password_reset.html`, `newsletter_blog.html`) featuring the premium `SMARTSHOP™ EST. 2026` logo typography.
 - **Contact Details Updated**: Updated site-wide contact information to the New Rochelle, NY address.
 
+### 11. 📧 Enterprise Marketing System (Feb 26, 2026)
+- **Campaign Management**: Full CRUD for marketing campaigns with 6 statuses (Draft → Scheduled → Sending → Sent / Paused / Failed), 5 campaign types, duplicate support.
+- **Advanced Audience Targeting**: 6 audience segments (all users, ordered once, never ordered, recent signups, abandoned cart, manual selection) with live preview.
+- **Enterprise Email Engine**: Batch sending via Celery (configurable, default 200/batch), per-email delivery logging (`EmailDeliveryLog`), auto-retry up to 3 times, atomic counter updates.
+- **Recipient Snapshots**: `CampaignRecipient` model stores a snapshot of all recipients at send time for audit trails and GDPR compliance.
+- **Analytics Dashboard**: Summary cards, status/type breakdowns, delivery/open/click rate progress bars, and last campaign banner.
+- **12 API Endpoints**: Including send, pause, resume, duplicate, delivery logs, analytics, audience preview, and user list.
+- **GDPR Compliance**: Unsubscribe footer automatically appended to every marketing email. Admin & seller accounts always excluded.
+- **Frontend**: Complete SaaS-grade Marketing Command Center with filterable campaign table, creation modal with audience targeting, delivery logs modal, and analytics view.
+
 ---
 
 ## 🔄 Deployment Workflow
