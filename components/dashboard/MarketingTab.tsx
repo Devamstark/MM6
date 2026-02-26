@@ -194,11 +194,17 @@ export const MarketingTab: React.FC = () => {
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this campaign?')) return;
         try {
+            console.log('Deleting campaign:', id);
             await api.deleteCampaign(id);
+            console.log('Campaign deleted successfully');
+            alert('Campaign deleted successfully!');
             loadCampaigns();
             loadAnalytics();
         } catch (error: any) {
-            alert('Failed to delete campaign');
+            console.error('Delete error:', error);
+            console.error('Error response:', error?.response?.data);
+            const errorMsg = error?.response?.data?.detail || error?.response?.data?.error || 'Failed to delete campaign. Make sure you are logged in as admin.';
+            alert(errorMsg);
         }
     };
 
@@ -236,10 +242,16 @@ export const MarketingTab: React.FC = () => {
         setShowConversionModal(true);
         setConversionLoading(true);
         try {
+            console.log('Loading conversion analytics for campaign:', campaign.id);
             const data = await api.getCampaignConversionAnalytics(campaign.id);
+            console.log('Conversion analytics loaded:', data);
             setConversionAnalytics(data);
-        } catch (e) {
+        } catch (e: any) {
             console.error('Failed to load conversion analytics', e);
+            console.error('Error response:', e?.response?.data);
+            alert('Failed to load conversion analytics. This feature requires conversion tracking to be set up. The campaign may not have any conversions yet.');
+            // Still show the modal with basic campaign data
+            setConversionAnalytics(null);
         } finally {
             setConversionLoading(false);
         }
@@ -883,85 +895,13 @@ Example:
                                         color="purple"
                                     />
                                 </div>
-
-                                {/* Revenue Metrics */}
-                                <div className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/10 dark:to-pink-900/10 rounded-2xl p-6 border border-purple-100 dark:border-purple-800">
-                                    <h4 className="text-xs font-black text-purple-600 dark:text-purple-400 uppercase tracking-widest mb-4">Revenue Metrics</h4>
-                                    <div className="grid grid-cols-3 gap-6">
-                                        <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Revenue Per Email</p>
-                                            <p className="text-2xl font-black text-gray-900 dark:text-white">${conversionAnalytics.revenue_per_email}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Avg Order Value</p>
-                                            <p className="text-2xl font-black text-gray-900 dark:text-white">${conversionAnalytics.avg_order_value}</p>
-                                        </div>
-                                        <div>
-                                            <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Unique Clicks</p>
-                                            <p className="text-2xl font-black text-gray-900 dark:text-white">{conversionAnalytics.unique_clicks}</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Top Performing Links */}
-                                {conversionAnalytics.top_links && conversionAnalytics.top_links.length > 0 && (
-                                    <div>
-                                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Top Performing Links</h4>
-                                        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
-                                            <table className="w-full text-sm">
-                                                <thead className="bg-gray-50 dark:bg-gray-700 text-xs uppercase tracking-wider text-gray-500 font-black">
-                                                    <tr>
-                                                        <th className="px-4 py-3 text-left">URL</th>
-                                                        <th className="px-4 py-3 text-center">Clicks</th>
-                                                        <th className="px-4 py-3 text-center">Conversions</th>
-                                                        <th className="px-4 py-3 text-right">Revenue</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                    {conversionAnalytics.top_links.map((link: any, idx: number) => (
-                                                        <tr key={idx} className="hover:bg-gray-50 dark:hover:bg-gray-700/50">
-                                                            <td className="px-4 py-3 text-gray-700 dark:text-gray-300 max-w-[300px] truncate">{link.url}</td>
-                                                            <td className="px-4 py-3 text-center font-bold text-gray-900 dark:text-white">{link.clicks}</td>
-                                                            <td className="px-4 py-3 text-center font-bold text-green-600">{link.conversions || 0}</td>
-                                                            <td className="px-4 py-3 text-right font-bold text-emerald-600">${link.revenue || '0.00'}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Recent Conversions */}
-                                {conversionAnalytics.recent_conversions && conversionAnalytics.recent_conversions.length > 0 && (
-                                    <div>
-                                        <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3">Recent Conversions</h4>
-                                        <div className="space-y-2">
-                                            {conversionAnalytics.recent_conversions.map((conv: any) => (
-                                                <div key={conv.id} className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600">
-                                                            <DollarSign className="w-4 h-4" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="text-sm font-bold text-gray-900 dark:text-white">{conv.user_name}</p>
-                                                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                                                                {conv.time_to_convert ? `Converted in ${Math.floor(conv.time_to_convert / 60)}m ${conv.time_to_convert % 60}s` : 'Direct conversion'}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="text-right">
-                                                        <p className="text-lg font-black text-emerald-600">${conv.conversion_value}</p>
-                                                        <p className="text-xs text-gray-400">{new Date(conv.converted_at).toLocaleString()}</p>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
+                                <button
+                                    onClick={() => setShowConversionModal(false)}
+                                    className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all"
+                                >
+                                    Close
+                                </button>
                             </div>
-                        ) : (
-                            <p className="text-gray-500 dark:text-gray-400 text-center py-10">No conversion data available.</p>
                         )}
                     </div>
                 </div>
