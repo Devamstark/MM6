@@ -22,12 +22,13 @@
 - **Language**: Python 3.10+
 - **Framework**: Django 4.2 + Django REST Framework (DRF)
 - **Authentication**: JWT (djangorestframework-simplejwt)
-- **Caching**: Redis 7.x (High-performance L3 Cache for API/Sessions)
+- **Caching & Brokers**: Redis 7.x (High-performance L3 Cache for API/Sessions and Celery Broker)
+- **Background Tasks**: Celery & Celery-Beat (Async task processing, scheduled jobs, emails)
 - **Database ORM**: Django ORM
 - **File Storage**: Local Docker volume (`backend_media`)
 - **CORS**: django-cors-headers
 - **Static Files**: WhiteNoise (Production static serving)
-- **Deployment**: Docker + Gunicorn (5 Workers)
+- **Deployment**: Docker + Gunicorn (5 Workers) + Celery Workers
 
 ### **Database**
 - **Development**: SQLite3 (Local testing)
@@ -659,7 +660,7 @@ Frontend will run at `http://localhost:5173`
 
 ### **Phase 2 Features**
 - [ ] Real payment integration (Stripe/PayPal)
-- [ ] Email notifications (order confirmations, shipping updates)
+- [x] Email notifications (Order confirmations, password reset, newsletters handled asynchronously via Celery)
 - [ ] Advanced search with Elasticsearch
 - [ ] Wishlist functionality
 - [ ] Product recommendations (AI-powered)
@@ -708,4 +709,4 @@ For questions or issues:
 ---
 
 **Last Updated**: February 25, 2026
-**Version**: 1.5.0 (Performance & Security Hardening)
+**Version**: 1.6.0 (Celery & Branded Transactional Emails)

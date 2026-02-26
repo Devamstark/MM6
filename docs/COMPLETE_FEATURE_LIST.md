@@ -835,9 +835,29 @@
 
 ---
 
+## 📨 Background Tasks & Emails
+
+### Feature 43: Automated Transactional Emails
+**User Story:** *As a platform user, I want reliable and branded email communication for important account actions.*
+
+**Functionality:**
+- Asynchronous email sending so the user doesn't wait
+- Password Reset emails with secure OTP
+- Order Confirmation emails summarizing purchase
+- Newsletter & promotional email support
+- Premium HTML email templates featuring the `SMARTSHOP™ EST. 2026` logo
+- Responsive email design formatted for all clients
+
+**Technical Details:**
+- Backend: Celery task queue, Redis broker
+- Infrastructure: Dockerized Celery workers
+- Templates: Base HTML templates using standard fonts and typography logomark
+
+---
+
 ## 📊 Feature Completion Statistics
 
-### **Total Features: 46**
+### **Total Features: 47**
 - **Authentication**: 4/4 (100%)
 - **Product**: 7/7 (100%)
 - **Shopping**: 6/6 (100%)
@@ -847,20 +867,20 @@
 - **Admin Features**: 6/6 (100%)
 - **UI/UX Features**: 5/5 (100%)
 - **Blogger Features**: 4/4 (100%)
+- **Background Tasks & Emails**: 1/1 (100%)
 
 **Overall Completion: 100%** ✅
 
 ---
 
-**Last Updated**: February 16, 2026  
-**Version**: 1.1.0 (MVP + Modern Stack)
-
+**Last Updated**: February 25, 2026  
+**Version**: 1.6.0 (Background Tasks & Celery)
 
 ---
 
 ## ✍️ Fashion Blogger Features
 
-### Feature 42: Public Blog Feed
+### Feature 44: Public Blog Feed
 **User Story:** *As a visitor, I want to read fashion articles and trend reports.*
 
 **Functionality:**

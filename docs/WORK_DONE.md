@@ -106,6 +106,12 @@
 - **Edge Caching Rules**: Created Cloudflare rules to cache `/media/` (product images) for 7 days, reducing VPS bandwidth by ~60%.
 - **Dependency Refresh**: Updated all core dependencies to latest stable versions (Django 4.2.28, Gunicorn 23.0.0, etc.).
 
+### 10. 📨 Background Task Processing & Emails (Feb 25, 2026)
+- **Celery & Redis Integration**: Configured Celery and Redis to handle asynchronous background tasks.
+- **Celery-Beat**: Added Celery-Beat service for scheduling periodic tasks (e.g. database cleanups, low stock alerts).
+- **Transactional Emails**: Created fully branded HTML email templates (`base.html`, `order_confirmation.html`, `password_reset.html`, `newsletter_blog.html`) featuring the premium `SMARTSHOP™ EST. 2026` logo typography.
+- **Contact Details Updated**: Updated site-wide contact information to the New Rochelle, NY address.
+
 ---
 
 ## 🔄 Deployment Workflow
@@ -151,8 +157,13 @@ Internet (HTTPS)
       │                              Media file serving
       │                                    │
       │                             ┌──────▼──────┐
-      │                             │  PostgreSQL  │
+      │                             │  PostgreSQL  │◄──── Celery Beat (Scheduler)
       │                             │  (Database)  │
+      │                             └──────┬──────┘
+      │                                    │
+      │                             ┌──────▼──────┐
+      │                             │    Redis     │◄──── Celery Worker (Background Tasks & Emails)
+      │                             │   (Broker)   │
       │                             └─────────────┘
       │
       ├── db.smartshop1.us ───────► Adminer (DB Browser UI)
