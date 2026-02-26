@@ -1105,9 +1105,28 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
         self._create_or_update_coupon(campaign)
 
     def perform_destroy(self, instance):
-        # Delete associated coupon if exists
+        # Safeguard: Don't delete while sending to avoid race conditions and task crashes
+        if instance.status == 'sending':
+            from rest_framework.exceptions import ValidationError
+            raise ValidationError("Cannot delete a campaign that is currently sending. Please pause it first.")
+
+        # Optimize deletion of potentially large amounts of related data
+        # Explicit queryset deletes are often more efficient than instance-level cascade for many children
+        instance.delivery_logs.all().delete()
+        instance.recipients.all().delete()
+        instance.click_logs.all().delete()
+        instance.conversions.all().delete()
+
+        # Delete associated coupon if it's not used by other campaigns
         if instance.coupon:
-            instance.coupon.delete()
+            # If this is the last campaign using this coupon, delete it
+            if instance.coupon.campaigns.count() <= 1:
+                instance.coupon.delete()
+            else:
+                # Just unlink it
+                instance.coupon = None
+                instance.save(update_fields=['coupon'])
+
         instance.delete()
 
     def _create_or_update_coupon(self, campaign):

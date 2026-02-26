@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { api } from '../../services/api';
-import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter, Tag, Layout } from 'lucide-react';
+import { Mail, Calendar, Send, Plus, Clock, CheckCircle, Users, BarChart3, ChevronDown, Copy, Pause, Play, Trash2, Eye, X, AlertCircle, TrendingUp, Target, Zap, Search, Filter, Tag, Layout, DollarSign } from 'lucide-react';
 import { MarketingCampaign, MarketingAnalytics, AudiencePreview, EmailDeliveryLog } from '../../types';
 import { ConversionAnalyticsTab } from './ConversionAnalyticsTab';
 import { EmailTemplateBuilder, EmailTemplate } from './EmailTemplateBuilder';
@@ -50,6 +50,7 @@ export const MarketingTab: React.FC = () => {
     const [activeView, setActiveView] = useState<'campaigns' | 'analytics' | 'conversions'>('campaigns');
     const [sendNow, setSendNow] = useState(true);
     const [saving, setSaving] = useState(false);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Partial<MarketingCampaign>>({
         name: '', subject: '', preheader: '', message: '', plain_text: '',
         banner_image_url: '', cta_text: '', cta_url: '', discount_code: '',
@@ -193,6 +194,7 @@ export const MarketingTab: React.FC = () => {
 
     const handleDelete = async (id: string) => {
         if (!window.confirm('Are you sure you want to delete this campaign?')) return;
+        setDeletingId(id);
         try {
             console.log('Deleting campaign:', id);
             await api.deleteCampaign(id);
@@ -203,8 +205,19 @@ export const MarketingTab: React.FC = () => {
         } catch (error: any) {
             console.error('Delete error:', error);
             console.error('Error response:', error?.response?.data);
-            const errorMsg = error?.response?.data?.detail || error?.response?.data?.error || 'Failed to delete campaign. Make sure you are logged in as admin.';
+
+            let errorMsg = 'Failed to delete campaign.';
+            if (error?.response?.status === 502) {
+                errorMsg = 'Server timeout while deleting local data. The campaign might have too many logs to delete instantly. Please wait a moment and refresh.';
+            } else if (error?.response?.data?.message || error?.response?.data?.detail) {
+                errorMsg = error.response.data.message || error.response.data.detail;
+            } else if (error.message === 'Network Error') {
+                errorMsg = 'Network error or server timeout. Large campaigns may take longer to delete.';
+            }
+
             alert(errorMsg);
+        } finally {
+            setDeletingId(null);
         }
     };
 
@@ -553,7 +566,12 @@ export const MarketingTab: React.FC = () => {
                                                                 <Target className="w-3.5 h-3.5" />
                                                             </button>
                                                         )}
-                                                        <button onClick={() => handleDelete(c.id)} className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-all" title="Delete">
+                                                        <button
+                                                            onClick={() => handleDelete(c.id)}
+                                                            disabled={deletingId === c.id || c.status === 'sending'}
+                                                            className={`p-2 rounded-lg transition-all ${deletingId === c.id ? 'text-gray-400 animate-pulse' : 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30'} ${c.status === 'sending' ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                                            title={c.status === 'sending' ? 'Cannot delete while sending' : "Delete"}
+                                                        >
                                                             <Trash2 className="w-3.5 h-3.5" />
                                                         </button>
                                                     </div>
