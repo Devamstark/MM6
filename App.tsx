@@ -25,6 +25,7 @@ import { AboutUs } from './pages/AboutUs';
 import { Cart } from './pages/Cart';
 import { Blog } from './pages/Blog';
 import { BloggerDashboard } from './pages/BloggerDashboard';
+import { MarketingDashboard } from './pages/MarketingDashboard';
 import ScrollToTop from './components/ScrollToTop';
 
 function App() {
@@ -74,6 +75,7 @@ function App() {
 
                             <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                                 <Route path="admin" element={<AdminDashboard />} />
+                                <Route path="marketing" element={<MarketingDashboard />} />
                             </Route>
 
                             <Route path="*" element={<Navigate to="/" replace />} />

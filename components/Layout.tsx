@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight, ChevronRight, Home, Heart, FileText, Phone, Settings } from 'lucide-react';
+import { ShoppingCart, LogOut, User as UserIcon, Shield, Package, Search, Menu, Store, LayoutDashboard, X, Trash2, Plus, Minus, ArrowRight, ChevronRight, Home, Heart, FileText, Phone, Settings, Mail } from 'lucide-react';
 import { api } from '../services/api';
 import { SearchSuggestions } from '../types';
 import { Clock, TrendingUp, History } from 'lucide-react';
@@ -430,6 +430,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                           </Link>
                         )}
 
+                        {isAdmin && (
+                          <Link
+                            to="/marketing"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-blue-50 text-blue-600 dark:hover:bg-blue-900/20 rounded-xl transition-colors"
+                          >
+                            <Mail className="w-4 h-4" /> Marketing
+                          </Link>
+                        )}
+
                         <Link
                           to="/orders"
                           onClick={() => setIsUserMenuOpen(false)}
@@ -708,6 +718,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-green-600 text-xs font-bold text-white rounded-lg hover:bg-green-700 transition-colors"
                     >
                       <FileText className="w-3.5 h-3.5" /> Blog
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/marketing"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-xs font-bold text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Mail className="w-3.5 h-3.5" /> Market
                     </Link>
                   )}
                 </div>

@@ -15,11 +15,10 @@ import { DashboardCharts } from '../components/dashboard/DashboardCharts';
 import { CouponsTab } from '../components/dashboard/CouponsTab';
 import { StaffTab } from '../components/dashboard/StaffTab';
 import { CMSTab } from '../components/dashboard/CMSTab';
-import { MarketingTab } from '../components/dashboard/MarketingTab';
 
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'coupons' | 'staff' | 'cms' | 'marketing'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'coupons' | 'staff' | 'cms'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -323,7 +322,7 @@ export const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-12 w-full animate-fade-up delay-100 overflow-x-auto pb-2">
-          {['overview', 'products', 'sellers', 'users', 'orders', 'coupons', 'marketing', 'messages', 'analytics', 'staff', 'cms'].map((tab) => (
+          {['overview', 'products', 'sellers', 'users', 'orders', 'coupons', 'messages', 'analytics', 'staff', 'cms'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -1006,10 +1005,6 @@ export const AdminDashboard = () => {
 
           {activeTab === 'cms' && (
             <CMSTab />
-          )}
-
-          {activeTab === 'marketing' && (
-            <MarketingTab />
           )}
         </div>
 
