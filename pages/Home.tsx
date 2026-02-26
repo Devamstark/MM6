@@ -48,7 +48,7 @@ export const Home = () => {
   });
   const [heroBanners, setHeroBanners] = useState<any[]>([]);
   const [homeSections, setHomeSections] = useState<any[]>([]);
-  const [currentHeroIndex, setCurrentHeroIndex] = useState(0);
+  const [[currentHeroIndex, direction], setHeroState] = useState([0, 0]);
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [popularProducts, setPopularProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>([]);
@@ -62,27 +62,51 @@ export const Home = () => {
   const [heroLoading, setHeroLoading] = useState(true);    // controls hero skeleton only
   const [contentLoading, setContentLoading] = useState(true); // controls product skeletons
 
-  // Auto-rotate hero banners every 6 seconds
-  useEffect(() => {
-    if (heroBanners.length <= 1) return;
-    const interval = setInterval(() => {
-      setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
-    }, 6000);
-    return () => clearInterval(interval);
-  }, [heroBanners.length]);
+  const setStep = (newStep: number, newDirection: number) => {
+    setHeroState([newStep, newDirection]);
+  };
 
   const goToPreviousHero = () => {
     if (heroBanners.length <= 1) return;
-    setCurrentHeroIndex((prev) => (prev - 1 + heroBanners.length) % heroBanners.length);
+    const nextIndex = (currentHeroIndex - 1 + heroBanners.length) % heroBanners.length;
+    setStep(nextIndex, -1);
   };
 
   const goToNextHero = () => {
     if (heroBanners.length <= 1) return;
-    setCurrentHeroIndex((prev) => (prev + 1) % heroBanners.length);
+    const nextIndex = (currentHeroIndex + 1) % heroBanners.length;
+    setStep(nextIndex, 1);
   };
 
   const goToHeroSlide = (index: number) => {
-    setCurrentHeroIndex(index);
+    const dir = index > currentHeroIndex ? 1 : -1;
+    setStep(index, dir);
+  };
+
+  // Auto-rotate hero banners every 6 seconds
+  useEffect(() => {
+    if (heroBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      goToNextHero();
+    }, 6000);
+    return () => clearInterval(interval);
+  }, [heroBanners.length, currentHeroIndex]);
+
+  const slideVariants = {
+    enter: (direction: number) => ({
+      x: direction > 0 ? 1000 : -1000,
+      opacity: 0
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1
+    },
+    exit: (direction: number) => ({
+      zIndex: 0,
+      x: direction < 0 ? 1000 : -1000,
+      opacity: 0
+    })
   };
 
   // Redirect Admins and Sellers to their dashboards
@@ -224,16 +248,21 @@ export const Home = () => {
         </div>
       ) : heroBanners.length > 0 ? (
         <div className="relative overflow-hidden w-full h-[500px] md:h-[420px]">
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence initial={false} custom={direction}>
             {heroBanners.map((banner: any, index: number) => {
               if (index !== currentHeroIndex) return null;
               return (
                 <motion.div
-                  key={banner.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.7, ease: 'easeInOut' }}
+                  key={`${banner.id}-${index}`}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 }
+                  }}
                   className="absolute inset-0 w-full h-full"
                   style={{ backgroundColor: banner.background_color || '#f6f6f6' }}
                 >
