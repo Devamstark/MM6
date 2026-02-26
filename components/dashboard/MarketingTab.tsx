@@ -59,6 +59,7 @@ export const MarketingTab: React.FC = () => {
         discount_usage_limit: null, discount_expiry_days: 7,
         status: 'draft', campaign_type: 'promotional', audience_type: 'all_users',
         audience_days: 30, manual_user_ids: [], batch_size: 200,
+        scheduled_date: '',
     });
 
     const loadCampaigns = useCallback(async () => {
@@ -95,6 +96,17 @@ export const MarketingTab: React.FC = () => {
             alert('Please fill out all required fields: Name, Subject, and Message.');
             return;
         }
+
+        // Validate scheduled date if scheduling for later
+        if (!sendNow && formData.scheduled_date) {
+            const scheduledDate = new Date(formData.scheduled_date);
+            const now = new Date();
+            if (scheduledDate <= now) {
+                alert('Scheduled date must be in the future. Please select a later date and time.');
+                return;
+            }
+        }
+
         setSaving(true);
         try {
             const dataToSave = { ...formData };
@@ -148,6 +160,7 @@ export const MarketingTab: React.FC = () => {
             discount_usage_limit: null, discount_expiry_days: 7,
             status: 'draft', campaign_type: 'promotional', audience_type: 'all_users',
             audience_days: 30, manual_user_ids: [], batch_size: 200,
+            scheduled_date: '',
         });
         setSendNow(true);
         setAudiencePreview(null);
@@ -226,6 +239,21 @@ export const MarketingTab: React.FC = () => {
             alert(errorMsg);
         } finally {
             setDeletingId(null);
+        }
+    };
+
+    const handleCancelSchedule = async (id: string) => {
+        if (!window.confirm('Are you sure you want to cancel the scheduled send? The campaign will be moved back to drafts.')) return;
+
+        try {
+            // Cancel by setting status back to draft and clearing scheduled_date
+            await api.updateCampaign(id, { status: 'draft', scheduled_date: null });
+            alert('✅ Schedule cancelled! Campaign moved to drafts.');
+            loadCampaigns();
+            loadAnalytics();
+        } catch (error: any) {
+            console.error('Cancel schedule error:', error);
+            alert(error?.response?.data?.error || 'Failed to cancel schedule');
         }
     };
 
@@ -552,6 +580,16 @@ export const MarketingTab: React.FC = () => {
                                                                 <Send className="w-3.5 h-3.5" />
                                                             </button>
                                                         )}
+                                                        {c.status === 'scheduled' && (
+                                                            <>
+                                                                <button onClick={() => handleCancelSchedule(c.id)} className="p-2 text-orange-600 hover:bg-orange-50 dark:hover:bg-orange-900/30 rounded-lg transition-all" title="Cancel Schedule">
+                                                                    <X className="w-3.5 h-3.5" />
+                                                                </button>
+                                                                <button onClick={() => handleSend(c.id, true)} className="p-2 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all" title="Send Now">
+                                                                    <Send className="w-3.5 h-3.5" />
+                                                                </button>
+                                                            </>
+                                                        )}
                                                         {c.status === 'sending' && (
                                                             <button onClick={() => handlePause(c.id)} className="p-2 text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/30 rounded-lg transition-all" title="Pause">
                                                                 <Pause className="w-3.5 h-3.5" />
@@ -795,7 +833,22 @@ Example:
                                 {!sendNow && (
                                     <div>
                                         <label className="block text-xs font-bold text-gray-700 dark:text-gray-300 mb-2 uppercase tracking-wider">Scheduled Date & Time</label>
-                                        <input type="datetime-local" value={formData.scheduled_date && !isNaN(new Date(formData.scheduled_date).getTime()) ? new Date(formData.scheduled_date).toISOString().slice(0, 16) : ''} onChange={e => setFormData({ ...formData, scheduled_date: e.target.value ? new Date(e.target.value).toISOString() : '' })} className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20" />
+                                        <input
+                                            type="datetime-local"
+                                            min={new Date().toISOString().slice(0, 16)}
+                                            value={formData.scheduled_date ? new Date(formData.scheduled_date).toISOString().slice(0, 16) : ''}
+                                            onChange={e => {
+                                                const selectedDate = e.target.value ? new Date(e.target.value).toISOString() : '';
+                                                console.log('Scheduled date selected:', selectedDate);
+                                                setFormData({ ...formData, scheduled_date: selectedDate });
+                                            }}
+                                            className="w-full bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-xl px-4 py-3 text-sm text-gray-900 dark:text-white focus:ring-4 focus:ring-indigo-500/20"
+                                        />
+                                        {formData.scheduled_date && (
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                                📅 Will be sent on: {new Date(formData.scheduled_date).toLocaleString()}
+                                            </p>
+                                        )}
                                     </div>
                                 )}
                             </div>
