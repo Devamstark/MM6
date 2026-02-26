@@ -12,4 +12,3 @@ whitenoise>=6.9.0
 django-redis>=5.4.0
 redis>=5.2.1
 
-resend>=2.6.0

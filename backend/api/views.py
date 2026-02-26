@@ -8,7 +8,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 import django_filters
 from django.contrib.auth import get_user_model
 from django.utils import timezone
-import resend
 from django.conf import settings
 import random
 from decimal import Decimal
