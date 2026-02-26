@@ -94,7 +94,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend
       args:
-        - VITE_API_URL=https://api.smartshop1.us/api
+        - VITE_API_URL=${VITE_API_URL}
     restart: always
     volumes:
       - frontend_build:/data

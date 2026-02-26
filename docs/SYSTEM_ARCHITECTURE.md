@@ -532,15 +532,15 @@ UI Error Display (Toast/Alert)
               └────────────┘
 ```
 
-### Caching Strategy (Future)
+### Caching Strategy
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    Cache Layers                          │
 ├─────────────────────────────────────────────────────────┤
-│  L1: Browser Cache (Static Assets)                      │
-│  L2: CDN Cache (Nginx static files, Traefik edge)       │
-│  L3: Redis Cache (API Responses) [Future]               │
-│  L4: Database Query Cache (PostgreSQL)                  │
+│  L1: Browser Cache (Static Assets - 1 Day)              │
+│  L2: CDN Cache (Cloudflare Edge - 7 Days /media/)       │
+│  L3: Redis Cache (Django API Responses - 15 Mins)       │
+│  L4: Database Query Cache (PostgreSQL Internal)         │
 └─────────────────────────────────────────────────────────┘
 ```
 

@@ -14,7 +14,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-change-me-for-product
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 
 # SECURITY: Default to strict allowed hosts — no wildcard in production.
-ALLOWED_HOSTS = [host for host in os.environ.get('ALLOWED_HOSTS', 'smartshop1.us,api.smartshop1.us,www.smartshop1.us').split(',') if host]
+ALLOWED_HOSTS = [host for host in os.environ.get('ALLOWED_HOSTS', '').split(',') if host]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -31,17 +31,17 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    'django.middleware.cache.UpdateCacheMiddleware',
+    'django.middleware.cache.UpdateCacheMiddleware',  # MUST BE FIRST
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.cache.FetchFromCacheMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.cache.FetchFromCacheMiddleware',   # MUST BE LAST
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -75,7 +75,7 @@ DATABASES = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.environ.get('REDIS_URL', 'redis://127.0.0.1:6379/1'),
+        "LOCATION": os.environ.get('REDIS_URL', 'redis://redis:6379/1'),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -145,17 +145,8 @@ USE_X_FORWARDED_PORT = True
 
 # CORS and CSRF Settings
 CORS_ALLOW_ALL_ORIGINS = DEBUG  # Only allow all in DEBUG mode
-CORS_ALLOWED_ORIGINS = [origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin] + [
-    "https://smartshop1.us",
-    "https://www.smartshop1.us",
-    "https://api.smartshop1.us",
-]
-
-CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin] + [
-    "https://smartshop1.us",
-    "https://www.smartshop1.us",
-    "https://api.smartshop1.us",
-]
+CORS_ALLOWED_ORIGINS = [origin for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin]
+CSRF_TRUSTED_ORIGINS = [origin for origin in os.environ.get('CSRF_TRUSTED_ORIGINS', '').split(',') if origin]
 
 # Security Hardening
 if not DEBUG:
@@ -182,8 +173,8 @@ except (ValueError, TypeError):
 
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
-SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER) or 'support@smartshop1.us'
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+SERVER_EMAIL = os.environ.get('SERVER_EMAIL', EMAIL_HOST_USER)
 
 # Mutually exclusive security settings — auto-detected from port
 if EMAIL_PORT == 465:

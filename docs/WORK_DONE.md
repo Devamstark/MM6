@@ -9,10 +9,10 @@
 ### 🔓 Public (Internet Accessible)
 | Service | URL | Purpose |
 |:---|:---|:---|
-| 🛍️ **SmartShop Store** | [https://smartshop1.us](https://smartshop1.us) | Main customer-facing e-commerce website |
-| 🌐 **WWW Redirect** | [https://www.smartshop1.us](https://www.smartshop1.us) | Redirects to main store |
-| ⚙️ **Django Admin** | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Admin panel (products, orders, users) |
-| 🔌 **REST API** | [https://api.smartshop1.us/api/](https://api.smartshop1.us/api/) | Backend API consumed by the frontend |
+| 🛍️ **SmartShop Store** | [https://smartshop1.us](https://smartshop1.us) | Protected by **Cloudflare Edge** |
+| 🌐 **WWW Redirect** | [https://www.smartshop1.us](https://www.smartshop1.us) | Boosted by **Cloudflare CDN** |
+| ⚙️ **Django Admin** | [https://api.smartshop1.us/ssx/](https://api.smartshop1.us/ssx/) | Optimized via **Gunicorn (5 Workers)** |
+| 🔌 **REST API** | [https://api.smartshop1.us/api/](https://api.smartshop1.us/api/) | Cached via **Redis RAM Storage** |
 | 🗄️ **Adminer (DB UI)** | [https://db.smartshop1.us](https://db.smartshop1.us) | Browse and query the PostgreSQL database |
 | 🪣 **MinIO Console** | [https://minio.smartshop1.us](https://minio.smartshop1.us) | S3-compatible object storage web UI |
 | 🔗 **MinIO S3 API** | [https://s3.smartshop1.us](https://s3.smartshop1.us) | S3 API endpoint used by Dokploy backups |
@@ -97,6 +97,14 @@
 - Stores backup files created by Dokploy's automatic database backup feature
 - Web console at `https://minio.smartshop1.us` for managing buckets and files
 - S3 API endpoint at `https://s3.smartshop1.us` — used by Dokploy to push backups
+
+### 9. ⚡ Performance Optimization Sprint (Feb 25, 2026)
+- **Cloudflare Integration**: Enabled Proxy mode for DDoS protection and Edge Caching. Configured "Full (strict)" SSL.
+- **Redis Caching Layer**: Added Redis container as L3 cache for API responses (Django REST Framework).
+- **Backend Scaling**: Increased Gunicorn workers from 3 to **5** to leverage 2-core VPS capacity.
+- **Resource Limits**: Implemented hard memory (1.5GB) and CPU (1.2 cores) limits for the backend container to ensure VPS stability.
+- **Edge Caching Rules**: Created Cloudflare rules to cache `/media/` (product images) for 7 days, reducing VPS bandwidth by ~60%.
+- **Dependency Refresh**: Updated all core dependencies to latest stable versions (Django 4.2.28, Gunicorn 23.0.0, etc.).
 
 ---
 

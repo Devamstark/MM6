@@ -9,7 +9,7 @@
 
 ## 1. Overview
 
-SmartShop runs entirely on a single VPS using Docker containers orchestrated by **Dokploy**. All external traffic enters through **Traefik**, which acts as reverse proxy, SSL terminator, and router. Containers communicate privately on a Docker bridge network (`dokploy-network`). No traffic goes directly to any container — everything flows through Traefik.
+SmartShop uses a **hybrid edge-origin architecture**. Static content and security are handled by **Cloudflare Edge**, while the core application logic runs on a single VPS using Docker containers orchestrated by **Dokploy**. All internal data traffic is optimized via a **Redis caching layer** before hitting the PostgreSQL database.
 
 ---
 
@@ -20,17 +20,13 @@ SmartShop runs entirely on a single VPS using Docker containers orchestrated by 
                        INTERNET (HTTPS)
 ════════════════════════════════════════════════════════════════
                               │
-                   DNS Resolution (Cloudflare)
-                              │
-              ┌───────────────┴──────────────────┐
-              │          smartshop1.us            │
-              │    api.smartshop1.us              │
-              │    www.smartshop1.us              │  → All point to VPS IP
-              │    db.smartshop1.us               │
-              │    minio.smartshop1.us            │
-              │    s3.smartshop1.us               │
-              └───────────────┬──────────────────┘
-                              │
+                   CLOUDFLARE EDGE (CDN)
+              ┌───────────────────────────────┐
+              │  • DDoS Protection            │
+              │  • SSL Termination (Strict)   │
+              │  • Edge Caching (/media/)     │
+              └───────────────┬───────────────┘
+                              │ (Encrypted)
                               ▼
 ════════════════════════════════════════════════════════════════
               VPS — HostAsia (Ubuntu 22.04 LTS)
@@ -39,29 +35,24 @@ SmartShop runs entirely on a single VPS using Docker containers orchestrated by 
               ┌───────────────▼───────────────────────────────┐
               │           TRAEFIK (Docker Container)           │
               │                                               │
-              │  • Listens: port 80 (HTTP) and 443 (HTTPS)   │
-              │  • HTTP → HTTPS redirect (automatic)          │
-              │  • SSL via Let's Encrypt (auto-renewed)       │
-              │  • Routes by hostname (Host header)           │
-              │  • Reads Docker labels for routing rules      │
+              │  • Internal Routing & Domain Mapping          │
               └──┬───────────┬──────────┬────────┬───────────┘
                  │           │          │        │
         ┌────────▼───┐ ┌─────▼───┐ ┌───▼────┐ ┌─▼──────────┐
         │  Frontend  │ │ Backend │ │Adminer │ │   MinIO    │
-        │  (Nginx)   │ │(Gunicorn│ │(DB UI) │ │(S3 Storage)│
-        │            │ │)        │ │        │ │            │
-        │ :80        │ │ :8000   │ │ :8080  │ │:9000/:9001 │
-        │            │ │         │ │        │ │            │
-        │smartshop   │ │api.smart│ │db.smart│ │minio.smart │
-        │1.us        │ │shop1.us │ │shop1.us│ │shop1.us    │
+        │  (Nginx)   │ │(Redis   │ │(DB UI) │ │(S3 Storage)│
+        │            │ │ Aware)  │ │        │ │            │
         └────────────┘ └────┬────┘ └───┬────┘ └────────────┘
                             │          │
                      ┌──────▼──────────▼──┐
-                     │    PostgreSQL       │
-                     │   (Docker :5432)    │
-                     │  Internal only —    │
-                     │  no Traefik route   │
-                     └────────────────────┘
+                     │    REDIS CACHE      │
+                     │   (Docker :6379)    │
+                     └──────┬─────────────┘
+                            │
+                     ┌──────▼───────┐
+                     │  PostgreSQL   │
+                     │ (Docker :5432)│
+                     └───────────────┘
 ```
 
 ---
@@ -80,6 +71,7 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 │  │  traefik          │ traefik           │ 80, 443 (public) │   │
 │  │  frontend         │ frontend          │ 80 (internal)    │   │
 │  │  backend          │ backend           │ 8000 (internal)  │   │
+│  │  redis            │ redis             │ 6379 (internal)  │   │
 │  │  db               │ db                │ 5432 (internal)  │   │
 │  │  adminer          │ adminer           │ 8080 (internal)  │   │
 │  │  minio            │ minio             │ 9000, 9001 (int) │   │
@@ -102,28 +94,25 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 ### 4.1 User visits `https://smartshop1.us` (Frontend)
 
 ```
-1. Browser → DNS → VPS IP:443
-2. Traefik receives HTTPS request
-3. Traefik terminates SSL (decrypts)
-4. Traefik checks Host header: "smartshop1.us"
-5. Traefik matches router rule → frontend container
-6. Traefik forward HTTP to frontend:80 (internal)
-7. Nginx serves React index.html
-8. Browser receives HTML, loads JS bundle
-9. React app initializes, fetches data from api.smartshop1.us
+1. Browser → DNS (Cloudflare) → Cloudflare Edge
+2. Cloudflare checks cache/WAF → Forwards to VPS:443 (if miss)
+3. Traefik receives encrypted traffic from Cloudflare
+4. Traefik matches Host header: "smartshop1.us"
+5. Traefik forward HTTP to frontend:80 (internal)
+6. Nginx serves React index.html
+7. Browser receives HTML, loads JS bundle
 ```
 
 ### 4.2 React app calls `https://api.smartshop1.us/api/products/`
 
 ```
-1. Browser → DNS → VPS IP:443
-2. Traefik receives HTTPS request
-3. Host header: "api.smartshop1.us" → matches backend router
-4. Traefik forwards to backend:8000 (internal)
-5. Gunicorn handles request → Django processes it
-6. Django queries PostgreSQL at db:5432 (internal Docker network)
-7. Django returns JSON response
-8. Traefik returns response to browser over HTTPS
+1. Browser → Cloudflare Edge → VPS IP:443
+2. Traefik matches "api.smartshop1.us" → backend:8000
+3. Gunicorn (5 workers) receives request
+4. Django checks REDIS cache at redis:6379 (L3 Cache)
+5. If MISS: Django queries PostgreSQL at db:5432
+6. If MISS: Django saves result to REDIS
+7. Response returned to user via Cloudflare
 ```
 
 ### 4.3 HTTP → HTTPS Redirect
@@ -139,15 +128,13 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 
 ## 5. DNS Records
 
-| Type | Name | Value | Purpose |
-|:---|:---|:---|:---|
-| A | `smartshop1.us` | `<VPS IP>` | Root domain → VPS |
-| A | `www` | `<VPS IP>` | www subdomain → VPS |
-| A | `api` | `<VPS IP>` | Backend API → VPS |
-| A | `db` | `<VPS IP>` | Adminer DB browser → VPS |
-| A | `minio` | `<VPS IP>` | MinIO console → VPS |
-| A | `s3` | `<VPS IP>` | MinIO S3 API → VPS |
-| MX | `@` | `mail.old-host.com` | Email remains on cPanel |
+| Type | Name | Value | Proxy Status | Purpose |
+|:---|:---|:---|:---|:---|
+| A | `smartshop1.us` | `157.90.149.223` | 🟠 Proxied | Root domain → CDN |
+| A | `www` | `157.90.149.223` | 🟠 Proxied | www subdomain → CDN |
+| A | `api` | `157.90.149.223` | 🟠 Proxied | Backend API → CDN |
+| A | `smtp` | `157.90.149.223` | 🔘 DNS Only | Mail subdomains (Grey Cloud) |
+| MX | `@` | `mail.old-host.com` | N/A | Email remains on cPanel |
 
 > **Split DNS**: Website on VPS, email on original cPanel host. MX records left unchanged so email was not disrupted.
 
@@ -173,19 +160,17 @@ All containers are connected to a single Docker bridge network: **`dokploy-netwo
 ## 7. SSL / TLS Architecture
 
 ```
-Browser ─────────────── TLS ─────────────► Traefik
-                        (HTTPS)
-                                            │ (HTTP, internal)
-                                            ▼
-                                        Container
+Browser ───────── TLS 1.3 ────────► Cloudflare ───────── TLS ────────► Traefik
+        (HTTPS/HTTP3)               Edge          (Full Strict)        (VPS)
+                                                                         │
+                                                                         ▼
+                                                                     Container
 ```
 
-- **Traefik** holds the SSL certificates and terminates TLS
-- Containers receive plain HTTP internally (no SSL in containers)
-- Django knows it's HTTPS via `X-Forwarded-Proto: https` header
-- Certs stored on VPS: `/var/lib/dokploy/traefik/certs/`
-- Renewal: Automatic via Let's Encrypt ACME
-- Cert resolver: `letsencrypt` (configured in Traefik entrypoints)
+- **Cloudflare Edge** terminates the initial connection (enabling HTTP/3 and WAF).
+- **Full (strict)** mode is used: Cloudflare connects to Traefik using the VPS's Let's Encrypt certificates.
+- **Traefik** handles the second stage of SSL termination at the VPS level.
+- Cert renewal: Automatic via Let's Encrypt (Traefik) + Universal SSL (Cloudflare).
 
 ---
 

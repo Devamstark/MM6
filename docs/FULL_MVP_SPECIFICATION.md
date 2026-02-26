@@ -22,11 +22,12 @@
 - **Language**: Python 3.10+
 - **Framework**: Django 4.2 + Django REST Framework (DRF)
 - **Authentication**: JWT (djangorestframework-simplejwt)
+- **Caching**: Redis 7.x (High-performance L3 Cache for API/Sessions)
 - **Database ORM**: Django ORM
 - **File Storage**: Local Docker volume (`backend_media`)
 - **CORS**: django-cors-headers
 - **Static Files**: WhiteNoise (Production static serving)
-- **Deployment**: Docker + Gunicorn (self-hosted VPS via Dokploy)
+- **Deployment**: Docker + Gunicorn (5 Workers)
 
 ### **Database**
 - **Development**: SQLite3 (Local testing)
@@ -36,7 +37,7 @@
 - **Version Control**: Git
 - **Package Managers**: npm (frontend), pip (backend)
 - **Environment Variables**: python-dotenv + Dokploy env manager
-- **Process Manager**: Gunicorn (WSGI server)
+- **Edge Optimization**: Cloudflare (CDN, DDoS, Edge Caching, Brotli)
 - **Orchestrator**: Dokploy (self-hosted)
 - **Containerization**: Docker + Docker Compose
 - **Reverse Proxy**: Traefik (auto SSL via Let's Encrypt)
@@ -688,5 +689,5 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 2026
-**Version**: 1.3.0 (Role Expansion & Unified Architecture)
+**Last Updated**: February 25, 2026
+**Version**: 1.5.0 (Performance & Security Hardening)
