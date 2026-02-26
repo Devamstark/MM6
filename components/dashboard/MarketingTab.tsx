@@ -902,6 +902,20 @@ Example:
                                     Close
                                 </button>
                             </div>
+                        ) : (
+                            <div className="p-10 text-center">
+                                <BarChart3 className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                                <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">No Conversion Data Available</h4>
+                                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                                    This campaign doesn't have conversion tracking set up yet, or no conversions have been recorded.
+                                </p>
+                                <button
+                                    onClick={() => setShowConversionModal(false)}
+                                    className="mt-6 px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition-all"
+                                >
+                                    Close
+                                </button>
+                            </div>
                         )}
                     </div>
                 </div>
