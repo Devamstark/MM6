@@ -37,6 +37,16 @@ client.interceptors.request.use((config) => {
   const token = localStorage.getItem('cm_token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
+
+    // Aggressive cache-busting for all authenticated requests 
+    // to prevent "ghost" items from CDNs or browser caches
+    config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
+    config.headers['Pragma'] = 'no-cache';
+    config.headers['Expires'] = '0';
+
+    if (config.method?.toLowerCase() === 'get') {
+      config.params = { ...config.params, _t: Date.now() };
+    }
   }
 
   // Add CSRF Token for mutation methods
