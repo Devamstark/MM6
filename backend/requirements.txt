@@ -14,3 +14,4 @@ redis>=5.2.1
 celery>=5.3.6
 django-celery-beat>=2.5.0
 django-celery-results>=2.5.1
+stripe>=11.5.0

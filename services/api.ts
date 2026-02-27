@@ -697,12 +697,13 @@ export const api = {
   },
 
   // --- Orders ---
-  createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails: any, totalPrice: number, useEarnings?: boolean }): Promise<Order> => {
+  createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails?: any, totalPrice: number, useEarnings?: boolean, couponCode?: string, transactionId?: string }): Promise<Order> => {
     const payload = {
       items: orderData.items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
       totalPrice: orderData.totalPrice,
       customerName: orderData.shippingAddress.name,
       use_earnings: orderData.useEarnings || false,
+      coupon_code: orderData.couponCode,
     };
 
     const response = await client.post('orders/', payload);
@@ -712,7 +713,8 @@ export const api = {
       orderId: newOrder.id,
       userId: newOrder.userId,
       amount: newOrder.totalPrice,
-      paymentMethod: 'Credit Card'
+      paymentMethod: 'Stripe',
+      transactionId: orderData.transactionId || `tx_${Date.now()}`
     });
 
     return newOrder;
@@ -750,13 +752,13 @@ export const api = {
     return mapOrder(response.data);
   },
 
-  processPayment: async (paymentData: { orderId: string, userId: string, amount: number, paymentMethod: string }): Promise<any> => {
+  processPayment: async (paymentData: { orderId: string, userId: string, amount: number, paymentMethod: string, transactionId?: string }): Promise<any> => {
     const payload = {
       order: paymentData.orderId,
       user: paymentData.userId,
       amount: paymentData.amount,
       payment_method: paymentData.paymentMethod,
-      transaction_id: `tx_${Date.now()}`,
+      transaction_id: paymentData.transactionId || `tx_${Date.now()}`,
       status: 'completed'
     };
     const response = await client.post('payments/', payload);
@@ -798,6 +800,15 @@ export const api = {
 
   deleteUser: async (userId: string): Promise<void> => {
     await client.delete(`users/${userId}/`);
+  },
+
+  createPaymentIntent: async (items: any[], couponCode?: string, useEarnings: boolean = false): Promise<{ clientSecret: string; totalAmount: number }> => {
+    const response = await client.post('payments/create-payment-intent/', {
+      items,
+      couponCode,
+      useEarnings
+    });
+    return response.data;
   },
 
   getMyEarnings: async (): Promise<{ referralEarnings: number; canRedeem: boolean; minimumToRedeem: number }> => {

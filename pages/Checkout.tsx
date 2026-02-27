@@ -6,6 +6,121 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag, Percent, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+
+// Initialize Stripe with test public key
+const stripePromise = loadStripe('pk_test_51T5FLjCXoN7dV1O9567fmjKf8uLw05HOVNDAbYjQb6b7kSCr53X0EdIjINqvQt7gDZsxSKBB5n649eDNSJrgNoZb00ezrvROlP');
+
+const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, useEarnings, appliedCoupon, earnings }: {
+  total: number;
+  onOrderPlaced: (orderId: string) => void;
+  onBack: () => void;
+  items: any[];
+  shippingData: any;
+  useEarnings: boolean;
+  appliedCoupon: any;
+  earnings: any;
+}) => {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // 1. Create PaymentIntent on the backend
+      const response = await api.createPaymentIntent(items, appliedCoupon?.code, useEarnings);
+      const clientSecret = response.clientSecret;
+
+      // 2. Confirm payment with Stripe
+      const result = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card: elements.getElement(CardElement)!,
+          billing_details: {
+            name: shippingData.name,
+            email: shippingData.email,
+          },
+        },
+      });
+
+      if (result.error) {
+        setError(result.error.message || 'Payment failed');
+      } else {
+        if (result.paymentIntent.status === 'succeeded') {
+          // 3. Create order on the backend
+          const order = await api.createOrder({
+            items,
+            shippingAddress: shippingData,
+            totalPrice: total,
+            useEarnings,
+            couponCode: appliedCoupon?.code,
+            transactionId: result.paymentIntent.id
+          });
+          onOrderPlaced(order.id);
+        }
+      }
+    } catch (err: any) {
+      setError(err.response?.data?.error || err.message || 'An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="p-6 sm:p-8">
+      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
+        <CreditCard className="w-6 h-6 text-indigo-600" />
+        Payment Method (Stripe Test Mode)
+      </h2>
+
+      <div className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 flex items-start gap-3">
+        <Lock className="w-5 h-5 text-indigo-600 mt-0.5" />
+        <div className="text-sm text-indigo-800">
+          <span className="font-bold">Secure Stripe Gateway:</span> You are in <strong>Test Mode</strong>. Use 4242 4242 4242 4242 for testing.
+        </div>
+      </div>
+
+      <div className="bg-white border-2 border-gray-100 p-6 rounded-2xl mb-8 shadow-sm">
+        <label className="block text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">Card Details</label>
+        <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all">
+          <CardElement options={{
+            style: {
+              base: {
+                fontSize: '16px',
+                color: '#1f2937',
+                '::placeholder': { color: '#9ca3af' },
+                fontFamily: 'Inter, sans-serif',
+              },
+              invalid: { color: '#ef4444' },
+            },
+          }} />
+        </div>
+      </div>
+
+      {error && (
+        <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm flex items-center gap-3 border border-red-100">
+          <X className="w-5 h-5" /> {error}
+        </div>
+      )}
+
+      <div className="mt-8 flex justify-between items-center">
+        <button type="button" onClick={onBack} disabled={loading} className="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1 disabled:opacity-50">
+          ← Back to Shipping
+        </button>
+        <button type="submit" disabled={!stripe || loading} className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02] active:scale-[0.98]">
+          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${total.toFixed(2)}</>}
+        </button>
+      </div>
+    </form>
+  );
+};
 
 export const Checkout = () => {
   const { items, cartTotal, clearCart } = useCart();
@@ -340,62 +455,22 @@ export const Checkout = () => {
                         </div>
                       </motion.form>
                     ) : (
-                      <motion.form
-                        key="payment"
-                        initial={{ opacity: 0, x: 40 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        exit={{ opacity: 0, x: -40 }}
-                        transition={{ duration: 0.35, ease: 'easeOut' }}
-                        className="p-6 sm:p-8"
-                        onSubmit={handlePlaceOrder}
-                      >
-                        <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-                          <CreditCard className="w-6 h-6 text-indigo-600" />
-                          Payment Method
-                        </h2>
-
-                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 flex items-start gap-3">
-                          <Lock className="w-5 h-5 text-indigo-600 mt-0.5" />
-                          <div className="text-sm text-indigo-800">
-                            <span className="font-bold">Secure Gateway:</span> In a production environment, this form would be replaced by <strong className="font-bold">Stripe Elements</strong> or a similar PCI-compliant iframe. No real card data is processed here.
-                          </div>
-                        </motion.div>
-
-                        <motion.div
-                          initial="hidden"
-                          animate="visible"
-                          variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.15 } } }}
-                          className="space-y-4"
-                        >
-                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
-                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="0000 0000 0000 0000" maxLength={19} required value={paymentData.cardNumber} onChange={e => setPaymentData({ ...paymentData, cardNumber: e.target.value })} />
-                          </motion.div>
-                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }} className="grid grid-cols-2 gap-6">
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
-                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="MM/YY" maxLength={5} required value={paymentData.expiry} onChange={e => setPaymentData({ ...paymentData, expiry: e.target.value })} />
-                            </div>
-                            <div>
-                              <label className="block text-sm font-medium text-gray-700 mb-1">CVC</label>
-                              <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" placeholder="123" maxLength={3} required value={paymentData.cvc} onChange={e => setPaymentData({ ...paymentData, cvc: e.target.value })} />
-                            </div>
-                          </motion.div>
-                          <motion.div variants={{ hidden: { opacity: 0, y: 16 }, visible: { opacity: 1, y: 0 } }}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Name on Card</label>
-                            <input className="w-full border border-gray-300 rounded-lg p-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition" required value={paymentData.nameOnCard} onChange={e => setPaymentData({ ...paymentData, nameOnCard: e.target.value })} />
-                          </motion.div>
-                        </motion.div>
-
-                        <div className="mt-8 flex justify-between items-center">
-                          <motion.button type="button" whileHover={{ x: -3 }} onClick={() => setStep('shipping')} className="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1">
-                            ← Back
-                          </motion.button>
-                          <motion.button type="submit" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} disabled={loading} className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-200">
-                            {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${finalTotal.toFixed(2)}</>}
-                          </motion.button>
-                        </div>
-                      </motion.form>
+                      <Elements stripe={stripePromise}>
+                        <StripePaymentForm
+                          total={finalTotal}
+                          onOrderPlaced={(id) => {
+                            setLastOrderId(id);
+                            clearCart();
+                            setStep('success');
+                          }}
+                          onBack={() => setStep('shipping')}
+                          items={items}
+                          shippingData={shippingData}
+                          useEarnings={useEarnings && (earnings?.canRedeem ?? false)}
+                          appliedCoupon={appliedCoupon}
+                          earnings={earnings}
+                        />
+                      </Elements>
                     )}
                   </AnimatePresence>
                 </div>

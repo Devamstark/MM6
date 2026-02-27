@@ -12,6 +12,7 @@ from .views import (
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
     MarketingCampaignViewSet
 )
+from .payment_views import CreatePaymentIntentView, StripeWebhookView
 
 from rest_framework.routers import SimpleRouter
 from django.conf import settings
@@ -48,4 +49,6 @@ urlpatterns = [
     path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
+    path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),
+    path('payments/webhook/', StripeWebhookView.as_view(), name='stripe_webhook'),
 ]
