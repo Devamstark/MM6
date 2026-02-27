@@ -205,7 +205,7 @@ export const AboutUs = () => {
 
             {/* ─── Hero Section ─── */}
             <div className="relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-indigo-950 to-gray-900" />
+                <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-indigo-950 to-gray-900" />
                 <motion.div
                     className="absolute top-10 left-10 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl"
                     animate={{ scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] }}
@@ -234,7 +234,7 @@ export const AboutUs = () => {
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7, delay: 0.2 }}
                         >
-                            About <span className="bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SmartShop</span>
+                            About <span className="bg-linear-to-r from-indigo-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">SmartShop</span>
                         </motion.h1>
                         <motion.p
                             className="text-base md:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed"
@@ -318,7 +318,7 @@ export const AboutUs = () => {
                         </motion.div>
 
                         <motion.div variants={slideRight} className="relative">
-                            <div className="aspect-video bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-3xl overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700 relative group hover:shadow-2xl hover:shadow-indigo-200/20 transition-all duration-500">
+                            <div className="aspect-video bg-linear-to-br from-indigo-50 via-purple-50 to-pink-50 dark:from-indigo-900/20 dark:via-purple-900/20 dark:to-pink-900/20 rounded-3xl overflow-hidden flex items-center justify-center border border-gray-200 dark:border-gray-700 relative group hover:shadow-2xl hover:shadow-indigo-200/20 transition-all duration-500">
                                 <motion.div
                                     className="absolute top-6 right-8 w-12 h-12 bg-indigo-200/50 dark:bg-indigo-800/30 rounded-xl rotate-12"
                                     animate={{ y: [0, -12, 0] }}
@@ -331,7 +331,7 @@ export const AboutUs = () => {
                                 />
                                 <div className="text-center p-6 relative z-10">
                                     <motion.div
-                                        className="w-20 h-20 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40"
+                                        className="w-20 h-20 bg-linear-to-br from-indigo-600 to-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40"
                                         animate={{ y: [0, -8, 0] }}
                                         transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                                         whileHover={{ scale: 1.15, rotate: 5 }}
@@ -392,7 +392,7 @@ export const AboutUs = () => {
                             Our Team
                         </div>
                         <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-3 tracking-tight">
-                            Meet Team <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SmartTech</span>
+                            Meet Team <span className="bg-linear-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">SmartTech</span>
                         </h2>
                         <p className="text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
                             Passionate developers and designers working together to build next-generation shopping platforms
@@ -413,7 +413,7 @@ export const AboutUs = () => {
 
                                     {/* Gradient Photo Area */}
                                     <div className="aspect-square relative overflow-hidden">
-                                        <div className={`absolute inset-0 bg-gradient-to-br ${member.color}`} />
+                                        <div className={`absolute inset-0 bg-linear-to-br ${member.color}`} />
 
                                         {/* Floating particles */}
                                         <motion.div
@@ -433,7 +433,7 @@ export const AboutUs = () => {
                                         />
 
                                         {/* Initials */}
-                                        <div className="absolute inset-0 flex items-center justify-center z-[1]">
+                                        <div className="absolute inset-0 flex items-center justify-center z-1">
                                             <motion.div
                                                 className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center border-2 border-white/30"
                                                 whileHover={{ scale: 1.15, backgroundColor: 'rgba(255,255,255,0.35)' }}
@@ -447,7 +447,7 @@ export const AboutUs = () => {
 
                                         {/* Social Overlay on hover */}
                                         <motion.div
-                                            className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-5 z-[5]"
+                                            className="absolute inset-0 bg-linear-to-t from-black/80 via-black/40 to-transparent flex items-end justify-center pb-5 z-5"
                                             initial={{ opacity: 0 }}
                                             whileHover={{ opacity: 1 }}
                                             transition={{ duration: 0.3 }}
@@ -540,7 +540,7 @@ export const AboutUs = () => {
             </AnimatedSection>
 
             {/* ─── CTA Section ─── */}
-            <AnimatedSection className="py-16 bg-gradient-to-br from-gray-50 via-indigo-50/30 to-gray-50 dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900 border-t border-gray-200 dark:border-gray-800">
+            <AnimatedSection className="py-16 bg-linear-to-br from-gray-50 via-indigo-50/30 to-gray-50 dark:from-gray-900 dark:via-indigo-950/20 dark:to-gray-900 border-t border-gray-200 dark:border-gray-800">
                 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                     <motion.div variants={fadeUp}>
                         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-indigo-100 dark:bg-indigo-900/30 rounded-full text-indigo-700 dark:text-indigo-400 text-xs font-bold mb-4">
