@@ -443,6 +443,15 @@ class OrderViewSet(viewsets.ModelViewSet):
                 serializer = self.get_serializer(order)
                 response_data = serializer.data
                 response_data['earnings_applied'] = str(earnings_applied)
+
+                # --- Trigger Order Confirmation Email ---
+                try:
+                    from .tasks import send_order_confirmation_email
+                    send_order_confirmation_email.delay(order.id)
+                except Exception as e:
+                    import logging
+                    logging.getLogger(__name__).error(f"Failed to queue order confirmation email: {str(e)}")
+
                 return Response(response_data, status=status.HTTP_201_CREATED)
         except Product.DoesNotExist:
             return Response({"error": "One or more products not found"}, status=status.HTTP_404_NOT_FOUND)

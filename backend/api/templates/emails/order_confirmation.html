@@ -10,7 +10,30 @@
     <h3 style="margin-top: 0; font-size: 18px; margin-bottom: 12px; font-weight: 700;">Order Summary</h3>
     <p style="margin-bottom: 4px; font-size: 14px;">Order ID: <strong>#{{ order.id }}</strong></p>
     <p style="margin: 0; font-size: 14px;">Placed on: {{ order.created_at|date:"F j, Y" }}</p>
+    
     <div class="divider"></div>
+    
+    <table style="width: 100%; font-size: 14px; border-collapse: collapse; margin-bottom: 20px;">
+        <thead>
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <th style="text-align: left; padding: 10px 0; font-weight: 700;">Item</th>
+                <th style="text-align: center; padding: 10px 0; font-weight: 700;">Qty</th>
+                <th style="text-align: right; padding: 10px 0; font-weight: 700;">Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 0;">
+                    <div style="font-weight: 600;">{{ item.product.name }}</div>
+                </td>
+                <td style="text-align: center; padding: 12px 0;">{{ item.quantity }}</td>
+                <td style="text-align: right; padding: 12px 0;">${{ item.price_at_purchase }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
     <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
         <tbody>
             <tr>
@@ -32,6 +55,13 @@
         </tbody>
     </table>
 </div>
+
+{% if order.shipping_address %}
+<div class="order-summary">
+    <h3 style="margin-top: 0; font-size: 16px; margin-bottom: 12px; font-weight: 700;">Shipping To</h3>
+    <p style="margin: 0; font-size: 14px; color: #475569; white-space: pre-line;">{{ order.shipping_address }}</p>
+</div>
+{% endif %}
 
 <center>
     <a href="https://smartshop1.us/profile" class="button">View Order Details</a>
