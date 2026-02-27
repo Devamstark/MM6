@@ -188,11 +188,24 @@ export const UserProfile = () => {
 
     const deleteAddress = async (id: string) => {
         if (!confirm('Are you sure?')) return;
+
+        // Optimistic update
+        setAddresses(prev => prev.filter(a => a.id !== id));
+
         try {
             await api.deleteAddress(id);
-            setAddresses(addresses.filter(a => a.id !== id));
-        } catch (error) {
-            console.error(error);
+        } catch (error: any) {
+            console.error("Delete address error:", error);
+            // If it's a 404, it means it's already deleted on the server, so we're good!
+            // Otherwise, we should probably fetch the real list to fix desyncs
+            if (error?.response?.status !== 404) {
+                try {
+                    const realList = await api.getAddresses();
+                    setAddresses(realList);
+                } catch (e) {
+                    console.error("Could not resync addresses:", e);
+                }
+            }
         }
     };
 
