@@ -133,6 +133,13 @@ export const BlogPostDetail = () => {
         .blog-content .team-member:hover {
             transform: translateY(-4px);
         }
+        .blog-content .professor-highlight {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .blog-content .professor-highlight:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.4);
+        }
     `;
 
     if (loading) {
@@ -254,7 +261,12 @@ export const BlogPostDetail = () => {
                         <img
                             src={post.coverImage}
                             alt={post.title}
-                            className="w-full h-auto max-h-[80vh] object-contain"
+                            className={`w-full ${
+                                post.imageFit === 'contain' ? 'object-contain' :
+                                post.imageFit === 'fill' ? 'object-fill' :
+                                'object-cover'
+                            }`}
+                            style={{ maxHeight: '80vh' }}
                         />
                     </div>
                 )}

@@ -16,6 +16,7 @@ const emptyForm = {
     category: 'Style',
     tags: '',
     coverImage: '',
+    imageFit: 'cover' as 'cover' | 'contain' | 'fill',
     isFeatured: false,
     isPublished: false,
 };
@@ -66,6 +67,7 @@ export const BloggerDashboard = () => {
             category: post.category,
             tags: post.tags.join(', '),
             coverImage: post.coverImage || '',
+            imageFit: post.imageFit || 'cover',
             isFeatured: post.isFeatured,
             isPublished: post.isPublished,
         });
@@ -83,6 +85,7 @@ export const BloggerDashboard = () => {
                 category: form.category,
                 tags: form.tags.split(',').map(t => t.trim()).filter(Boolean),
                 cover_image: form.coverImage,
+                image_fit: form.imageFit,
                 is_featured: form.isFeatured,
                 is_published: form.isPublished,
             };
@@ -452,6 +455,68 @@ export const BloggerDashboard = () => {
                                             </button>
                                         </div>
                                     )}
+                                </div>
+
+                                {/* Image Display Size */}
+                                <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-3">
+                                        Image Display Style
+                                    </label>
+                                    <div className="space-y-2">
+                                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <input
+                                                type="radio"
+                                                name="imageFit"
+                                                checked={form.imageFit === 'cover'}
+                                                onChange={() => setForm({ ...form, imageFit: 'cover' })}
+                                                className="mt-0.5"
+                                            />
+                                            <div className="flex-1">
+                                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                                    📷 Fill / Crop (Recommended)
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 mt-0.5">
+                                                    Fills the space, may crop edges. Best for uniform thumbnails.
+                                                </p>
+                                            </div>
+                                        </label>
+
+                                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <input
+                                                type="radio"
+                                                name="imageFit"
+                                                checked={form.imageFit === 'contain'}
+                                                onChange={() => setForm({ ...form, imageFit: 'contain' })}
+                                                className="mt-0.5"
+                                            />
+                                            <div className="flex-1">
+                                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                                    🖼️ Fit / Stretch (No Crop)
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 mt-0.5">
+                                                    Shows entire image, may have empty space. Best for team photos.
+                                                </p>
+                                            </div>
+                                        </label>
+
+                                        <label className="flex items-start gap-3 cursor-pointer p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                                            <input
+                                                type="radio"
+                                                name="imageFit"
+                                                checked={form.imageFit === 'fill'}
+                                                onChange={() => setForm({ ...form, imageFit: 'fill' })}
+                                                className="mt-0.5"
+                                            />
+                                            <div className="flex-1">
+                                                <p className="text-xs font-semibold text-gray-700 dark:text-gray-200">
+                                                    ↗️ Stretch (Distorted)
+                                                </p>
+                                                <p className="text-[10px] text-gray-500 mt-0.5">
+                                                    Stretches to fill. Not recommended - may distort image.
+                                                </p>
+                                            </div>
+                                        </label>
+                                    </div>
                                 </div>
 
                                 {/* Tags */}

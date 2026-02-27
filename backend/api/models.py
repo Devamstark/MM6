@@ -328,6 +328,11 @@ class BlogPost(models.Model):
     content = models.TextField(blank=True)
     cover_image = models.CharField(max_length=500, blank=True)  # URL or file path
     cover_image_file = models.ImageField(upload_to='blog_covers/', blank=True, null=True)
+    image_fit = models.CharField(
+        max_length=20,
+        choices=[('cover', 'Fill/Crop'), ('contain', 'Fit/Stretch'), ('fill', 'Stretch')],
+        default='cover'
+    )
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

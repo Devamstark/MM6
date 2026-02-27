@@ -140,6 +140,7 @@ export interface BlogPost {
     updatedAt: string;
     readingTime?: number;    // minutes
     views?: number;
+    imageFit?: 'cover' | 'contain' | 'fill';  // how to display the image
 }
 
 export interface Product {

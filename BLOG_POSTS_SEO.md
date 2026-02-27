@@ -88,7 +88,24 @@ These blog posts are optimized to help you rank for "SmartShop" and related keyw
     </div>
 
     <h2>Our Project Origins</h2>
-    <p>This platform is part of the <strong>Senior Seminar Ecommerce Project (26WN-IT495-56)</strong> by <strong>Team Smart Tech</strong>, guided by Professor <strong>Khadhirunissa Shaik</strong>. What started as a class project became a fully functional e-commerce platform that puts people first.</p>
+    <p>This platform is part of the <strong>Senior Seminar Ecommerce Project (26WN-IT495-56)</strong> by <strong>Team Smart Tech</strong>. What started as a class project became a fully functional e-commerce platform that puts people first.</p>
+
+    <div class="professor-highlight" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 16px; margin: 40px 0; text-align: center; color: white; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);">
+        <div style="font-size: 48px; margin-bottom: 16px;">👩‍🏫</div>
+        <h3 style="color: white; margin: 0 0 12px 0; font-size: 1.5rem; font-weight: 700;">Guided by Our Professor</h3>
+        <p style="font-size: 1.25rem; font-weight: 600; margin: 0 0 8px 0;">Professor Khadhirunissa Shaik</p>
+        <p style="font-size: 0.95rem; opacity: 0.9; margin: 0;">
+            Her expert guidance, invaluable insights, and continuous support have been instrumental in shaping SmartShop into what it is today.
+            We're grateful for her mentorship throughout this journey.
+        </p>
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
+            <p style="font-size: 0.85rem; opacity: 0.8; margin: 0; font-style: italic;">
+                "Education is not the learning of facts, but the training of the mind to think." — Albert Einstein
+            </p>
+        </div>
+    </div>
+
+    <p>We couldn't have done this without the expert guidance of <strong>Professor Khadhirunissa Shaik</strong>. Her mentorship, feedback, and encouragement pushed us to think beyond code and focus on creating a user-centric experience that solves real problems.</p>
 
     <h2>Why Shop with SmartShop?</h2>
     <p>When you shop at SmartShop, you're not just buying clothes — you're joining a community. Here's what makes us different:</p>
@@ -141,9 +158,17 @@ These blog posts are optimized to help you rank for "SmartShop" and related keyw
 
     <hr style="margin: 40px 0; border: none; border-top: 1px solid #e5e7eb;" />
 
-    <p style="text-align: center; font-size: 14px; color: #666;">
-        <em>Senior Seminar Ecommerce Project 26WN-IT495-56 by Team Smart Tech. Guided by Professor Khadhirunissa Shaik.</em>
-    </p>
+    <div style="text-align: center; padding: 24px; background: #f8f9fa; border-radius: 12px; margin: 32px 0;">
+        <p style="font-size: 14px; color: #666; margin: 0 0 8px 0;">
+            <strong>Senior Seminar Ecommerce Project 26WN-IT495-56</strong>
+        </p>
+        <p style="font-size: 14px; color: #666; margin: 0 0 8px 0;">
+            by <strong>Team Smart Tech</strong>
+        </p>
+        <p style="font-size: 15px; color: #667eea; margin: 0; font-weight: 600;">
+            Guided by Professor Khadhirunissa Shaik
+        </p>
+    </div>
 </div>
 ```
 

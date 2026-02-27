@@ -74,7 +74,11 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                            post.imageFit === 'contain' ? 'object-contain' :
+                            post.imageFit === 'fill' ? 'object-fill' :
+                            'object-cover'
+                        }`}
                         style={{ minHeight: '320px', maxHeight: '400px' }}
                         onError={e => {
                             const img = e.target as HTMLImageElement;
@@ -155,7 +159,11 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
+                            post.imageFit === 'contain' ? 'object-contain' :
+                            post.imageFit === 'fill' ? 'object-fill' :
+                            'object-cover'
+                        }`}
                         onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                 ) : (
