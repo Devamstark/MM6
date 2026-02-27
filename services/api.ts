@@ -40,10 +40,7 @@ client.interceptors.request.use((config) => {
 
     // Aggressive cache-busting for all authenticated requests 
     // to prevent "ghost" items from CDNs or browser caches
-    config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate';
-    config.headers['Pragma'] = 'no-cache';
-    config.headers['Expires'] = '0';
-
+    // (Headers removed to prevent CORS preflight blocking)
     if (config.method?.toLowerCase() === 'get') {
       config.params = { ...config.params, _t: Date.now() };
     }
