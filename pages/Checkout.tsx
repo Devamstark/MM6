@@ -27,13 +27,13 @@ const stripeElementStyle = {
 
 // SmartShop Logo Component - uses actual logo image
 const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'default' | 'large'; dark?: boolean }) => {
-  const heights = { small: 'h-8', default: 'h-10', large: 'h-14' };
+  const heights = { small: 'h-16 md:h-20', default: 'h-20 md:h-28', large: 'h-28 md:h-36' };
   return (
-    <div className="inline-flex items-center justify-center">
+    <div className="inline-flex items-center justify-center -my-6">
       <img
-        src="/smartshop-logo.png"
+        src="/smartshop-logo-main.png"
         alt="SmartShop™ EST. 2026"
-        className={`${heights[size]} w-auto object-contain ${dark ? 'invert' : ''}`}
+        className={`${heights[size]} w-auto object-contain transition-all duration-300 ${dark ? 'brightness-0 invert' : ''}`}
       />
     </div>
   );
