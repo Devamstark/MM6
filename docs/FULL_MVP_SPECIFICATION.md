@@ -755,7 +755,7 @@ This project is created for academic purposes as part of a senior capstone proje
 ## 📞 Support
 
 For questions or issues:
-- Email: smartshop@example.com
+- Email: [support@smartshop1.us]
 - GitHub Issues: https://github.com/Devamstark/MM6/issues
 
 ---
