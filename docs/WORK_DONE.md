@@ -112,25 +112,6 @@
 - **Transactional Emails**: Created fully branded HTML email templates (`base.html`, `order_confirmation.html`, `password_reset.html`, `newsletter_blog.html`) featuring the premium `SMARTSHOP™ EST. 2026` logo typography.
 - **Contact Details Updated**: Updated site-wide contact information to the New Rochelle, NY address.
 
-### 11. 📧 Enterprise Marketing System (Feb 26, 2026)
-- **Campaign Management**: Full CRUD for marketing campaigns with 6 statuses (Draft → Scheduled → Sending → Sent / Paused / Failed), 5 campaign types, duplicate support.
-- **Advanced Audience Targeting**: 6 audience segments (all users, ordered once, never ordered, recent signups, abandoned cart, manual selection) with live preview.
-- **Enterprise Email Engine**: Batch sending via Celery (configurable, default 200/batch), per-email delivery logging (`EmailDeliveryLog`), auto-retry up to 3 times, atomic counter updates.
-- **Recipient Snapshots**: `CampaignRecipient` model stores a snapshot of all recipients at send time for audit trails and GDPR compliance.
-- **Analytics Dashboard**: Summary cards, status/type breakdowns, delivery/open/click rate progress bars, and last campaign banner.
-- **12 API Endpoints**: Including send, pause, resume, duplicate, delivery logs, analytics, audience preview, and user list.
-- **GDPR Compliance**: Unsubscribe footer automatically appended to every marketing email. Admin & seller accounts always excluded.
-- **Frontend**: Complete SaaS-grade Marketing Command Center with filterable campaign table, creation modal with audience targeting, delivery logs modal, and analytics view.
-
-### 12. 🗓️ Marketing Tab UI/UX Overhaul (Feb 26, 2026)
-- **Custom Calendar Date-Time Picker**: Replaced the broken native `<input type="datetime-local">` with a fully custom `CustomDateTimePicker` component featuring a visual month-by-month calendar for date selection, scrollable hour (00–23) and minute (00, 05...55) pickers, past-date disabling, and a green "Confirmed Schedule" confirmation banner.
-- **JSX Structure Fix**: Resolved a cascading JSX nesting bug where a multi-line string placeholder in a `<textarea>` was causing the entire campaign modal and all sibling modals (Delivery Logs, Conversion Analytics, Email Template Builder) to be incorrectly nested. Fixed by converting the placeholder to a template literal and removing a spurious `</div>` + `)}` pair.
-- **Modal Sizing**: Capped the campaign creation modal at `max-h-[90vh]` with `overflow-y-auto` on the body to prevent it from exceeding the viewport and cutting off the header.
-- **Static Header (Non-Scrolling)**: Made the quick stats header section `position: sticky` / part of a non-scrolling layout so it stays visible while the admin scrolls the campaign table below.
-- **Page Width Readability**: Reduced the maximum content width of the marketing tab for better readability on wide-screen monitors.
-- **Tailwind v4 Compatibility**: Updated 4 deprecated `bg-gradient-to-r` class occurrences to the Tailwind v4 equivalent `bg-linear-to-r` to suppress IDE warnings without any visual change.
-- **Code Cleanup**: Removed junk/duplicate code at the end of `MarketingTab.tsx` and corrected indentation of all modal JSX blocks to be proper siblings inside the root container.
-
 ---
 
 ## 🔄 Deployment Workflow

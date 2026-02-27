@@ -115,9 +115,9 @@
 - **Cart Summary**: Real-time total calculation with discounts
 - **Checkout Flow**:
   1. Review cart items
-  2. Enter shipping address
-  3. Select payment method (Mock payment for MVP)
-  4. Order confirmation
+  2. Enter shipping address (detailed address management)
+  3. Select payment method (Secure Stripe Card Payment)
+  4. Order confirmation & Background email notification
 
 #### Technical Implementation:
 - **Frontend**: `cartAtom` (Jotai) with CRUD operations
@@ -143,7 +143,8 @@
 #### Admin Features:
 - View all orders
 - Update any order status
-- Handle cancellations and refunds
+- Handle cancellations with automatic restocking and referral earnings refunds
+- Real-time revenue analytics update (excludes cancelled orders)
 
 #### Technical Implementation:
 - **Backend**: `Order` model with status choices
@@ -325,6 +326,7 @@
 - **Conversion Analytics**: Per-campaign revenue, click-through, and conversion tracking modal.
 - **Campaign Calendar View**: Visual calendar showing scheduled and sent campaigns by date.
 - **Custom Calendar Date-Time Picker**: Fully custom date-time scheduler replacing native `datetime-local` input — includes monthly calendar navigation, past-date disabling, manual hour/minute selection, and a confirmation banner.
+- **Email confirmation**: (Background Celery task with itemized summary & shipping info)
 - **Email Template Builder**: Visual drag-and-drop style template builder with live HTML preview that auto-populates the email body field.
 - **Audience Preview**: Live preview of recipient count before sending.
 - **Campaign Actions**: Send Now, Schedule Later, Pause, Resume, Duplicate.
@@ -709,10 +711,10 @@ Frontend will run at `http://localhost:5173`
 ## 🔮 Future Enhancements (Post-MVP)
 
 ### **Phase 2 Features**
-- [ ] Real payment integration (Stripe/PayPal)
+- [x] Real payment integration (Stripe/PayPal)
 - [x] Email notifications (Order confirmations, password reset, newsletters handled asynchronously via Celery)
 - [ ] Advanced search with Elasticsearch
-- [ ] Wishlist functionality
+- [x] Wishlist functionality (Full toggle support and dedicated view)
 - [ ] Product recommendations (AI-powered)
 - [ ] Live chat support
 - [ ] Multi-language support (i18n)
@@ -759,4 +761,4 @@ For questions or issues:
 ---
 
 **Last Updated**: February 26, 2026
-**Version**: 1.8.0 (UI/UX Polish, Coupons in Marketing, Custom DateTime Picker)
+**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)

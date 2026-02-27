@@ -360,8 +360,8 @@
 **Functionality:**
 - Review order summary
 - Enter shipping address
-- Select payment method (mock for MVP)
-- Apply discount code (future)
+- Select payment method (Secure Stripe Card Processing)
+- Apply referral earnings as a discount (Referral System Integration)
 - View order total
 - Place order button
 - Validate all required fields
@@ -385,7 +385,7 @@
 - Show estimated delivery date
 - Print order button
 - Continue shopping button
-- Email confirmation (future)
+- Email confirmation (Background Celery task with itemized summary & shipping info)
 
 **Technical Details:**
 - Frontend: Order confirmation page/modal
@@ -437,7 +437,9 @@
 - Cancel button (only for pending orders)
 - Confirmation dialog
 - Update order status to "cancelled"
-- Restore product stock
+- Restore product stock automatically
+- Refund any applied referral earnings to the user's balance
+- Dashboard statistics updated to exclude cancelled revenue
 - Show cancellation confirmation
 
 **Technical Details:**
@@ -1162,7 +1164,7 @@ A visual calendar component available within the marketing system.
 ---
 
 **Last Updated**: February 26, 2026  
-**Version**: 1.8.0 (Marketing Tab UI/UX Overhaul + Custom Calendar Date Picker)
+**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)
 
 ---
 

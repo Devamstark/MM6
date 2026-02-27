@@ -124,9 +124,9 @@
    │ 6. Checkout  │                 │                │
    ├─────────────>│ 7. POST /api/orders/             │
    │              ├────────────────>│                │
-   │              │                 │ 8. Create Order│
-   │              │                 │    & Update    │
-   │              │                 │    Stock       │
+   │              │                 │ 8. Stripe Payment Verify
+   │              │                 │    & Create Order
+   │              │                 │    & Update Stock     │
    │              │                 ├───────────────>│
    │              │                 │<───────────────┤
    │              │<────────────────┤                │
@@ -598,8 +598,8 @@ UI Error Display (Toast/Alert)
 
 ---
 
-**Last Updated**: February 25, 2026
-**Version**: 1.4.0
+**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)
+**Last Updated**: February 26, 2026
 
 ---
 

@@ -248,6 +248,6 @@ New version is live at https://smartshop1.us
 
 ---
 
-**Version**: 1.4.0  
-**Last Updated**: February 2026  
+**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)  
+**Last Updated**: February 26, 2026  
 **Infrastructure**: HostAsia VPS, Docker, Dokploy, Traefik  

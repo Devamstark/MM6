@@ -2,7 +2,7 @@
 
 Welcome to the SmartShop documentation. This folder contains all project documentation.
 
-> **Last Updated:** February 25, 2026 | **Version:** 1.6.0 | **Status:** ✅ Live in Production
+> **Last Updated:** February 26, 2026 | **Version:** 1.9.0 | **Status:** ✅ Live in Production (v1.9.0 — Financial Integrity & Stripe)
 
 ---
 
@@ -82,6 +82,6 @@ Local development setup in 5 minutes — backend + frontend, testing guide, and 
 
 ## 📊 Documentation Statistics
 
-- **Total Files:** 12 documentation files
-- **Features Documented:** 43
-- **Status:** ✅ Fully deployed and live
+- **Total Files:** 15+ documentation files
+- **Features Documented:** 53
+- **Status:** ✅ Fully deployed and live (v1.9.0)
