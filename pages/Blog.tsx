@@ -16,8 +16,16 @@ const CATEGORY_COLORS: Record<string, string> = {
     Lookbook: 'bg-amber-100  text-amber-700  dark:bg-amber-900/30  dark:text-amber-400',
 };
 
-const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const formatDate = (d: string) => {
+    if (!d) return '';
+    try {
+        const date = new Date(d);
+        if (isNaN(date.getTime())) return '';
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    } catch {
+        return '';
+    }
+};
 
 /* ── Skeleton loader ───────────────────────────────────────── */
 const SkeletonCard = () => (
@@ -67,7 +75,10 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
                         src={post.coverImage}
                         alt={post.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 absolute inset-0"
-                        onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                        onError={e => {
+                            const img = e.target as HTMLImageElement;
+                            img.style.display = 'none';
+                        }}
                     />
                 ) : (
                     <div className="absolute inset-0 flex items-center justify-center">

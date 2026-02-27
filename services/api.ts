@@ -242,6 +242,27 @@ const mapOrder = (o: any): Order => ({
   })),
 });
 
+// Helper to map BlogPost (API) to Frontend
+const mapBlogPost = (p: any): BlogPost => ({
+  id: p.id,
+  title: p.title,
+  slug: p.slug,
+  excerpt: p.excerpt,
+  content: p.content,
+  coverImage: getAbsoluteUrl(p.cover_image || p.coverImage),
+  author: p.author || p.author_name,
+  authorId: p.author_id,
+  category: p.category,
+  tags: p.tags || [],
+  isPublished: p.is_published,
+  isFeatured: p.is_featured,
+  publishedAt: p.published_at,
+  createdAt: p.created_at,
+  updatedAt: p.updated_at,
+  readingTime: p.reading_time,
+  views: p.views,
+});
+
 // Helper to map User (API) to Frontend
 const mapUser = (u: any): User => ({
   id: u.id,
@@ -1003,13 +1024,14 @@ export const api = {
   },
   getBlogPosts: async (params) => {
     const response = await client.get('blog/', { params });
-    return response.data.results && Array.isArray(response.data.results)
+    const data = response.data.results && Array.isArray(response.data.results)
       ? response.data.results
       : Array.isArray(response.data) ? response.data : [];
+    return data.map(mapBlogPost);
   },
   getBlogPost: async (slug) => {
     const response = await client.get(`blog/${slug}/`);
-    return response.data;
+    return mapBlogPost(response.data);
   },
   createBlogPost: async (data) => {
     const isForm = data instanceof FormData;
