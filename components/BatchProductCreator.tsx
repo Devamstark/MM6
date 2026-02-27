@@ -124,7 +124,7 @@ export const BatchProductCreator: React.FC<BatchProductCreatorProps> = ({ onClos
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-hidden">
+        <div className="fixed inset-0 z-10001 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 overflow-y-auto">
             <div className="bg-white w-full max-w-5xl h-[80vh] rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-up">
 
                 {/* Header */}

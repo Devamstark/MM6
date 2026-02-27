@@ -760,8 +760,8 @@ export const AdminDashboard = () => {
 
               {/* View User Detail Modal */}
               {viewingUser && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setViewingUser(null)}>
-                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-10001 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setViewingUser(null)}>
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative my-8" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
                     <button onClick={() => setViewingUser(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="w-5 h-5" /></button>
                     <div className="flex items-center gap-4 mb-6">
                       <div className="w-14 h-14 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xl border-2 border-indigo-200 dark:border-indigo-800">{viewingUser.name.charAt(0)}</div>
@@ -783,8 +783,8 @@ export const AdminDashboard = () => {
 
               {/* Edit User Modal */}
               {editingUser && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setEditingUser(null)}>
-                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-10001 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setEditingUser(null)}>
+                  <div className="bg-white dark:bg-gray-900 rounded-3xl shadow-2xl max-w-lg w-full p-8 relative my-8" onClick={e => e.stopPropagation()} style={{ fontFamily: 'Inter, sans-serif' }}>
                     <button onClick={() => setEditingUser(null)} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"><X className="w-5 h-5" /></button>
                     <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6">Edit User — {editingUser.name}</h3>
                     <div className="space-y-4">
@@ -1019,8 +1019,8 @@ export const AdminDashboard = () => {
 
       {/* Discount Modal */}
       {discountProduct && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-900 rounded-4xl p-8 max-w-sm w-full animate-fade-in border border-gray-100 dark:border-gray-800 shadow-2xl transition-all">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-10001 flex items-center justify-center p-4 overflow-y-auto" onClick={() => setDiscountProduct(null)}>
+          <div className="bg-white dark:bg-gray-900 rounded-4xl p-8 max-w-sm w-full animate-fade-in border border-gray-100 dark:border-gray-800 shadow-2xl transition-all my-8" onClick={e => e.stopPropagation()}>
             <h3 className="text-xl font-black text-gray-900 dark:text-white mb-2 tracking-tight">Set Sale Discount</h3>
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Select a discount percentage for "{discountProduct.name}".</p>
 
@@ -1056,8 +1056,8 @@ export const AdminDashboard = () => {
       )}
 
       {selectedOrder && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in transition-all">
-          <div className="bg-white dark:bg-gray-900 rounded-4xl w-full max-w-2xl p-8 shadow-2xl relative animate-scale-in border border-gray-100 dark:border-gray-800 transition-all">
+        <div className="fixed inset-0 z-10001 flex items-start justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in transition-all overflow-y-auto">
+          <div className="bg-white dark:bg-gray-900 rounded-4xl w-full max-w-2xl p-8 shadow-2xl relative animate-scale-in border border-gray-100 dark:border-gray-800 transition-all my-8">
             <button
               onClick={() => setSelectedOrder(null)}
               className="absolute right-6 top-6 p-2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-all"

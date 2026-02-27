@@ -164,7 +164,8 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
             shipping_cost: parseFloat(formData.shipping_cost),
             flash_sale_start: formData.flashSaleStart || null,
             flash_sale_end: formData.flashSaleEnd || null,
-            image_fit: formData.imageFit
+            image_fit: formData.imageFit,
+            slug: formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
         };
 
         try {
@@ -181,7 +182,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Left Column: Main Info */}
             <div className="lg:col-span-2 space-y-8">
-                <section className="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 space-y-6">
+                <section className="bg-gray-50/50 p-6 rounded-4xl border border-gray-100 space-y-6">
                     <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                         <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
                             <Plus className="w-5 h-5" />
@@ -254,7 +255,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     </div>
                 </section>
 
-                <section className="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100 space-y-6">
+                <section className="bg-gray-50/50 p-6 rounded-4xl border border-gray-100 space-y-6">
                     <div className="flex items-center gap-3 border-b border-gray-100 pb-4">
                         <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center text-indigo-600">
                             <Package className="w-5 h-5" />
@@ -324,7 +325,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
 
             {/* Right Column: Assets & Toggles */}
             <div className="space-y-8">
-                <section className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+                <section className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
                     <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Visual Assets</h4>
 
                     <div className="space-y-4">
@@ -418,7 +419,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     </div>
                 </section>
 
-                <section className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+                <section className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
                     <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b border-gray-50 pb-2">Visibility & Status</h4>
                     <div className="grid grid-cols-1 gap-3">
                         <label className="flex items-center gap-3 p-4 bg-gray-50 rounded-2xl cursor-pointer hover:bg-indigo-50 hover:border-indigo-100 border border-transparent transition-all">
@@ -442,7 +443,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     </div>
                 </section>
 
-                <section className="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-sm space-y-6">
+                <section className="bg-white p-6 rounded-4xl border border-gray-100 shadow-sm space-y-6">
                     <div className="flex items-center gap-3 border-b border-gray-50 pb-2">
                         <div className="w-8 h-8 bg-orange-100 rounded-lg flex items-center justify-center text-orange-600">
                             <Timer className="w-4 h-4" />
@@ -472,7 +473,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                     </div>
                 </section>
 
-                <section className="bg-black text-white p-6 rounded-[2rem] shadow-xl space-y-6">
+                <section className="bg-black text-white p-6 rounded-4xl shadow-xl space-y-6">
                     <h4 className="text-xs font-black text-gray-400 uppercase tracking-widest border-b border-white/10 pb-2">Financial Insights</h4>
                     <div className="space-y-4">
                         <div className="space-y-1">
@@ -493,11 +494,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
                 </section>
 
                 <div className="flex flex-col gap-3">
-                    <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-[2rem] font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-100 hover:shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
+                    <button type="submit" className="w-full py-5 bg-indigo-600 text-white rounded-4xl font-black text-lg hover:bg-indigo-700 shadow-xl shadow-indigo-100 hover:shadow-indigo-200 transition-all hover:-translate-y-1 flex items-center justify-center gap-2">
                         {initialData ? 'Update Product' : 'Publish Product'}
                         <Check className="w-6 h-6" />
                     </button>
-                    <button type="button" onClick={onClose} className="w-full py-4 bg-gray-100 text-gray-500 rounded-[2rem] font-bold text-sm hover:bg-gray-200 transition-all italic">Discard Changes</button>
+                    <button type="button" onClick={onClose} className="w-full py-4 bg-gray-100 text-gray-500 rounded-4xl font-bold text-sm hover:bg-gray-200 transition-all italic">Discard Changes</button>
                 </div>
             </div>
         </form>
@@ -527,7 +528,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
     }
 
     return (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-gray-900/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-10001 overflow-y-auto bg-gray-900/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-[3rem] shadow-2xl max-w-5xl w-full p-12 animate-scale-in my-10 relative overflow-hidden max-h-[90vh] overflow-y-auto">
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                 <div className="flex justify-between items-center mb-10">
