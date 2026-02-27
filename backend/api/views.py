@@ -450,6 +450,12 @@ class OrderViewSet(viewsets.ModelViewSet):
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+    @action(detail=False, methods=['get'], url_path='my_orders')
+    def my_orders(self, request):
+        orders = Order.objects.filter(user=request.user).order_by('-created_at')
+        serializer = self.get_serializer(orders, many=True)
+        return Response(serializer.data)
+
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
@@ -771,6 +777,12 @@ class ReviewViewSet(viewsets.ModelViewSet):
             raise PermissionDenied("You can only review products you have purchased.")
 
         serializer.save(user=user)  # single save — bug fix: was called twice
+
+    @action(detail=False, methods=['get'], url_path='my_reviews', permission_classes=[permissions.IsAuthenticated])
+    def my_reviews(self, request):
+        reviews = Review.objects.filter(user=request.user).order_by('-created_at')
+        serializer = self.get_serializer(reviews, many=True)
+        return Response(serializer.data)
 
 class BulkProductUploadView(APIView):
     parser_classes = (parsers.MultiPartParser,)

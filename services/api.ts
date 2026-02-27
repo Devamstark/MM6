@@ -374,7 +374,7 @@ export const api = {
   },
 
   getUserReviews: async (): Promise<import('../types').Review[]> => {
-    const response = await client.get('reviews/my_reviews/'); // Assuming endpoint
+    const response = await client.get('reviews/my_reviews/');
     const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
     return data.map((r: any) => ({
       id: r.id,
