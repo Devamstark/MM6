@@ -261,6 +261,7 @@ const mapBlogPost = (p: any): BlogPost => ({
   updatedAt: p.updated_at,
   readingTime: p.reading_time,
   views: p.views,
+  imageFit: p.image_fit || 'cover',
 });
 
 // Helper to map User (API) to Frontend

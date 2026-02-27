@@ -90,19 +90,13 @@ These blog posts are optimized to help you rank for "SmartShop" and related keyw
     <h2>Our Project Origins</h2>
     <p>This platform is part of the <strong>Senior Seminar Ecommerce Project (26WN-IT495-56)</strong> by <strong>Team Smart Tech</strong>. What started as a class project became a fully functional e-commerce platform that puts people first.</p>
 
-    <div class="professor-highlight" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px; border-radius: 16px; margin: 40px 0; text-align: center; color: white; box-shadow: 0 10px 40px rgba(102, 126, 234, 0.3);">
-        <div style="font-size: 48px; margin-bottom: 16px;">👩‍🏫</div>
-        <h3 style="color: white; margin: 0 0 12px 0; font-size: 1.5rem; font-weight: 700;">Guided by Our Professor</h3>
-        <p style="font-size: 1.25rem; font-weight: 600; margin: 0 0 8px 0;">Professor Khadhirunissa Shaik</p>
-        <p style="font-size: 0.95rem; opacity: 0.9; margin: 0;">
-            Her expert guidance, invaluable insights, and continuous support have been instrumental in shaping SmartShop into what it is today.
-            We're grateful for her mentorship throughout this journey.
+    <div class="professor-highlight" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 20px 24px; border-radius: 12px; margin: 24px 0; text-align: center; color: white; box-shadow: 0 4px 16px rgba(102, 126, 234, 0.25);">
+        <div style="font-size: 32px; margin-bottom: 10px;">👩‍🏫</div>
+        <h3 style="color: white; margin: 0 0 6px 0; font-size: 1.1rem; font-weight: 600;">Guided by Our Professor</h3>
+        <p style="font-size: 0.95rem; font-weight: 500; margin: 0 0 8px 0;">Professor Khadhirunissa Shaik</p>
+        <p style="font-size: 0.85rem; opacity: 0.9; margin: 0; line-height: 1.4;">
+            Her expert guidance and support have been instrumental in shaping SmartShop into what it is today.
         </p>
-        <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.3);">
-            <p style="font-size: 0.85rem; opacity: 0.8; margin: 0; font-style: italic;">
-                "Education is not the learning of facts, but the training of the mind to think." — Albert Einstein
-            </p>
-        </div>
     </div>
 
     <p>We couldn't have done this without the expert guidance of <strong>Professor Khadhirunissa Shaik</strong>. Her mentorship, feedback, and encouragement pushed us to think beyond code and focus on creating a user-centric experience that solves real problems.</p>
