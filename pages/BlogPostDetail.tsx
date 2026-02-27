@@ -72,6 +72,69 @@ export const BlogPostDetail = () => {
         }
     };
 
+    // CSS for blog content spacing
+    const blogContentStyles = `
+        .blog-content h2 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: 2.5rem;
+            margin-bottom: 1rem;
+            line-height: 2.25rem;
+        }
+        .blog-content h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 2rem;
+            margin-bottom: 0.75rem;
+        }
+        .blog-content h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .blog-content p {
+            margin-bottom: 1.25rem;
+            line-height: 1.75;
+            color: #374151;
+        }
+        .blog-content ul {
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+        .blog-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        .blog-content blockquote {
+            border-left: 4px solid #6366f1;
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+            color: #4b5563;
+        }
+        .blog-content hr {
+            margin: 2.5rem 0;
+            border: 0;
+            border-top: 1px solid #e5e7eb;
+        }
+        .blog-content a {
+            color: #4f46e5;
+            text-decoration: underline;
+            font-weight: 600;
+        }
+        .blog-content .team-member {
+            transition: transform 0.2s;
+        }
+        .blog-content .team-member:hover {
+            transform: translateY(-4px);
+        }
+    `;
+
     if (loading) {
         return (
             <div className="min-h-screen bg-white dark:bg-gray-950 pt-24 pb-16">
@@ -119,6 +182,9 @@ export const BlogPostDetail = () => {
             animate={{ opacity: 1, y: 0 }}
             className="min-h-screen bg-white dark:bg-gray-950 pt-24 pb-16"
         >
+            {/* Inject blog content styles */}
+            <style>{blogContentStyles}</style>
+
             <div className="max-w-4xl mx-auto px-4 sm:px-6">
                 {/* Back Link */}
                 <Link
@@ -195,17 +261,12 @@ export const BlogPostDetail = () => {
 
                 {/* Content */}
                 <div
-                    className="prose prose-lg dark:prose-invert max-w-none
-                        prose-headings:font-bold prose-headings:text-gray-900 dark:prose-headings:text-white
-                        prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-                        prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                        prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-p:leading-relaxed prose-p:mb-6
-                        prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:font-semibold prose-a:underline
-                        prose-ul:my-6 prose-li:text-gray-700 dark:prose-li:text-gray-300
-                        prose-blockquote:border-l-4 prose-blockquote:border-indigo-500 prose-blockquote:pl-4 prose-blockquote:italic
-                        prose-blockquote:text-gray-600 dark:prose-blockquote:text-gray-300
-                        prose-img:rounded-xl prose-img:my-8
-                        prose-hr:border-gray-200 dark:prose-hr:border-gray-800"
+                    className="blog-content space-y-6"
+                    style={{
+                        fontSize: '1.125rem',
+                        lineHeight: '1.75',
+                        color: '#374151',
+                    }}
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
