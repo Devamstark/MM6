@@ -69,19 +69,20 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
             className="group grid md:grid-cols-5 rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-xl hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 bg-white dark:bg-gray-900"
         >
             {/* Image — takes 3 of 5 cols */}
-            <div className="md:col-span-3 relative overflow-hidden bg-gray-100 dark:bg-gray-800 min-h-[220px] md:min-h-[320px]">
+            <div className="md:col-span-3 relative overflow-hidden bg-gray-100 dark:bg-gray-800">
                 {post.coverImage ? (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 absolute inset-0"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
+                        style={{ minHeight: '320px', maxHeight: '400px' }}
                         onError={e => {
                             const img = e.target as HTMLImageElement;
                             img.style.display = 'none';
                         }}
                     />
                 ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="absolute inset-0 flex items-center justify-center" style={{ minHeight: '320px' }}>
                         <PenLine className="w-12 h-12 text-gray-200 dark:text-gray-700" />
                     </div>
                 )}
@@ -149,12 +150,12 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
             className="group flex flex-col rounded-2xl overflow-hidden border border-gray-100 dark:border-gray-800 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 transition-all duration-300 h-full bg-white dark:bg-gray-900"
         >
             {/* Thumbnail */}
-            <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-800 aspect-video shrink-0">
+            <div className="relative overflow-hidden bg-gray-100 dark:bg-gray-800 shrink-0" style={{ height: '200px' }}>
                 {post.coverImage ? (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-500"
                         onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                 ) : (

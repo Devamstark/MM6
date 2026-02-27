@@ -184,11 +184,11 @@ export const BlogPostDetail = () => {
 
                 {/* Cover Image */}
                 {post.coverImage && (
-                    <div className="mb-10 rounded-2xl overflow-hidden">
+                    <div className="mb-10 rounded-2xl overflow-hidden bg-gray-100 dark:bg-gray-800">
                         <img
                             src={post.coverImage}
                             alt={post.title}
-                            className="w-full aspect-video object-cover"
+                            className="w-full h-auto max-h-[80vh] object-contain"
                         />
                     </div>
                 )}
