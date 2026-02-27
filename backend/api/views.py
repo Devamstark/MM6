@@ -1149,6 +1149,26 @@ class BlogPostViewSet(viewsets.ModelViewSet):
             return BlogPost.objects.filter(is_published=True, author__id=author_id)
         return BlogPost.objects.filter(is_published=True)
 
+    def get_object(self):
+        """Support both UUID (id) and slug for lookup."""
+        lookup_value = self.kwargs.get(self.lookup_field)
+        if not lookup_value:
+            return super().get_object()
+
+        # Try to find by UUID first
+        try:
+            import uuid
+            uuid_obj = uuid.UUID(lookup_value)
+            queryset = self.get_queryset()
+            obj = queryset.filter(id=uuid_obj).first()
+            if obj:
+                return obj
+        except (ValueError, TypeError):
+            pass
+
+        # Fall back to slug lookup
+        return super().get_object()
+
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
