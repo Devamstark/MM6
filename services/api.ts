@@ -993,6 +993,14 @@ export const api = {
     await client.delete(`home-sections/${id}/`);
   },
   // -- Blog --
+  uploadBlogImage: async (file: File): Promise<{ url: string; filename: string; size: number; content_type: string }> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await client.post('blog/upload-image/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
   getBlogPosts: async (params) => {
     const response = await client.get('blog/', { params });
     return response.data.results && Array.isArray(response.data.results)

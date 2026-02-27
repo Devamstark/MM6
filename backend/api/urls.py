@@ -10,7 +10,7 @@ from .views import (
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
-    MarketingCampaignViewSet
+    MarketingCampaignViewSet, BlogImageView
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
 
@@ -51,4 +51,5 @@ urlpatterns = [
     path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
+    path('blog/upload-image/', BlogImageView.as_view(), name='blog-upload-image'),
 ]

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../services/api';
 import { BlogPost } from '../types';
 import { useAuth } from '../context/AuthContext';
-import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, Save, X, ArrowLeft, Image } from 'lucide-react';
+import { Plus, Edit2, Trash2, Eye, EyeOff, Clock, Save, X, ArrowLeft, Image, Upload, Loader } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 type EditorMode = 'list' | 'new' | 'edit';
@@ -31,6 +31,9 @@ export const BloggerDashboard = () => {
     const [form, setForm] = useState(emptyForm);
     const [saving, setSaving] = useState(false);
     const [successMsg, setSuccessMsg] = useState('');
+    const [uploadingImage, setUploadingImage] = useState(false);
+    const [uploadError, setUploadError] = useState('');
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         loadPosts();
@@ -96,6 +99,42 @@ export const BloggerDashboard = () => {
             console.error(e);
         } finally {
             setSaving(false);
+        }
+    };
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file type
+        if (!file.type.startsWith('image/')) {
+            setUploadError('Please select an image file');
+            return;
+        }
+
+        // Validate file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            setUploadError('Image size must be less than 5MB');
+            return;
+        }
+
+        setUploadingImage(true);
+        setUploadError('');
+
+        try {
+            const response = await api.uploadBlogImage(file);
+            setForm({ ...form, coverImage: response.url });
+            setSuccessMsg('Image uploaded successfully!');
+            setTimeout(() => setSuccessMsg(''), 3000);
+        } catch (error: any) {
+            console.error('Image upload error:', error);
+            setUploadError(error.response?.data?.error || 'Failed to upload image');
+        } finally {
+            setUploadingImage(false);
+            // Reset file input
+            if (fileInputRef.current) {
+                fileInputRef.current.value = '';
+            }
         }
     };
 
@@ -341,21 +380,77 @@ export const BloggerDashboard = () => {
 
                                 {/* Cover image */}
                                 <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-100 dark:border-gray-800 p-4">
-                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Cover Image URL</label>
-                                    <input
-                                        type="text"
-                                        value={form.coverImage}
-                                        onChange={e => setForm({ ...form, coverImage: e.target.value })}
-                                        placeholder="https://..."
-                                        className="w-full px-3 py-2.5 text-xs border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
-                                    />
-                                    {form.coverImage && (
-                                        <img
-                                            src={form.coverImage}
-                                            alt="Preview"
-                                            className="mt-2 w-full h-28 object-cover rounded-lg border border-gray-100 dark:border-gray-800"
-                                            onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                    <label className="text-xs font-bold text-gray-500 uppercase tracking-wider block mb-2">Cover Image</label>
+
+                                    {/* Upload button */}
+                                    <div className="mb-3">
+                                        <input
+                                            ref={fileInputRef}
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="hidden"
                                         />
+                                        <button
+                                            type="button"
+                                            onClick={() => fileInputRef.current?.click()}
+                                            disabled={uploadingImage}
+                                            className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg text-sm font-semibold text-gray-600 dark:text-gray-300 hover:border-indigo-500 hover:text-indigo-600 dark:hover:border-indigo-400 dark:hover:text-indigo-400 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        >
+                                            {uploadingImage ? (
+                                                <>
+                                                    <Loader className="w-4 h-4 animate-spin" />
+                                                    Uploading...
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Upload className="w-4 h-4" />
+                                                    Upload Image
+                                                </>
+                                            )}
+                                        </button>
+                                        <p className="text-[10px] text-gray-400 mt-1.5 text-center">
+                                            JPEG, PNG, GIF, WebP • Max 5MB
+                                        </p>
+                                    </div>
+
+                                    {/* URL input (alternative) */}
+                                    <div className="relative">
+                                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span className="text-xs text-gray-400">or</span>
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={form.coverImage}
+                                            onChange={e => setForm({ ...form, coverImage: e.target.value })}
+                                            placeholder="https://..."
+                                            className="w-full pl-10 pr-3 py-2.5 text-xs border border-gray-200 dark:border-gray-800 rounded-lg bg-gray-50 dark:bg-gray-800 text-gray-800 dark:text-gray-200 outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-500"
+                                        />
+                                    </div>
+
+                                    {/* Upload error */}
+                                    {uploadError && (
+                                        <p className="text-xs text-red-500 mt-2">{uploadError}</p>
+                                    )}
+
+                                    {/* Image preview */}
+                                    {form.coverImage && (
+                                        <div className="mt-3 relative">
+                                            <img
+                                                src={form.coverImage}
+                                                alt="Preview"
+                                                className="w-full h-32 object-cover rounded-lg border border-gray-100 dark:border-gray-800"
+                                                onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setForm({ ...form, coverImage: '' })}
+                                                className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 transition-colors"
+                                                title="Remove image"
+                                            >
+                                                <X className="w-3 h-3" />
+                                            </button>
+                                        </div>
                                     )}
                                 </div>
 

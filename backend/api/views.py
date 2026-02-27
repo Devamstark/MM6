@@ -12,6 +12,10 @@ from django.conf import settings
 import random
 from decimal import Decimal
 from datetime import timedelta
+import os
+import uuid
+from django.core.files.storage import default_storage
+from django.core.files.base import ContentFile
 from .models import (
     Product, Order, OrderItem, Payment, User, PasswordResetToken, PageContent,
     Affiliate, Review, Wishlist, ContactMessage, Address, Coupon,
@@ -1073,6 +1077,52 @@ class IsBloggerOrAdmin(permissions.BasePermission):
         if request.user.role == 'admin':
             return True
         return obj.author == request.user
+
+
+class BlogImageView(APIView):
+    """Handle blog cover image uploads."""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        if 'image' not in request.FILES:
+            return Response(
+                {'error': 'No image provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        image = request.FILES['image']
+
+        # Validate file type
+        allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp']
+        if image.content_type not in allowed_types:
+            return Response(
+                {'error': 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate file size (max 5MB)
+        max_size = 5 * 1024 * 1024  # 5MB
+        if image.size > max_size:
+            return Response(
+                {'error': 'File too large. Maximum size: 5MB'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Generate unique filename
+        ext = os.path.splitext(image.name)[1]
+        filename = f"blog_cover_{uuid.uuid4().hex}{ext}"
+        filepath = f"blog_covers/{filename}"
+
+        # Save file
+        path = default_storage.save(filepath, ContentFile(image.read()))
+        url = default_storage.url(path)
+
+        return Response({
+            'url': url,
+            'filename': filename,
+            'size': image.size,
+            'content_type': image.content_type
+        })
 
 
 class BlogPostViewSet(viewsets.ModelViewSet):

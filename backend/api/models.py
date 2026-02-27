@@ -6,6 +6,7 @@ import datetime
 import uuid
 from django.core.validators import MinValueValidator
 from django.utils.text import slugify
+from django.core.files.storage import default_storage
 
 class PasswordResetToken(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -325,7 +326,8 @@ class BlogPost(models.Model):
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     excerpt = models.TextField()
     content = models.TextField(blank=True)
-    cover_image = models.URLField(max_length=500, blank=True)
+    cover_image = models.CharField(max_length=500, blank=True)  # URL or file path
+    cover_image_file = models.ImageField(upload_to='blog_covers/', blank=True, null=True)
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -367,6 +369,10 @@ class BlogPost(models.Model):
         # Estimate reading time (~200 words/min)
         word_count = len(self.content.split())
         self.reading_time = max(1, round(word_count / 200))
+
+        # Auto-set cover_image URL from uploaded file
+        if self.cover_image_file and not self.cover_image:
+            self.cover_image = self.cover_image_file.url
 
         super().save(*args, **kwargs)
 
