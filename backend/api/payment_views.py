@@ -6,8 +6,6 @@ from rest_framework import status, permissions
 from .models import Product
 from decimal import Decimal
 
-stripe.api_key = settings.STRIPE_SECRET_KEY
-
 class CreatePaymentIntentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -18,6 +16,8 @@ class CreatePaymentIntentView(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
             
+        stripe.api_key = settings.STRIPE_SECRET_KEY
+        
         try:
             data = request.data
             items = data.get('items', [])
