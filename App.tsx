@@ -24,6 +24,7 @@ import { FAQ } from './pages/FAQ';
 import { AboutUs } from './pages/AboutUs';
 import { Cart } from './pages/Cart';
 import { Blog } from './pages/Blog';
+import { BlogPostDetail } from './pages/BlogPostDetail';
 import { BloggerDashboard } from './pages/BloggerDashboard';
 import { MarketingDashboard } from './pages/MarketingDashboard';
 import ScrollToTop from './components/ScrollToTop';
@@ -53,7 +54,7 @@ function App() {
                             <Route path="terms" element={<StaticPage page="terms" />} />
                             <Route path="privacy" element={<StaticPage page="privacy" />} />
                             <Route path="blog" element={<Blog />} />
-                            <Route path="blog/:slug" element={<Blog />} />
+                            <Route path="blog/:slug" element={<BlogPostDetail />} />
 
                             <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
                                 <Route path="checkout" element={<Checkout />} />
