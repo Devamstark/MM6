@@ -12,6 +12,12 @@ class CreatePaymentIntentView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        if not settings.STRIPE_SECRET_KEY:
+            return Response(
+                {'error': 'Stripe Secret Key is missing from Server Environment. Please add STRIPE_SECRET_KEY to Dokploy and Redeploy the Container.'}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
         try:
             data = request.data
             items = data.get('items', [])
