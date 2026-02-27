@@ -4,13 +4,97 @@ import { Address } from '../types';
 import { api } from '../services/api';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag, Percent, X, Package, Truck, MapPin, ChevronRight, Sparkles, Info, ArrowLeft } from 'lucide-react';
+import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, DollarSign, Tag, Percent, X, Package, Truck, MapPin, ChevronRight, Info, ArrowLeft, User } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
 
 // Initialize Stripe with test public key
 const stripePromise = loadStripe('pk_test_51T5FLjCXoN7dV1O9567fmjKf8uLw05HOVNDAbYjQb6b7kSCr53X0EdIjINqvQt7gDZsxSKBB5n649eDNSJrgNoZb00ezrvROlP');
+
+// Shared Stripe element style
+const stripeElementStyle = {
+  base: {
+    fontSize: '16px',
+    color: '#111827',
+    fontFamily: 'Inter, system-ui, -apple-system, sans-serif',
+    fontWeight: '500',
+    '::placeholder': { color: '#9ca3af', fontWeight: '400' },
+    iconColor: '#4f46e5',
+  },
+  invalid: { color: '#ef4444', iconColor: '#ef4444' },
+};
+
+// SmartShop Logo Component
+const SmartShopLogo = ({ size = 'default' }: { size?: 'small' | 'default' }) => (
+  <div className={`bg-black rounded-xl flex items-center justify-center ${size === 'small' ? 'px-4 py-2' : 'px-6 py-3'}`}>
+    <div className="text-center">
+      <div className={`text-white font-black tracking-[0.25em] uppercase ${size === 'small' ? 'text-sm' : 'text-lg'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        SmartShop<span className="text-gray-400 text-[0.6em] align-super ml-0.5">™</span>
+      </div>
+      <div className={`text-gray-500 font-medium tracking-[0.4em] uppercase ${size === 'small' ? 'text-[7px]' : 'text-[9px]'}`}>
+        EST. 2026
+      </div>
+    </div>
+  </div>
+);
+
+// ─── Credit Card Visual ──────────────────────────────────────────────────────
+const CreditCardVisual = ({ name, lastFour }: { name: string; lastFour: string }) => (
+  <div className="relative w-full aspect-[1.6/1] max-w-[380px] mx-auto mb-8">
+    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl shadow-2xl shadow-black/30 overflow-hidden">
+      {/* Decorative circles */}
+      <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full" />
+      <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-white/5 rounded-full" />
+
+      {/* Chip */}
+      <div className="absolute top-6 left-6">
+        <div className="w-10 h-7 bg-gradient-to-br from-yellow-300/80 to-yellow-500/60 rounded-md border border-yellow-400/30">
+          <div className="w-full h-full grid grid-cols-3 grid-rows-3">
+            {[...Array(9)].map((_, i) => (
+              <div key={i} className="border border-yellow-600/20" />
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Contactless icon */}
+      <div className="absolute top-7 left-[70px]">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="2">
+          <path d="M8.5 16A6.5 6.5 0 0 1 15 9.5" />
+          <path d="M6 19a9.5 9.5 0 0 1 13-13" />
+          <path d="M11 13a3 3 0 0 1 4-4" />
+        </svg>
+      </div>
+
+      {/* Card Number */}
+      <div className="absolute top-[52%] left-6 right-6 -translate-y-1/2">
+        <div className="text-white/90 text-lg font-mono tracking-[0.2em] flex gap-4">
+          <span>••••</span>
+          <span>••••</span>
+          <span>••••</span>
+          <span>{lastFour || '••••'}</span>
+        </div>
+      </div>
+
+      {/* Name & Logo */}
+      <div className="absolute bottom-5 left-6 right-6 flex justify-between items-end">
+        <div>
+          <div className="text-[10px] text-white/40 uppercase tracking-widest mb-1">Card Holder</div>
+          <div className="text-white/80 text-sm font-medium uppercase tracking-wider">
+            {name || 'YOUR NAME'}
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-white/80 text-xs font-black tracking-[0.15em] uppercase" style={{ fontFamily: 'Inter, sans-serif' }}>
+            SMART<span className="text-indigo-400">SHOP</span>
+          </div>
+          <div className="text-white/30 text-[7px] tracking-widest">PREMIUM</div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // ─── Stripe Payment Form ───────────────────────────────────────────────────────
 const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, useEarnings, appliedCoupon, earnings }: {
@@ -27,7 +111,11 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [cardComplete, setCardComplete] = useState(false);
+  const [cardholderName, setCardholderName] = useState(shippingData.name || '');
+  const [zipCode, setZipCode] = useState(shippingData.zip || '');
+  const [fieldStatus, setFieldStatus] = useState({ number: false, expiry: false, cvc: false });
+
+  const allFieldsComplete = fieldStatus.number && fieldStatus.expiry && fieldStatus.cvc && cardholderName.trim().length > 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -40,17 +128,20 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
       const response = await api.createPaymentIntent(items, appliedCoupon?.code, useEarnings);
       const clientSecret = response.clientSecret;
 
+      const cardNumber = elements.getElement(CardNumberElement);
+      if (!cardNumber) throw new Error('Card element not found');
+
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
-          card: elements.getElement(CardElement)!,
+          card: cardNumber,
           billing_details: {
-            name: shippingData.name,
+            name: cardholderName,
             email: shippingData.email,
             address: {
               line1: shippingData.address,
               city: shippingData.city,
               state: shippingData.state,
-              postal_code: shippingData.zip,
+              postal_code: zipCode,
             }
           },
         },
@@ -94,7 +185,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
               <CreditCard className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-black text-gray-900">Payment Details</h2>
+              <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Payment Details</h2>
               <p className="text-sm text-gray-500">Secure checkout powered by Stripe</p>
             </div>
           </div>
@@ -116,75 +207,134 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
       {/* Test Mode Banner */}
       <div className="mx-6 sm:mx-8 mt-6">
         <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-2xl p-4 flex items-start gap-3">
-          <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
             <Info className="w-4 h-4 text-amber-600" />
           </div>
           <div className="text-sm">
-            <p className="font-bold text-amber-900 mb-1">🧪 Stripe Test Mode Active</p>
+            <p className="font-bold text-amber-900 mb-1" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>🧪 Stripe Test Mode Active</p>
             <p className="text-amber-700 text-xs leading-relaxed">Use these test card details to place an order:</p>
-            <div className="mt-2 grid grid-cols-3 gap-2">
-              <div className="bg-white/80 rounded-lg px-3 py-1.5 border border-amber-100">
-                <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider block">Card</span>
-                <span className="text-xs font-mono font-bold text-gray-900">4242 4242 4242 4242</span>
-              </div>
-              <div className="bg-white/80 rounded-lg px-3 py-1.5 border border-amber-100">
-                <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider block">Expiry</span>
-                <span className="text-xs font-mono font-bold text-gray-900">12/30</span>
-              </div>
-              <div className="bg-white/80 rounded-lg px-3 py-1.5 border border-amber-100">
-                <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider block">CVC</span>
-                <span className="text-xs font-mono font-bold text-gray-900">123</span>
-              </div>
+            <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {[
+                { label: 'Card Number', value: '4242 4242 4242 4242' },
+                { label: 'Expiry', value: '12/30' },
+                { label: 'CVC', value: '123' },
+                { label: 'ZIP', value: 'Any 5 digits' },
+              ].map(item => (
+                <div key={item.label} className="bg-white/80 rounded-lg px-3 py-1.5 border border-amber-100">
+                  <span className="text-[10px] uppercase font-bold text-amber-500 tracking-wider block">{item.label}</span>
+                  <span className="text-xs font-mono font-bold text-gray-900">{item.value}</span>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Card Input */}
+      {/* Card Visual + Form */}
       <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-6">
-        <div className="space-y-2">
-          <label className="flex items-center gap-2 text-xs font-black text-gray-500 uppercase tracking-widest">
-            <Lock className="w-3 h-3" /> Card Information
+
+        {/* Credit Card Visual */}
+        <CreditCardVisual name={cardholderName} lastFour="" />
+
+        {/* Cardholder Name */}
+        <div>
+          <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <User className="w-3 h-3" /> Cardholder Name
           </label>
-          <div className={`rounded-2xl border-2 transition-all duration-300 ${cardComplete ? 'border-emerald-300 bg-emerald-50/30 shadow-lg shadow-emerald-100' : 'border-gray-200 bg-white hover:border-gray-300'} focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-50`}>
-            <div className="p-5">
-              <CardElement
-                onChange={(e) => setCardComplete(e.complete)}
-                options={{
-                  style: {
-                    base: {
-                      fontSize: '17px',
-                      color: '#111827',
-                      fontFamily: "'Inter', -apple-system, sans-serif",
-                      '::placeholder': { color: '#9ca3af', fontWeight: '400' },
-                      iconColor: '#4f46e5',
-                    },
-                    invalid: { color: '#ef4444', iconColor: '#ef4444' },
-                  },
-                }}
+          <input
+            type="text"
+            value={cardholderName}
+            onChange={e => setCardholderName(e.target.value)}
+            placeholder="Full name on card"
+            required
+            className="w-full border-2 border-gray-100 rounded-xl p-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all placeholder:text-gray-300 hover:border-gray-200"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+          />
+        </div>
+
+        {/* Card Number */}
+        <div>
+          <label className="flex items-center gap-2 text-xs font-bold text-gray-500 uppercase tracking-widest mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+            <CreditCard className="w-3 h-3" /> Card Number
+          </label>
+          <div className={`rounded-xl border-2 transition-all duration-300 ${fieldStatus.number ? 'border-emerald-300 bg-emerald-50/20' : 'border-gray-100 bg-white hover:border-gray-200'} focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-50`}>
+            <div className="p-4">
+              <CardNumberElement
+                onChange={(e) => setFieldStatus(prev => ({ ...prev, number: e.complete }))}
+                options={{ style: stripeElementStyle, showIcon: true }}
               />
             </div>
           </div>
-          {cardComplete && (
-            <motion.div
-              initial={{ opacity: 0, y: -5 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="flex items-center gap-1.5 text-xs text-emerald-600 font-bold mt-1"
-            >
-              <CheckCircle className="w-3.5 h-3.5" /> Card details valid
-            </motion.div>
-          )}
+        </div>
+
+        {/* Expiry + CVC + ZIP Row */}
+        <div className="grid grid-cols-3 gap-4">
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              Expiry
+            </label>
+            <div className={`rounded-xl border-2 transition-all duration-300 ${fieldStatus.expiry ? 'border-emerald-300 bg-emerald-50/20' : 'border-gray-100 bg-white hover:border-gray-200'} focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-50`}>
+              <div className="p-4">
+                <CardExpiryElement
+                  onChange={(e) => setFieldStatus(prev => ({ ...prev, expiry: e.complete }))}
+                  options={{ style: stripeElementStyle }}
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              CVC
+            </label>
+            <div className={`rounded-xl border-2 transition-all duration-300 ${fieldStatus.cvc ? 'border-emerald-300 bg-emerald-50/20' : 'border-gray-100 bg-white hover:border-gray-200'} focus-within:border-indigo-500 focus-within:ring-4 focus-within:ring-indigo-50`}>
+              <div className="p-4">
+                <CardCvcElement
+                  onChange={(e) => setFieldStatus(prev => ({ ...prev, cvc: e.complete }))}
+                  options={{ style: stripeElementStyle }}
+                />
+              </div>
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-2 block" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+              ZIP Code
+            </label>
+            <input
+              type="text"
+              value={zipCode}
+              onChange={e => setZipCode(e.target.value)}
+              placeholder="10001"
+              required
+              className="w-full h-full border-2 border-gray-100 rounded-xl p-4 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all placeholder:text-gray-300 hover:border-gray-200"
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
+            />
+          </div>
+        </div>
+
+        {/* Validation Badges */}
+        <div className="flex flex-wrap gap-2">
+          {[
+            { ok: fieldStatus.number, label: 'Card Number' },
+            { ok: fieldStatus.expiry, label: 'Expiry' },
+            { ok: fieldStatus.cvc, label: 'CVC' },
+            { ok: cardholderName.trim().length > 0, label: 'Name' },
+          ].map(f => (
+            <div key={f.label} className={`flex items-center gap-1.5 text-xs px-3 py-1 rounded-full font-bold transition-all ${f.ok ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-gray-50 text-gray-400 border border-gray-100'}`}>
+              {f.ok ? <CheckCircle className="w-3 h-3" /> : <div className="w-3 h-3 rounded-full border-2 border-gray-300" />}
+              {f.label}
+            </div>
+          ))}
         </div>
 
         {/* Shipping Summary */}
         <div className="bg-gray-50 rounded-2xl p-5 border border-gray-100">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+            <span className="text-xs font-black text-gray-400 uppercase tracking-widest flex items-center gap-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
               <MapPin className="w-3 h-3" /> Shipping To
             </span>
             <button type="button" onClick={onBack} className="text-xs text-indigo-600 font-bold hover:text-indigo-800 transition-colors">Edit</button>
           </div>
-          <div className="text-sm text-gray-700">
+          <div className="text-sm text-gray-700" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
             <p className="font-bold text-gray-900">{shippingData.name}</p>
             <p className="text-gray-500">{shippingData.address}</p>
             <p className="text-gray-500">{shippingData.city}, {shippingData.state} {shippingData.zip}</p>
@@ -200,11 +350,11 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
               exit={{ opacity: 0, height: 0 }}
               className="bg-red-50 text-red-700 p-4 rounded-2xl text-sm flex items-start gap-3 border border-red-100"
             >
-              <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+              <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center shrink-0 mt-0.5">
                 <X className="w-3 h-3 text-red-600" />
               </div>
               <div>
-                <p className="font-bold text-red-800">Payment Error</p>
+                <p className="font-bold text-red-800" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Payment Error</p>
                 <p className="text-red-600 text-xs mt-0.5">{error}</p>
               </div>
             </motion.div>
@@ -218,6 +368,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
             onClick={onBack}
             disabled={loading}
             className="flex items-center gap-2 text-gray-400 hover:text-gray-900 font-bold transition-all group disabled:opacity-50"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             Back to Shipping
@@ -227,8 +378,9 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            disabled={!stripe || loading || !cardComplete}
+            disabled={!stripe || loading || !allFieldsComplete}
             className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xl shadow-indigo-200/50 transition-all hover:shadow-indigo-300/70 text-base"
+            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
@@ -307,7 +459,7 @@ export const Checkout = () => {
           <div className="w-24 h-24 bg-gray-100 rounded-3xl flex items-center justify-center mx-auto mb-6">
             <Package className="w-12 h-12 text-gray-300" />
           </div>
-          <h2 className="text-2xl font-black text-gray-900 mb-2">Your cart is empty</h2>
+          <h2 className="text-2xl font-black text-gray-900 mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Your cart is empty</h2>
           <p className="text-gray-500 mb-8">Add some products to get started with your order.</p>
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -345,15 +497,20 @@ export const Checkout = () => {
             animate="visible"
             variants={{ visible: { transition: { staggerChildren: 0.1, delayChildren: 0.4 } } }}
           >
+            <motion.div variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }} className="mb-4">
+              <SmartShopLogo size="small" />
+            </motion.div>
             <motion.p
               variants={{ hidden: { opacity: 0, y: 12 }, visible: { opacity: 1, y: 0 } }}
               className="text-xs font-black tracking-[0.3em] text-emerald-600 uppercase mb-3"
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
             >
               Order Confirmed
             </motion.p>
             <motion.h2
               variants={{ hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } }}
               className="text-4xl font-black text-gray-900 mb-3"
+              style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
             >
               Thank you!
             </motion.h2>
@@ -452,18 +609,12 @@ export const Checkout = () => {
 
   // ── Checkout Layout ──
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
       {/* Branded Header */}
       <div className="border-b border-gray-200/60 bg-white/80 backdrop-blur-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-200/50 group-hover:shadow-indigo-300 transition-shadow">
-              <Sparkles className="w-5 h-5 text-white" />
-            </div>
-            <div>
-              <span className="text-lg font-black tracking-widest text-gray-900 uppercase">SmartShop</span>
-              <span className="text-[10px] font-bold text-gray-400 tracking-widest uppercase block -mt-0.5">Secure Checkout</span>
-            </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+          <Link to="/" className="group">
+            <SmartShopLogo size="small" />
           </Link>
 
           {/* Step Indicator */}
@@ -501,12 +652,9 @@ export const Checkout = () => {
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
             >
-              <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-8 text-center">
-                <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-                  <Lock className="w-8 h-8 text-white" />
-                </div>
-                <h2 className="text-2xl font-black text-white mb-1">Welcome Back</h2>
-                <p className="text-indigo-200 text-sm">Sign in to complete your purchase</p>
+              <div className="bg-black p-8 text-center">
+                <SmartShopLogo />
+                <p className="text-gray-400 text-sm mt-4">Sign in to complete your purchase</p>
               </div>
               <div className="p-8 flex flex-col gap-3">
                 <motion.button
@@ -552,7 +700,7 @@ export const Checkout = () => {
                             <Truck className="w-6 h-6 text-white" />
                           </div>
                           <div>
-                            <h2 className="text-xl font-black text-gray-900">Shipping Address</h2>
+                            <h2 className="text-xl font-black text-gray-900" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>Shipping Address</h2>
                             <p className="text-sm text-gray-500">Where should we deliver your order?</p>
                           </div>
                         </div>
@@ -560,7 +708,7 @@ export const Checkout = () => {
                         {/* Saved Addresses */}
                         {savedAddresses.length > 0 && (
                           <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                            <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest mb-3 flex items-center gap-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                               <MapPin className="w-3 h-3" /> Saved Addresses
                             </h3>
                             <div className="grid grid-cols-1 gap-3">
@@ -576,7 +724,7 @@ export const Checkout = () => {
                                     <p className="font-bold text-gray-900">{addr.fullName}</p>
                                     <p className="text-sm text-gray-500">{addr.street}, {addr.city}, {addr.state} {addr.postalCode}</p>
                                   </div>
-                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'}`}>
+                                  <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${shippingData.address === addr.street && shippingData.zip === addr.postalCode ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'}`}>
                                     {shippingData.address === addr.street && shippingData.zip === addr.postalCode && <div className="w-2 h-2 rounded-full bg-white" />}
                                   </div>
                                 </motion.div>
@@ -606,11 +754,12 @@ export const Checkout = () => {
                             <motion.div
                               key={field.key}
                               variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}
-                              className={field.span === 2 ? 'md:col-span-2' : field.span === 1 ? '' : ''}
+                              className={field.span === 2 ? 'md:col-span-2' : ''}
                             >
-                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">{field.label}</label>
+                              <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>{field.label}</label>
                               <input
                                 className="w-full border-2 border-gray-100 rounded-xl p-3 text-sm font-medium text-gray-900 focus:outline-none focus:ring-4 focus:ring-indigo-50 focus:border-indigo-500 transition-all placeholder:text-gray-300 hover:border-gray-200"
+                                style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                                 required
                                 placeholder={field.placeholder}
                                 value={(shippingData as any)[field.key]}
@@ -632,6 +781,7 @@ export const Checkout = () => {
                             whileTap={{ scale: 0.98 }}
                             type="submit"
                             className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-2 shadow-2xl shadow-indigo-200/50 hover:shadow-indigo-300/70 transition-all text-base"
+                            style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                           >
                             Continue to Payment <ChevronRight className="w-4 h-4" />
                           </motion.button>
@@ -661,12 +811,12 @@ export const Checkout = () => {
             </div>
 
             {/* ── RIGHT: Order Summary ── */}
-            <div className="lg:w-[400px] flex-shrink-0">
+            <div className="lg:w-[400px] shrink-0">
               <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden sticky top-28">
                 {/* Summary Header */}
                 <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
                   <div className="flex items-center justify-between">
-                    <h3 className="font-black text-gray-900 flex items-center gap-2">
+                    <h3 className="font-black text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                       <Package className="w-5 h-5 text-indigo-600" />
                       Order Summary
                     </h3>
@@ -703,6 +853,7 @@ export const Checkout = () => {
                         placeholder="Promo code"
                         disabled={!!appliedCoupon || couponLoading}
                         className="w-full pl-9 pr-3 py-2.5 border-2 border-gray-100 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-indigo-100 focus:border-indigo-500 disabled:bg-gray-50 transition-all placeholder:text-gray-300"
+                        style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                       />
                     </div>
                     {appliedCoupon ? (
@@ -792,7 +943,7 @@ export const Checkout = () => {
                   <div className="pt-4 border-t border-gray-200 flex justify-between items-baseline">
                     <span className="text-sm font-bold text-gray-500">Total</span>
                     <div className="text-right">
-                      <span className="text-3xl font-black text-gray-900">${finalTotal.toFixed(2)}</span>
+                      <span className="text-3xl font-black text-gray-900" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>${finalTotal.toFixed(2)}</span>
                       <span className="text-xs text-gray-400 block">USD</span>
                     </div>
                   </div>

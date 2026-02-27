@@ -388,9 +388,9 @@ export const UserProfile = () => {
                                     <p className="text-gray-600 dark:text-gray-300 text-sm">{addr.city}, {addr.state} {addr.postalCode}</p>
                                     <p className="text-gray-600 dark:text-gray-300 text-sm">{addr.country}</p>
                                     <p className="text-gray-600 dark:text-gray-300 text-sm mt-2">{addr.phone}</p>
-                                    <div className="mt-4 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg dark:text-blue-400 dark:hover:bg-blue-900/30"><Edit2 className="w-4 h-4" /></button>
-                                        <button onClick={() => deleteAddress(addr.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg dark:text-red-400 dark:hover:bg-red-900/30"><Trash2 className="w-4 h-4" /></button>
+                                    <div className="mt-4 flex gap-2">
+                                        <button onClick={() => { setEditingAddress(addr); setShowAddressForm(true); }} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg dark:text-blue-400 dark:hover:bg-blue-900/30 flex items-center gap-1 text-sm font-medium"><Edit2 className="w-4 h-4" /> Edit</button>
+                                        <button onClick={() => deleteAddress(addr.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg dark:text-red-400 dark:hover:bg-red-900/30 flex items-center gap-1 text-sm font-medium"><Trash2 className="w-4 h-4" /> Delete</button>
                                     </div>
                                 </div>
                             ))}
