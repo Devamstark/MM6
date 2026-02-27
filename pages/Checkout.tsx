@@ -25,19 +25,19 @@ const stripeElementStyle = {
   invalid: { color: '#ef4444', iconColor: '#ef4444' },
 };
 
-// SmartShop Logo Component
-const SmartShopLogo = ({ size = 'default' }: { size?: 'small' | 'default' }) => (
-  <div className={`bg-black rounded-xl flex items-center justify-center ${size === 'small' ? 'px-4 py-2' : 'px-6 py-3'}`}>
-    <div className="text-center">
-      <div className={`text-white font-black tracking-[0.25em] uppercase ${size === 'small' ? 'text-sm' : 'text-lg'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-        SmartShop<span className="text-gray-400 text-[0.6em] align-super ml-0.5">™</span>
-      </div>
-      <div className={`text-gray-500 font-medium tracking-[0.4em] uppercase ${size === 'small' ? 'text-[7px]' : 'text-[9px]'}`}>
-        EST. 2026
-      </div>
+// SmartShop Logo Component - uses actual logo image
+const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'default' | 'large'; dark?: boolean }) => {
+  const heights = { small: 'h-8', default: 'h-10', large: 'h-14' };
+  return (
+    <div className="inline-flex items-center justify-center">
+      <img
+        src="/smartshop-logo.png"
+        alt="SmartShop™ EST. 2026"
+        className={`${heights[size]} w-auto object-contain ${dark ? 'invert' : ''}`}
+      />
     </div>
-  </div>
-);
+  );
+};
 
 // ─── Credit Card Visual ──────────────────────────────────────────────────────
 const CreditCardVisual = ({ name, lastFour }: { name: string; lastFour: string }) => (
@@ -652,8 +652,8 @@ export const Checkout = () => {
               animate={{ opacity: 1, y: 0 }}
               className="bg-white rounded-3xl shadow-2xl shadow-gray-200/50 border border-gray-100 overflow-hidden"
             >
-              <div className="bg-black p-8 text-center">
-                <SmartShopLogo />
+              <div className="bg-black p-8 text-center rounded-t-3xl">
+                <SmartShopLogo dark />
                 <p className="text-gray-400 text-sm mt-4">Sign in to complete your purchase</p>
               </div>
               <div className="p-8 flex flex-col gap-3">
