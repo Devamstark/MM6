@@ -508,7 +508,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
         return (
             <div className="max-w-[1200px] mx-auto">
                 <div className="bg-white rounded-[3rem] shadow-2xl border border-gray-100 p-12 animate-fade-up my-12 relative overflow-hidden">
-                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                    <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                     <div className="flex justify-between items-center mb-10">
                         <div className="flex items-center gap-4">
                             <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center text-white">
@@ -530,7 +530,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onClose, 
     return (
         <div className="fixed inset-0 z-10001 overflow-y-auto bg-gray-900/80 backdrop-blur-md flex items-center justify-center p-4">
             <div className="bg-white rounded-[3rem] shadow-2xl max-w-5xl w-full p-12 animate-scale-in my-10 relative overflow-hidden max-h-[90vh] overflow-y-auto">
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                <div className="absolute top-0 left-0 w-full h-2 bg-linear-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                 <div className="flex justify-between items-center mb-10">
                     <div className="flex items-center gap-4">
                         <div className="w-14 h-14 bg-black rounded-2xl flex items-center justify-center text-white">

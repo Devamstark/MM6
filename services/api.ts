@@ -5,7 +5,8 @@ import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, Sell
 // @ts-ignore
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-if (!import.meta.env.VITE_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+// @ts-ignore
+if (!(import.meta as any).env?.VITE_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
   console.warn("⚠️ Production API Warning: VITE_API_URL is missing. Falling back to localhost will cause CORS errors.");
 }
 
@@ -225,7 +226,7 @@ const mapOrder = (o: any): Order => ({
   userId: o.user,
   customerName: o.customer_name || 'Unknown Guest',
   email: o.user_email || o.shipping_info?.email || 'N/A', // Try to infer email
-  shippingAddress: o.shipping_address || 'No address provided',
+  shippingAddress: o.shipping_address || o.shippingAddress || 'No address provided',
   paymentMethod: o.payment_method || 'Credit Card',
   totalPrice: parseFloat(o.total_amount),
   status: o.status,
@@ -706,10 +707,14 @@ export const api = {
   // --- Orders ---
   createOrder: async (orderData: { items: any[], shippingAddress: any, paymentDetails?: any, totalPrice: number, useEarnings?: boolean, couponCode?: string, transactionId?: string }): Promise<Order> => {
     const payload = {
-      items: orderData.items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
+      items: orderData.items.map(i => ({ id: i.id, quantity: parseInt(i.quantity), price: parseFloat(i.price) })),
       totalPrice: orderData.totalPrice,
-      customerName: orderData.shippingAddress.name || '',
-      shipping_address: orderData.shippingAddress ? `${orderData.shippingAddress.name}\n${orderData.shippingAddress.address}\n${orderData.shippingAddress.city}, ${orderData.shippingAddress.state} ${orderData.shippingAddress.zip}` : '',
+      customerName: orderData.shippingAddress?.name || '',
+      shipping_address: orderData.shippingAddress
+        ? (typeof orderData.shippingAddress === 'string'
+          ? orderData.shippingAddress
+          : `${orderData.shippingAddress.name || ''}\n${orderData.shippingAddress.address || ''}\n${orderData.shippingAddress.city || ''}, ${orderData.shippingAddress.state || ''} ${orderData.shippingAddress.zip || ''}`.trim())
+        : '',
       use_earnings: orderData.useEarnings || false,
       coupon_code: orderData.couponCode,
     };
@@ -1115,7 +1120,7 @@ export const api = {
       user_id: userId,
       order_id: orderId,
       conversion_value: conversionValue,
-      click_id: click_id,
+      click_id: clickId,
     });
     return response.data;
   },

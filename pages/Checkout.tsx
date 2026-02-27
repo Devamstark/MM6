@@ -46,14 +46,14 @@ const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'd
 // ─── Credit Card Visual ──────────────────────────────────────────────────────
 const CreditCardVisual = ({ name, lastFour }: { name: string; lastFour: string }) => (
   <div className="relative w-full aspect-[1.6/1] max-w-[380px] mx-auto mb-8">
-    <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black rounded-2xl shadow-2xl shadow-black/30 overflow-hidden">
+    <div className="absolute inset-0 bg-linear-to-br from-gray-900 via-gray-800 to-black rounded-2xl shadow-2xl shadow-black/30 overflow-hidden">
       {/* Decorative circles */}
       <div className="absolute -top-10 -right-10 w-40 h-40 bg-white/5 rounded-full" />
       <div className="absolute -bottom-6 -left-6 w-32 h-32 bg-white/5 rounded-full" />
 
       {/* Chip */}
       <div className="absolute top-6 left-6">
-        <div className="w-10 h-7 bg-gradient-to-br from-yellow-300/80 to-yellow-500/60 rounded-md border border-yellow-400/30">
+        <div className="w-10 h-7 bg-linear-to-br from-yellow-300/80 to-yellow-500/60 rounded-md border border-yellow-400/30">
           <div className="w-full h-full grid grid-cols-3 grid-rows-3">
             {[...Array(9)].map((_, i) => (
               <div key={i} className="border border-yellow-600/20" />
@@ -155,9 +155,16 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
         setError(result.error.message || 'Payment failed');
       } else {
         if (result.paymentIntent.status === 'succeeded') {
+          // Merge local form state (name and zip) back into shippingData for the order record
+          const finalShippingData = {
+            ...shippingData,
+            name: cardholderName,
+            zip: zipCode
+          };
+
           const order = await api.createOrder({
             items,
-            shippingAddress: shippingData,
+            shippingAddress: finalShippingData,
             totalPrice: total,
             useEarnings,
             couponCode: appliedCoupon?.code,
@@ -185,7 +192,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
       <div className="p-6 sm:p-8 border-b border-gray-100">
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+            <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
               <CreditCard className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -210,7 +217,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
 
       {/* Test Mode Banner */}
       <div className="mx-6 sm:mx-8 mt-6">
-        <div className="bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-2xl p-4 flex items-start gap-3">
+        <div className="bg-linear-to-r from-amber-50 to-orange-50 border border-amber-200/60 rounded-2xl p-4 flex items-start gap-3">
           <div className="w-8 h-8 bg-amber-100 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
             <Info className="w-4 h-4 text-amber-600" />
           </div>
@@ -383,7 +390,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
             whileTap={{ scale: 0.98 }}
             type="submit"
             disabled={!stripe || loading || !allFieldsComplete}
-            className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xl shadow-indigo-200/50 transition-all hover:shadow-indigo-300/70 text-base"
+            className="w-full sm:w-auto bg-linear-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-3 disabled:opacity-40 disabled:cursor-not-allowed shadow-2xl shadow-indigo-200/50 transition-all hover:shadow-indigo-300/70 text-base"
             style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
           >
             {loading ? (
@@ -454,7 +461,7 @@ export const Checkout = () => {
   // ── Empty Cart ──
   if (items.length === 0 && step !== 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50/30 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -481,7 +488,7 @@ export const Checkout = () => {
   // ── Success ──
   if (step === 'success') {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-indigo-50/30 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-linear-to-br from-emerald-50 via-white to-indigo-50/30 flex items-center justify-center px-4">
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -491,7 +498,7 @@ export const Checkout = () => {
             initial={{ scale: 0, rotate: -180 }}
             animate={{ scale: 1, rotate: 0 }}
             transition={{ type: 'spring', stiffness: 200, damping: 14, delay: 0.15 }}
-            className="w-28 h-28 bg-gradient-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-200"
+            className="w-28 h-28 bg-linear-to-br from-emerald-400 to-emerald-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-emerald-200"
           >
             <CheckCircle className="w-14 h-14 text-white" strokeWidth={2} />
           </motion.div>
@@ -613,7 +620,7 @@ export const Checkout = () => {
 
   // ── Checkout Layout ──
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-indigo-50/30" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+    <div className="min-h-screen bg-linear-to-br from-gray-50 via-white to-indigo-50/30" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
       {/* Branded Header */}
       <div className="border-b border-gray-200/60 bg-white/80 backdrop-blur-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
@@ -700,7 +707,7 @@ export const Checkout = () => {
                       {/* Shipping Header */}
                       <div className="p-6 sm:p-8">
                         <div className="flex items-center gap-4 mb-8">
-                          <div className="w-12 h-12 bg-gradient-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
+                          <div className="w-12 h-12 bg-linear-to-br from-indigo-600 to-violet-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-200">
                             <Truck className="w-6 h-6 text-white" />
                           </div>
                           <div>
@@ -784,7 +791,7 @@ export const Checkout = () => {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                             type="submit"
-                            className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-2 shadow-2xl shadow-indigo-200/50 hover:shadow-indigo-300/70 transition-all text-base"
+                            className="w-full sm:w-auto bg-linear-to-r from-indigo-600 to-violet-600 text-white px-10 py-4 rounded-2xl font-black flex items-center justify-center gap-2 shadow-2xl shadow-indigo-200/50 hover:shadow-indigo-300/70 transition-all text-base"
                             style={{ fontFamily: 'Inter, system-ui, sans-serif' }}
                           >
                             Continue to Payment <ChevronRight className="w-4 h-4" />
@@ -818,7 +825,7 @@ export const Checkout = () => {
             <div className="lg:w-[400px] shrink-0">
               <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden sticky top-28">
                 {/* Summary Header */}
-                <div className="p-6 border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
+                <div className="p-6 border-b border-gray-100 bg-linear-to-r from-gray-50 to-white">
                   <div className="flex items-center justify-between">
                     <h3 className="font-black text-gray-900 flex items-center gap-2" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
                       <Package className="w-5 h-5 text-indigo-600" />
@@ -923,7 +930,7 @@ export const Checkout = () => {
                 )}
 
                 {/* Totals */}
-                <div className="p-6 bg-gradient-to-b from-gray-50/50 to-gray-50 border-t border-gray-100 space-y-3">
+                <div className="p-6 bg-linear-to-b from-gray-50/50 to-gray-50 border-t border-gray-100 space-y-3">
                   <div className="flex justify-between text-sm text-gray-500">
                     <span>Subtotal</span>
                     <span className="font-bold text-gray-700">${cartTotal.toFixed(2)}</span>

@@ -565,7 +565,7 @@ export const UserProfile = () => {
                                 <div key={review.id} className="border-b border-gray-100 pb-6 last:border-0 dark:border-gray-700">
                                     <div className="flex gap-4">
                                         {/* Assuming review has product image/name populated */}
-                                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 dark:bg-gray-700">
+                                        <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden shrink-0 dark:bg-gray-700">
                                             {/* In a real app we'd need product details here. Assuming api.getUserReviews returns enhanced data */}
                                             {/* @ts-ignore */}
                                             {review.productImage && <img src={review.productImage} className="w-full h-full object-cover" />}
