@@ -418,7 +418,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                     customer_name=data.get('customerName') or user.get_full_name(),
                     total_amount=raw_total,
                     status='pending',
-                    coupon_code=data.get('couponCode')
+                    coupon_code=data.get('couponCode'),
+                    shipping_address=data.get('shipping_address') or ''
                 )
 
                 for item in data.get('items'):

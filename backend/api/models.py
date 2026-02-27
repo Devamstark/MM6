@@ -171,7 +171,7 @@ class Order(models.Model):
     coupon_code = models.CharField(max_length=50, blank=True, null=True)
 
     # Add shipping address snapshot to Order (optional but good practice)
-    # For now, simplistic approach as requested.
+    shipping_address = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"

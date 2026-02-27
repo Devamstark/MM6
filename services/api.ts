@@ -708,7 +708,8 @@ export const api = {
     const payload = {
       items: orderData.items.map(i => ({ id: i.id, quantity: i.quantity, price: i.price })),
       totalPrice: orderData.totalPrice,
-      customerName: orderData.shippingAddress.name,
+      customerName: orderData.shippingAddress.name || '',
+      shipping_address: orderData.shippingAddress ? `${orderData.shippingAddress.name}\n${orderData.shippingAddress.address}\n${orderData.shippingAddress.city}, ${orderData.shippingAddress.state} ${orderData.shippingAddress.zip}` : '',
       use_earnings: orderData.useEarnings || false,
       coupon_code: orderData.couponCode,
     };
