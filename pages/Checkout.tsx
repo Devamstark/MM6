@@ -26,6 +26,7 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
   const elements = useElements();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cardComplete, setCardComplete] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,17 +36,21 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
     setError(null);
 
     try {
-      // 1. Create PaymentIntent on the backend
       const response = await api.createPaymentIntent(items, appliedCoupon?.code, useEarnings);
       const clientSecret = response.clientSecret;
 
-      // 2. Confirm payment with Stripe
       const result = await stripe.confirmCardPayment(clientSecret, {
         payment_method: {
           card: elements.getElement(CardElement)!,
           billing_details: {
             name: shippingData.name,
             email: shippingData.email,
+            address: {
+              line1: shippingData.address,
+              city: shippingData.city,
+              state: shippingData.state,
+              postal_code: shippingData.zip,
+            }
           },
         },
       });
@@ -54,7 +59,6 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
         setError(result.error.message || 'Payment failed');
       } else {
         if (result.paymentIntent.status === 'succeeded') {
-          // 3. Create order on the backend
           const order = await api.createOrder({
             items,
             shippingAddress: shippingData,
@@ -74,51 +78,134 @@ const StripePaymentForm = ({ total, onOrderPlaced, onBack, items, shippingData, 
   };
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 sm:p-8">
-      <h2 className="text-xl font-bold mb-6 flex items-center gap-2">
-        <CreditCard className="w-6 h-6 text-indigo-600" />
-        Payment Method (Stripe Test Mode)
-      </h2>
-
-      <div className="bg-indigo-50 p-4 rounded-xl mb-6 border border-indigo-100 flex items-start gap-3">
-        <Lock className="w-5 h-5 text-indigo-600 mt-0.5" />
-        <div className="text-sm text-indigo-800">
-          <span className="font-bold">Secure Stripe Gateway:</span> You are in <strong>Test Mode</strong>. Use 4242 4242 4242 4242 for testing.
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="p-6 sm:p-10"
+    >
+      <div className="flex flex-col md:flex-row gap-8 mb-8 pb-8 border-b border-gray-100">
+        <div className="flex-1">
+          <h2 className="text-2xl font-black text-gray-900 mb-2 flex items-center gap-3">
+            <div className="p-2 bg-indigo-600 rounded-lg shadow-lg shadow-indigo-200">
+              <CreditCard className="w-5 h-5 text-white" />
+            </div>
+            Payment Details
+          </h2>
+          <p className="text-gray-500 text-sm">Complete your purchase securely via Stripe.</p>
+        </div>
+        <div className="flex items-center gap-4 bg-gray-50 px-4 py-2 rounded-2xl border border-gray-100">
+          <div className="flex -space-x-2">
+            <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center p-1 shadow-sm overflow-hidden">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/d/d6/Visa_2021.svg" alt="Visa" className="w-full h-auto" />
+            </div>
+            <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center p-1 shadow-sm overflow-hidden">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" className="w-full h-auto" />
+            </div>
+            <div className="w-8 h-8 rounded-full bg-white border border-gray-200 flex items-center justify-center p-1 shadow-sm overflow-hidden">
+              <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" className="w-full h-auto" />
+            </div>
+          </div>
+          <div className="h-6 w-px bg-gray-200" />
+          <div className="flex items-center gap-1.5 text-emerald-600 font-bold text-xs uppercase tracking-widest">
+            <ShieldCheck className="w-4 h-4" />
+            Encrypted
+          </div>
         </div>
       </div>
 
-      <div className="bg-white border-2 border-gray-100 p-6 rounded-2xl mb-8 shadow-sm">
-        <label className="block text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">Card Details</label>
-        <div className="p-4 border border-gray-200 rounded-xl bg-gray-50 focus-within:border-indigo-500 focus-within:ring-2 focus-within:ring-indigo-200 transition-all">
-          <CardElement options={{
-            style: {
-              base: {
-                fontSize: '16px',
-                color: '#1f2937',
-                '::placeholder': { color: '#9ca3af' },
-                fontFamily: 'Inter, sans-serif',
-              },
-              invalid: { color: '#ef4444' },
-            },
-          }} />
-        </div>
-      </div>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 gap-6 mb-8">
+          <div className="bg-white border-2 border-gray-100 rounded-2xl p-6 shadow-sm hover:shadow-md transition-shadow">
+            <label className="block text-xs font-black text-gray-400 mb-4 uppercase tracking-widest">Secure Card Input</label>
+            <div className={`p-4 rounded-xl transition-all duration-300 ${cardComplete ? 'bg-indigo-50 border border-indigo-200' : 'bg-gray-50 border border-gray-200'} focus-within:ring-4 focus-within:ring-indigo-100 focus-within:border-indigo-500`}>
+              <CardElement
+                onChange={(e) => setCardComplete(e.complete)}
+                options={{
+                  style: {
+                    base: {
+                      fontSize: '17px',
+                      color: '#111827',
+                      fontFamily: 'Outfit, Inter, sans-serif',
+                      '::placeholder': { color: '#9ca3af', fontWeight: '400' },
+                      iconColor: '#4f46e5',
+                    },
+                    invalid: { color: '#ef4444', iconColor: '#ef4444' },
+                  },
+                }}
+              />
+            </div>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-xs text-gray-400 font-medium">
+                <Lock className="w-3 h-3" />
+                SSL Certified Checkout
+              </div>
+              <img src="https://stripe.com/img/v3/home/twitter.png" alt="Powered by Stripe" className="h-4 grayscale opacity-50" />
+            </div>
+          </div>
 
-      {error && (
-        <div className="bg-red-50 text-red-600 p-4 rounded-xl mb-6 text-sm flex items-center gap-3 border border-red-100">
-          <X className="w-5 h-5" /> {error}
+          <div className="bg-indigo-50/50 rounded-2xl p-6 border border-indigo-100/50">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-sm font-bold text-indigo-900 uppercase tracking-wider opacity-60">Payment Summary</span>
+              <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-1 rounded-full font-bold">1-Click Secure</span>
+            </div>
+            <div className="space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 font-medium">Processing Method</span>
+                <span className="text-gray-900 font-bold">Stripe Gateway</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600 font-medium">Currency</span>
+                <span className="text-gray-900 font-bold uppercase">USD ($)</span>
+              </div>
+              <div className="pt-3 border-t border-indigo-100 flex justify-between">
+                <span className="text-gray-900 font-black">Total Charge</span>
+                <span className="text-indigo-600 font-black text-lg">${total.toFixed(2)}</span>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
 
-      <div className="mt-8 flex justify-between items-center">
-        <button type="button" onClick={onBack} disabled={loading} className="text-gray-500 hover:text-gray-900 font-medium flex items-center gap-1 disabled:opacity-50">
-          ← Back to Shipping
-        </button>
-        <button type="submit" disabled={!stripe || loading} className="bg-indigo-600 text-white px-8 py-3 rounded-xl hover:bg-indigo-700 font-bold flex items-center gap-2 disabled:opacity-70 shadow-lg shadow-indigo-200 transition-all hover:scale-[1.02] active:scale-[0.98]">
-          {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <><ShieldCheck className="w-5 h-5" /> Pay ${total.toFixed(2)}</>}
-        </button>
-      </div>
-    </form>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            className="bg-red-50 text-red-600 p-4 rounded-2xl mb-6 text-sm flex items-center gap-3 border border-red-100 shadow-sm font-medium"
+          >
+            <div className="bg-white p-1 rounded-full shadow-sm"><X className="w-4 h-4 text-red-500" /></div>
+            {error}
+          </motion.div>
+        )}
+
+        <div className="flex flex-col sm:flex-row justify-between items-center gap-6 mt-10">
+          <button
+            type="button"
+            onClick={onBack}
+            disabled={loading}
+            className="text-gray-400 hover:text-gray-900 font-bold flex items-center gap-2 transition-colors disabled:opacity-50 group"
+          >
+            <span className="group-hover:-translate-x-1 transition-transform">←</span> Return to Shipping
+          </button>
+
+          <button
+            type="submit"
+            disabled={!stripe || loading || !cardComplete}
+            className="w-full sm:w-auto min-w-[240px] bg-indigo-600 text-white px-10 py-4 rounded-2xl hover:bg-black font-black flex items-center justify-center gap-3 disabled:opacity-50 shadow-2xl shadow-indigo-200 transition-all hover:scale-[1.03] active:scale-[0.98] group"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                Confirm & Pay
+                <div className="w-6 h-6 bg-white/20 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                </div>
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+    </motion.div>
   );
 };
 
@@ -344,29 +431,31 @@ export const Checkout = () => {
               // Authenticated View
               <>
                 {/* Steps Indicator */}
-                <div className="flex items-center mb-8">
+                <div className="flex items-center mb-10 bg-white/60 backdrop-blur-md p-4 rounded-2xl border border-white shadow-xl shadow-gray-100/50">
                   {(['shipping', 'payment'] as const).map((s, i) => (
                     <React.Fragment key={s}>
-                      <div className={`flex items-center ${step === s ? 'text-indigo-600 font-bold' : 'text-gray-400'}`}>
+                      <div className={`flex items-center px-4 ${step === s ? 'text-indigo-600 font-black' : 'text-gray-400'}`}>
                         <motion.div
-                          animate={step === s ? { scale: 1.15, borderColor: '#4f46e5', backgroundColor: '#eef2ff' } : { scale: 1, borderColor: '#d1d5db', backgroundColor: 'transparent' }}
-                          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                          className="w-8 h-8 rounded-full flex items-center justify-center border-2 mr-2 text-sm font-bold"
+                          animate={step === s ? { scale: 1.15, borderColor: '#4f46e5', backgroundColor: '#eef2ff', boxShadow: '0 10px 15px -3px rgba(79, 70, 229, 0.2)' } : { scale: 1, borderColor: '#d1d5db', backgroundColor: 'transparent' }}
+                          className="w-10 h-10 rounded-2xl flex items-center justify-center border-2 mr-3 text-sm font-black transition-all"
                         >
                           {s === 'payment' && step === 'payment' ? (
-                            <CreditCard className="w-4 h-4 text-indigo-600" />
+                            <CreditCard className="w-5 h-5" />
                           ) : (
-                            <span className={step === s ? 'text-indigo-600' : 'text-gray-400'}>{i + 1}</span>
+                            <span>{i + 1}</span>
                           )}
                         </motion.div>
-                        <span className="capitalize text-sm font-semibold">{s}</span>
+                        <div className="flex flex-col">
+                          <span className="capitalize text-xs font-black tracking-widest leading-tight">{s}</span>
+                          <span className="text-[10px] uppercase font-bold opacity-50">{s === 'shipping' ? 'Address' : 'Security'}</span>
+                        </div>
                       </div>
                       {i < 1 && (
-                        <div className="flex-1 h-0.5 mx-4 bg-gray-200 overflow-hidden">
+                        <div className="flex-1 h-0.5 mx-2 bg-gray-200/50 rounded-full overflow-hidden">
                           <motion.div
                             animate={{ width: step === 'payment' ? '100%' : '0%' }}
-                            transition={{ duration: 0.5, ease: 'easeInOut' }}
-                            className="h-full bg-indigo-500"
+                            transition={{ duration: 0.6, ease: 'easeInOut' }}
+                            className="h-full bg-indigo-500 shadow-[0_0_10px_#4f46e5]"
                           />
                         </div>
                       )}
