@@ -229,6 +229,7 @@ export interface Order {
         imageUrl?: string;
         userId?: string; // Seller ID for the item
     }>;
+    earningsApplied?: number;
 }
 
 export interface DashboardStats {

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { api } from '../services/api';
 import { Order } from '../types';
-import { 
-    Loader2, Package, Truck, CheckCircle, XCircle, Clock, 
+import {
+    Loader2, Package, Truck, CheckCircle, XCircle, Clock,
     ArrowLeft, Calendar, MapPin, CreditCard, DollarSign,
     Download, Share2
 } from 'lucide-react';
@@ -135,7 +135,7 @@ export const OrderDetail = () => {
                     <h3 className="text-lg font-bold text-gray-900 mb-6">Order Status</h3>
                     <div className="relative">
                         <div className="absolute top-5 left-0 right-0 h-1 bg-gray-200 rounded-full"></div>
-                        <div 
+                        <div
                             className="absolute top-5 left-0 h-1 bg-indigo-600 rounded-full transition-all duration-500"
                             style={{ width: `${((currentStep - 1) / (steps.length - 1)) * 100}%` }}
                         ></div>
@@ -147,13 +147,12 @@ export const OrderDetail = () => {
                                 return (
                                     <div key={step.id} className="flex flex-col items-center flex-1">
                                         <div
-                                            className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${
-                                                isCompleted
+                                            className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${isCompleted
                                                     ? 'bg-indigo-600 border-indigo-600'
                                                     : isCurrent
-                                                    ? 'bg-white border-indigo-600'
-                                                    : 'bg-white border-gray-300'
-                                            }`}
+                                                        ? 'bg-white border-indigo-600'
+                                                        : 'bg-white border-gray-300'
+                                                }`}
                                         >
                                             <Icon className={`w-5 h-5 ${isCompleted ? 'text-white' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`} />
                                         </div>
@@ -231,8 +230,14 @@ export const OrderDetail = () => {
                         <div className="p-6 space-y-4">
                             <div className="flex justify-between text-gray-600">
                                 <span>Subtotal</span>
-                                <span>${order.totalPrice.toFixed(2)}</span>
+                                <span>${(order.totalPrice + (order.earningsApplied || 0)).toFixed(2)}</span>
                             </div>
+                            {order.earningsApplied && order.earningsApplied > 0 ? (
+                                <div className="flex justify-between text-indigo-600 font-medium">
+                                    <span>Earnings Discount</span>
+                                    <span>-${order.earningsApplied.toFixed(2)}</span>
+                                </div>
+                            ) : null}
                             <div className="flex justify-between text-gray-600">
                                 <span>Shipping</span>
                                 <span className="text-green-600 font-medium">Free</span>

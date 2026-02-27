@@ -227,6 +227,7 @@ const mapOrder = (o: any): Order => ({
   customerName: o.customer_name || 'Unknown Guest',
   email: o.user_email || o.shipping_info?.email || 'N/A', // Try to infer email
   shippingAddress: o.shipping_address || o.shippingAddress || 'No address provided',
+  earningsApplied: o.earnings_applied ? parseFloat(o.earnings_applied) : 0,
   paymentMethod: o.payment_method || 'Credit Card',
   totalPrice: parseFloat(o.total_amount),
   status: o.status,
