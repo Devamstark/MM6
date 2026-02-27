@@ -39,6 +39,8 @@ router.register(r'newsletter', NewsletterSubscriberViewSet, basename='newsletter
 router.register(r'marketing-campaigns', MarketingCampaignViewSet, basename='marketing-campaigns')
 
 urlpatterns = [
+    path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),
+    path('payments/webhook/', StripeWebhookView.as_view(), name='stripe_webhook'),
     path('', include(router.urls)),
     path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -49,6 +51,4 @@ urlpatterns = [
     path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
-    path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),
-    path('payments/webhook/', StripeWebhookView.as_view(), name='stripe_webhook'),
 ]
