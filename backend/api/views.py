@@ -419,7 +419,8 @@ class OrderViewSet(viewsets.ModelViewSet):
                     total_amount=raw_total,
                     status='pending',
                     coupon_code=data.get('couponCode'),
-                    shipping_address=data.get('shipping_address') or ''
+                    shipping_address=data.get('shipping_address') or '',
+                    earnings_applied=earnings_applied
                 )
 
                 for item in data.get('items'):
@@ -459,6 +460,25 @@ class OrderViewSet(viewsets.ModelViewSet):
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def perform_update(self, serializer):
+        old_status = self.get_object().status
+        instance = serializer.save()
+        new_status = instance.status
+
+        # Logic for cancellation: Refund used referral earnings and RESTOCK products
+        if old_status != 'cancelled' and new_status == 'cancelled':
+            # 1. Refund referral earnings if they were applied
+            if hasattr(instance, 'earnings_applied') and instance.earnings_applied > 0:
+                user = instance.user
+                user.referral_earnings += instance.earnings_applied
+                user.save(update_fields=['referral_earnings'])
+
+            # 2. Restock items
+            for item in instance.items.all():
+                product = item.product
+                product.stock_quantity += item.quantity
+                product.save(update_fields=['stock_quantity'])
 
     @action(detail=False, methods=['get'], url_path='my_orders')
     def my_orders(self, request):
@@ -608,18 +628,19 @@ class DashboardStatsView(APIView):
         if request.user.role != 'admin':
             return Response({'error': 'Admin access required.'}, status=403)
         try:
-            # Calculate real data for dashboard
-            total_revenue_data = Order.objects.aggregate(total=Sum('total_amount'))
+            # Calculate real data for dashboard (excluding cancelled orders)
+            active_orders = Order.objects.exclude(status='cancelled')
+            total_revenue_data = active_orders.aggregate(total=Sum('total_amount'))
             total_revenue = float(total_revenue_data['total'] or 0)
 
-            total_orders = Order.objects.count()
+            total_orders = active_orders.count()
             total_products = Product.objects.count()
             total_users = User.objects.count()
 
             # Monthly Trend (Last 12 months)
             monthly_trend = [0] * 12
             try:
-                sales_by_month = Order.objects.annotate(
+                sales_by_month = active_orders.annotate(
                     month=ExtractMonth('created_at')
                 ).values('month').annotate(revenue=Sum('total_amount'))
 
