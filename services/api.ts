@@ -138,6 +138,7 @@ client.interceptors.response.use(
           localStorage.removeItem('cm_token');
           localStorage.removeItem('cm_refresh');
           localStorage.removeItem('cm_user_data');
+          isRefreshing = false; // CRITICAL FIX: Reset flag so subsequent login attempts don't hang
           // Don't redirect immediately to avoid breaking public page views that just happen to fail on a bg call
         }
       }
