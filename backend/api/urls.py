@@ -10,7 +10,7 @@ from .views import (
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
-    MarketingCampaignViewSet, BlogImageView
+    MarketingCampaignViewSet, BlogImageView, HealthCheckView
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
 
@@ -52,4 +52,5 @@ urlpatterns = [
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
     path('blog/upload-image/', BlogImageView.as_view(), name='blog-upload-image'),
+    path('health/', HealthCheckView.as_view(), name='health_check'),
 ]

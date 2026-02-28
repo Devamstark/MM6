@@ -200,20 +200,51 @@ STRIPE_SECRET_KEY = os.environ.get('STRIPE_SECRET_KEY', '')
 STRIPE_PUBLIC_KEY = os.environ.get('STRIPE_PUBLIC_KEY', '')
 STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
 
-# Database Query Logging for Performance Monitoring
+# 🔭 Observability: Sentry Error Monitoring & Slack Integration
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
+from sentry_sdk.integrations.celery import CeleryIntegration
+from sentry_sdk.integrations.redis import RedisIntegration
+
+SENTRY_DSN = os.environ.get('SENTRY_DSN')
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration(), CeleryIntegration(), RedisIntegration()],
+        traces_sample_rate=0.2,
+        send_default_pii=True,
+        environment=os.environ.get('ENVIRONMENT', 'production'),
+    )
+
+# 🔭 Observability: Structured JSON Logging
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(asctime)s %(levelname)s %(name)s %(message)s',
+        },
+    },
     'handlers': {
         'console': {
             'class': 'logging.StreamHandler',
+            'formatter': 'json',
         },
     },
     'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
         'django.db.backends': {
             'handlers': ['console'],
             'level': 'WARNING',  # Set to DEBUG to see all SQL queries in console during Dev
             'propagate': False,
+        },
+        'api': {
+            'handlers': ['console'],
+            'level': 'INFO',
         },
     },
 }

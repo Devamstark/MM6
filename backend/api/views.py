@@ -1759,3 +1759,36 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
             raise PermissionDenied()
         users = User.objects.filter(role='user', is_active=True).values('id', 'username', 'email', 'first_name', 'last_name')
         return Response(list(users[:500]))
+
+class HealthCheckView(APIView):
+    """
+    Observability: Comprehensive systems health check for Uptime Kuma or external pings.
+    """
+    permission_classes = [permissions.AllowAny]
+
+    def get(self, request):
+        status_dict = {'status': 'healthy'}
+        try:
+            # 1. Check Primary Database
+            from django.db import connection
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT 1")
+                row = cursor.fetchone()
+            status_dict['database'] = 'ok'
+        except Exception as e:
+            status_dict['status'] = 'unhealthy'
+            status_dict['database'] = str(e)
+
+        try:
+            # 2. Check Redis/Cache
+            from django.core.cache import cache
+            cache.set('health_check', 'ok', timeout=5)
+            if cache.get('health_check') == 'ok':
+                status_dict['redis_cache'] = 'ok'
+            else:
+                raise ValueError("Cache set/get mismatch")
+        except Exception as e:
+            status_dict['status'] = 'unhealthy'
+            status_dict['redis_cache'] = str(e)
+
+        return Response(status_dict, status=200 if status_dict['status'] == 'healthy' else 503)
