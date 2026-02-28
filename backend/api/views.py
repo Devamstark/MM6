@@ -184,7 +184,7 @@ class CategoryViewSet(viewsets.ViewSet):
         return Response(data)
 
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all()
+    queryset = Product.objects.all().select_related('seller')
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     parser_classes = (parsers.JSONParser, parsers.MultiPartParser, parsers.FormParser)
@@ -386,11 +386,12 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        qs = Order.objects.select_related('user').prefetch_related('items__product')
         if user.role == 'admin':
-            return Order.objects.all()
+            return qs
         # Sellers see orders containing their products (complex logic, simplified here to 'see all' or 'see own')
         # For simplicity in this stage: Users see their own orders.
-        return Order.objects.filter(user=user)
+        return qs.filter(user=user)
 
     def create(self, request, *args, **kwargs):
         # Custom creation logic to handle items transactionally
@@ -631,6 +632,13 @@ class DashboardStatsView(APIView):
     def get(self, request):
         if request.user.role != 'admin':
             return Response({'error': 'Admin access required.'}, status=403)
+        
+        from django.core.cache import cache
+        cache_key = 'admin_dashboard_stats'
+        cached_data = cache.get(cache_key)
+        if cached_data:
+            return Response(cached_data)
+
         try:
             # Calculate real data for dashboard (excluding cancelled orders)
             active_orders = Order.objects.exclude(status='cancelled')
@@ -655,13 +663,15 @@ class DashboardStatsView(APIView):
             except Exception:
                 pass  # Monthly trend is non-critical; fall back to zeros
 
-            return Response({
+            data = {
                 "totalRevenue": total_revenue,
                 "totalOrders": total_orders,
                 "totalProducts": total_products,
                 "totalUsers": total_users,
                 "monthlyTrend": monthly_trend
-            })
+            }
+            cache.set(cache_key, data, 60 * 15)  # Cache for 15 minutes
+            return Response(data)
         except Exception as e:
             import traceback
             import logging
@@ -1379,15 +1389,22 @@ class MarketingCampaignViewSet(viewsets.ModelViewSet):
         log_status = request.query_params.get('log_status')
         if log_status:
             logs = logs.filter(status=log_status)
-        serializer = EmailDeliveryLogSerializer(logs[:500], many=True)
+        
+        page = self.paginate_queryset(logs)
+        if page is not None:
+            serializer = EmailDeliveryLogSerializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+        else:
+            serializer = EmailDeliveryLogSerializer(logs, many=True)
+            response = Response({'results': serializer.data})
+            
         # Also return summary
         from django.db.models import Count
         summary = logs.values('status').annotate(count=Count('id'))
-        return Response({
-            'logs': serializer.data,
-            'summary': {item['status']: item['count'] for item in summary},
-            'total': logs.count(),
-        })
+        
+        response.data['summary'] = {item['status']: item['count'] for item in summary}
+        response.data['total'] = logs.count()
+        return response
 
     @action(detail=False, methods=['get'], url_path='audience-preview')
     def audience_preview(self, request):

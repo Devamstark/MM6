@@ -94,17 +94,17 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
-    category = models.CharField(max_length=100)
+    category = models.CharField(max_length=100, db_index=True)
     brand = models.CharField(max_length=100)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
     additional_images = models.JSONField(default=list, blank=True) # List of image URLs
     gender = models.CharField(max_length=20, choices=[('Male', 'Male'), ('Female', 'Female'), ('Unisex', 'Unisex')], default='Unisex')
-    subcategory = models.CharField(max_length=100, blank=True, null=True)
+    subcategory = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     sizes = models.JSONField(default=list, blank=True) # List of sizes e.g. ["S", "M", "L"]
     colors = models.JSONField(default=list, blank=True) # List of colors e.g. ["Red", "Blue"]
     variants = models.JSONField(default=list, blank=True) # List of variants e.g. [{size: "M", color: "Red", stock: 5}]
-    is_featured = models.BooleanField(default=False)
-    is_popular = models.BooleanField(default=False)
+    is_featured = models.BooleanField(default=False, db_index=True)
+    is_popular = models.BooleanField(default=False, db_index=True)
     image_fit = models.CharField(max_length=10, choices=[('cover', 'Cover'), ('contain', 'Contain')], default='cover')
     
     # Discount fields
@@ -126,6 +126,9 @@ class Product(models.Model):
 
     class Meta:
         ordering = ['display_order', '-created_at']
+        indexes = [
+            models.Index(fields=['category', 'subcategory']),
+        ]
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -167,13 +170,19 @@ class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='orders')
     customer_name = models.CharField(max_length=255)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending', db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     coupon_code = models.CharField(max_length=50, blank=True, null=True)
 
     # Add shipping address snapshot to Order (optional but good practice)
     shipping_address = models.TextField(blank=True, null=True)
     earnings_applied = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_at', 'status']),
+            models.Index(fields=['user', 'created_at']),
+        ]
 
     def __str__(self):
         return f"Order {self.id} by {self.user.username}"
@@ -230,7 +239,7 @@ class Coupon(models.Model):
     discount_type = models.CharField(max_length=20, choices=[('percentage', 'Percentage'), ('fixed', 'Fixed Amount')], default='percentage')
     discount_value = models.DecimalField(max_digits=10, decimal_places=2)
     min_purchase = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=True, db_index=True)
     start_date = models.DateTimeField(default=timezone.now)
     end_date = models.DateTimeField(null=True, blank=True)
     usage_limit = models.IntegerField(null=True, blank=True)
