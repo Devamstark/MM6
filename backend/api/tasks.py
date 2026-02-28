@@ -154,10 +154,11 @@ def send_newsletter(blog_post_id):
         text_content = strip_tags(html_content)
         
         send_mail(
-            subject,
-            text_content,
-            settings.DEFAULT_FROM_EMAIL,
-            recipient_list,
+            subject=subject,
+            message=text_content,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[settings.DEFAULT_FROM_EMAIL],
+            bcc=recipient_list,
             html_message=html_content,
             fail_silently=True
         )
@@ -424,12 +425,13 @@ def _send_batch(campaign_id, log_ids):
                 # Try to personalize with user's name if available
                 user_name = getattr(log.user, 'first_name', None) or log.email.split('@')[0]
                 personalized_html = personalized_html.replace('{{customer_name}}', user_name)
+                personalized_text = text_message.replace('{{customer_name}}', user_name)
 
                 send_mail(
-                    campaign.subject,
-                    text_message,
-                    settings.DEFAULT_FROM_EMAIL,
-                    [log.email],
+                    subject=campaign.subject,
+                    message=personalized_text,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    recipient_list=[log.email], # CRITICAL: MUST BE A SINGLE ELEMENT LIST
                     html_message=personalized_html,
                     fail_silently=False,
                 )

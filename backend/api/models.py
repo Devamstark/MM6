@@ -426,14 +426,17 @@ class BlogPost(models.Model):
         plain_message = strip_tags(html_message)
         
         try:
-            send_mail(
-                subject,
-                plain_message,
-                settings.DEFAULT_FROM_EMAIL,
-                recipient_list,
-                html_message=html_message,
-                fail_silently=True
+            from django.core.mail import EmailMultiAlternatives
+            
+            msg = EmailMultiAlternatives(
+                subject=subject,
+                body=plain_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[settings.DEFAULT_FROM_EMAIL],
+                bcc=recipient_list
             )
+            msg.attach_alternative(html_message, "text/html")
+            msg.send(fail_silently=True)
         except Exception as e:
             import logging
             logging.getLogger(__name__).error(f"Failed to send newsletter: {str(e)}")
