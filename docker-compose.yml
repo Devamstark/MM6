@@ -220,22 +220,6 @@ services:
     networks:
       - dokploy-network
 
-  checkcle:
-    image: operacle/checkcle:latest
-    container_name: checkcle
-    restart: always
-    volumes:
-      - checkcle_data:/checkcle/data
-    networks:
-      - dokploy-network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.checkcle.rule=Host(`status.smartshop1.us`)"
-      - "traefik.http.routers.checkcle.entrypoints=websecure"
-      - "traefik.http.routers.checkcle.tls.certresolver=letsencrypt"
-      - "traefik.http.services.checkcle.loadbalancer.server.port=8090"
-      - "traefik.http.routers.checkcle.middlewares=security-headers"
-
 volumes:
   postgres_data:
   backend_static:
@@ -243,7 +227,6 @@ volumes:
   frontend_build:
   minio_data:
   filebrowser_data:
-  checkcle_data:
 
 
 networks:
