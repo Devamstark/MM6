@@ -1163,8 +1163,8 @@ A visual calendar component available within the marketing system.
 
 ---
 
-**Last Updated**: February 26, 2026  
-**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)
+**Last Updated**: February 27, 2026  
+**Version**: 2.0.0 (Enterprise Observability, Slack Webhooks, Database Optimization)
 
 ---
 
@@ -1237,3 +1237,67 @@ A visual calendar component available within the marketing system.
 **Technical Details:**
 - Backend: Django Admin registration with customized list filters and searchable fields.
 - API: `set_role` endpoint in `UserViewSet`.
+
+---
+
+## 🔭 Observability & Notifications
+
+### Feature 46: Full-Stack Health & Monitoring
+**User Story:** *As an admin, I want to proactively monitor my server, database, cache, and frontend uptime to prevent sales loss.*
+
+**Functionality:**
+- Dedicated `GET /api/health/` JSON endpoint.
+- Live PostgreSQL query testing (`SELECT 1`).
+- Live Redis cache read/write testing.
+- CheckCle UI monitoring integration at `status.smartshop1.us`.
+- Traefik SSL auto-generation specifically for the status dashboard.
+- Uptime Kuma/CheckCle Slack alerts for sudden downtime.
+
+**Technical Details:**
+- Endpoint: `GET /api/health/` (`permissions.AllowAny`)
+- Middleware: Independent Docker deployment template (DNS-Only).
+
+---
+
+### Feature 47: Actionable Slack Webhooks
+**User Story:** *As a business owner, I want real-time notifications about sales and security attacks on my phone.*
+
+**Functionality:**
+- Instant Slack ping on order completion with customer name and USD value.
+- Configurable environment variables for `SLACK_ORDERS_WEBHOOK` and `SLACK_SECURITY_WEBHOOK`.
+- Non-blocking asynchronous dispatch via Celery.
+
+**Technical Details:**
+- Backend: `notify_slack_new_order.delay()` in `OrderViewSet`
+- Dependencies: `requests` module mapped to `settings.py`
+
+---
+
+### Feature 48: Brute-Force Shield (`django-axes`)
+**User Story:** *As an admin, I want my application to automatically defend itself against hackers guessing passwords.*
+
+**Functionality:**
+- Tracks failed login attempts per IP address and Username.
+- Hard lock-out established after 5 consecutive failures.
+- 30-minute automated cool-off period.
+- Automatic Django Signal dispatched to Celery upon lockout.
+- High-priority Slack alert broadcasting the attacker's IP and targeted user.
+
+**Technical Details:**
+- Library: `django-axes` integration in `settings.py` and `middleware`.
+- Backend: `@receiver(user_locked_out)` hooking into `notify_slack_security_alert` in `models.py`.
+
+---
+
+### Feature 49: Privacy & Database Scans (Optimization)
+**User Story:** *As a growing enterprise, I want my data to load instantly and keep user emails entirely private.*
+
+**Functionality:**
+- Mass email delivery (Marketing & Newsletters) leverages `bcc` headers to mask PII from other recipients.
+- Composite B-Tree indexes constructed on `User`, `Product`, and `MarketingCampaign` to eradicate full-table scans.
+- Bulk generation of database objects (`OrderItem`, `EmailDeliveryLog`) to eliminate `O(n)` query loops.
+- Asynchronous Celery-Beat task designed to delete outdated tracking logs over 6 months old.
+
+**Technical Details:**
+- Operations: `bulk_create`, Django `Meta.indexes`
+- Emailing: `EmailMultiAlternatives` utilizing `bcc=[...]` mechanism.
