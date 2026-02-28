@@ -240,31 +240,25 @@ def send_marketing_campaign(campaign_id):
             campaign.save(update_fields=['status', 'total_recipients'])
             return "No valid recipients found."
 
-        # Snapshot recipients
-        recipient_count = 0
+        # Snapshot recipients using bulk_create
+        recipients_to_create = []
         for user in users:
             if user.email:
-                CampaignRecipient.objects.get_or_create(
-                    campaign=campaign,
-                    user=user,
-                    defaults={'email': user.email}
-                )
-                recipient_count += 1
+                recipients_to_create.append(CampaignRecipient(campaign=campaign, user=user, email=user.email))
+        
+        CampaignRecipient.objects.bulk_create(recipients_to_create, ignore_conflicts=True)
+        recipient_count = CampaignRecipient.objects.filter(campaign=campaign).count()
 
         campaign.total_recipients = recipient_count
         campaign.save(update_fields=['total_recipients'])
 
-        # Create delivery logs for all recipients
+        # Create delivery logs for all recipients using bulk_create
         recipients = CampaignRecipient.objects.filter(campaign=campaign)
+        logs_to_create = []
         for recipient in recipients:
-            EmailDeliveryLog.objects.get_or_create(
-                campaign=campaign,
-                user=recipient.user,
-                defaults={
-                    'email': recipient.email,
-                    'status': 'pending',
-                }
-            )
+            logs_to_create.append(EmailDeliveryLog(campaign=campaign, user=recipient.user, email=recipient.email, status='pending'))
+        
+        EmailDeliveryLog.objects.bulk_create(logs_to_create, ignore_conflicts=True)
 
         # Send in batches
         batch_size = campaign.batch_size or 200
@@ -510,3 +504,15 @@ def _resolve_audience(campaign):
         return User.objects.none()
 
     return base_qs
+
+@shared_task
+def prune_old_logs():
+    """Periodic task to delete logs and old records (e.g. > 6 months old) to prevent DB bloat."""
+    from dateutil.relativedelta import relativedelta
+    six_months_ago = timezone.now() - relativedelta(months=6)
+    
+    deleted_emails = EmailDeliveryLog.objects.filter(sent_at__lt=six_months_ago).delete()
+    deleted_clicks = EmailClickLog.objects.filter(clicked_at__lt=six_months_ago).delete()
+    
+    logger.info(f"Pruned {deleted_emails[0]} old email logs and {deleted_clicks[0]} old click logs.")
+    return f"Pruning complete. {deleted_emails[0]} emails, {deleted_clicks[0]} clicks deleted."

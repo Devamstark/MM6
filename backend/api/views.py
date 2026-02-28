@@ -428,6 +428,7 @@ class OrderViewSet(viewsets.ModelViewSet):
                     earnings_applied=earnings_applied
                 )
 
+                order_items_to_create = []
                 for item in data.get('items'):
                     product = Product.objects.select_for_update().get(id=item['id'])
 
@@ -439,12 +440,14 @@ class OrderViewSet(viewsets.ModelViewSet):
                     product.stock_quantity -= quantity
                     product.save(update_fields=['stock_quantity'])
 
-                    OrderItem.objects.create(
+                    order_items_to_create.append(OrderItem(
                         order=order,
                         product=product,
                         quantity=quantity,
                         price_at_purchase=item['price']
-                    )
+                    ))
+
+                OrderItem.objects.bulk_create(order_items_to_create)
 
                 serializer = self.get_serializer(order)
                 response_data = serializer.data

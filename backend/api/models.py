@@ -31,6 +31,12 @@ class User(AbstractUser):
     profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
     referral_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['is_active', 'date_joined']),
+            models.Index(fields=['email']),
+        ]
+
     def __str__(self):
         return self.username
 
@@ -128,6 +134,7 @@ class Product(models.Model):
         ordering = ['display_order', '-created_at']
         indexes = [
             models.Index(fields=['category', 'subcategory']),
+            models.Index(fields=['name']),
         ]
 
     def save(self, *args, **kwargs):
@@ -508,6 +515,7 @@ class MarketingCampaign(models.Model):
             models.Index(fields=['status']),
             models.Index(fields=['campaign_type']),
             models.Index(fields=['created_at']),
+            models.Index(fields=['status', 'created_at']),
         ]
 
     def __str__(self):
