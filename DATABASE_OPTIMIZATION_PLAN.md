@@ -88,3 +88,15 @@ Audit and refactor all API `ViewSet`s and serializers to utilize `select_related
 ### Phase 4: Hardening & Pagination
 - Set strict limits in `settings.py` for Pagination.
 - Refactor any `.all()` or slice operations on endpoints dealing with user logs into properly paginated responses.
+
+---
+
+## 🔭 6. Future Enhancements: Observability & Monitoring
+
+For full production maturity and to track database and application health proactively before bottlenecks occur, an enterprise observability stack should be considered:
+
+- **Logging Strategy:** Transition to structured JSON logs for backend, database, and background processes for easier parsing.
+- **Error Monitoring & Alerts:** Integrate tools like Sentry, hooked into Slack for immediate alerting on critical 500s or database deadlocks.
+- **Health Checks:** Implement `/api/health` endpoints to automatically monitor DB, Redis, and Celery worker status.
+- **Celery Task Monitoring:** Employ Flower to visually monitor queue congestion, failure rates, and background task execution times.
+- **Uptime Monitoring:** Leverage a tool like Uptime Kuma for active pings and downtime tracking across all active microservices.
