@@ -29,7 +29,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'django_celery_results',
     'django_celery_beat',
+    'axes',
     'api',
+]
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesStandaloneBackend',
+    'django.contrib.auth.backends.ModelBackend',
 ]
 
 MIDDLEWARE = [
@@ -41,6 +47,7 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'axes.middleware.AxesMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.cache.FetchFromCacheMiddleware',   # MUST BE LAST
@@ -248,3 +255,12 @@ LOGGING = {
         },
     },
 }
+
+# Webhooks for Slack Observability
+SLACK_ORDERS_WEBHOOK = os.environ.get('SLACK_ORDERS_WEBHOOK', '')
+SLACK_SECURITY_WEBHOOK = os.environ.get('SLACK_SECURITY_WEBHOOK', '')
+
+# Axes Security configuration (Login Brute Force)
+AXES_FAILURE_LIMIT = 5
+AXES_COOLOFF_TIME = timedelta(minutes=30)
+AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]

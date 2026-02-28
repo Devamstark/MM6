@@ -640,3 +640,15 @@ class EmailConversion(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - ${self.conversion_value} from {self.campaign.name}"
+
+# 🔭 Observability: Brute Force Security Alerts
+from django.dispatch import receiver
+try:
+    from axes.signals import user_locked_out
+    @receiver(user_locked_out)
+    def handle_user_locked_out(sender, request, username, ip_address, **kwargs):
+        from .tasks import notify_slack_security_alert
+        message = f"Multiple failed login attempts detected.\n*Target Username:* {username}\n*Attacker IP:* {ip_address}\n*Action:* IP has been locked by Axes defense system."
+        notify_slack_security_alert.delay(message)
+except ImportError:
+    pass

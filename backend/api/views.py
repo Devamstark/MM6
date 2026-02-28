@@ -453,13 +453,14 @@ class OrderViewSet(viewsets.ModelViewSet):
                 response_data = serializer.data
                 response_data['earnings_applied'] = str(earnings_applied)
 
-                # --- Trigger Order Confirmation Email ---
+                # --- Trigger Order Confirmation Email & Slack ---
                 try:
-                    from .tasks import send_order_confirmation_email
+                    from .tasks import send_order_confirmation_email, notify_slack_new_order
                     send_order_confirmation_email.delay(order.id)
+                    notify_slack_new_order.delay(order.id, str(order.total_amount), order.customer_name)
                 except Exception as e:
                     import logging
-                    logging.getLogger(__name__).error(f"Failed to queue order confirmation email: {str(e)}")
+                    logging.getLogger(__name__).error(f"Failed to queue order confirmations: {str(e)}")
 
                 return Response(response_data, status=status.HTTP_201_CREATED)
         except Product.DoesNotExist:

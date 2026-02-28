@@ -518,3 +518,33 @@ def prune_old_logs():
     
     logger.info(f"Pruned {deleted_emails[0]} old email logs and {deleted_clicks[0]} old click logs.")
     return f"Pruning complete. {deleted_emails[0]} emails, {deleted_clicks[0]} clicks deleted."
+
+@shared_task
+def notify_slack_new_order(order_id, amount, customer):
+    """Observability: Ping slack channel when a new order is completed."""
+    import requests
+    from django.conf import settings
+    webhook_url = getattr(settings, 'SLACK_ORDERS_WEBHOOK', None)
+    if webhook_url:
+        payload = {
+            "text": f"🛍️ *New Order Received!*\n*ID:* #{order_id}\n*Customer:* {customer}\n*Value:* ${amount}"
+        }
+        try:
+            requests.post(webhook_url, json=payload, timeout=5)
+        except Exception as e:
+            logger.error(f"Failed to ping Slack orders webhook: {str(e)}")
+
+@shared_task
+def notify_slack_security_alert(message):
+    """Observability: Ping slack security channel directly."""
+    import requests
+    from django.conf import settings
+    webhook_url = getattr(settings, 'SLACK_SECURITY_WEBHOOK', None)
+    if webhook_url:
+        payload = {
+            "text": f"🚨 *Security Alert!* \n{message}"
+        }
+        try:
+            requests.post(webhook_url, json=payload, timeout=5)
+        except Exception as e:
+            logger.error(f"Failed to ping Slack security webhook: {str(e)}")
