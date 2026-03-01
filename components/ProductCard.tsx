@@ -172,7 +172,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, pr
                   ${displayPrice.toFixed(2)}
                 </span>
                 {hasDiscount && (
-                  <span className="text-xs text-gray-400 dark:text-gray-500 line-through">
+                  <span className="text-xs text-gray-500 dark:text-gray-400 line-through">
                     ${product.price.toFixed(2)}
                   </span>
                 )}
@@ -195,7 +195,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, pr
                   />
                 ))}
                 {product.colors.length > 5 && (
-                  <span className="text-[10px] font-medium text-gray-400">
+                  <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">
                     +{product.colors.length - 5}
                   </span>
                 )}

@@ -1,7 +1,10 @@
 User-agent: *
-Disallow: /api/
-Disallow: /ssx/
-Disallow: /media/
 Allow: /
+
+# Disallow indexing of private or utility areas
+Disallow: /api/
+Disallow: /admin/
+Disallow: /seller/
+Disallow: /ssx/
 
 Sitemap: https://smartshop1.us/sitemap.xml

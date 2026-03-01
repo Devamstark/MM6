@@ -282,7 +282,7 @@ export const Home = () => {
                       </h1>
                       {banner.description && (
                         <p
-                          className="text-gray-600 mb-8 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3"
+                          className="text-gray-700 mb-8 max-w-md dark:text-gray-300 line-clamp-2 md:line-clamp-3"
                           style={{ fontSize: `calc(${(banner.content_scale ?? 100) * 0.01} * 1.125rem)` }}
                         >
                           {banner.description}
@@ -292,6 +292,7 @@ export const Home = () => {
                         {banner.cta_text && (
                           <Link
                             to={banner.cta_link || '/products'}
+                            aria-label={banner.cta_text}
                             className="bg-black text-white font-bold uppercase tracking-widest hover:bg-gray-800 transition-all dark:bg-white dark:text-black dark:hover:bg-gray-200 text-center flex items-center justify-center min-w-[180px] px-10"
                             style={{
                               height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
@@ -304,6 +305,7 @@ export const Home = () => {
                         )}
                         <Link
                           to="/register"
+                          aria-label="Register to sell now"
                           className="bg-white border-2 border-black text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-all dark:bg-transparent dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black text-center flex items-center justify-center min-w-[180px] px-10"
                           style={{
                             height: `calc(${(banner.content_scale ?? 100) * 0.01} * 3.5rem)`,
@@ -323,7 +325,7 @@ export const Home = () => {
                           src={banner.image}
                           alt={banner.title}
                           loading={index === 0 ? 'eager' : 'lazy'}
-                          fetchPriority={index === 0 ? 'high' : 'auto'}
+                          fetchPriority={index === 0 ? 'high' : 'low'}
                           className="absolute inset-0 w-full h-full"
                           style={{
                             objectFit: (banner.image_fit as any) || 'cover',
@@ -331,7 +333,7 @@ export const Home = () => {
                           }}
                         />
                       ) : (
-                        <div className="absolute inset-0 bg-gray-100 dark:bg-gray-800 animate-pulse" />
+                        <div className="absolute inset-0 bg-gray-200 dark:bg-gray-800 animate-pulse" />
                       )}
                     </div>
                   </div>
@@ -400,8 +402,9 @@ export const Home = () => {
             </div>
             <div className="w-full md:w-1/2 h-1/2 md:h-full relative overflow-hidden order-first md:order-last">
               <img
-                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=1200&fm=webp&auto=format&fit=crop"
                 alt="Fashion Model"
+                loading="lazy"
                 className="absolute inset-0 w-full h-full object-cover object-top hover:scale-105 transition-transform duration-1000"
               />
             </div>
@@ -433,6 +436,7 @@ export const Home = () => {
                     <img
                       src={image}
                       alt={title}
+                      loading="lazy"
                       className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                     <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-300 group-hover:from-black/90"></div>

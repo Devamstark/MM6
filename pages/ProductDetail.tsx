@@ -678,6 +678,7 @@ export const ProductDetail = () => {
                                                 <button
                                                     key={s}
                                                     onClick={() => setNewReviewRating(s)}
+                                                    aria-label={`${s} Stars`}
                                                     className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all ${s <= newReviewRating ? 'bg-yellow-50 text-yellow-400' : 'bg-gray-50 text-gray-300 dark:bg-gray-800'}`}
                                                 >
                                                     <Star className={`w-4 h-4 ${s <= newReviewRating ? 'fill-current' : ''}`} />
