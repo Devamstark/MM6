@@ -19,11 +19,21 @@ RUN echo 'server { \
     listen 80; \
     root /usr/share/nginx/html; \
     index index.html; \
+    gzip on; \
+    gzip_vary on; \
+    gzip_proxied any; \
+    gzip_comp_level 6; \
+    gzip_types text/plain text/css text/xml application/json application/javascript application/xml+rss application/atom+xml image/svg+xml; \
     # Deny access to hidden files and directories \
     location ~ /\. { deny all; } \
     # Deny access to potentially sensitive files \
     location ~ \.(env|php|bak|sql|zip|tar|gz|config|log)$ { \
     deny all; \
+    } \
+    location ~* \.(?:ico|css|js|gif|jpe?g|png|woff2?|eot|ttf|svg|webp|avif)$ { \
+    expires 6M; \
+    access_log off; \
+    add_header Cache-Control "public"; \
     } \
     # Explicitly serve sitemap and robots.txt \
     location = /robots.txt { \
