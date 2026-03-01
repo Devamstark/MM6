@@ -247,6 +247,10 @@ export const Auth = () => {
           <div className="slide-panel">
             {/* LEFT PANEL */}
             <div className="panel-content panel-content-left bg-linear-to-br from-[#1e1b4b] via-[#312e81] to-[#4338ca]">
+              <div className="mb-10 text-center">
+                <span className="text-3xl font-black text-white tracking-[0.2em] uppercase">SMARTSHOP</span>
+                <div className="h-1 w-12 bg-indigo-500 mx-auto mt-2 rounded-full"></div>
+              </div>
               <h1 className="text-4xl font-black mb-6 text-white tracking-tight">Welcome Back!</h1>
               <p className="px-10 text-indigo-100/90 leading-relaxed text-[15px] font-bold mb-12">
                 Sign in to rediscover a smarter way to shop, where every detail is designed around your preferences.
@@ -258,6 +262,10 @@ export const Auth = () => {
 
             {/* RIGHT PANEL */}
             <div className="panel-content panel-content-right bg-linear-to-br from-[#1e1b4b] via-[#312e81] to-[#4338ca]">
+              <div className="mb-10 text-center">
+                <span className="text-3xl font-black text-white tracking-[0.2em] uppercase">SMARTSHOP</span>
+                <div className="h-1 w-12 bg-indigo-500 mx-auto mt-2 rounded-full"></div>
+              </div>
               <h1 className="text-4xl font-black mb-6 text-white tracking-tight">Hey There!</h1>
               <p className="px-10 text-indigo-100/90 leading-relaxed text-[15px] font-bold mb-12">
                 Join SmartShop today and step into a world where every product is thoughtfully curated to match your lifestyle.

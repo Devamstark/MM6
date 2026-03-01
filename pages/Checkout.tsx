@@ -35,7 +35,13 @@ const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'd
     large: 'text-4xl'
   };
 
-  return <div className={`block ${size === 'default' ? 'mb-8' : ''}`} />;
+  return (
+    <Link to="/" className={`block ${size === 'default' ? 'mb-8' : ''}`}>
+      <span className={`${textSizes[size]} font-black tracking-[0.2em] uppercase ${dark ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        SMARTSHOP
+      </span>
+    </Link>
+  );
 };
 
 // ─── Credit Card Visual ──────────────────────────────────────────────────────
