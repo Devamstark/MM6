@@ -215,10 +215,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex justify-between items-center h-16">
 
             {/* Left: Logo */}
-            <Link to="/" className="shrink-0 group relative h-10 w-40 flex items-center justify-center overflow-hidden">
-              <span className="text-xl font-black uppercase tracking-[0.2em] text-gray-900 dark:text-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                SMARTSHOP
-              </span>
+            <Link to="/" className="shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
+              SmartShop
             </Link>
 
             {/* Center: Navigation Links */}
@@ -931,7 +929,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Cart Drawer */}
       {
         cartOpen && (
-          <div className="fixed inset-0 z-50 overflow-hidden">
+          <div className="fixed inset-0 z-[2000] overflow-hidden">
             <div
               className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
               onClick={() => setCartOpen(false)}
