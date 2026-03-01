@@ -214,12 +214,8 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
 
-            {/* Left: Logo */}
-            <Link to="/" className="shrink-0 group relative h-10 w-40 flex items-center justify-center overflow-hidden">
-              <span className="text-2xl font-black tracking-tighter text-gray-900 dark:text-white" style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
-                Smart<span className="text-indigo-600 dark:text-indigo-400">Shop</span>
-              </span>
-            </Link>
+            {/* Left: Logo placeholder */}
+            <div className="shrink-0 h-10 w-40"></div>
 
             {/* Center: Navigation Links */}
             <div className="hidden lg:flex items-center space-x-8">
