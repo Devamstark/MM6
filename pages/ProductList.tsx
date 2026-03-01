@@ -47,7 +47,16 @@ export const ProductList = () => {
     ? `Shop the latest ${filters.category}'s fashion at SmartShop. Browse clothing, accessories and more with free shipping over $100.`
     : 'Browse all products at SmartShop — premium fashion for men, women and accessories. Filter by category, brand and price.';
 
-  useSEO({ title: seoTitle, description: seoDesc });
+  const baseDomain = 'https://smartshop1.us';
+  const canonicalUrl = filters.category
+    ? `${baseDomain}/products?category=${encodeURIComponent(filters.category)}`
+    : `${baseDomain}/products`;
+
+  useSEO({
+    title: seoTitle,
+    description: seoDesc,
+    canonical: canonicalUrl
+  });
 
   useEffect(() => {
     setProducts([]);

@@ -25,6 +25,17 @@ RUN echo 'server { \
     location ~ \.(env|php|bak|sql|zip|tar|gz|config|log)$ { \
     deny all; \
     } \
+    # Explicitly serve sitemap and robots.txt \
+    location = /robots.txt { \
+    allow all; \
+    log_not_found off; \
+    access_log off; \
+    } \
+    location = /sitemap.xml { \
+    allow all; \
+    log_not_found off; \
+    access_log off; \
+    } \
     location / { \
     try_files $uri $uri/ /index.html; \
     } \

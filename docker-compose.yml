@@ -86,11 +86,12 @@ services:
       - "traefik.http.middlewares.security-headers.headers.stspreload=true"
       - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Content-Security-Policy=upgrade-insecure-requests; block-all-mixed-content;"
       - "traefik.http.middlewares.security-headers.headers.customresponseheaders.Permissions-Policy=camera=(), microphone=(), geolocation=(), browsing-topics=()"
-      - "traefik.http.routers.backend.middlewares=security-headers"
+      - "traefik.http.routers.backend.middlewares=security-headers,noindex-headers"
       - "traefik.http.middlewares.redirect-https.redirectscheme.scheme=https"
       - "traefik.http.routers.backend-http.rule=Host(`api.smartshop1.us`)"
       - "traefik.http.routers.backend-http.entrypoints=web"
       - "traefik.http.routers.backend-http.middlewares=redirect-https"
+      - "traefik.http.middlewares.noindex-headers.headers.customResponseHeaders.X-Robots-Tag=noindex, nofollow"
 
   celery_worker:
     build:
@@ -195,7 +196,7 @@ services:
       - "traefik.http.routers.adminer.entrypoints=websecure"
       - "traefik.http.routers.adminer.tls.certresolver=letsencrypt"
       - "traefik.http.services.adminer.loadbalancer.server.port=8080"
-      - "traefik.http.routers.adminer.middlewares=security-headers"
+      - "traefik.http.routers.adminer.middlewares=security-headers,noindex-headers"
 
   filebrowser:
     image: filebrowser/filebrowser:latest
@@ -209,6 +210,13 @@ services:
     command: [ "-a", "0.0.0.0", "-p", "8080", "-d", "/database/filebrowser.db", "--root", "/srv" ]
     networks:
       - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.filebrowser.rule=Host(`files.smartshop1.us`)"
+      - "traefik.http.routers.filebrowser.entrypoints=websecure"
+      - "traefik.http.routers.filebrowser.tls.certresolver=letsencrypt"
+      - "traefik.http.services.filebrowser.loadbalancer.server.port=8080"
+      - "traefik.http.routers.filebrowser.middlewares=security-headers,noindex-headers"
 
   roundcube:
     image: roundcube/roundcubemail:latest
@@ -223,6 +231,13 @@ services:
       - ROUNDCUBEMAIL_PLUGINS=archive,zipdownload
     networks:
       - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.roundcube.rule=Host(`mail.smartshop1.us`)"
+      - "traefik.http.routers.roundcube.entrypoints=websecure"
+      - "traefik.http.routers.roundcube.tls.certresolver=letsencrypt"
+      - "traefik.http.services.roundcube.loadbalancer.server.port=80"
+      - "traefik.http.routers.roundcube.middlewares=security-headers,noindex-headers"
 
 volumes:
   postgres_data:
