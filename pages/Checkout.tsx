@@ -848,7 +848,14 @@ export const Checkout = () => {
                   {items.map(item => (
                     <div key={item.id} className="flex gap-4 group">
                       <div className="relative">
-                        <img src={item.imageUrl} alt="" className="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100 group-hover:scale-105 transition-transform" />
+                        <img
+                          src={item.imageUrl || 'https://placehold.co/100x100/f3f4f6/9ca3af?text=Img'}
+                          alt={item.name}
+                          className="w-16 h-16 rounded-xl object-cover bg-gray-100 border border-gray-100 group-hover:scale-105 transition-transform"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/f3f4f6/9ca3af?text=Img';
+                          }}
+                        />
                         <div className="absolute -top-1 -right-1 w-5 h-5 bg-gray-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">{item.quantity}</div>
                       </div>
                       <div className="flex-1 min-w-0">

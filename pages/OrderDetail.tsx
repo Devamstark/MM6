@@ -182,7 +182,14 @@ export const OrderDetail = () => {
                                 <div key={idx} className="p-6 flex items-center gap-4 hover:bg-gray-50 transition-colors">
                                     <div className="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0 border border-gray-200">
                                         {item.imageUrl ? (
-                                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                                            <img
+                                                src={item.imageUrl || 'https://placehold.co/100x100/f3f4f6/9ca3af?text=Img'}
+                                                alt={item.name}
+                                                className="w-full h-full object-cover"
+                                                onError={(e) => {
+                                                    (e.target as HTMLImageElement).src = 'https://placehold.co/100x100/f3f4f6/9ca3af?text=Img';
+                                                }}
+                                            />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center text-gray-300">
                                                 <Package className="w-8 h-8" />

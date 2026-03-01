@@ -180,6 +180,7 @@ export const getAbsoluteUrl = (url: string | null | undefined) => {
   if (!url) return '';
   if (typeof url !== 'string') return '';
   if (url.startsWith('http')) return url;
+  if (url.startsWith('data:')) return url;
 
   // Clean base URL (remove trailing slashes and /api)
   let baseUrl = API_URL.split('/api')[0];
