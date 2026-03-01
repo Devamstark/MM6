@@ -91,8 +91,8 @@ CACHES = {
     }
 }
 
-# Cache timeout set to 15 minutes by default
-CACHE_MIDDLEWARE_SECONDS = 900
+# Cache timeout set to 60 seconds to ensure fresher data reflection
+CACHE_MIDDLEWARE_SECONDS = 60
 
 AUTH_USER_MODEL = 'api.User'
 
@@ -264,3 +264,7 @@ SLACK_SECURITY_WEBHOOK = os.environ.get('SLACK_SECURITY_WEBHOOK', '')
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=30)
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+
+# Increased data upload limits for Base64 images in CMS and Products
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB

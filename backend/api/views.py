@@ -1098,6 +1098,21 @@ class HeroBannerViewSet(viewsets.ModelViewSet):
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
 
+    def perform_create(self, serializer):
+        serializer.save()
+        from django.core.cache import cache
+        cache.clear()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        from django.core.cache import cache
+        cache.clear()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        from django.core.cache import cache
+        cache.clear()
+
 
 class HomePageSectionViewSet(viewsets.ModelViewSet):
     queryset = HomePageSection.objects.all().order_by('display_order', '-created_at')
@@ -1114,6 +1129,21 @@ class HomePageSectionViewSet(viewsets.ModelViewSet):
         if self.action in ['list', 'retrieve']:
             return [permissions.AllowAny()]
         return [permissions.IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        serializer.save()
+        from django.core.cache import cache
+        cache.clear()
+
+    def perform_update(self, serializer):
+        serializer.save()
+        from django.core.cache import cache
+        cache.clear()
+
+    def perform_destroy(self, instance):
+        instance.delete()
+        from django.core.cache import cache
+        cache.clear()
 
 
 # ── Blog ────────────────────────────────────────────────────────────────────

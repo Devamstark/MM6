@@ -18,6 +18,7 @@ interface HeroBanner {
     image_fit?: string;
     image_position?: string;
     content_scale?: number;
+    display_order: number;
 }
 
 interface HomeSection {
@@ -40,6 +41,7 @@ export const CMSTab = () => {
     const [isSectionFormOpen, setIsSectionFormOpen] = useState(false);
     const [editingHero, setEditingHero] = useState<HeroBanner | null>(null);
     const [editingSection, setEditingSection] = useState<HomeSection | null>(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
 
     const [heroFormData, setHeroFormData] = useState<Partial<HeroBanner>>({
         title: '',
@@ -179,18 +181,35 @@ export const CMSTab = () => {
         setIsSectionFormOpen(true);
     };
 
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, field: 'hero' | 'section') => {
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, field: 'hero' | 'section') => {
         const file = e.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
+            setUploadingImage(true);
+            try {
+                // Upload to server and get permanent URL
+                const response = await api.uploadBlogImage(file);
+                const imageUrl = response.url;
+
                 if (field === 'hero') {
-                    setHeroFormData({ ...heroFormData, image: reader.result as string });
+                    setHeroFormData({ ...heroFormData, image: imageUrl });
                 } else {
-                    setSectionFormData({ ...sectionFormData, image: reader.result as string });
+                    setSectionFormData({ ...sectionFormData, image: imageUrl });
                 }
-            };
-            reader.readAsDataURL(file);
+            } catch (e) {
+                console.error("Image upload failed", e);
+                // Fallback to Base64 if server upload fails (mostly for local dev without media setup)
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    if (field === 'hero') {
+                        setHeroFormData({ ...heroFormData, image: reader.result as string });
+                    } else {
+                        setSectionFormData({ ...sectionFormData, image: reader.result as string });
+                    }
+                };
+                reader.readAsDataURL(file);
+            } finally {
+                setUploadingImage(false);
+            }
         }
     };
 
@@ -394,19 +413,35 @@ export const CMSTab = () => {
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Banner Image</label>
                                     <div className="flex items-center gap-4">
-                                        <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                            <Upload className="w-4 h-4" />
-                                            <span className="text-sm font-medium">Upload Image</span>
+                                        <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 disabled:opacity-50">
+                                            {uploadingImage ? (
+                                                <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Upload className="w-4 h-4" />
+                                            )}
+                                            <span className="text-sm font-medium">
+                                                {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                                            </span>
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={(e) => handleImageUpload(e, 'hero')}
                                                 className="hidden"
+                                                disabled={uploadingImage}
                                             />
                                         </label>
                                         {heroFormData.image && (
-                                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 shadow-sm relative group">
                                                 <img src={heroFormData.image} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <button
+                                                        onClick={() => setHeroFormData({ ...heroFormData, image: '' })}
+                                                        className="p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                                                        type="button"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -742,19 +777,35 @@ export const CMSTab = () => {
                                 <div className="md:col-span-2">
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Section Image</label>
                                     <div className="flex items-center gap-4">
-                                        <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50">
-                                            <Upload className="w-4 h-4" />
-                                            <span className="text-sm font-medium">Upload Image</span>
+                                        <label className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 disabled:opacity-50">
+                                            {uploadingImage ? (
+                                                <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                                            ) : (
+                                                <Upload className="w-4 h-4" />
+                                            )}
+                                            <span className="text-sm font-medium">
+                                                {uploadingImage ? 'Uploading...' : 'Upload Image'}
+                                            </span>
                                             <input
                                                 type="file"
                                                 accept="image/*"
                                                 onChange={(e) => handleImageUpload(e, 'section')}
                                                 className="hidden"
+                                                disabled={uploadingImage}
                                             />
                                         </label>
                                         {sectionFormData.image && (
-                                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200">
+                                            <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 shadow-sm relative group">
                                                 <img src={sectionFormData.image} alt="Preview" className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                                    <button
+                                                        onClick={() => setSectionFormData({ ...sectionFormData, image: '' })}
+                                                        className="p-1 bg-red-600 text-white rounded-full hover:bg-red-700"
+                                                        type="button"
+                                                    >
+                                                        <X className="w-3 h-3" />
+                                                    </button>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
