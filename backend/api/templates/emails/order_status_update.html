@@ -1,0 +1,56 @@
+{% extends "emails/base.html" %}
+
+{% block content %}
+<h2 style="margin-top: 0; font-weight: 800; color: #1e293b; font-size: 24px;">Order Update</h2>
+<p>Hi <span class="highlight">{{ order.customer_name }}</span>,</p>
+<p>The status of your order <strong>#{{ order.tracking_number }}</strong> has been updated to:</p>
+
+<div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
+    <h3
+        style="margin: 0; font-size: 24px; color: {% if status == 'cancelled' %}#ef4444{% elif status == 'delivered' %}#22c55e{% elif status == 'shipped' %}#3b82f6{% else %}#4f46e5{% endif %}; text-transform: uppercase; letter-spacing: 0.05em;">
+        {{ status }}
+    </h3>
+</div>
+
+{% if status == 'shipped' %}
+<p>Your items are on the way! You can track your order or view details below.</p>
+{% elif status == 'delivered' %}
+<p>Your order has arrived. We hope you love your newly purchased items! Don't hesitate to leave a review.</p>
+{% elif status == 'cancelled' %}
+<p>Your order has been cancelled. If any charges were made, a refund will be processed shortly.</p>
+{% endif %}
+
+<div class="order-summary">
+    <h3 style="margin-top: 0; font-size: 18px; margin-bottom: 12px; font-weight: 700;">Order Details</h3>
+    <p style="margin-bottom: 4px; font-size: 14px;">Order ID: <strong>#{{ order.tracking_number }}</strong></p>
+    <p style="margin: 0; font-size: 14px;">Placed on: {{ order.created_at|date:"F j, Y" }}</p>
+
+    <div class="divider"></div>
+
+    <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+        <thead>
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <th style="text-align: left; padding: 10px 0; font-weight: 700;">Item</th>
+                <th style="text-align: center; padding: 10px 0; font-weight: 700;">Qty</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr style="border-bottom: 1px solid #f1f5f9;">
+                <td style="padding: 12px 0;">
+                    <div style="font-weight: 600;">{{ item.product.name }}</div>
+                </td>
+                <td style="text-align: center; padding: 12px 0;">{{ item.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<center>
+    <a href="https://smartshop1.us/profile" class="button">View Complete Order</a>
+</center>
+
+<p style="margin-top: 30px; font-size: 14px; color: #64748b;">If you have any questions, please reply to this email or
+    visit our <a href="https://smartshop1.us/faq" style="color: #4f46e5;">Help Center</a>.</p>
+{% endblock %}

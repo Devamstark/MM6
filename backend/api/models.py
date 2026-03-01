@@ -126,9 +126,14 @@ class Product(models.Model):
     flash_sale_start = models.DateTimeField(null=True, blank=True)
     flash_sale_end = models.DateTimeField(null=True, blank=True)
     
+    # Phase 3B: Subscription & Auto-Replenishment
+    is_subscribable = models.BooleanField(default=False)
+    subscription_discount_percent = models.IntegerField(default=10)
+
     display_order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
 
     class Meta:
         ordering = ['display_order', '-created_at']
@@ -157,6 +162,47 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class ProductVariant(models.Model):
+    """Normalize product variants (size, color, stock) for enterprise scaling"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_variants')
+    size = models.CharField(max_length=50, blank=True, null=True)
+    color = models.CharField(max_length=50, blank=True, null=True)
+    stock_quantity = models.IntegerField(default=0, validators=[MinValueValidator(0)])
+    price_override = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    sku = models.CharField(max_length=100, unique=True, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('product', 'size', 'color')
+        verbose_name = "Product Variant"
+        verbose_name_plural = "Product Variants"
+
+    def __str__(self):
+        parts = [self.product.name]
+        if self.size: parts.append(self.size)
+        if self.color: parts.append(self.color)
+        return " - ".join(parts)
+
+class ProductImage(models.Model):
+    """Normalize product images for variant-specific display"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_images')
+    image = models.ImageField(upload_to='products/additional/')
+    color = models.CharField(max_length=50, blank=True, null=True) # For color-specific switching
+    display_order = models.IntegerField(default=0)
+    alt_text = models.CharField(max_length=255, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['display_order', 'created_at']
+        verbose_name = "Product Image"
+        verbose_name_plural = "Product Images"
+
+    def __str__(self):
+        return f"Image for {self.product.name} ({self.color or 'Generic'})"
 
 class Wishlist(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='wishlist')
@@ -191,8 +237,31 @@ class Order(models.Model):
             models.Index(fields=['user', 'created_at']),
         ]
 
+    @property
+    def tracking_number(self):
+        return f"ORD-{str(self.id).split('-')[0].upper()}"
+
+    @property
+    def subtotal(self):
+        return self.total_amount + self.earnings_applied
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        old_status = None
+        if not is_new:
+            try:
+                old_status = Order.objects.get(pk=self.pk).status
+            except Order.DoesNotExist:
+                pass
+                
+        super().save(*args, **kwargs)
+        
+        if not is_new and old_status and old_status != self.status:
+            from .tasks import send_order_status_email
+            send_order_status_email.delay(self.pk, self.status)
+
     def __str__(self):
-        return f"Order {self.id} by {self.user.username}"
+        return f"Order {self.tracking_number} by {self.user.username}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
@@ -640,6 +709,65 @@ class EmailConversion(models.Model):
 
     def __str__(self):
         return f"{self.user.email} - ${self.conversion_value} from {self.campaign.name}"
+
+class Cart(models.Model):
+    """Backend cart storage for multi-device sync (Phase 1B)"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='cart', null=True, blank=True)
+    session_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    abandoned_email_sent = models.BooleanField(default=False)
+    abandoned_discount_sent = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+    def __str__(self):
+        return f"Cart for {self.user.username if self.user else 'Guest ' + self.session_id[:8]}"
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True)
+    quantity = models.PositiveIntegerField(default=1)
+
+    def __str__(self):
+        return f"{self.quantity} x {self.product.name}"
+
+class StockReservation(models.Model):
+    """Temporary inventory locking to prevent overselling (Phase 1B)"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reservations')
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True, related_name='reservations')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField()
+    expires_at = models.DateTimeField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Reservation of {self.quantity} for {self.user.username}"
+
+    @property
+    def is_expired(self):
+        return timezone.now() > self.expires_at
+
+class Subscription(models.Model):
+    """Phase 3B: Subscription & Auto-Replenishment"""
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='subscriptions')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    variant = models.ForeignKey(ProductVariant, on_delete=models.SET_NULL, null=True, blank=True)
+    stripe_subscription_id = models.CharField(max_length=255, null=True, blank=True, db_index=True)
+    quantity = models.PositiveIntegerField(default=1)
+    
+    interval_days = models.PositiveIntegerField(default=30)
+    next_billing_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Subscription for {self.user.username} - {self.product.name}"
 
 # 🔭 Observability: Brute Force Security Alerts
 from django.dispatch import receiver

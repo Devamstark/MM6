@@ -91,6 +91,18 @@ This document outlines the planned enhancements and future feature sets for the 
 *   **Voice-Guided Navigation**: 
     *   *Implementation*: A "Hands-Free" mode for the entire website, allowing users to navigate and checkout using only their voice.
 
+## 🏗️ 11. Technical Resilience & Error Management (Stability)
+*   **Global Error Boundaries (React)**: 
+    *   *Implementation*: Wrap core UI segments in Error Boundaries to prevent the entire app from crashing if a single component fails.
+*   **Centralized Error Logging (Sentry/PostHog)**: 
+    *   *Implementation*: Integrate a production monitoring tool to track frontend and backend errors in real-time before users report them.
+*   **API Resilience (Retry Logic & Circuit Breakers)**: 
+    *   *Implementation*: Enhance the Axios interceptor to automatically retry idempotent GET requests on network failure and handle timeouts gracefully.
+*   **Robust User Feedback System (Toasts & Modals)**: 
+    *   *Implementation*: Replace generic `window.alert()` calls with a non-intrusive Toast notification system (e.g., `framer-motion` based notifications) for a more premium Feel.
+*   **Offline Status Detection**: 
+    *   *Implementation*: Add a "Connection Lost" floating indicator to help users understand why their requests might be failing.
+
 ---
 
 **Last Updated**: February 2026  

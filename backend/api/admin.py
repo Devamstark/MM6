@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    User, Product, Order, OrderItem, Payment, BlogPost,
+    User, Product, ProductVariant, ProductImage, Order, OrderItem, Payment, BlogPost,
     NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog,
     CampaignRecipient, EmailClickLog, EmailConversion
 )
@@ -18,11 +18,20 @@ class CustomUserAdmin(UserAdmin):
         ('Custom Fields', {'fields': ('role',)}),
     )
 
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1
+
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('name', 'price', 'stock_quantity', 'category', 'seller')
     search_fields = ('name', 'description')
     list_filter = ('category', 'created_at')
+    inlines = [ProductVariantInline, ProductImageInline]
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem

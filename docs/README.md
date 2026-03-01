@@ -21,46 +21,46 @@ Welcome to the SmartShop documentation. This folder contains all project documen
 
 ### 🚀 Deployment & Infrastructure
 
-#### **[WORK_DONE.md](./WORK_DONE.md)** ⭐ NEW
+#### **[WORK_DONE.md](./progress/WORK_DONE.md)** ⭐ NEW
 Complete summary of everything deployed — services, URLs, architecture, what was built and why.
 
-#### **[setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md)**
+#### **[deployment/VPS_DEPLOYMENT_GUIDE.md](./deployment/VPS_DEPLOYMENT_GUIDE.md)**
 Full guide to the Docker + Dokploy deployment setup. Covers environment variables, redeployment, logging, and backup.
 
-#### **[setup/SSL_SECURITY_SETUP.md](./setup/SSL_SECURITY_SETUP.md)**
+#### **[deployment/SSL_SECURITY_SETUP.md](./deployment/SSL_SECURITY_SETUP.md)**
 How SSL/HTTPS is managed via Traefik + Let's Encrypt. Covers CORS, CSRF, and Django proxy configuration.
 
-#### **[setup/DEPLOYMENT_GUIDE.md](./setup/DEPLOYMENT_GUIDE.md)**
-Original deployment reference (legacy — see setup/VPS_DEPLOYMENT_GUIDE.md for current setup).
+#### **[deployment/DEPLOYMENT_GUIDE.md](./deployment/DEPLOYMENT_GUIDE.md)**
+Original deployment reference (legacy — see deployment/VPS_DEPLOYMENT_GUIDE.md for current setup).
 
 ---
 
 ### 📋 Project Specification
 
-#### **[MVP_SUMMARY.md](./MVP_SUMMARY.md)**
+#### **[specifications/MVP_SUMMARY.md](./specifications/MVP_SUMMARY.md)**
 Complete project overview — tech stack, all features, statistics, demo flow guide, and academic highlights.
 
-#### **[FULL_MVP_SPECIFICATION.md](./FULL_MVP_SPECIFICATION.md)**
+#### **[specifications/FULL_MVP_SPECIFICATION.md](./specifications/FULL_MVP_SPECIFICATION.md)**
 Detailed technical specification — all features, API endpoints, database schema, and design system.
 
-#### **[COMPLETE_FEATURE_LIST.md](./COMPLETE_FEATURE_LIST.md)**
+#### **[specifications/COMPLETE_FEATURE_LIST.md](./specifications/COMPLETE_FEATURE_LIST.md)**
 All 42 features with user stories, functionality descriptions, and implementation details organized by role.
 
-#### **[MVP_IMPLEMENTATION_CHECKLIST.md](./MVP_IMPLEMENTATION_CHECKLIST.md)**
+#### **[progress/MVP_IMPLEMENTATION_CHECKLIST.md](./progress/MVP_IMPLEMENTATION_CHECKLIST.md)**
 Feature completion tracker — 98% complete. Includes testing checklist and launch criteria.
 
 ---
 
 ### 🏗️ Architecture
 
-#### **[SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md)**
+#### **[architecture/SYSTEM_ARCHITECTURE.md](./architecture/SYSTEM_ARCHITECTURE.md)**
 Technical architecture diagrams — request flow, database ERD, security architecture, component hierarchy, and **network architecture** (updated for VPS/Docker/Dokploy).
 
 ---
 
 ### ⚡ Getting Started
 
-#### **[setup/QUICK_START_GUIDE.md](./setup/QUICK_START_GUIDE.md)**
+#### **[deployment/QUICK_START_GUIDE.md](./deployment/QUICK_START_GUIDE.md)**
 Local development setup in 5 minutes — backend + frontend, testing guide, and troubleshooting.
 
 ---
@@ -69,14 +69,14 @@ Local development setup in 5 minutes — backend + frontend, testing guide, and 
 
 | I want to... | Go to |
 |:---|:---|
-| See what's deployed and where | [WORK_DONE.md](./WORK_DONE.md) |
-| Understand the deployment setup | [setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md) |
-| Run the app locally | [setup/QUICK_START_GUIDE.md](./setup/QUICK_START_GUIDE.md) |
-| Understand SSL/security | [setup/SSL_SECURITY_SETUP.md](./setup/SSL_SECURITY_SETUP.md) |
-| See all features | [COMPLETE_FEATURE_LIST.md](./COMPLETE_FEATURE_LIST.md) |
-| Understand the architecture | [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) |
-| See the tech stack | [MVP_SUMMARY.md](./MVP_SUMMARY.md) |
-| Check API endpoints | [FULL_MVP_SPECIFICATION.md](./FULL_MVP_SPECIFICATION.md) |
+| See what's deployed and where | [WORK_DONE.md](./progress/WORK_DONE.md) |
+| Understand the deployment setup | [VPS_DEPLOYMENT_GUIDE.md](./deployment/VPS_DEPLOYMENT_GUIDE.md) |
+| Run the app locally | [QUICK_START_GUIDE.md](./deployment/QUICK_START_GUIDE.md) |
+| Understand SSL/security | [SSL_SECURITY_SETUP.md](./deployment/SSL_SECURITY_SETUP.md) |
+| See all features | [COMPLETE_FEATURE_LIST.md](./specifications/COMPLETE_FEATURE_LIST.md) |
+| Understand the architecture | [SYSTEM_ARCHITECTURE.md](./architecture/SYSTEM_ARCHITECTURE.md) |
+| See the tech stack | [MVP_SUMMARY.md](./specifications/MVP_SUMMARY.md) |
+| Check API endpoints | [FULL_MVP_SPECIFICATION.md](./specifications/FULL_MVP_SPECIFICATION.md) |
 
 ---
 

@@ -214,6 +214,8 @@ export interface PaginatedResponse<T> {
 
 export interface Order {
     id: string;
+    trackingNumber?: string;
+    subtotal?: number;
     userId: string;
     customerName: string;
     email?: string; // Contact email
@@ -249,6 +251,11 @@ export interface SellerStats {
     conversionRate: number;
     conversionGrowth: number;
     monthlySales: number[];
+    // Phase 2A: Granular Analytics
+    salesByRegion: { region: string; sales: number }[];
+    cartAbandonmentRate: number;
+    topSearchTerms: string[];
+    inventoryHealth: { status: string; count: number }[];
 }
 
 export interface ContactMessage {

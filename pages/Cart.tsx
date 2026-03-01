@@ -1,18 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     Trash2, Plus, Minus, ArrowRight, ShoppingBag,
     ArrowLeft, ShieldCheck, Truck, CreditCard,
-    Star, Heart, Share2, Tag
+    Star, Heart, Share2, Tag, X
 } from 'lucide-react';
 
 export const Cart = () => {
     const { items, cartTotal, removeFromCart, updateQuantity, itemCount } = useCart();
     const { isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
+    // Coupon state
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
+    const [couponError, setCouponError] = useState('');
+    const [couponLoading, setCouponLoading] = useState(false);
+
+    const handleApplyCoupon = async () => {
+        if (!couponCode.trim()) return;
+
+        setCouponLoading(true);
+        setCouponError('');
+
+        try {
+            const result = await api.validateCoupon(couponCode.trim(), cartTotal);
+
+            if (result.valid) {
+                setAppliedCoupon({ code: couponCode.trim().toUpperCase(), discount: result.discount });
+                setCouponCode('');
+            } else {
+                setCouponError(result.message || 'Invalid coupon code');
+            }
+        } catch (error) {
+            setCouponError('Failed to apply coupon. Please try again.');
+        } finally {
+            setCouponLoading(false);
+        }
+    };
+
+    const handleRemoveCoupon = () => {
+        setAppliedCoupon(null);
+        setCouponError('');
+    };
+
+    const finalTotal = Math.max(0, cartTotal - (appliedCoupon?.discount || 0));
 
     if (items.length === 0) {
         return (
@@ -206,26 +241,58 @@ export const Cart = () => {
                                         </div>
                                         <input
                                             type="text"
-                                            placeholder="ENTER CODE"
-                                            className="grow bg-gray-50 dark:bg-gray-800 border-none rounded-2xl py-4 pl-12 pr-4 text-xs font-bold focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 tracking-widest transition-all dark:text-white"
+                                            value={couponCode}
+                                            onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                            placeholder={appliedCoupon ? appliedCoupon.code : "ENTER CODE"}
+                                            disabled={!!appliedCoupon || couponLoading}
+                                            className="grow bg-gray-50 dark:bg-gray-800 border-none rounded-2xl py-4 pl-12 pr-4 text-xs font-bold focus:ring-2 focus:ring-indigo-100 dark:focus:ring-indigo-900 tracking-widest transition-all dark:text-white disabled:opacity-50"
                                         />
-                                        <button className="bg-gray-900 dark:bg-white dark:text-black text-white px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg shadow-gray-200 dark:shadow-none">
-                                            Apply
-                                        </button>
+                                        {appliedCoupon ? (
+                                            <button
+                                                onClick={handleRemoveCoupon}
+                                                className="bg-red-500 text-white px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 transition-all active:scale-95 shadow-lg shadow-red-200 dark:shadow-none"
+                                            >
+                                                Remove
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handleApplyCoupon}
+                                                disabled={!couponCode.trim() || couponLoading}
+                                                className="bg-gray-900 dark:bg-white dark:text-black text-white px-6 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-black transition-all active:scale-95 shadow-lg shadow-gray-200 dark:shadow-none disabled:opacity-30"
+                                            >
+                                                {couponLoading ? '...' : 'Apply'}
+                                            </button>
+                                        )}
                                     </div>
+                                    {couponError && (
+                                        <p className="text-[10px] text-red-500 font-bold mt-2 ml-1 flex items-center gap-1">
+                                            <X className="w-3 h-3" /> {couponError}
+                                        </p>
+                                    )}
+                                    {appliedCoupon && (
+                                        <p className="text-[10px] text-green-600 font-bold mt-2 ml-1 flex items-center gap-1">
+                                            <ShieldCheck className="w-3 h-3" /> Coupon "{appliedCoupon.code}" applied!
+                                        </p>
+                                    )}
                                 </div>
 
                                 <div className="pt-8 mt-8 border-t border-gray-900/5 dark:border-gray-800">
+                                    {appliedCoupon && (
+                                        <div className="flex justify-between items-center mb-4 text-green-600 font-bold">
+                                            <span className="text-sm">Discount</span>
+                                            <span className="text-lg">-${appliedCoupon.discount.toFixed(2)}</span>
+                                        </div>
+                                    )}
                                     <div className="flex justify-between items-end mb-8">
                                         <div>
                                             <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Total Valuation</p>
                                             <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">Including all levies</p>
                                         </div>
-                                        <p className="text-4xl font-black text-gray-900 dark:text-white">${cartTotal.toFixed(2)}</p>
+                                        <p className="text-4xl font-black text-gray-900 dark:text-white">${finalTotal.toFixed(2)}</p>
                                     </div>
 
                                     <button
-                                        onClick={() => navigate('/checkout')}
+                                        onClick={() => navigate('/checkout', { state: { appliedCoupon } })}
                                         className="w-full bg-gray-900 dark:bg-indigo-600 text-white rounded-3xl py-6 text-base font-black uppercase tracking-[0.2em] shadow-2xl hover:bg-indigo-600 dark:hover:bg-indigo-700 transition-all active:scale-[0.98] flex items-center justify-center gap-3 group relative overflow-hidden"
                                     >
                                         <div className="absolute inset-x-0 bottom-0 h-1 bg-white/20 scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></div>
@@ -236,7 +303,7 @@ export const Cart = () => {
                                     <div className="mt-8 bg-indigo-50/50 dark:bg-indigo-900/10 p-4 rounded-2xl flex items-start gap-3 border border-indigo-100/50 dark:border-indigo-800/30 transition-colors">
                                         <Star className="w-4 h-4 text-indigo-600 dark:text-indigo-400 mt-0.5 shrink-0" />
                                         <p className="text-[10px] text-indigo-800 dark:text-indigo-300 font-medium leading-relaxed">
-                                            Checkout today and earn <span className="font-bold">{(cartTotal * 0.1).toFixed(0)} SmartPoints</span> to use on your next purchase.
+                                            Checkout today and earn <span className="font-bold">{(finalTotal * 0.1).toFixed(0)} SmartPoints</span> to use on your next purchase.
                                             <Link to="/points" className="underline ml-1">Learn More</Link>
                                         </p>
                                     </div>

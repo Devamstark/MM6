@@ -20,8 +20,8 @@ SmartShop is deployed on a **HostAsia VPS** using:
 |:---|:---|
 | **[VPS_DEPLOYMENT_GUIDE.md](./VPS_DEPLOYMENT_GUIDE.md)** | Full deployment instructions for Docker + Dokploy |
 | **[SSL_SECURITY_SETUP.md](./SSL_SECURITY_SETUP.md)** | How Traefik + Let's Encrypt handles SSL |
-| **[NETWORK_ARCHITECTURE.md](./NETWORK_ARCHITECTURE.md)** | Full network diagram and Docker network layout |
-| **[WORK_DONE.md](./WORK_DONE.md)** | Summary of all deployed services and their URLs |
+| **[NETWORK_ARCHITECTURE.md](../architecture/NETWORK_ARCHITECTURE.md)** | Full network diagram and Docker network layout |
+| **[WORK_DONE.md](../progress/WORK_DONE.md)** | Summary of all deployed services and their URLs |
 
 ---
 

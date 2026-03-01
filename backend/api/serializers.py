@@ -1,10 +1,10 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from .models import (
-    Product, Order, OrderItem, Payment, PageContent, Affiliate, Review,
+    Product, ProductVariant, ProductImage, Order, OrderItem, Payment, PageContent, Affiliate, Review,
     Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection,
     BlogPost, NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog, CampaignRecipient,
-    EmailClickLog, EmailConversion
+    EmailClickLog, EmailConversion, Cart, CartItem, StockReservation
 )
 
 User = get_user_model()
@@ -36,11 +36,31 @@ class AffiliateSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('user', 'earnings', 'clicks', 'created_at')
 
-class ProductSerializer(serializers.ModelSerializer):
-    # 'image' is for uploads (write-only) and not sent back in responses.
-    image = serializers.ImageField(write_only=True, required=False, allow_null=True)
-    # 'image_url' is for responses (read-only).
+class ProductVariantSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductVariant
+        fields = ['id', 'size', 'color', 'stock_quantity', 'price_override', 'sku']
+
+class ProductImageSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProductImage
+        fields = ['id', 'image', 'image_url', 'color', 'display_order', 'alt_text']
+
+    def get_image_url(self, instance):
+        if instance.image and hasattr(instance.image, 'url'):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(instance.image.url)
+            return instance.image.url
+        return None
+
+class ProductSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField(write_only=True, required=False, allow_null=True)
+    image_url = serializers.SerializerMethodField()
+    variants_data = ProductVariantSerializer(source='product_variants', many=True, read_only=True)
+    product_images = ProductImageSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
@@ -50,7 +70,8 @@ class ProductSerializer(serializers.ModelSerializer):
             'is_featured', 'is_popular', 'image_fit', 'variants', 'seller', 'created_at',
             'discount_percentage', 'sale_price',
             'cogs', 'marketing_cost', 'shipping_cost',
-            'flash_sale_start', 'flash_sale_end'
+            'flash_sale_start', 'flash_sale_end',
+            'variants_data', 'product_images'
         ]
         read_only_fields = ('seller', 'created_at', 'sale_price', 'additional_images')
 
@@ -81,8 +102,8 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = ('id', 'user', 'customer_name', 'total_amount', 'status', 'created_at', 'items', 'coupon_code', 'shipping_address', 'earnings_applied')
-        read_only_fields = ('user', 'created_at')
+        fields = ('id', 'tracking_number', 'subtotal', 'user', 'customer_name', 'total_amount', 'status', 'created_at', 'items', 'coupon_code', 'shipping_address', 'earnings_applied')
+        read_only_fields = ('user', 'created_at', 'tracking_number', 'subtotal')
 
 class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
@@ -270,3 +291,47 @@ class CampaignConversionAnalyticsSerializer(serializers.Serializer):
 
     # Recent conversions
     recent_conversions = EmailConversionSerializer(many=True)
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product_name = serializers.ReadOnlyField(source='product.name')
+    product_price = serializers.ReadOnlyField(source='product.price')
+    product_image = serializers.SerializerMethodField()
+    variant_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'product_name', 'product_price', 'product_image', 'variant', 'variant_name', 'quantity']
+
+    def get_product_image(self, instance):
+        if instance.product.image and hasattr(instance.product.image, 'url'):
+            request = self.context.get('request')
+            if request:
+                return request.build_absolute_uri(instance.product.image.url)
+            return instance.product.image.url
+        return None
+
+    def get_variant_name(self, instance):
+        if instance.variant:
+            return str(instance.variant)
+        return None
+
+class CartSerializer(serializers.ModelSerializer):
+    items = CartItemSerializer(many=True, read_only=True)
+    total_items = serializers.SerializerMethodField()
+    total_amount = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'user', 'session_id', 'items', 'total_items', 'total_amount', 'updated_at']
+
+    def get_total_items(self, instance):
+        return sum(item.quantity for item in instance.items.all())
+
+    def get_total_amount(self, instance):
+         return sum(item.quantity * item.product.price for item in instance.items.all())
+
+class StockReservationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = StockReservation
+        fields = ['id', 'product', 'variant', 'quantity', 'expires_at', 'created_at']
+        read_only_fields = ('id', 'created_at')

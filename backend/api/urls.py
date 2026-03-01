@@ -10,7 +10,7 @@ from .views import (
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
-    MarketingCampaignViewSet, BlogImageView, HealthCheckView
+    MarketingCampaignViewSet, BlogImageView, HealthCheckView, CartViewSet, StockReservationViewSet
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
 
@@ -37,6 +37,8 @@ router.register(r'home-sections', HomePageSectionViewSet, basename='home-section
 router.register(r'blog', BlogPostViewSet, basename='blog')
 router.register(r'newsletter', NewsletterSubscriberViewSet, basename='newsletter')
 router.register(r'marketing-campaigns', MarketingCampaignViewSet, basename='marketing-campaigns')
+router.register(r'carts', CartViewSet, basename='carts')
+router.register(r'reservations', StockReservationViewSet, basename='reservations')
 
 urlpatterns = [
     path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),

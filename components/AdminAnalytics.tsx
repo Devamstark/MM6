@@ -195,7 +195,7 @@ export const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ orders, products
                                         const profit = calculateOrderProfit(order);
                                         return (
                                             <tr key={order.id} className="hover:bg-gray-50 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-indigo-600">#{order.id}</td>
+                                                <td className="px-6 py-4 font-bold text-indigo-600">#{order.trackingNumber || order.id.slice(0, 8)}</td>
                                                 <td className="px-6 py-4 font-bold text-gray-900">{order.customerName}</td>
                                                 <td className="px-6 py-4 text-right font-medium text-gray-900">${order.totalPrice.toFixed(2)}</td>
                                                 <td className={`px-6 py-4 text-right font-bold ${profit >= 0 ? 'text-green-600' : 'text-red-500'}`}>
@@ -370,8 +370,8 @@ export const AdminAnalytics: React.FC<AdminAnalyticsProps> = ({ orders, products
                         key={tool.id}
                         onClick={() => setActiveTool(tool.id)}
                         className={`w-full flex items-center gap-3 p-4 rounded-xl transition-all duration-300 ${activeTool === tool.id
-                                ? 'bg-black text-white shadow-lg shadow-gray-200 scale-105'
-                                : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                            ? 'bg-black text-white shadow-lg shadow-gray-200 scale-105'
+                            : 'bg-white text-gray-500 hover:bg-gray-50 hover:text-gray-900'
                             }`}
                     >
                         <tool.icon className={`w-5 h-5 ${activeTool === tool.id ? 'text-white' : 'text-gray-400'}`} />

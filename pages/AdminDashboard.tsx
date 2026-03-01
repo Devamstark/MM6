@@ -374,7 +374,7 @@ export const AdminDashboard = () => {
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                     {orders.slice(0, 5).map(order => (
                       <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                        <td className="px-6 py-4 font-bold text-indigo-600">#{order.id}</td>
+                        <td className="px-6 py-4 font-bold text-indigo-600">#{order.trackingNumber || order.id.slice(0, 8)}</td>
                         <td className="px-6 py-4 text-sm font-bold text-gray-900 dark:text-gray-200">
                           {order.items?.length || 0} items
                         </td>
@@ -861,7 +861,7 @@ export const AdminDashboard = () => {
                   <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-50 dark:divide-gray-800">
                     {filteredOrders.map(order => (
                       <tr key={order.id} className="hover:bg-gray-50/80 dark:hover:bg-gray-800 transition-colors group">
-                        <td className="px-8 py-6 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">#{order.id}</td>
+                        <td className="px-8 py-6 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">#{order.trackingNumber || order.id.slice(0, 8)}</td>
                         <td className="px-8 py-6 whitespace-nowrap">
                           <div className="text-sm font-medium text-gray-900 dark:text-gray-200">{order.customerName}</div>
                           <div className="text-xs text-gray-500 dark:text-gray-400">{order.email}</div>

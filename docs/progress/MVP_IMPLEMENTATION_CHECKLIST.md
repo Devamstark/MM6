@@ -151,7 +151,20 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Analytics dashboard (delivery rate, open rate, click rate)
 - [x] Delivery logs viewer with status summary
 - [x] GDPR-compliant unsubscribe footer
-- [x] Admin/Seller exclusion from recipient lists
+### ✅ Features - Enterprise Operations & Scale (100% Complete)
+- [x] Product Variant SQL Normalization (`ProductVariant`, `ProductImage` models)
+- [x] Database-backed Persistent Shopping Carts
+- [x] 10-Minute Checkout Inventory Reservations
+- [x] Atomic Database Locks for Stock Decrements
+- [x] Global API Circuit Breakers
+- [x] Axios Auto-Retries (Backoff) for 5xx/429 errors
+- [x] Granular Seller Analytics (Heatmaps, Cart Abandonment % Stats)
+- [x] Celery Background CSV Catalog Uploads
+- [x] Celery Abandoned Cart 4h Reminders
+- [x] Celery Abandoned Cart 48h 'COMEBACK10' Discount Codes
+- [x] Stripe Consumer Subscriptions logic (30-day loop)
+- [x] Backend Shipping Rate Stub calculation in checkout
+- [x] Automate Tax enablement setting for Stripe Intents
 
 ---
 
@@ -199,6 +212,14 @@ This checklist tracks the implementation status of all MVP features for the Smar
 ---
 
 ## 🧪 Testing & Quality Assurance
+
+### ✅ Automated E2E Testing (100% Complete)
+- [x] Playwright End-to-End framework integrated
+- [x] Complete checkout flow tests
+- [x] GDPR and data compliance tests
+- [x] Seller dashboard tests
+- [x] Admin analytics tests
+- [x] Docker-build optimization (Playwright exclusions)
 
 ### ✅ Manual Testing (100% Complete)
 - [x] Authentication flow
@@ -362,7 +383,10 @@ All of the following must be ✅ before launch:
 ### Known Issues
 - Financial fields (`cogs`, `marketing_cost`, `shipping_cost`) are present in the database but currently defaulted to 0 in the UI for simplicity. Admin can edit these if features are enabled later.
 
-### Recent Updates (v1.7.0)
+### Recent Updates (v3.0.0)
+- **Enterprise Scale**: Background CSV uploads, Celery abandoned cart recovery, automated subscriptions, API circuit breaking, variant architecture normalization, and 10-minute cart inventory holding.
+
+### Previous Updates (v1.7.0 → v2.0.0)
 - **Enterprise Marketing System**: Campaign management, audience targeting, batch sending, delivery logging, analytics dashboard, pause/resume/duplicate.
 
 ### Previous Updates (v1.3.0 → v1.6.0)
@@ -370,13 +394,8 @@ All of the following must be ✅ before launch:
 - **GDPR Compliance**: Data export and account erasure.
 - **Celery & Emails**: Branded transactional email templates with async backgrounds tasks.
 
-### Previous Updates (v1.1.0 → v1.2.0)
-- **State Management**: Migrated from Context API to **Jotai** for atomic state updates (Cart, User, UI).
-- **Frontend Stack**: Upgraded to React 19, Vite 6, and Tailwind CSS 4.
-- **Deployment**: Docker + Dokploy on VPS with Traefik + SSL.
-
 ### Future Improvements
-- See FULL_MVP_SPECIFICATION.md "Future Enhancements" section
+- Ongoing expansion of ShipStation & EasyPost webhooks for exact-to-the-pound rate extraction
 
 ### Performance Benchmarks
 - Homepage load: ~0.8s (Improved with Vite/Jotai)
@@ -385,6 +404,7 @@ All of the following must be ✅ before launch:
 
 ---
 
-**Last Updated**: February 26, 2026  
-**Status**: ✅ Live in Production (v1.9.0 — Financial Integrity & Stripe)
+**Last Updated**: February 28, 2026  
+**Status**: ✅ Live in Production (v3.0.0 — Enterprise Complete)
 **URL**: https://smartshop1.us
+

@@ -9,3 +9,10 @@ Dockerfile.*
 backend/db.sqlite3
 backend/staticfiles
 backend/media
+
+# Playwright exclusions to save VPS storage and image context
+tests/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

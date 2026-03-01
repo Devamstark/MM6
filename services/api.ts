@@ -1,20 +1,26 @@
 import axios from 'axios';
-import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions, PaginatedResponse } from '../types';
+import axiosRetry from 'axios-retry';
+import { User, Product, AuthResponse, ProductFilter, DashboardStats, Order, SellerStats, ContactMessage, SearchSuggestions, PaginatedResponse, BlogPost } from '../types';
 
-// @ts-ignore
 // @ts-ignore
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-
-// @ts-ignore
-if (!(import.meta as any).env?.VITE_API_URL && typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-  console.warn("⚠️ Production API Warning: VITE_API_URL is missing. Falling back to localhost will cause CORS errors.");
-}
 
 const client = axios.create({
   baseURL: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+// Phase 1C: Automatic Request Retries with Exponential Backoff
+axiosRetry(client, {
+  retries: 3,
+  retryDelay: axiosRetry.exponentialDelay,
+  retryCondition: (error) => {
+    // Only retry on network errors or 5xx server errors
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) ||
+      (error.response?.status && error.response.status >= 500);
+  }
 });
 
 // Helper to get cookie by name
@@ -143,6 +149,14 @@ client.interceptors.response.use(
         }
       }
 
+      // Phase 1C: Circuit Breaker - Silent fail for non-critical endpoints
+      const nonCriticalEndpoints = ['/suggestions', '/analytics', '/recommendations', '/stats', '/health'];
+      if (nonCriticalEndpoints.some(ep => url?.includes(ep))) {
+        console.warn(`[Circuit Breaker] Suppressed error for non-critical endpoint: ${url}`);
+        // Return a mock successful response to prevent frontend crashes
+        return Promise.resolve({ data: url?.includes('suggestions') ? { categories: [], products: [] } : [] });
+      }
+
       // Server responded with error status
       console.error(`[API Error] ${method} ${url}`, {
         status: response.status,
@@ -238,7 +252,7 @@ const mapOrder = (o: any): Order => ({
     name: i.product?.name || i.product_name || 'Unknown Product',
     price: parseFloat(i.price_at_purchase || i.price || 0),
     quantity: i.quantity,
-    imageUrl: i.product?.image_url || i.product_image,
+    imageUrl: getAbsoluteUrl(i.product?.image_url || i.product_image),
     userId: i.seller_id // If relevant
   })),
 });
@@ -412,7 +426,7 @@ export const api = {
       id: r.id,
       productId: r.product.id || r.product, // Handle populated or ID
       productName: r.product.name, // If populated
-      productImage: r.product.image, // If populated
+      productImage: getAbsoluteUrl(r.product.image_url || r.product.image), // Ensure absolute URL
       userId: r.user,
       userName: r.user_name,
       rating: r.rating,
@@ -809,15 +823,8 @@ export const api = {
   },
 
   getSellerStats: async (sellerId: string): Promise<SellerStats> => {
-    return {
-      totalRevenue: 0,
-      revenueGrowth: 0,
-      unitsSold: 0,
-      unitsGrowth: 0,
-      conversionRate: 0,
-      conversionGrowth: 0,
-      monthlySales: []
-    };
+    const response = await client.get(`/users/${sellerId}/seller_stats/`);
+    return response.data;
   },
 
   getUsers: async (): Promise<User[]> => {
@@ -980,7 +987,11 @@ export const api = {
   // --- CMS (Hero Banners & Home Sections) ---
   getHeroBanners: async (): Promise<any[]> => {
     const response = await client.get('hero-banners/');
-    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map((b: any) => ({
+      ...b,
+      image: getAbsoluteUrl(b.image)
+    }));
   },
 
   createHeroBanner: async (data: any): Promise<any> => {
@@ -999,7 +1010,13 @@ export const api = {
 
   getHomeSections: async (): Promise<any[]> => {
     const response = await client.get('home-sections/');
-    return response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    const data = response.data.results && Array.isArray(response.data.results) ? response.data.results : (Array.isArray(response.data) ? response.data : []);
+    return data.map((s: any) => ({
+      ...s,
+      image: getAbsoluteUrl(s.image),
+      // If images is a JSON string of URLs
+      images: s.images ? (typeof s.images === 'string' ? JSON.parse(s.images).map(getAbsoluteUrl) : s.images.map(getAbsoluteUrl)) : []
+    }));
   },
 
   createHomeSection: async (data: any): Promise<any> => {

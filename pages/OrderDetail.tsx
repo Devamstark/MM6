@@ -59,7 +59,7 @@ export const OrderDetail = () => {
 
     const copyOrderId = () => {
         if (order?.id) {
-            navigator.clipboard.writeText(order.id.toString());
+            navigator.clipboard.writeText(order.trackingNumber || order.id.toString());
             setCopySuccess(true);
             setTimeout(() => setCopySuccess(false), 2000);
         }
@@ -107,7 +107,7 @@ export const OrderDetail = () => {
                         <ArrowLeft className="w-5 h-5 text-gray-600" />
                     </button>
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Order #{order.id}</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Order #{order.trackingNumber || order.id.slice(0, 8)}</h1>
                         <p className="text-sm text-gray-500 flex items-center gap-2 mt-1">
                             <Calendar className="w-4 h-4" />
                             Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
@@ -148,10 +148,10 @@ export const OrderDetail = () => {
                                     <div key={step.id} className="flex flex-col items-center flex-1">
                                         <div
                                             className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${isCompleted
-                                                    ? 'bg-indigo-600 border-indigo-600'
-                                                    : isCurrent
-                                                        ? 'bg-white border-indigo-600'
-                                                        : 'bg-white border-gray-300'
+                                                ? 'bg-indigo-600 border-indigo-600'
+                                                : isCurrent
+                                                    ? 'bg-white border-indigo-600'
+                                                    : 'bg-white border-gray-300'
                                                 }`}
                                         >
                                             <Icon className={`w-5 h-5 ${isCompleted ? 'text-white' : isCurrent ? 'text-indigo-600' : 'text-gray-400'}`} />

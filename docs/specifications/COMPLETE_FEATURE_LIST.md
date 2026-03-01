@@ -1158,13 +1158,16 @@ A visual calendar component available within the marketing system.
 - **Blogger Features**: 4/4 (100%)
 - **Background Tasks & Emails**: 1/1 (100%)
 - **Enterprise Marketing**: 5/5 (100%)
+- **Wishlist & Loyalty**: 3/3 (100%) [NEW]
+- **GDPR Compliance**: 2/2 (100%) [NEW]
+- **Dynamic CMS**: 2/2 (100%) [NEW]
 
 **Overall Completion: 100%** ✅
 
 ---
 
-**Last Updated**: February 27, 2026  
-**Version**: 2.0.0 (Enterprise Observability, Slack Webhooks, Database Optimization)
+**Last Updated**: February 28, 2026  
+**Version**: 2.1.0 (Referral System, Wishlists, Dynamic CMS, GDPR Controls)
 
 ---
 
@@ -1240,6 +1243,8 @@ A visual calendar component available within the marketing system.
 
 ---
 
+---
+
 ## 🔭 Observability & Notifications
 
 ### Feature 46: Full-Stack Health & Monitoring
@@ -1280,6 +1285,7 @@ A visual calendar component available within the marketing system.
 - Tracks failed login attempts per IP address and Username.
 - Hard lock-out established after 5 consecutive failures.
 - 30-minute automated cool-off period.
+- Introduces intentional ~1-second PBKDF2 Hash processing threshold (Key Stretching) to explicitly throttle supercomputers attempting fast, programmatic brute-forcing.
 - Automatic Django Signal dispatched to Celery upon lockout.
 - High-priority Slack alert broadcasting the attacker's IP and targeted user.
 
@@ -1301,3 +1307,215 @@ A visual calendar component available within the marketing system.
 **Technical Details:**
 - Operations: `bulk_create`, Django `Meta.indexes`
 - Emailing: `EmailMultiAlternatives` utilizing `bcc=[...]` mechanism.
+
+---
+
+## 💖 Wishlist & Shopping Tools
+
+### Feature 54: Wishlist System
+**User Story:** *As a shopper, I want to save items for later without adding them to my cart.*
+
+**Functionality:**
+- Integrated "Add to Wishlist" heart icon on product cards and detail pages
+- Animated heart toggle (solid vs outline)
+- Dedicated Wishlist page to view all saved items
+- Real-time "Remove from Wishlist" action
+- "Add to Cart from Wishlist" capability
+- Guest user protection (must be logged in to save favorites)
+
+**Technical Details:**
+- Endpoint: `POST /api/wishlist/toggle/`
+- Frontend: `pages/Wishlist.tsx`, `components/Wishlist.tsx`
+- Backend: `Wishlist` model with unique user-product constraint
+
+---
+
+## 🎁 Referral & Loyalty System
+
+### Feature 55: Invitation Network
+**User Story:** *As a loyal customer, I want to invite friends and earn rewards for their signups.*
+
+**Functionality:**
+- Unique referral link generation for every user
+- **Affiliate Profile**: Dedicated dashboard to track clicks and earnings
+- **Signup Bonus**: Referrers earn $1.00 instantly for every new user who signs up via their link
+- **Automated Fraud Detection**: Prevention of self-referral or double-crediting
+- **Earnings Wallet**: Transparent balance view and redemption eligibility
+
+**Technical Details:**
+- Model: `ReferralSignup`, `User.referral_earnings`, `Affiliate`
+- Registry: Credit applied atomically during `POST /api/auth/register/`
+
+### Feature 56: Referral Discount Redemption
+**User Story:** *As a customer with referral earnings, I want to use my balance to pay for my orders.*
+
+**Functionality:**
+- Dynamic checkout option to "Use Referral Earnings"
+- **Redemption Threshold**: Minimum $10.00 balance required to unlock redemption
+- Automatic deduction from order total
+- Secure atomic updates to user balance and order records
+- **refund on Cancellation**: If an order using earnings is cancelled, the balance is restored to the user account
+
+**Technical Details:**
+- Logic: `OrderViewSet.create` handles balance deduction and threshold validation
+
+---
+
+## ⚡ Dynamic Homepage CMS (Admin Only)
+
+### Feature 57: Hero Banner Management
+**User Story:** *As an admin, I want to update the homepage banners for sales and promotions instantly.*
+
+**Functionality:**
+- **Visual Banner Editor**: Update titles, subtitles, and CTA buttons
+- **Asset Control**: Base64 or URL image uploads
+- **Rich Placement**: Choose image fit (Cover/Contain) and focal point (Top/Center/Bottom)
+- **Active Toggle**: Show or hide specific banners without deleting them
+- **Auto-Stacking**: Multiple active banners create a high-speed Carousel
+
+**Technical Details:**
+- Model: `HeroBanner`
+- UI: Admin Dashboard → CMS Tab → Hero Sub-tab
+
+### Feature 58: Flexible Home Sections
+**User Story:** *As an admin, I want to reorder and swap homepage sections (Featured, Categories, Testimonials).*
+
+**Functionality:**
+- Support for multiple section types: Featured Collection, Promotional Banner, Category Showcase
+- **Custom Display Order**: Drag-and-drop or manual ordering
+- Targeted linking to specific categories or product collections
+- Section-specific images and descriptions
+
+**Technical Details:**
+- Model: `HomePageSection`
+- UI: Admin Dashboard → CMS Tab → Sections Sub-tab
+
+---
+
+## 🛡️ GDPR & Data Privacy
+
+### Feature 59: User Data Portability (SAR)
+**User Story:** *As a user, I want to download all my data to comply with GDPR Right to Data Portability.*
+
+**Functionality:**
+- One-click "Export My Data" button in User Profile
+- Instant JSON generation containing:
+  - Personal profile and contact info
+  - Full order history (itemized)
+  - All shipping addresses
+  - All product reviews written
+- Non-blocking background generation
+
+**Technical Details:**
+- Endpoint: `GET /api/users/export_data/`
+- Frontend: Profile Page → Security & Privacy
+
+### Feature 60: Right to Erasure (Account Deletion)
+**User Story:** *As a user, I want to permanently delete my account and data.*
+
+**Functionality:**
+- "Delete Account" option with multi-step confirmation
+- Atomic deletion of user profile and PII
+- Persistence of anonymized order data for accounting (optional/configurable)
+- Instant logout and session termination
+
+- Action: `UserViewSet.delete_self`
+
+---
+
+## 🏢 Enterprise Scaling (Roadmap Phases 1-4)
+
+### Feature 61: Relational Product Architecture
+**User Story:** *As an enterprise admin, I want structured product data to accurately map stock levels to specific sizes and colors.*
+
+**Functionality:**
+- Separation of products into `ProductVariant` and `ProductImage` relations
+- Exact stock level mapping down to variant combination (e.g., Red-XL has 5 units)
+- Variant-specific images linked to color variants
+- API segregation with optimized prefetches to prevent N+1 query overhead
+
+**Technical Details:**
+- Models: `ProductVariant`, `ProductImage`
+- UI: Admin Product Inlines
+
+### Feature 62: Enterprise Cart & Inventory Locking
+**User Story:** *As a buyer, my cart should be preserved across devices, and as a seller, I want to avoid overselling items during checkout.*
+
+**Functionality:**
+- Backend-stored active carts syncing seamlessly across mobile and desktop
+- 10-minute active inventory reservations upon entering checkout
+- SQL-level atomic stock decrements to prevent race conditions during high-volume sales events
+
+**Technical Details:**
+- Models: `Cart`, `StockReservation`
+- Backend: Endpoint `reservations/` and `carts/`
+- DB: Atomic transactions (`F()` expressions)
+
+### Feature 63: Circuit Breaker & Automatic Retries
+**User Story:** *As a user, the app should remain functional even if background services fail or network connections drop.*
+
+**Functionality:**
+- Exponential backoff retry logic for 5xx and 429 API errors
+- Circuit breaker pattern to silently disable non-critical features (like analytics or suggestions) during partial outages without blocking checkout
+
+**Technical Details:**
+- Implementation: `axios-retry` frontend plugin
+- Frontend API interceptors
+
+### Feature 64: Real-Time Seller Analytics
+**User Story:** *As a seller, I want to deeply understand my business performance using granular data.*
+
+**Functionality:**
+- Dynamic dashboard widgets showing Total Revenue, Conversion Rate, and Top Search Terms
+- Cart-abandonment recovery insights and opportunity calculations
+- Geographic sales breakdown by region
+- Inventory health monitoring (low stock alerts)
+
+**Technical Details:**
+- UI: Seller Dashboard metrics grid
+- Backend: `users/{id}/seller_stats/` endpoint
+
+### Feature 65: Background Catalog Bulk Import
+**User Story:** *As a new vendor, I want to upload a CSV with a thousand products without timing out my browser.*
+
+**Functionality:**
+- Asynchronous processing of massive product catalogs via CSV
+- Job queued and processed entirely in the background, freeing the seller's browser
+
+**Technical Details:**
+- Tech Stack: Celery + Redis
+- Backend Tasks: `process_bulk_upload`
+
+### Feature 66: Automated Abandoned Cart Recovery
+**User Story:** *As a business owner, I want to automatically recover lost revenue by reminding users of their abandoned carts.*
+
+**Functionality:**
+- "Did you forget something?" email sent automatically 4 hours after a cart is abandoned
+- Dynamic "COMEBACK10" 10% discount email sent 48 hours after abandonment
+- High-conversion branded HTML email templates
+
+**Technical Details:**
+- Tech Stack: Celery Beat + Celery worker task `process_abandoned_carts`
+
+### Feature 67: Subscription & Auto-Replenishment
+**User Story:** *As a customer, I want to subscribe to consumables (like coffee) and have them auto-shipped monthly at a discount.*
+
+**Functionality:**
+- Option to subscribe to specific products for up to 10% discount
+- Background recurring orders engine that generates orders on a 30-day cron loop
+- Automatic stock deduction for subscription renewals
+
+**Technical Details:**
+- Model: `Subscription`
+- Task: `process_subscriptions`
+
+### Feature 68: Advanced Logistics & Tax
+**User Story:** *As an admin, I want dynamic shipping rates and accurate backend taxation enabled seamlessly through Stripe.*
+
+**Functionality:**
+- Dynamic API shipping rate calculation stub included during checkout intent creation
+- Hardcoded multi-region automated tax attributes added to Stripe intents
+
+**Technical Details:**
+- Webhook: `StripeWebhookView`
+- Intent: Automatic tax enabled flag logic

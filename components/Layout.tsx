@@ -215,8 +215,12 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
           <div className="flex justify-between items-center h-16">
 
             {/* Left: Logo */}
-            <Link to="/" className="shrink-0 text-2xl font-bold tracking-widest text-black uppercase dark:text-white transition-colors">
-              SMARTSHOP
+            <Link to="/" className="shrink-0 group relative h-10 w-40 flex items-center justify-center overflow-hidden">
+              <img
+                src="/smartshop-logo.png"
+                alt="SmartShop"
+                className="absolute inset-0 w-full h-full object-contain scale-[3.5] transform transition-transform duration-500 group-hover:scale-[3.8] dark:brightness-0 dark:invert"
+              />
             </Link>
 
             {/* Center: Navigation Links */}

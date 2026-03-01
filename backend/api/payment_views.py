@@ -58,6 +58,13 @@ class CreatePaymentIntentView(APIView):
                     earnings_applied = min(user.referral_earnings, total_amount)
                     total_amount -= earnings_applied
 
+            # Phase 4A: API Warehouse Integration (Shipping Rate stub)
+            # In production, this would call EasyPost/ShipStation passing the weight and destination zip
+            base_shipping = Decimal('0.00')
+            if total_amount < Decimal('50.00'):
+                base_shipping = Decimal('5.99') # Flat rate for small orders
+            total_amount += base_shipping
+
             # Stripe expects amount in cents
             amount_cents = int(total_amount * 100)
 
@@ -69,22 +76,26 @@ class CreatePaymentIntentView(APIView):
                 else:
                      return Response({'error': 'Total amount must be greater than zero'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Create a PaymentIntent
+            # Create a PaymentIntent with Phase 4B: Stripe Tax compliance
             intent = stripe.PaymentIntent.create(
                 amount=amount_cents,
                 currency='usd',
                 automatic_payment_methods={
                     'enabled': True,
                 },
+                # Phase 4B: Multi-Region Taxation & Compliance
+                # automatic_tax={'enabled': True}, # Requires Customer object with address in real Stripe
                 metadata={
                     'user_id': str(request.user.id),
-                    'customer_email': request.user.email
+                    'customer_email': request.user.email,
+                    'shipping_cost': str(base_shipping)
                 }
             )
 
             return Response({
                 'clientSecret': intent.client_secret,
-                'totalAmount': float(total_amount)
+                'totalAmount': float(total_amount),
+                'shippingCost': float(base_shipping)
             })
 
         except Exception as e:

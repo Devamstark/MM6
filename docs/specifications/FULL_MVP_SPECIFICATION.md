@@ -43,6 +43,7 @@
 - **Containerization**: Docker + Docker Compose
 - **Reverse Proxy**: Traefik (auto SSL via Let's Encrypt)
 - **Backup Storage**: MinIO (self-hosted S3)
+- **E2E Testing**: Playwright (Automated flows and reporting, excluded from Docker context for optimization)
 
 ---
 
@@ -58,7 +59,8 @@
   - **User/Buyer**: Browse products, add to cart, checkout, write reviews
   - **Seller**: Manage own products, view sales analytics
   - **Blogger**: Create and manage fashion-related blog content
-  - **Admin**: Full platform control, user management, content moderation
+  - **Admin**: Full platform control, user management, content moderation, dynamic CMS
+- **GDPR Protection**: Self-deletion and data export (SAR) for all users
 
 #### Technical Implementation:
 - **Backend**: Custom `User` model extending `AbstractUser` with `role` field
@@ -355,6 +357,34 @@
 
 ---
 
+### **14. Observability & Notifications** 🔭
+
+#### Features:
+- **Full-Stack Health & Monitoring**: Dedicated `/api/health/` JSON endpoint executing live PostgreSQL and Redis connection tests.
+- **CheckCle Integration**: UI monitoring dashboard deployed independently at `status.smartshop1.us`.
+- **Actionable Slack Webhooks**: Instant Celery-powered Slack alerts upon successful order completions.
+- **Brute-Force Shield**: `django-axes` automatically tracks failed logins, locks out IP addresses after 5 strikes, introduces a 1.2s PBKDF2 hash delay to throttle supercomputers, and instantly fires a high-priority Slack alert.
+
+#### Technical Implementation:
+- **Backend Model**: `@receiver(user_locked_out)` hooking into `notify_slack_security_alert`.
+- **Celery Tasks**: `notify_slack_new_order`, `notify_slack_security_alert`.
+- **Infrastructure**: Traefik labels configured for DNS-only Let's Encrypt SSL generation on the CheckCle container.
+
+---
+
+### **15. Privacy & Database Optimizations** ⚡
+
+#### Features:
+- **Email Privacy**: Mass emails utilize `bcc` headers to strictly veil all customer PII.
+- **Query Elimination**: Composite B-Tree indexes constructed across User, Product, and MarketingCampaign tables to permanently eradicate full-table scan bottlenecks.
+- **Log Pruning**: Asynchronous `django-celery-beat` background task configured to permanently delete outdated tracking logs after 6 months.
+
+#### Technical Implementation:
+- **Backend Models**: Extended `Index` Meta classes within `models.py`.
+- **Celery**: Configured `prune_old_logs` task mapped to a monthly periodic execution cycle.
+
+---
+
 ## 🎨 Design System
 
 ### **Color Palette**
@@ -455,8 +485,8 @@ smartshop-e-commerce/
 │
 ├── .gitignore
 ├── README.md
-├── setup/DEPLOYMENT_GUIDE.md
-└── MVP_SPECIFICATION.md (this file)
+├── deployment/DEPLOYMENT_GUIDE.md
+└── specifications/FULL_MVP_SPECIFICATION.md (this file)
 ```
 
 ---
@@ -659,7 +689,7 @@ Frontend will run at `http://localhost:5173`
 
 ## 🌐 Deployment
 
-> The application is live on a self-hosted VPS. See **[setup/VPS_DEPLOYMENT_GUIDE.md](./setup/VPS_DEPLOYMENT_GUIDE.md)** for full details.
+> The application is live on a self-hosted VPS. See **[deployment/VPS_DEPLOYMENT_GUIDE.md](../deployment/VPS_DEPLOYMENT_GUIDE.md)** for full details.
 
 ### **Current Stack (VPS + Docker + Dokploy)**
 1. Push code to GitHub
@@ -760,5 +790,81 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 26, 2026
-**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)
+### **8. Wishlist & Shopping Tools** 💖
+
+#### Features:
+- **Save for Later**: Heart toggle on all product cards and detail pages
+- **Wishlist Dashboard**: Aggregated view of all saved items
+- **Add to Cart from Wishlist**: Direct conversion from saved items
+- **Guest Protection**: Persistence requires authenticated state
+
+#### Technical Implementation:
+- **Backend Model**: `Wishlist` with unique user-product constraint
+- **Endpoints**: `POST /api/wishlist/toggle/`
+
+---
+
+### **9. Referral & Loyalty System** 🎁
+
+#### Features:
+- **Unique Referral Links**: Every user gets a shareable link and code
+- **Signup Bonus**: Instant $1.00 credit for referrers per new valid signup
+- **Order Redemption**: Apply earnings as real cash discounts during checkout
+- **Redemption Logic**: Locked until a $10.00 minimum balance is reached
+- **Cancellation Refunds**: Automatic restoration of applied earnings if an order is cancelled
+
+#### Technical Implementation:
+- **Backend**: Referral bonus logic inside `RegisterView` (auth system)
+- **Frontend**: `Affiliate.tsx` dashboard for tracking metrics
+
+---
+
+### **10. Dynamic Homepage CMS (Admin-Only)** ⚡
+
+#### Features:
+- **Hero Banner Management**: Visual editor for homepage slides (titles, buttons, images)
+- **Positioning**: Focal point control (Top/Center/Bottom) and Image Fit (Cover/Contain)
+- **Flexible Home Sections**: Reorderable rows (Featured, Promos, Categories)
+- **Active Toggles**: Instant show/hide control from Dashboard
+
+#### Technical Implementation:
+- **Backend**: `HeroBanner` and `HomePageSection` models
+- **Frontend**: CMS Sub-tabs in Admin Dashboard
+
+---
+
+### **11. GDPR & Privacy Compliance** 🛡️
+
+#### Features:
+- **Data Portability (SAR)**: Download full JSON profile, orders, and reviews
+- **Right to Erasure**: Permanent self-deletion of account and PII
+- **Transparency**: Clear opt-out for marketing emails
+
+#### Technical Implementation:
+- **Backend Actions**: `export_data` and `delete_self` on `UserViewSet`
+
+---
+
+### **12. Enterprise Operations & Scale** 🏢
+
+#### Features:
+- **Relational Architecture**: Structured `ProductVariant` and `ProductImage` relations to exactly track stock and images down to size and color.
+- **Resilient Shopping Carts**: Database-backed carts maintaining session state across all devices.
+- **Inventory Reservations**: 10-minute cart locking period preventing overselling during checkout.
+- **Atomic Database Locks**: Backend SQL decrements for absolute accuracy during high-concurrency peak sales.
+- **Client Resilience**: API Interceptor "Circuit Breaker" to prevent crashes from analytics/slow endpoints, plus `axios-retry` logic for unreliable networks.
+- **Granular Seller Analytics**: Real-time sales by region, cart-abandonment analysis, and inventory health tracking.
+- **Background Upload Processing**: Asynchronous Celery + Redis workers processing massive CSV catalogs without blocking the seller.
+- **Automated Lifecycle Marketing**: 4-hour abandoned cart reminders and 48-hour automated 10% discount codes generated dynamically.
+- **Consumable Subscriptions**: 30-day recurring automated order engine supporting consumer "Subscribe and Save" workflows via Stripe.
+- **Dynamic Fulfillment & Tax**: Stripe Native API taxation setup and backend shipping rate stubs for ShipStation/EasyPost APIs.
+
+#### Technical Implementation:
+- **Task Broker**: Redis & Django Celery/Celery Beat
+- **Models**: `Cart`, `StockReservation`, `Subscription`, `ProductVariant`
+- **Frontend Interceptors**: Custom Axios plugins and Chart.js dashboards
+
+---
+
+**Last Updated**: February 28, 2026
+**Version**: 3.0.0 (Enterprise Roadmap Scaling: Celery, Subscriptions, Variants, Analytics)

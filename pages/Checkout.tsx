@@ -35,7 +35,7 @@ const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'd
   return (
     <div className={`inline-flex items-center justify-center relative z-10 ${containerHeights[size]}`}>
       <img
-        src="/smartshop-logo-main.png"
+        src="/smartshop-logo.png"
         alt="SmartShop™ EST. 2026"
         className={`absolute inset-0 w-full h-full object-contain ${scales[size]} transform origin-center pointer-events-none transition-all duration-300 ${dark ? 'brightness-0 invert' : ''}`}
       />
@@ -452,6 +452,14 @@ export const Checkout = () => {
       api.getMyEarnings().then(setEarnings).catch(console.error);
     }
   }, [isAuthenticated]);
+
+  // Pre-fill coupon from Cart page if available
+  useEffect(() => {
+    const state = location.state as { appliedCoupon?: { code: string; discount: number } };
+    if (state?.appliedCoupon) {
+      setAppliedCoupon(state.appliedCoupon);
+    }
+  }, [location.state]);
 
   // Calculate totals
   const earningsDiscount = useEarnings && earnings?.canRedeem ? Math.min(earnings.referralEarnings, cartTotal) : 0;

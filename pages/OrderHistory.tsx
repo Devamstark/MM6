@@ -74,14 +74,14 @@ export const OrderHistory = () => {
 
             <div className="space-y-6">
                 {orders.map((order) => (
-                    <div 
-                        key={order.id} 
+                    <div
+                        key={order.id}
                         className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow cursor-pointer group"
                         onClick={() => navigate(`/orders/${order.id}`)}
                     >
                         <div className="p-6 border-b border-gray-50 flex flex-wrap items-center justify-between gap-4 bg-gray-50/30">
                             <div className="flex items-center gap-4">
-                                <span className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">Order #{order.id}</span>
+                                <span className="text-lg font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">Order #{order.trackingNumber || order.id.slice(0, 8)}</span>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border flex items-center gap-1.5 ${getStatusColor(order.status)}`}>
                                     <StatusIcon status={order.status} />
                                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}

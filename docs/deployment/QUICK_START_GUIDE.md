@@ -374,8 +374,8 @@ After getting the app running:
    - Use Neon for PostgreSQL database
 
 4. ✅ **Add new features**
-   - See `FULL_MVP_SPECIFICATION.md` for future enhancements
-   - Check `MVP_IMPLEMENTATION_CHECKLIST.md` for remaining tasks
+   - See `../specifications/FULL_MVP_SPECIFICATION.md` for future enhancements
+   - Check `../progress/MVP_IMPLEMENTATION_CHECKLIST.md` for remaining tasks
 
 ---
 
@@ -389,10 +389,10 @@ After getting the app running:
 - [Vite Guide](https://vitejs.dev/guide/)
 
 ### Project Files
-- `FULL_MVP_SPECIFICATION.md` - Complete feature specification
-- `MVP_IMPLEMENTATION_CHECKLIST.md` - Implementation status
+- `../specifications/FULL_MVP_SPECIFICATION.md` - Complete feature specification
+- `../progress/MVP_IMPLEMENTATION_CHECKLIST.md` - Implementation status
 - `DEPLOYMENT_GUIDE.md` - Production deployment guide
-- `README.md` - Project overview
+- `../README.md` - Project overview
 
 ---
 

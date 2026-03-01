@@ -34,7 +34,15 @@ export const CouponsTab: React.FC = () => {
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await api.createCoupon(newCoupon);
+            // Clean up the data: empty strings for numeric fields should be null or omitted
+            const payload = {
+                ...newCoupon,
+                usage_limit: newCoupon.usage_limit.trim() === '' ? null : parseInt(newCoupon.usage_limit),
+                discount_value: parseFloat(newCoupon.discount_value),
+                min_purchase: parseFloat(newCoupon.min_purchase || '0'),
+            };
+
+            await api.createCoupon(payload);
             setIsAdding(false);
             setNewCoupon({
                 code: '',
@@ -45,8 +53,13 @@ export const CouponsTab: React.FC = () => {
                 is_active: true
             });
             loadCoupons();
-        } catch (e) {
-            alert('Failed to create coupon. Code might already exist.');
+        } catch (err: any) {
+            console.error('API Error:', err);
+            const errorMsg = err.response?.data?.code?.[0] ||
+                err.response?.data?.error ||
+                (err.response?.data && typeof err.response.data === 'object' ? JSON.stringify(err.response.data) : null) ||
+                'Failed to create coupon. Code might already exist.';
+            alert(errorMsg);
         }
     };
 

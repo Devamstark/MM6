@@ -548,3 +548,210 @@ def notify_slack_security_alert(message):
             requests.post(webhook_url, json=payload, timeout=5)
         except Exception as e:
             logger.error(f"Failed to ping Slack security webhook: {str(e)}")
+@shared_task
+def process_bulk_upload(csv_content, user_id):
+    """Phase 2B: Background CSV Uploader using Celery"""
+    import csv
+    import io
+    from .models import Product, User
+    from decimal import Decimal
+    
+    try:
+        user = User.objects.get(id=user_id)
+        f = io.StringIO(csv_content)
+        reader = csv.DictReader(f)
+        
+        count = 0
+        for row in reader:
+            # Basic validation
+            if not row.get('name') or not row.get('price'):
+                continue
+                
+            Product.objects.create(
+                name=row['name'],
+                description=row.get('description', ''),
+                price=Decimal(row['price']),
+                stock_quantity=int(row.get('stock', row.get('stock_quantity', 0))),
+                category=row.get('category', 'Uncategorized'),
+                brand=row.get('brand', ''),
+                seller=user,
+                # Default values for enterprise requirements
+                is_featured=False,
+                is_popular=False
+            )
+            count += 1
+        
+        logger.info(f"Bulk upload complete: {count} products added for user {user.username}")
+        return f"Successfully processed {count} products"
+    except Exception as e:
+        logger.error(f"Bulk upload failed for user {user_id}: {str(e)}")
+        return f"Error: {str(e)}"
+
+@shared_task
+def process_abandoned_carts():
+    """Phase 3A: Abandoned Cart Recovery (Automated emails & dynamic discounts)"""
+    from .models import Cart
+    from django.utils import timezone
+    from datetime import timedelta
+    
+    now = timezone.now()
+    four_hours_ago = now - timedelta(hours=4)
+    forty_eight_hours_ago = now - timedelta(hours=48)
+    
+    # 1. Send "Forgot something?" email after 4 hours
+    abandoned_4h = Cart.objects.filter(
+        user__isnull=False,
+        updated_at__lte=four_hours_ago,
+        updated_at__gt=forty_eight_hours_ago,
+        abandoned_email_sent=False,
+        items__isnull=False
+    ).distinct()
+    
+    count_4h = 0
+    for cart in abandoned_4h:
+        if cart.items.count() > 0:
+            try:
+                subject = "Did you forget something in your cart?"
+                html_message = render_to_string('emails/abandoned_cart.html', {'user': cart.user, 'cart': cart, 'title': subject})
+                send_mail(
+                    subject,
+                    strip_tags(html_message),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [cart.user.email],
+                    html_message=html_message,
+                    fail_silently=True,
+                )
+                cart.abandoned_email_sent = True
+                cart.save(update_fields=['abandoned_email_sent'])
+                logger.info(f"Abandoned cart email (4h) sent to {cart.user.email}")
+                count_4h += 1
+            except Exception as e:
+                logger.error(f"Failed to send abandoned cart email to {cart.user.email}: {e}")
+
+    # 2. Attach 10% discount after 48 hours
+    abandoned_48h = Cart.objects.filter(
+        user__isnull=False,
+        updated_at__lte=forty_eight_hours_ago,
+        abandoned_discount_sent=False,
+        items__isnull=False
+    ).distinct()
+    
+    count_48h = 0
+    for cart in abandoned_48h:
+        if cart.items.count() > 0:
+            try:
+                subject = "Come back! Here's 10% off your cart 🎁"
+                # Dynamic generation of 24hr expiry code could happen here, simpler for now:
+                discount_code = 'COMEBACK10'
+                html_message = render_to_string('emails/abandoned_cart_discount.html', {'user': cart.user, 'cart': cart, 'title': subject, 'discount_code': discount_code})
+                send_mail(
+                    subject,
+                    strip_tags(html_message),
+                    settings.DEFAULT_FROM_EMAIL,
+                    [cart.user.email],
+                    html_message=html_message,
+                    fail_silently=True,
+                )
+                cart.abandoned_discount_sent = True
+                cart.save(update_fields=['abandoned_discount_sent'])
+                logger.info(f"Abandoned cart discount email (48h) sent to {cart.user.email}")
+                count_48h += 1
+            except Exception as e:
+                logger.error(f"Failed to send abandoned cart discount email to {cart.user.email}: {e}")
+                
+    return f"Processed {count_4h} 4h carts and {count_48h} 48h carts."
+
+@shared_task
+def process_subscriptions():
+    """Phase 3B: Subscription & Auto-Replenishment (Recurring Orders)"""
+    from .models import Subscription, Order, OrderItem
+    from django.utils import timezone
+    from datetime import timedelta
+    import uuid
+
+    now = timezone.now()
+    due_subscriptions = Subscription.objects.filter(is_active=True, next_billing_date__lte=now)
+
+    processed_count = 0
+    failed_count = 0
+
+    for sub in due_subscriptions:
+        try:
+            # Fake Stripe Charge (since this is roadmap phase 3b logic without actual card details stored directly)
+            # In a real scenario, we'd trigger stripe.Subscription.retrieve and confirm invoice payment succeeded.
+            # Here we simulate the creation of an order upon successful billing period.
+            
+            # 1. Create Order
+            order = Order.objects.create(
+                user=sub.user,
+                total_amount=0, # Computed below
+                status='processing',
+                shipping_address=sub.user.addresses.filter(is_default=True).first() or None
+            )
+
+            # 2. Add Item with discount
+            discounted_price = sub.product.price * (1 - (sub.product.subscription_discount_percent / 100))
+            OrderItem.objects.create(
+                order=order,
+                product=sub.product,
+                variant=sub.variant,
+                quantity=sub.quantity,
+                price_at_purchase=discounted_price
+            )
+            
+            order.total_amount = discounted_price * sub.quantity
+            order.save()
+
+            # 3. Decrement Inventory
+            if sub.variant:
+                sub.variant.stock -= sub.quantity
+                sub.variant.save(update_fields=['stock'])
+            else:
+                sub.product.stock_quantity -= sub.quantity
+                sub.product.save(update_fields=['stock_quantity'])
+
+            # 4. Schedule next billing date
+            sub.next_billing_date = now + timedelta(days=sub.interval_days)
+            sub.save(update_fields=['next_billing_date'])
+
+            # Send order confirmation email (this uses existing task)
+            send_order_confirmation_email.delay(order.id)
+            
+            processed_count += 1
+            logger.info(f"Processed subscription {sub.id} for user {sub.user.username}. Created order {order.id}.")
+        except Exception as e:
+            logger.error(f"Failed to process subscription {sub.id}: {e}")
+            failed_count += 1
+
+    return f"Processed {processed_count} subscriptions successfully, {failed_count} failed."
+
+@shared_task
+def send_order_status_email(order_id, status):
+    """Send an email notification when the order status is updated (shipped, delivered, cancelled)."""
+    try:
+        from .models import Order
+        order = Order.objects.get(id=order_id)
+        
+        # Don't send this email for 'pending' since that's handled by send_order_confirmation_email
+        if status == 'pending':
+            return
+            
+        subject = f"Order update: Your package is {status}!"
+        html_message = render_to_string('emails/order_status_update.html', {
+            'order': order,
+            'status': status,
+            'title': subject
+        })
+        plain_message = strip_tags(html_message)
+        
+        send_mail(
+            subject=subject,
+            message=plain_message,
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[order.user.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+        logger.info(f"Sent order status update ({status}) email to {order.user.email}")
+    except Exception as e:
+        logger.error(f"Failed to send order status email for {order_id}: {str(e)}")

@@ -522,7 +522,7 @@ export const UserProfile = () => {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-500 dark:text-gray-400">Order #</p>
-                                            <p className="font-mono dark:text-gray-300">{order.id.slice(0, 8)}</p>
+                                            <p className="font-mono dark:text-gray-300">{order.trackingNumber || order.id.slice(0, 8)}</p>
                                         </div>
                                         <div className="ml-auto">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase ${order.status === 'delivered' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' :

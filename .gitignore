@@ -33,3 +33,9 @@ htmlcov/
 
 # Nested repo (duplicate folder — ignore)
 MM6/
+
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/

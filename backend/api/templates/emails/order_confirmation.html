@@ -8,7 +8,7 @@
 
 <div class="order-summary">
     <h3 style="margin-top: 0; font-size: 18px; margin-bottom: 12px; font-weight: 700;">Order Summary</h3>
-    <p style="margin-bottom: 4px; font-size: 14px;">Order ID: <strong>#{{ order.id }}</strong></p>
+    <p style="margin-bottom: 4px; font-size: 14px;">Order ID: <strong>#{{ order.tracking_number }}</strong></p>
     <p style="margin: 0; font-size: 14px;">Placed on: {{ order.created_at|date:"F j, Y" }}</p>
 
     <div class="divider"></div>
@@ -38,8 +38,7 @@
         <tbody>
             <tr>
                 <td style="padding-bottom: 8px; color: #64748b;">Subtotal</td>
-                <td style="text-align: right; padding-bottom: 8px; font-weight: 600;">${{
-                    order.total_amount|add:order.earnings_applied }}</td>
+                <td style="text-align: right; padding-bottom: 8px; font-weight: 600;">${{ order.subtotal }}</td>
             </tr>
             {% if order.earnings_applied > 0 %}
             <tr>

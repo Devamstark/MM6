@@ -92,7 +92,7 @@ export const SellerDashboard = () => {
               <BarChart2 className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> Business Performance
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-100 transition-colors">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-100 transition-colors">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 rounded-xl"><DollarSign className="w-6 h-6" /></div>
                   <span className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wide">Total Revenue</span>
@@ -103,7 +103,7 @@ export const SellerDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-200 transition-colors">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-200 transition-colors">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl"><ShoppingBag className="w-6 h-6" /></div>
                   <span className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wide">Total Units Sold</span>
@@ -114,7 +114,7 @@ export const SellerDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-300 transition-colors">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-300 transition-colors">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 rounded-xl"><TrendingUp className="w-6 h-6" /></div>
                   <span className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wide">Conversion Rate</span>
@@ -123,7 +123,7 @@ export const SellerDashboard = () => {
                 <div className="text-purple-600 dark:text-purple-400 text-xs font-bold mt-2">Top {stats.conversionGrowth}% of sellers</div>
               </div>
 
-              <div className="bg-white dark:bg-gray-900 p-6 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-400 transition-colors">
+              <div className="bg-white dark:bg-gray-900 p-6 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-400 transition-colors">
                 <div className="flex items-center gap-3 mb-2">
                   <div className="p-3 bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 rounded-xl"><Package className="w-6 h-6" /></div>
                   <span className="text-gray-400 dark:text-gray-500 text-xs font-bold uppercase tracking-wide">Low Stock Alerts</span>
@@ -133,21 +133,68 @@ export const SellerDashboard = () => {
               </div>
             </div>
 
-            {/* Visual Sales Chart Simulation */}
-            <div className="mt-8 bg-white dark:bg-gray-900 p-8 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-200 transition-colors">
-              <h3 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">Monthly Sales Trend</h3>
-              <div className="h-40 flex items-end gap-3 justify-between">
-                {stats.monthlySales.map((h, i) => (
-                  <div key={i} className="w-full bg-indigo-50 dark:bg-indigo-900/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
-                    <div style={{ height: `${h}%` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
-                    <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg">
-                      ${Math.floor(h * 150)}
+            {/* Phase 2A: Granular Analytics Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-10">
+              {/* Sales by Region */}
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-300 transition-colors">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">Sales by Region</h3>
+                <div className="space-y-6">
+                  {stats.salesByRegion.map((region, i) => (
+                    <div key={i}>
+                      <div className="flex justify-between text-sm font-bold mb-2">
+                        <span className="text-gray-600 dark:text-gray-400">{region.region}</span>
+                        <span className="text-gray-900 dark:text-white">${region.sales.toLocaleString()}</span>
+                      </div>
+                      <div className="w-full bg-gray-100 dark:bg-gray-800 h-2.5 rounded-full overflow-hidden">
+                        <div
+                          className="bg-indigo-500 h-full rounded-full"
+                          style={{ width: `${(region.sales / stats.totalRevenue) * 100}%` }}
+                        ></div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-between mt-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide px-1">
-                <span>Jan</span><span>Feb</span><span>Mar</span><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span><span>Dec</span>
+
+              {/* Monthly Sales Trend */}
+              <div className="bg-white dark:bg-gray-900 p-8 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-400 transition-colors">
+                <h3 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">Monthly Sales Trend</h3>
+                <div className="h-40 flex items-end gap-3 justify-between">
+                  {stats.monthlySales.map((h, i) => (
+                    <div key={i} className="w-full bg-indigo-50 dark:bg-indigo-900/20 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/30 transition-all duration-300 relative group cursor-pointer" style={{ height: '100%' }}>
+                      <div style={{ height: `${h}%` }} className="bg-indigo-500 rounded-xl absolute bottom-0 w-full group-hover:bg-indigo-600 transition-colors shadow-sm"></div>
+                      <div className="opacity-0 group-hover:opacity-100 absolute -top-10 left-1/2 transform -translate-x-1/2 bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold px-3 py-1.5 rounded-lg transition-all duration-200 shadow-lg">
+                        {h}%
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex justify-between mt-4 text-xs font-semibold text-gray-400 dark:text-gray-500 uppercase tracking-wide px-1">
+                  <span>Jan</span><span>Dec</span>
+                </div>
+              </div>
+
+              {/* Inventory Health & Abandonment */}
+              <div className="space-y-8">
+                <div className="bg-white dark:bg-gray-900 p-8 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 animate-fade-up delay-500 transition-colors">
+                  <h3 className="font-bold text-gray-900 dark:text-white mb-6 text-lg">Inventory Health</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {stats.inventoryHealth.map((item, i) => (
+                      <div key={i} className="flex items-center justify-between p-4 rounded-2xl bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-700">
+                        <span className="text-sm font-bold text-gray-600 dark:text-gray-400">{item.status}</span>
+                        <span className={`text-sm font-bold ${item.status === 'Out of Stock' ? 'text-red-500' : item.status === 'Low Stock' ? 'text-orange-500' : 'text-green-500'}`}>
+                          {item.count} Products
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-linear-to-br from-indigo-500 to-purple-600 p-8 rounded-4xl shadow-lg text-white animate-fade-up delay-600">
+                  <h3 className="font-bold mb-2 text-lg">Cart Abandonment</h3>
+                  <div className="text-4xl font-black mb-2">{stats.cartAbandonmentRate}%</div>
+                  <p className="text-indigo-100 text-xs font-bold uppercase tracking-wider">Opportunity to recover ${Math.floor(stats.totalRevenue * 0.4).toLocaleString()}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -155,7 +202,7 @@ export const SellerDashboard = () => {
 
         {/* Products Table */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-up delay-300">Your Inventory</h2>
-        <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden mb-12 animate-fade-up delay-300 transition-colors">
+        <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden mb-12 animate-fade-up delay-300 transition-colors">
           <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
             <thead className="bg-white dark:bg-gray-900">
               <tr>
@@ -171,7 +218,7 @@ export const SellerDashboard = () => {
                 <tr key={p.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors group">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="h-14 w-14 flex-shrink-0">
+                      <div className="h-14 w-14 shrink-0">
                         <img className="h-14 w-14 rounded-xl object-cover border border-gray-100 dark:border-gray-800 group-hover:scale-105 transition-transform duration-300" src={p.imageUrl} alt="" />
                       </div>
                       <div className="ml-4">
@@ -222,7 +269,7 @@ export const SellerDashboard = () => {
 
         {/* Recent Orders Section */}
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-6 animate-fade-up delay-400">Recent Orders</h2>
-        <div className="bg-white dark:bg-gray-900 rounded-[2rem] shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden animate-fade-up delay-400 transition-colors">
+        <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 overflow-hidden animate-fade-up delay-400 transition-colors">
           <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
             <thead className="bg-white dark:bg-gray-900">
               <tr>
@@ -240,12 +287,12 @@ export const SellerDashboard = () => {
 
                 return (
                   <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">#{order.id}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-indigo-600 dark:text-indigo-400">#{order.trackingNumber || order.id.slice(0, 8)}</td>
                     <td className="px-6 py-4 text-sm text-gray-900 dark:text-gray-200">
                       <div className="space-y-2">
                         {sellerItems.map((item: any, idx) => (
                           <div key={idx} className="flex items-center gap-3 p-2 rounded-xl bg-gray-50 dark:bg-gray-800 border border-gray-100 dark:border-gray-700 hover:border-indigo-100 dark:hover:border-indigo-900 transition-colors">
-                            <div className="h-10 w-10 rounded-lg bg-white dark:bg-gray-900 flex-shrink-0 overflow-hidden border border-gray-200 dark:border-gray-700">
+                            <div className="h-10 w-10 rounded-lg bg-white dark:bg-gray-900 shrink-0 overflow-hidden border border-gray-200 dark:border-gray-700">
                               <img src={item.imageUrl} alt="" className="h-full w-full object-cover" />
                             </div>
                             <div className="flex flex-col">

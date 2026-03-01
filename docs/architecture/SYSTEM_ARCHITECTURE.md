@@ -154,6 +154,7 @@
 │ role            │◄──────────┐
 │ bio             │           │
 │ bonus_points    │           │
+│ referral_earn.  │           │
 └─────────────────┘           │
         │                     │
         │ 1:N                 │ 1:N
@@ -212,6 +213,7 @@
 │ customer_name   │       │
 │ total_amount    │       │
 │ status          │       │
+│ earnings_appl.  │       │
 │ created_at      │       │
 └─────────────────┘       │
         │                 │
@@ -598,8 +600,8 @@ UI Error Display (Toast/Alert)
 
 ---
 
-**Version**: 1.9.0 (Financial Integrity Sprint: Stripe, Order Cancellation Restocking, Referral Refunds, Wishlist)
-**Last Updated**: February 26, 2026
+**Version**: 2.0.0 (Global Infrastructure Integration & Data Lifecycle: CMS, GDPR, Referrals, Wishlists, Scalability)
+**Last Updated**: February 28, 2026
 
 ---
 
