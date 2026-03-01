@@ -126,15 +126,61 @@ export const ProductDetail = () => {
         ? reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length
         : 0; // Live data only, no fallback 4.5
 
-    // Dynamic SEO per product
+    // --- ENHANCED DYNAMIC SEO ---
+    const seoTitle = product ? `${product.name} - ${product.brand} ${product.category} | SmartShop` : 'Product | SmartShop';
+    const seoDesc = product
+        ? `Buy ${product.name} by ${product.brand} at SmartShop. High-quality ${product.subcategory || product.category} available with free shipping. ${product.description?.slice(0, 100)}...`
+        : 'Shop premium fashion at SmartShop.';
+    const seoCanonical = product ? `https://smartshop1.us/product/${product.slug || product.id}` : undefined;
+
     useSEO({
-        title: product ? `${product.name} | SmartShop` : 'Product | SmartShop',
-        description: product
-            ? `${product.description?.slice(0, 140) || `Buy ${product.name} at SmartShop`}. Shop ${product.category} products with free shipping over $100.`
-            : 'Shop premium fashion at SmartShop.',
-        canonical: product ? `https://smartshop1.us/products/${product.slug || product.id}` : undefined,
+        title: seoTitle,
+        description: seoDesc,
+        canonical: seoCanonical,
         ogImage: product?.imageUrl,
     });
+
+    // --- JSON-LD SCHEMA MARKUP (FOR GOOGLE RICH SNIPPETS) ---
+    useEffect(() => {
+        if (!product) return;
+
+        const structuredData = {
+            "@context": "https://schema.org/",
+            "@type": "Product",
+            "name": product.name,
+            "image": [product.imageUrl],
+            "description": product.description,
+            "sku": product.id.slice(0, 8).toUpperCase(),
+            "brand": {
+                "@type": "Brand",
+                "name": product.brand || 'SmartShop'
+            },
+            "offers": {
+                "@type": "Offer",
+                "url": seoCanonical,
+                "priceCurrency": "USD",
+                "price": product.salePrice || product.price,
+                "availability": product.stock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                "itemCondition": "https://schema.org/NewCondition"
+            },
+            "aggregateRating": reviews.length > 0 ? {
+                "@type": "AggregateRating",
+                "ratingValue": averageRating.toFixed(1),
+                "reviewCount": reviews.length
+            } : undefined
+        };
+
+        const script = document.createElement('script');
+        script.type = 'application/ld+json';
+        script.id = 'product-json-ld';
+        script.text = JSON.stringify(structuredData);
+        document.head.appendChild(script);
+
+        return () => {
+            const existingScript = document.getElementById('product-json-ld');
+            if (existingScript) existingScript.remove();
+        };
+    }, [product, reviews, averageRating, seoCanonical]);
 
     if (loading) return (
         <div className="flex justify-center items-center h-screen bg-white">
