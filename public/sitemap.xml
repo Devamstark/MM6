@@ -6,6 +6,7 @@
     <loc>https://smartshop1.us/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
 
   <!-- Product Listing Pages -->
@@ -13,6 +14,7 @@
     <loc>https://smartshop1.us/products</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
 
   <!-- Category Pages -->
@@ -20,16 +22,19 @@
     <loc>https://smartshop1.us/products?category=Men</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
   <url>
     <loc>https://smartshop1.us/products?category=Women</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
   <url>
     <loc>https://smartshop1.us/products?category=Accessories</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
 
   <!-- Blog -->
@@ -37,6 +42,7 @@
     <loc>https://smartshop1.us/blog</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
 
   <!-- Static Pages -->
@@ -44,11 +50,13 @@
     <loc>https://smartshop1.us/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
   <url>
     <loc>https://smartshop1.us/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+    <lastmod>2026-03-01</lastmod>
   </url>
 
 </urlset>

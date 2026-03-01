@@ -7,9 +7,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description"
         content="Discover the latest trends in fashion at SmartShop. Shop men's clothing, women's fashion, accessories and more. Free shipping on orders over $100." />
-    <!-- Add Google Site Verification Code Here if using HTML tag method -->
+
+    <!-- Google Site Verification -->
+    <meta name="google-site-verification" content="blS6P0LrFmy_sJBDFYOk1oDNXxEirHq5QjABiIx0vqs" />
+
     <link rel="canonical" href="https://smartshop1.us/" />
     <meta name="theme-color" content="#ffffff" />
+
+    <!-- Robots meta tag - allow all search engines -->
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
 
     <!-- Open Graph / SEO Social -->
     <meta property="og:type" content="website" />
@@ -100,6 +106,106 @@
             }
         }
     </style>
+
+    <!-- Schema.org Structured Data for OnlineStore -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "OnlineStore",
+      "name": "SmartShop",
+      "url": "https://smartshop1.us",
+      "logo": "https://smartshop1.us/smartshop-logo.png",
+      "description": "Premium fashion for men, women & accessories. Free shipping on orders over $100.",
+      "priceRange": "$$",
+      "currenciesAccepted": "USD",
+      "paymentAccepted": "Credit Card, PayPal, Apple Pay, Google Pay",
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": "0",
+          "currency": "USD"
+        },
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 1,
+            "maxValue": 3,
+            "unitCode": "DAY"
+          },
+          "transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": 2,
+            "maxValue": 7,
+            "unitCode": "DAY"
+          }
+        }
+      },
+      "areaServed": {
+        "@type": "Country",
+        "name": "United States"
+      },
+      "hasOfferCatalog": {
+        "@type": "OfferCatalog",
+        "name": "Fashion Products",
+        "itemListElement": [
+          {
+            "@type": "OfferCatalog",
+            "name": "Men's Clothing",
+            "url": "https://smartshop1.us/products?category=Men"
+          },
+          {
+            "@type": "OfferCatalog",
+            "name": "Women's Clothing",
+            "url": "https://smartshop1.us/products?category=Women"
+          },
+          {
+            "@type": "OfferCatalog",
+            "name": "Accessories",
+            "url": "https://smartshop1.us/products?category=Accessories"
+          }
+        ]
+      }
+    }
+    </script>
+
+    <!-- BreadcrumbList Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://smartshop1.us/"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Organization Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SmartShop",
+      "url": "https://smartshop1.us",
+      "logo": "https://smartshop1.us/smartshop-logo.png",
+      "sameAs": [
+        "https://www.facebook.com/smartshop1",
+        "https://www.instagram.com/smartshop1",
+        "https://twitter.com/smartshop1"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "email": "support@smartshop1.us"
+      }
+    }
+    </script>
 </head>
 
 <body>
