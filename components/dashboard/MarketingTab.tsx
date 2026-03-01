@@ -177,6 +177,12 @@ export const MarketingTab: React.FC = () => {
         setSaving(true);
         try {
             const dataToSave = { ...formData };
+
+            // Clean up empty strings that DRF might reject
+            if (!dataToSave.scheduled_date) {
+                dataToSave.scheduled_date = null;
+            }
+
             if (!sendNow && dataToSave.scheduled_date) {
                 dataToSave.status = 'scheduled';
             } else {
