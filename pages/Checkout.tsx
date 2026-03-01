@@ -27,19 +27,20 @@ const stripeElementStyle = {
 
 // SmartShop Logo Component - uses actual logo image
 const SmartShopLogo = ({ size = 'default', dark = false }: { size?: 'small' | 'default' | 'large'; dark?: boolean }) => {
-  // Keep the container height small so the header doesn't expand
-  const containerHeights = { small: 'h-10 w-40', default: 'h-12 w-48', large: 'h-16 w-56' };
-  // Multiply the visual size to crop out the empty whitespace constraints of the PNG
-  const scales = { small: 'scale-[3.5]', default: 'scale-[4]', large: 'scale-[4.5]' };
+  // The original containerHeights and scales are for the image logo.
+  // For the text logo, we'll adjust the styling directly on the Link/span.
+  const textSizes = {
+    small: 'text-2xl',
+    default: 'text-3xl',
+    large: 'text-4xl'
+  };
 
   return (
-    <div className={`inline-flex items-center justify-center relative z-10 ${containerHeights[size]}`}>
-      <img
-        src="/smartshop-logo.png"
-        alt="SmartShop™ EST. 2026"
-        className={`absolute inset-0 w-full h-full object-contain ${scales[size]} transform origin-center pointer-events-none transition-all duration-300 ${dark ? 'brightness-0 invert' : ''}`}
-      />
-    </div>
+    <Link to="/" className={`block ${size === 'default' ? 'mb-8' : ''}`}>
+      <span className={`${textSizes[size]} font-black tracking-tighter ${dark ? 'text-white' : 'text-gray-900'}`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
+        Smart<span className="text-indigo-600">Shop</span>
+      </span>
+    </Link>
   );
 };
 

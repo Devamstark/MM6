@@ -6,10 +6,19 @@
 <p>The status of your order <strong>#{{ order.tracking_number }}</strong> has been updated to:</p>
 
 <div style="background-color: #f1f5f9; border-radius: 8px; padding: 20px; text-align: center; margin: 24px 0;">
-    <h3
-        style="margin: 0; font-size: 24px; color: {% if status == 'cancelled' %}#ef4444{% elif status == 'delivered' %}#22c55e{% elif status == 'shipped' %}#3b82f6{% else %}#4f46e5{% endif %}; text-transform: uppercase; letter-spacing: 0.05em;">
-        {{ status }}
-    </h3>
+    {% if status == 'cancelled' %}
+    <h3 style="margin: 0; font-size: 24px; color: #ef4444; text-transform: uppercase; letter-spacing: 0.05em;">{{ status
+        }}</h3>
+    {% elif status == 'delivered' %}
+    <h3 style="margin: 0; font-size: 24px; color: #22c55e; text-transform: uppercase; letter-spacing: 0.05em;">{{ status
+        }}</h3>
+    {% elif status == 'shipped' %}
+    <h3 style="margin: 0; font-size: 24px; color: #3b82f6; text-transform: uppercase; letter-spacing: 0.05em;">{{ status
+        }}</h3>
+    {% else %}
+    <h3 style="margin: 0; font-size: 24px; color: #4f46e5; text-transform: uppercase; letter-spacing: 0.05em;">{{ status
+        }}</h3>
+    {% endif %}
 </div>
 
 {% if status == 'shipped' %}
