@@ -7,7 +7,7 @@
 - [x] `index.html` - Added robots meta tag (index, follow)
 - [x] `index.html` - Added Schema.org structured data (JSON-LD)
 - [x] `public/sitemap.xml` - Added `<lastmod>` tags
-- [ ] **DEPLOY** all changes to production server
+- [x] **DEPLOY** all changes to production server
 
 ---
 
@@ -28,9 +28,9 @@ npm run build
 
 ### 3. Google Search Console Setup
 - [ ] Go to https://search.google.com/search-console/
-- [ ] Add property: `https://smartshop1.us`
-- [ ] Verify ownership (HTML tag or DNS method)
-- [ ] Confirmation: "Ownership verified"
+- [x] Add property: `https://smartshop1.us`
+- [x] Verify ownership (HTML tag or DNS method)
+- [x] Confirmation: "Ownership verified"
 
 ### 4. Submit Sitemap
 - [ ] Navigate to "Sitemaps" section
@@ -39,10 +39,10 @@ npm run build
 - [ ] Confirmation: Status = "Success" ✓
 
 ### 5. Request Indexing
-- [ ] Navigate to "URL Inspection"
-- [ ] Enter: `https://smartshop1.us/`
-- [ ] Click "Request Indexing"
-- [ ] Confirmation: "Indexing requested"
+- [x] Navigate to "URL Inspection"
+- [x] Enter: `https://smartshop1.us/`
+- [x] Click "Request Indexing"
+- [x] Confirmation: "Indexing requested"
 
 ---
 
