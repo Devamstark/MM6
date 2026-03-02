@@ -1861,7 +1861,8 @@ class HealthCheckView(APIView):
         except Exception as e:
             status_dict['status'] = 'unhealthy'
             status_dict['redis_cache'] = f"Error: {str(e)}"
-            return Response(status_dict, status=200 if status_dict['status'] == 'healthy' else 503)
+
+        return Response(status_dict, status=200 if status_dict['status'] == 'healthy' else 503)
 
 class CartViewSet(viewsets.ModelViewSet):
     """Phase 1B: Backend cart management"""
