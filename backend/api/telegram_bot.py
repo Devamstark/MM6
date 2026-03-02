@@ -9,6 +9,7 @@ from .models import Product
 import requests
 from .telegram_utils import send_telegram_message, send_telegram_photo
 from .ai_concierge import AIConcierge
+from seed_products import seed_demo_products # Import the seed script
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,8 @@ class TelegramWebhookView(APIView):
                 if is_admin:
                     welcome = "🚀 *Welcome Back, Admin!*\n\n" \
                               "You have full control over SmartShop here.\n\n" \
-                              "Admin Commands:\n" \
+                              "Available Admin Commands:\n" \
+                              "• `/seed` - Populate Demo Products\n" \
                               "• `/stock [id] [amount]`\n" \
                               "• `/price [id] [price]`"
                     send_telegram_message(welcome, chat_id=chat_id)
@@ -119,6 +121,14 @@ class TelegramWebhookView(APIView):
             # --- ADMIN COMMANDS ---
             if not is_admin:
                 return Response(status=status.HTTP_200_OK)
+
+            # Command: /seed
+            elif text.startswith('/seed'):
+                try:
+                    seed_demo_products()
+                    send_telegram_message("✅ *Database Seeded Successfully!*\nDemo products are now live in your shop.")
+                except Exception as e:
+                    send_telegram_message(f"❌ Error seeding database: {str(e)}")
 
             # Command: /stock [id] [amount]
             elif text.startswith('/stock'):
