@@ -780,3 +780,18 @@ try:
         notify_slack_security_alert.delay(message)
 except ImportError:
     pass
+
+# 🤖 Telegram: New Order Alerts
+from django.db.models.signals import post_save
+
+@receiver(post_save, sender=Order)
+def notify_telegram_new_order(sender, instance, created, **kwargs):
+    if created:
+        from .telegram_utils import send_telegram_message
+        message = f"🎉 *New Order Received!*\n\n" \
+                  f"*Order ID:* `{str(instance.id)[:8]}`\n" \
+                  f"*Customer:* {instance.customer_name}\n" \
+                  f"*Total:* ${instance.total_amount}\n" \
+                  f"*Status:* {instance.status.capitalize()}\n\n" \
+                  f"View in Admin: https://smartshop1.us/admin/orders/{instance.id}"
+        send_telegram_message(message)

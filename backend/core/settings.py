@@ -268,3 +268,7 @@ AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
 # Increased data upload limits for Base64 images in CMS and Products
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
+
+# 🤖 Telegram Bot Configuration
+TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
+TELEGRAM_ADMIN_ID = os.environ.get('TELEGRAM_ADMIN_ID', '')
