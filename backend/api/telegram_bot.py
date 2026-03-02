@@ -11,6 +11,7 @@ from .telegram_utils import send_telegram_message
 logger = logging.getLogger(__name__)
 
 class TelegramWebhookView(APIView):
+    authentication_classes = [] # Allow Telegram to post without session/JWT
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
