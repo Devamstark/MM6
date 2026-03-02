@@ -106,7 +106,8 @@ class TelegramWebhookView(APIView):
                         # 1. Prepare valid Image
                         img = product.image.url if product.image else "https://via.placeholder.com/300"
                         if not img.startswith('http'):
-                            img = f"https://smartshop1.us{img}"
+                            # Images must be fetched from the API domain
+                            img = f"https://api.smartshop1.us{img}"
                         
                         # 2. Escape EVERYTHING for HTML mode
                         safe_name = html.escape(product.name)
