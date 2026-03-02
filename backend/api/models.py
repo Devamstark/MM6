@@ -31,6 +31,10 @@ class User(AbstractUser):
     profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
     referral_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    # 🤖 Telegram Integration Fields
+    telegram_id = models.CharField(max_length=100, unique=True, blank=True, null=True, db_index=True)
+    telegram_photo_url = models.URLField(max_length=1000, blank=True, null=True)
+
     class Meta:
         indexes = [
             models.Index(fields=['is_active', 'date_joined']),

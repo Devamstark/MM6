@@ -75,17 +75,37 @@ class TelegramLoginView(APIView):
         first_name = tg_user.get('first_name', '')
         last_name = tg_user.get('last_name', '')
         username = tg_user.get('username') or f"tg_{tg_id}"
+        photo_url = tg_user.get('photo_url', '')
 
-        # Try to find user by username (matching our auto-username pattern)
-        user, created = User.objects.get_or_create(
-            username=username,
-            defaults={
-                'first_name': first_name,
-                'last_name': last_name,
-                'role': 'user',
-                'is_active': True
-            }
-        )
+        # Try to find user by telegram_id first (most reliable)
+        user = User.objects.filter(telegram_id=tg_id).first()
+        created = False
+
+        if not user:
+            # Fallback to username if for some reason telegram_id wasn't set earlier
+            user, created = User.objects.get_or_create(
+                username=username,
+                defaults={
+                    'first_name': first_name,
+                    'last_name': last_name,
+                    'role': 'user',
+                    'is_active': True,
+                    'telegram_id': tg_id,
+                    'telegram_photo_url': photo_url
+                }
+            )
+        
+        # If user existed but photo/name changed, update it
+        if not created:
+            updated = False
+            if not user.telegram_id:
+                user.telegram_id = tg_id
+                updated = True
+            if photo_url and user.telegram_photo_url != photo_url:
+                user.telegram_photo_url = photo_url
+                updated = True
+            if updated:
+                user.save(update_fields=['telegram_id', 'telegram_photo_url'])
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
