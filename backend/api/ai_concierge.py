@@ -16,10 +16,9 @@ class AIConcierge:
     
     # 📂 Category Mapping
     CATEGORY_KEYWORDS = {
-        'electronics': ['phone', 'laptop', 'camera', 'headphone', 'tech', 'gadget'],
-        'fashion': ['shirt', 'shoes', 'dress', 'clothing', 'fashion', 'sneaker', 'jeans'],
-        'home': ['furniture', 'decor', 'kitchen', 'home', 'living'],
-        'beauty': ['makeup', 'skincare', 'perfume', 'beauty', 'cosmetic'],
+        'Men': ['men', 'man', 'boy', 'guy', 'shirt', 'gentleman'],
+        'Women': ['women', 'woman', 'girl', 'lady', 'dress', 'fashion'],
+        'Accessories': ['accessories', 'watch', 'bag', 'sunglasses', 'jewelry', 'belt', 'hat'],
     }
 
     # 👫 Gender Dictionary
@@ -99,4 +98,6 @@ class AIConcierge:
         if not products.exists():
             return "🤷 I couldn't find exactly that. Can I show you something from our main collections?", []
 
-        return f"✨ I found these {len(products)} match(es) for you:", products
+        count = len(products)
+        msg = f"✨ I found <b>{count} match</b> for you:" if count == 1 else f"✨ I found <b>{count} matches</b> for you:"
+        return msg, products

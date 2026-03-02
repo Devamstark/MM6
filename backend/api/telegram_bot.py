@@ -1,5 +1,6 @@
 import logging
 import json
+import html
 from django.conf import settings
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -9,7 +10,6 @@ from .models import Product
 import requests
 from .telegram_utils import send_telegram_message, send_telegram_photo
 from .ai_concierge import AIConcierge
-from seed_products import seed_demo_products # Import the seed script
 
 logger = logging.getLogger(__name__)
 
@@ -56,8 +56,6 @@ class TelegramWebhookView(APIView):
                     welcome = "🚀 <b>Welcome Back, Admin!</b>\n\n" \
                               "You have full control over SmartShop here.\n\n" \
                               "Available Admin Commands:\n" \
-                              "• <code>/clear_demo</code> - Remove all demo products\n" \
-                              "• <code>/seed</code> - Add Demo Products (Test only)\n" \
                               "• <code>/stock [id] [amount]</code>\n" \
                               "• <code>/price [id] [price]</code>"
                     send_telegram_message(welcome, chat_id=chat_id)
@@ -67,9 +65,9 @@ class TelegramWebhookView(APIView):
                     
                     # Quick Search + Mini App buttons
                     buttons = [
-                        [{"text": "👕 Men's Fashion", "callback_data": "search:men fashion"}, 
-                         {"text": "👗 Women's Fashion", "callback_data": "search:women fashion"}],
-                        [{"text": "🔌 Electronics", "callback_data": "search:electronics"}],
+                        [{"text": "👕 Men", "callback_data": "search:Men"}, 
+                         {"text": "👗 Women", "callback_data": "search:Women"}],
+                        [{"text": "👜 Accessories", "callback_data": "search:Accessories"}],
                         [{"text": "🛍️ Open SmartShop App", "web_app": {"url": "https://smartshop1.us/"}}]
                     ]
                     
@@ -89,9 +87,9 @@ class TelegramWebhookView(APIView):
                 if not products:
                     # Offer quick buttons if nothing found
                     buttons = [
-                        [{"text": "👕 Men's Fashion", "callback_data": "search:men fashion"}, 
-                         {"text": "👗 Women's Fashion", "callback_data": "search:women fashion"}],
-                        [{"text": "🔌 Electronics", "callback_data": "search:electronics"}],
+                        [{"text": "👕 Men", "callback_data": "search:Men"}, 
+                         {"text": "👗 Women", "callback_data": "search:Women"}],
+                        [{"text": "👜 Accessories", "callback_data": "search:Accessories"}],
                         [{"text": "🛍️ Open Store", "web_app": {"url": "https://smartshop1.us/"}}]
                     ]
                     # We need to send as a normal message for callback buttons
@@ -108,46 +106,37 @@ class TelegramWebhookView(APIView):
                         # 1. Prepare valid Image
                         img = product.image.url if product.image else "https://via.placeholder.com/300"
                         if not img.startswith('http'):
-                            base_url = "https://smartshop1.us"
-                            img = f"{base_url}{img}"
+                            img = f"https://smartshop1.us{img}"
                         
-                        # 2. Escape HTML special chars 
-                        p_name = product.name.replace('<', '&lt;').replace('>', '&gt;')
-                        p_desc = product.description.replace('<', '&lt;').replace('>', '&gt;')
+                        # 2. Escape EVERYTHING for HTML mode
+                        safe_name = html.escape(product.name)
+                        safe_desc = html.escape(product.description[:100])
+                        caption = f"🏷️ <b>{safe_name}</b>\n💰 Price: <b>${product.price}</b>\n\n{safe_desc}..."
                         
-                        caption = f"🏷️ <b>{p_name}</b>\n💰 Price: <b>${product.price}</b>\n\n{p_desc[:100]}..."
-                        
-                        # 3. Prepare Buttons
+                        # 3. Prepare Links & Buttons
                         p_url = f"https://smartshop1.us/product/{product.slug}"
-                        buttons = [[{"text": "🛒 Buy Now", "web_app": {"url": p_url}}]]
+                        buttons = [[{"text": "🛒 Open SmartShop", "web_app": {"url": p_url}}]]
                         
-                        # 4. Try sending photo, fallback to text if fail
+                        # 4. Attempt Sending - Try Photo first
+                        logger.info(f"Sending product card: {safe_name}, Image: {img}")
                         photo_sent = send_telegram_photo(img, caption, chat_id=chat_id, buttons=buttons)
+                        
                         if not photo_sent:
-                            send_telegram_message(f"{caption}\n\n🔗 <a href='{p_url}'>View Product</a>", chat_id=chat_id)
+                            # 5. Try safe HTML fallback
+                            logger.warning(f"send_telegram_photo failed for {safe_name}. Trying text-only...")
+                            msg_sent = send_telegram_message(f"{caption}\n\n🔗 <a href='{p_url}'>View Details</a>", chat_id=chat_id)
+                            
+                            if not msg_sent:
+                                # 6. Final Minimal Fallback (No HTML entities except basic)
+                                logger.error(f"HTML fallback failed for {safe_name}. Final minimal fallback...")
+                                minimal_msg = f"📦 {safe_name} - ${product.price}\nView here: {p_url}"
+                                send_telegram_message(minimal_msg, chat_id=chat_id)
                 
                 return Response(status=status.HTTP_200_OK)
 
             # --- ADMIN COMMANDS ---
             if not is_admin:
                 return Response(status=status.HTTP_200_OK)
-
-            # Command: /clear_demo
-            elif text.startswith('/clear_demo'):
-                try:
-                    demo_slugs = ['mens-casual-black-tshirt', 'classic-white-sneakers-shoes', 'womens-floral-dress', 'ss-wireless-headphones']
-                    deleted_count, _ = Product.objects.filter(slug__in=demo_slugs).delete()
-                    send_telegram_message(f"🗑️ *Demo Data Cleared!*\nRemoved `{deleted_count}` demo products from your live database.")
-                except Exception as e:
-                    send_telegram_message(f"❌ Error clearing demo data: {str(e)}")
-
-            # Command: /seed
-            elif text.startswith('/seed'):
-                try:
-                    seed_demo_products()
-                    send_telegram_message("✅ <b>Database Seeded Successfully!</b>\nDemo products are now live in your shop.")
-                except Exception as e:
-                    send_telegram_message(f"❌ Error seeding database: {str(e)}")
 
             # Command: /stock [id] [amount]
             elif text.startswith('/stock'):
