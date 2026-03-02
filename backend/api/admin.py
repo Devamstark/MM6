@@ -1,10 +1,16 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from .models import (
-    User, Product, ProductVariant, ProductImage, Order, OrderItem, Payment, BlogPost,
+    User, TelegramUser, Product, ProductVariant, ProductImage, Order, OrderItem, Payment, BlogPost,
     NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog,
     CampaignRecipient, EmailClickLog, EmailConversion
 )
+
+@admin.register(TelegramUser)
+class TelegramUserAdmin(admin.ModelAdmin):
+    list_display = ('telegram_id', 'username', 'user', 'created_at')
+    search_fields = ('telegram_id', 'username', 'user__username', 'user__email')
+    readonly_fields = ('created_at', 'updated_at')
 
 # Register User Custom Admin
 @admin.register(User)

@@ -31,10 +31,6 @@ class User(AbstractUser):
     profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
     referral_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    # 🤖 Telegram Integration Fields
-    telegram_id = models.CharField(max_length=100, unique=True, blank=True, null=True, db_index=True)
-    telegram_photo_url = models.URLField(max_length=1000, blank=True, null=True)
-
     class Meta:
         indexes = [
             models.Index(fields=['is_active', 'date_joined']),
@@ -43,6 +39,19 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+class TelegramUser(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='telegram_profile')
+    telegram_id = models.CharField(max_length=100, unique=True, db_index=True)
+    username = models.CharField(max_length=255, blank=True, null=True)
+    first_name = models.CharField(max_length=255, blank=True, null=True)
+    last_name = models.CharField(max_length=255, blank=True, null=True)
+    photo_url = models.URLField(max_length=1000, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"TG: {self.username or self.telegram_id} ({self.user.username})"
 
 
 class ReferralSignup(models.Model):

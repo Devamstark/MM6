@@ -63,49 +63,59 @@ class TelegramLoginView(APIView):
         if not init_data:
             return Response({'error': 'initData is required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        is_valid, tg_user = verify_telegram_data(init_data)
+        is_valid, tg_user_data = verify_telegram_data(init_data)
         if not is_valid:
-            logger.error(f"TMA Validation Failed: {tg_user}")
-            return Response({'error': f'Validation failed: {tg_user}'}, status=status.HTTP_401_UNAUTHORIZED)
+            logger.error(f"TMA Validation Failed: {tg_user_data}")
+            return Response({'error': f'Validation failed: {tg_user_data}'}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if not tg_user:
+        if not tg_user_data:
             return Response({'error': 'User data missing in initData'}, status=status.HTTP_400_BAD_REQUEST)
 
-        tg_id = str(tg_user.get('id'))
-        first_name = tg_user.get('first_name', '')
-        last_name = tg_user.get('last_name', '')
-        username = tg_user.get('username') or f"tg_{tg_id}"
-        photo_url = tg_user.get('photo_url', '')
+        tg_id = str(tg_user_data.get('id'))
+        first_name = tg_user_data.get('first_name', '')
+        last_name = tg_user_data.get('last_name', '')
+        username = tg_user_data.get('username') or f"tg_{tg_id}"
+        photo_url = tg_user_data.get('photo_url', '')
 
-        # Try to find user by telegram_id first (most reliable)
-        user = User.objects.filter(telegram_id=tg_id).first()
+        # Try to find TelegramUser first
+        tg_user = TelegramUser.objects.filter(telegram_id=tg_id).first()
         created = False
 
-        if not user:
-            # Fallback to username if for some reason telegram_id wasn't set earlier
-            user, created = User.objects.get_or_create(
-                username=username,
-                defaults={
-                    'first_name': first_name,
-                    'last_name': last_name,
-                    'role': 'user',
-                    'is_active': True,
-                    'telegram_id': tg_id,
-                    'telegram_photo_url': photo_url
-                }
+        if not tg_user:
+            # Check if a User with this username already exists (for legacy support)
+            user = User.objects.filter(username=username).first()
+            if not user:
+                # Create a NEW system User
+                user = User.objects.create(
+                    username=username,
+                    first_name=first_name,
+                    last_name=last_name,
+                    role='user',
+                    is_active=True
+                )
+                created = True
+            
+            # Create the TelegramUser entry
+            tg_user = TelegramUser.objects.create(
+                user=user,
+                telegram_id=tg_id,
+                username=tg_user_data.get('username'),
+                first_name=first_name,
+                last_name=last_name,
+                photo_url=photo_url
             )
-        
-        # If user existed but photo/name changed, update it
-        if not created:
+        else:
+            user = tg_user.user
+            # Update Telegram profile info if changed
             updated = False
-            if not user.telegram_id:
-                user.telegram_id = tg_id
+            if tg_user.username != tg_user_data.get('username'):
+                tg_user.username = tg_user_data.get('username')
                 updated = True
-            if photo_url and user.telegram_photo_url != photo_url:
-                user.telegram_photo_url = photo_url
+            if tg_user.photo_url != photo_url:
+                tg_user.photo_url = photo_url
                 updated = True
             if updated:
-                user.save(update_fields=['telegram_id', 'telegram_photo_url'])
+                tg_user.save()
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
