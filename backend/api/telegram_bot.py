@@ -30,23 +30,31 @@ class TelegramWebhookView(APIView):
             chat_id = str(message.get('chat', {}).get('id', '')).strip()
             admin_id = str(getattr(settings, 'TELEGRAM_ADMIN_ID', '')).strip()
 
-            logger.info(f"Message from {chat_id}, checking against Admin ID: {admin_id}")
-
-            # Basic Security: Only respond to the configured Admin ID
-            if chat_id != admin_id:
-                logger.warning(f"Unauthorized bot access Attempt from ID: {chat_id}")
-                return Response({'status': 'unauthorized'}, status=status.HTTP_200_OK)
-
-            if not text:
-                return Response(status=status.HTTP_200_OK)
+            is_admin = (chat_id == admin_id)
+            logger.info(f"Message from {chat_id}, Admin Level: {is_admin}")
 
             # Command: /start
             if text.startswith('/start'):
-                welcome = "🚀 *SmartShop Admin Bot Active*\n\n" \
-                          "Available Commands:\n" \
-                          "• `/stock [id] [amount]` - e.g. `/stock 105 50` or `/stock 105 +10`\n" \
-                          "• `/price [id] [price]` - e.g. `/price 201 24.99`"
-                send_telegram_message(welcome)
+                if is_admin:
+                    welcome = "🚀 *Welcome Back, Admin!*\n\n" \
+                              "You have full control over SmartShop here.\n\n" \
+                              "Available Commands:\n" \
+                              "• `/stock [id] [amount]` - Update inventory\n" \
+                              "• `/price [id] [price]` - Change prices"
+                    send_telegram_message(welcome, chat_id=chat_id)
+                else:
+                    customer_welcome = "👋 *Welcome to SmartShop!*\n\n" \
+                                       "We're excited to have you here. Shop the latest fashion, accessories, and more directly from Telegram.\n\n" \
+                                       "👇 *Click the button below to start shopping!*"
+                    # We can use a direct link for now, 
+                    # or I can enhance send_telegram_message with buttons next
+                    send_telegram_message(customer_welcome, chat_id=chat_id)
+                return Response(status=status.HTTP_200_OK)
+
+            # --- CUSTOMER COMMANDS END HERE ---
+            # All following commands require Admin access
+            if not is_admin:
+                return Response(status=status.HTTP_200_OK)
 
             # Command: /stock [id] [amount]
             elif text.startswith('/stock'):

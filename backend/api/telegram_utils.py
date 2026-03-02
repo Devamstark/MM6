@@ -4,17 +4,24 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-def send_telegram_message(message: str):
+def send_telegram_message(message: str, chat_id=None):
     token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
-    chat_id = getattr(settings, 'TELEGRAM_ADMIN_ID', '')
+    admin_id = getattr(settings, 'TELEGRAM_ADMIN_ID', '')
     
-    if not token or not chat_id:
-        logger.warning("Telegram Bot Token or Admin ID not configured.")
+    if not token:
+        logger.error("Telegram Bot Token not configured.")
+        return False
+
+    # Default to Admin ID if no specific chat_id provided
+    target_chat_id = chat_id or admin_id
+    
+    if not target_chat_id:
+        logger.error("No target chat_id or Admin ID for Telegram message.")
         return False
         
     url = f"https://api.telegram.org/bot{token}/sendMessage"
     payload = {
-        "chat_id": chat_id,
+        "chat_id": target_chat_id,
         "text": message,
         "parse_mode": "Markdown"
     }
