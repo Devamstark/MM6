@@ -28,10 +28,35 @@ def send_telegram_message(message: str, chat_id=None):
     
     try:
         response = requests.post(url, json=payload, timeout=10)
-        logger.info(f"Telegram API Response Status: {response.status_code}")
-        logger.info(f"Telegram API Response Text: {response.text}")
         response.raise_for_status()
         return True
     except Exception as e:
         logger.error(f"Failed to send Telegram message: {str(e)}")
+        return False
+
+def send_telegram_photo(photo_url: str, caption: str, chat_id=None, buttons=None):
+    """
+    Sends a photo with a caption and optional inline buttons.
+    """
+    token = getattr(settings, 'TELEGRAM_BOT_TOKEN', '')
+    if not token or not chat_id:
+        return False
+
+    url = f"https://api.telegram.org/bot{token}/sendPhoto"
+    payload = {
+        "chat_id": chat_id,
+        "photo": photo_url,
+        "caption": caption,
+        "parse_mode": "Markdown"
+    }
+
+    if buttons:
+        payload["reply_markup"] = json.dumps({
+            "inline_keyboard": buttons
+        })
+
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        return response.ok
+    except Exception:
         return False

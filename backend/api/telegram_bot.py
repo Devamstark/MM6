@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
 from .models import Product
-from .telegram_utils import send_telegram_message
+from .telegram_utils import send_telegram_message, send_telegram_photo
+from .ai_concierge import AIConcierge
 
 logger = logging.getLogger(__name__)
 
@@ -35,24 +36,57 @@ class TelegramWebhookView(APIView):
 
             # Command: /start
             if text.startswith('/start'):
+                # Bot App URL (from your bot name)
+                bot_url = "https://t.me/cloudmart_shop_bot/smartshop" # Update with your actual bot username
+                
                 if is_admin:
                     welcome = "🚀 *Welcome Back, Admin!*\n\n" \
                               "You have full control over SmartShop here.\n\n" \
-                              "Available Commands:\n" \
-                              "• `/stock [id] [amount]` - Update inventory\n" \
-                              "• `/price [id] [price]` - Change prices"
+                              "Admin Commands:\n" \
+                              "• `/stock [id] [amount]`\n" \
+                              "• `/price [id] [price]`"
                     send_telegram_message(welcome, chat_id=chat_id)
                 else:
                     customer_welcome = "👋 *Welcome to SmartShop!*\n\n" \
-                                       "We're excited to have you here. Shop the latest fashion, accessories, and more directly from Telegram.\n\n" \
-                                       "👇 *Click the button below to start shopping!*"
-                    # We can use a direct link for now, 
-                    # or I can enhance send_telegram_message with buttons next
-                    send_telegram_message(customer_welcome, chat_id=chat_id)
+                                       "Shop the latest fashion and tech directly from Telegram.\n\n" \
+                                       "👇 *Start shopping below!*"
+                    
+                    # Add a button to open the Mini App
+                    buttons = [[{"text": "🛍️ Open SmartShop", "web_app": {"url": "https://smartshop1.us/"}}]]
+                    
+                    send_telegram_photo(
+                        "https://smartshop1.us/logo.png", # Fallback logo
+                        customer_welcome,
+                        chat_id=chat_id,
+                        buttons=buttons
+                    )
                 return Response(status=status.HTTP_200_OK)
 
-            # --- CUSTOMER COMMANDS END HERE ---
-            # All following commands require Admin access
+            # AI CONCIERGE SEARCH (If non-command text)
+            if not text.startswith('/'):
+                message_text, products = AIConcierge.format_response(text)
+                
+                if not products:
+                    send_telegram_message(message_text, chat_id=chat_id)
+                else:
+                    send_telegram_message(message_text, chat_id=chat_id)
+                    for product in products:
+                        # Get a valid image URL
+                        img = product.image.url if product.image else "https://via.placeholder.com/300"
+                        if not img.startswith('http'):
+                            img = f"https://api.smartshop1.us{img}"
+                        
+                        caption = f"🏷️ *{product.name}*\n💰 Price: `${product.price}`\n\n{product.description[:100]}..."
+                        
+                        # Button to open this specific product in Mini App
+                        p_url = f"https://smartshop1.us/product/{product.slug}"
+                        buttons = [[{"text": "🛒 Buy Now", "web_app": {"url": p_url}}]]
+                        
+                        send_telegram_photo(img, caption, chat_id=chat_id, buttons=buttons)
+                
+                return Response(status=status.HTTP_200_OK)
+
+            # --- ADMIN COMMANDS ---
             if not is_admin:
                 return Response(status=status.HTTP_200_OK)
 
