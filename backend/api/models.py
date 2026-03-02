@@ -798,13 +798,44 @@ except ImportError:
 from django.db.models.signals import post_save
 
 @receiver(post_save, sender=Order)
-def notify_telegram_new_order(sender, instance, created, **kwargs):
+def notify_telegram_order_update(sender, instance, created, **kwargs):
+    """
+    Unified Telegram Notification Signal:
+    1. Notifies Admin of NEW orders.
+    2. Notifies Customer if their order status changes (Shipped/Delivered).
+    """
+    from .telegram_utils import send_telegram_message
+    
+    # 1. NEW ORDER -> Notify Admin
     if created:
-        from .telegram_utils import send_telegram_message
-        message = f"🎉 *New Order Received!*\n\n" \
-                  f"*Order ID:* `{str(instance.id)[:8]}`\n" \
-                  f"*Customer:* {instance.customer_name}\n" \
-                  f"*Total:* ${instance.total_amount}\n" \
-                  f"*Status:* {instance.status.capitalize()}\n\n" \
-                  f"View in Admin: https://smartshop1.us/admin/orders/{instance.id}"
-        send_telegram_message(message)
+        admin_msg = f"🎉 <b>New Order Received!</b>\n\n" \
+                    f"<b>Order ID:</b> <code>{str(instance.id)[:8]}</code>\n" \
+                    f"<b>Customer:</b> {instance.customer_name}\n" \
+                    f"<b>Total:</b> <b>${instance.total_amount}</b>\n\n" \
+                    f"🔗 <a href='https://smartshop1.us/ssx/api/order/'>Open Management Console</a>"
+        send_telegram_message(admin_msg) # Defaults to Admin ID
+
+    # 2. STATUS CHANGE -> Notify Customer (if linked)
+    else:
+        # We only care about Shipped, Delivered, or Cancelled for customers
+        if instance.status in ['shipped', 'delivered', 'cancelled']:
+            try:
+                # Check if this user has a linked Telegram profile
+                tg_profile = getattr(instance.user, 'telegram_profile', None)
+                if tg_profile and tg_profile.telegram_id:
+                    status_icons = {
+                        'shipped': '🚚',
+                        'delivered': '🎁',
+                        'cancelled': '❌'
+                    }
+                    icon = status_icons.get(instance.status, '🔔')
+                    
+                    customer_msg = f"{icon} <b>Order Update: {instance.status.upper()}</b>\n\n" \
+                                   f"Hi {tg_profile.first_name or instance.user.username},\n" \
+                                   f"Your order <code>#{str(instance.id)[:8]}</code> is now <b>{instance.status}</b>.\n\n" \
+                                   f"🛍️ <a href='https://t.me/cloudmart_shop_bot/smartshop?startapp=order_{instance.id}'>Track in Mini App</a>"
+                    
+                    send_telegram_message(customer_msg, chat_id=tg_profile.telegram_id)
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Failed to send customer TG notification: {e}")

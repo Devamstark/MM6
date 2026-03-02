@@ -177,10 +177,17 @@ class CategoryViewSet(viewsets.ViewSet):
     def list(self, request):
         items = Product.objects.values('category', 'subcategory').distinct()
         data = {}
+        # Predefined list of allowed main categories to avoid demo data leakage
+        disallowed = ['electronics', 'fashion']
+        
         for item in items:
             cat = item['category']
             sub = item['subcategory']
+            
             if cat:
+                if cat.lower() in disallowed:
+                    continue
+                    
                 if cat not in data:
                     data[cat] = []
                 if sub and sub not in data[cat]:

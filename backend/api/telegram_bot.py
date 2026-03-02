@@ -31,7 +31,49 @@ class TelegramWebhookView(APIView):
             
             message = data.get('message', {})
             callback_query = data.get('callback_query', {})
+            inline_query = data.get('inline_query', {})
             
+            # --- 1. HANDLE INLINE QUERIES (Global Search) ---
+            if inline_query:
+                query_text = inline_query.get('query', '')
+                query_id = inline_query.get('id')
+                
+                logger.info(f"Inline Query Received: '{query_text}'")
+                
+                products, _ = AIConcierge.search_products(query_text, limit=10)
+                results = []
+                
+                for p in products:
+                    # Construct product URL
+                    p_url = f"https://smartshop1.us/product/{p.slug}"
+                    img = p.image.url if p.image else "https://via.placeholder.com/300"
+                    if not img.startswith('http'):
+                        img = f"https://api.smartshop1.us{img}"
+
+                    results.append({
+                        "type": "article",
+                        "id": str(p.id),
+                        "title": p.name,
+                        "input_message_content": {
+                            "message_text": f"🏷️ <b>{html.escape(p.name)}</b>\n💰 Price: <b>${p.price}</b>\n\n{html.escape(p.description[:150])}...\n\n<a href='{p_url}'>View Details</a>",
+                            "parse_mode": "HTML"
+                        },
+                        "reply_markup": {
+                            "inline_keyboard": [[{"text": "🛒 Buy Now", "url": p_url}]]
+                        },
+                        "thumb_url": img,
+                        "description": f"${p.price} - {p.category}"
+                    })
+                
+                # Answer Inline Query
+                requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/answerInlineQuery", 
+                              json={
+                                  "inline_query_id": query_id,
+                                  "results": results,
+                                  "cache_time": 300
+                              })
+                return Response(status=status.HTTP_200_OK)
+
             if callback_query:
                 # Handle button clicks
                 chat_id = str(callback_query.get('message', {}).get('chat', {}).get('id', '')).strip()
@@ -51,7 +93,7 @@ class TelegramWebhookView(APIView):
             # Command: /start
             if text.startswith('/start'):
                 # Bot App URL (from your bot name)
-                bot_url = "https://t.me/cloudmart_shop_bot/smartshop" # Update with your actual bot username
+                bot_url = "https://t.me/cloudmart_shop_bot/smartshop" 
                 
                 if is_admin:
                     welcome = "🚀 <b>Welcome Back, Admin!</b>\n\n" \
@@ -66,7 +108,10 @@ class TelegramWebhookView(APIView):
                     send_telegram_message(welcome, chat_id=chat_id)
                 else:
                     customer_welcome = "👋 <b>Welcome to SmartShop!</b>\n\n" \
-                                       "I am your AI shopping assistant. Type what you are looking for (e.g., 'blue dress') or choose a category below:"
+                                       "I am your AI shopping assistant. You can:\n" \
+                                       "🔍 <b>Search</b> by typing anything (e.g. 'black tshirt')\n" \
+                                       "🚚 <b>Track</b> orders by asking 'where is my package?'\n" \
+                                       "🛍️ <b>Shop</b> directly using the Mini App below!"
                     
                     # Quick Search + Mini App buttons
                     buttons = [
@@ -83,6 +128,16 @@ class TelegramWebhookView(APIView):
                         "reply_markup": json.dumps({"inline_keyboard": buttons})
                     }
                     requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/sendMessage", json=payload)
+                return Response(status=status.HTTP_200_OK)
+
+            # Command: /help
+            elif text.startswith('/help'):
+                help_text = "📖 <b>SmartShop Bot Help</b>\n\n" \
+                            "• <b>Search</b>: Just type what you want (e.g., 'blue dress').\n" \
+                            "• <b>Share</b>: Type <code>@your_bot_name</code> in any chat to share products!\n" \
+                            "• <b>Support</b>: Ask about 'shipping', 'returns', or 'contact'.\n" \
+                            "• <b>App</b>: Click the 'Open App' button to browse the full store."
+                send_telegram_message(help_text, chat_id=chat_id)
                 return Response(status=status.HTTP_200_OK)
 
             # AI CONCIERGE SEARCH (If non-command text)

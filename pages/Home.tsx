@@ -130,7 +130,14 @@ export const Home = () => {
         setHeroBanners(
           banners.filter((b: any) => b.is_active).sort((a: any, b: any) => a.display_order - b.display_order)
         );
-        setCategories(cats);
+
+        // Filter out unwanted categories (electronics, fashion) as requested
+        const filteredCats = cats.filter((cat: string) => {
+          const lower = cat.toLowerCase();
+          return !lower.includes('electronics') && !lower.includes('fashion') && lower !== '';
+        });
+
+        setCategories(filteredCats);
       } catch (err) {
         console.error('Critical fetch failed:', err);
         setError('Failed to connect to the server. Please ensure the backend is running.');
