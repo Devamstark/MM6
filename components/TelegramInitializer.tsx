@@ -30,6 +30,7 @@ export const TelegramInitializer: React.FC<{ children: React.ReactNode }> = ({ c
                         localStorage.setItem('cm_user_data', JSON.stringify(data.user));
 
                         console.log("Telegram Login Successful!");
+                        window.location.reload(); // Refresh to apply new auth state
 
                         // Haptic feedback if available
                         if (tg.HapticFeedback) {
