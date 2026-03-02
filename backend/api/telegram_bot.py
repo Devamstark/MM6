@@ -10,6 +10,10 @@ from .telegram_utils import send_telegram_message
 
 logger = logging.getLogger(__name__)
 
+from django.views.decorators.csrf import csrf_exempt
+from django.utils.decorators import method_decorator
+
+@method_decorator(csrf_exempt, name='dispatch')
 class TelegramWebhookView(APIView):
     authentication_classes = [] # Allow Telegram to post without session/JWT
     permission_classes = [permissions.AllowAny]
@@ -17,15 +21,19 @@ class TelegramWebhookView(APIView):
     def post(self, request):
         try:
             data = request.data
+            logger.info(f"Telegram Webhook Received Data: {json.dumps(data)}")
+            
             message = data.get('message', {})
             text = message.get('text', '')
-            chat_id = str(message.get('chat', {}).get('id', ''))
-            admin_id = str(getattr(settings, 'TELEGRAM_ADMIN_ID', ''))
+            chat_id = str(message.get('chat', {}).get('id', '')).strip()
+            admin_id = str(getattr(settings, 'TELEGRAM_ADMIN_ID', '')).strip()
+
+            logger.info(f"Message from {chat_id}, checking against Admin ID: {admin_id}")
 
             # Basic Security: Only respond to the configured Admin ID
             if chat_id != admin_id:
                 logger.warning(f"Unauthorized bot access Attempt from ID: {chat_id}")
-                return Response(status=status.HTTP_200_OK)
+                return Response({'status': 'unauthorized'}, status=status.HTTP_200_OK)
 
             if not text:
                 return Response(status=status.HTTP_200_OK)

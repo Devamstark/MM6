@@ -21,6 +21,8 @@ def send_telegram_message(message: str):
     
     try:
         response = requests.post(url, json=payload, timeout=10)
+        logger.info(f"Telegram API Response Status: {response.status_code}")
+        logger.info(f"Telegram API Response Text: {response.text}")
         response.raise_for_status()
         return True
     except Exception as e:
