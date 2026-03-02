@@ -406,6 +406,7 @@ You now have:
 | progress/MVP_IMPLEMENTATION_CHECKLIST.md | 1.3.0 | March 2, 2026 | ✅ Updated |
 | progress/WORK_DONE.md | 1.1.0 | March 2, 2026 | ✅ Updated |
 | strategy/TELEGRAM_BOT_ROADMAP.md | 1.1.0 | March 2, 2026 | ✅ COMPLETED |
+| strategy/TELEGRAM_BOT_CONFIG.md | 1.0.0 | March 2, 2026 | ✅ New |
 
 ---
 
