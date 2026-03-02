@@ -56,7 +56,8 @@ class TelegramWebhookView(APIView):
                     welcome = "🚀 *Welcome Back, Admin!*\n\n" \
                               "You have full control over SmartShop here.\n\n" \
                               "Available Admin Commands:\n" \
-                              "• `/seed` - Populate Demo Products\n" \
+                              "• `/clear_demo` - Remove all demo products\n" \
+                              "• `/seed` - Add Demo Products (Test only)\n" \
                               "• `/stock [id] [amount]`\n" \
                               "• `/price [id] [price]`"
                     send_telegram_message(welcome, chat_id=chat_id)
@@ -129,6 +130,15 @@ class TelegramWebhookView(APIView):
             # --- ADMIN COMMANDS ---
             if not is_admin:
                 return Response(status=status.HTTP_200_OK)
+
+            # Command: /clear_demo
+            elif text.startswith('/clear_demo'):
+                try:
+                    demo_slugs = ['mens-casual-black-tshirt', 'classic-white-sneakers-shoes', 'womens-floral-dress', 'ss-wireless-headphones']
+                    deleted_count, _ = Product.objects.filter(slug__in=demo_slugs).delete()
+                    send_telegram_message(f"🗑️ *Demo Data Cleared!*\nRemoved `{deleted_count}` demo products from your live database.")
+                except Exception as e:
+                    send_telegram_message(f"❌ Error clearing demo data: {str(e)}")
 
             # Command: /seed
             elif text.startswith('/seed'):
