@@ -80,8 +80,9 @@ class AIConcierge:
         # Robust keyword search
         q_obj = Q()
         for term in intent['search_terms']:
-            if len(term) > 2: # Ignore short words
-                q_obj |= Q(name__icontains=term) | Q(description__icontains=term) | Q(category__icontains=term)
+            clean_term = term.rstrip('s').rstrip('es') if len(term) > 3 else term
+            if len(clean_term) > 2:
+                q_obj |= Q(name__icontains=clean_term) | Q(description__icontains=clean_term) | Q(category__icontains=clean_term)
         
         if q_obj:
             products = products.filter(q_obj)

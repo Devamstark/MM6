@@ -103,18 +103,26 @@ class TelegramWebhookView(APIView):
                 else:
                     send_telegram_message(message_text, chat_id=chat_id)
                     for product in products:
-                        # Get a valid image URL
+                        # 1. Prepare valid Image
                         img = product.image.url if product.image else "https://via.placeholder.com/300"
                         if not img.startswith('http'):
                             img = f"https://api.smartshop1.us{img}"
                         
-                        caption = f"🏷️ *{product.name}*\n💰 Price: `${product.price}`\n\n{product.description[:100]}..."
+                        # 2. Escape name and description to prevent Markdown errors
+                        p_name = product.name.replace('*', '').replace('_', '').replace('[', '').replace(']', '')
+                        p_desc = product.description.replace('*', '').replace('_', '').replace('[', '').replace(']', '')
                         
-                        # Button to open this specific product in Mini App
+                        caption = f"🏷️ *{p_name}*\n💰 Price: `${product.price}`\n\n{p_desc[:100]}..."
+                        
+                        # 3. Prepare Buttons
                         p_url = f"https://smartshop1.us/product/{product.slug}"
                         buttons = [[{"text": "🛒 Buy Now", "web_app": {"url": p_url}}]]
                         
-                        send_telegram_photo(img, caption, chat_id=chat_id, buttons=buttons)
+                        # 4. Try sending photo, fallback to text if fail
+                        photo_sent = send_telegram_photo(img, caption, chat_id=chat_id, buttons=buttons)
+                        if not photo_sent:
+                            # Fallback to Text-only card
+                            send_telegram_message(f"{caption}\n\n🔗 [View Product]({p_url})", chat_id=chat_id)
                 
                 return Response(status=status.HTTP_200_OK)
 

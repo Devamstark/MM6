@@ -25,9 +25,9 @@ def seed_demo_products():
 
     demo_products = [
         {
-            "name": "Men's Sleek Black T-Shirt",
-            "slug": "mens-sleek-black-tshirt",
-            "description": "High-quality cotton t-shirt for daily wear.",
+            "name": "Men's Casual Black T-Shirt",
+            "slug": "mens-casual-black-tshirt",
+            "description": "Premium cotton shirt for any occasion.",
             "price": 25.0,
             "category": "Fashion",
             "gender": "Men",
@@ -35,9 +35,19 @@ def seed_demo_products():
             "stock_quantity": 50
         },
         {
-            "name": "Women's Floral Summer Dress",
-            "slug": "womens-floral-summer-dress",
-            "description": "Light and airy dress perfect for the beach.",
+            "name": "Classic White Sneakers",
+            "slug": "classic-white-sneakers-shoes",
+            "description": "Comfortable white shoes for walking and running.",
+            "price": 55.0,
+            "category": "Fashion",
+            "gender": "Unisex",
+            "colors": "white",
+            "stock_quantity": 25
+        },
+        {
+            "name": "Women's Floral Dress",
+            "slug": "womens-floral-dress",
+            "description": "Elegant summer dress with floral patterns.",
             "price": 45.0,
             "category": "Fashion",
             "gender": "Women",
@@ -45,13 +55,13 @@ def seed_demo_products():
             "stock_quantity": 30
         },
         {
-            "name": "SmartShop Pro Headphones",
-            "slug": "smartshop-pro-headphones",
-            "description": "Noise-cancelling wireless headphones with 40h battery.",
+            "name": "SmartShop Wireless Headphones",
+            "slug": "ss-wireless-headphones",
+            "description": "Noise-cancelling tech gadget.",
             "price": 120.0,
             "category": "Electronics",
             "gender": "Unisex",
-            "colors": "gray",
+            "colors": "black",
             "stock_quantity": 15
         }
     ]
