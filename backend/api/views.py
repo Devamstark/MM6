@@ -9,6 +9,10 @@ import django_filters
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.conf import settings
+from django.http import JsonResponse
+import logging
+
+logger = logging.getLogger(__name__)
 import random
 from decimal import Decimal
 from datetime import timedelta
@@ -1844,11 +1848,12 @@ class HealthCheckView(APIView):
             from django.db import connection
             with connection.cursor() as cursor:
                 cursor.execute("SELECT 1")
-                row = cursor.fetchone()
+                cursor.fetchone()
             status_dict['database'] = 'ok'
         except Exception as e:
             status_dict['status'] = 'unhealthy'
-            status_dict['database'] = str(e)
+            status_dict['database'] = f"Database Error: {str(e)}"
+            logger.error(f"HealthCheck DB Failure: {e}")
 
         try:
             # 2. Check Redis/Cache
@@ -1860,9 +1865,14 @@ class HealthCheckView(APIView):
                 raise ValueError("Cache set/get mismatch")
         except Exception as e:
             status_dict['status'] = 'unhealthy'
-            status_dict['redis_cache'] = f"Error: {str(e)}"
+            status_dict['redis_cache'] = f"Redis Error: {str(e)}"
+            logger.error(f"HealthCheck Redis Failure: {e}")
 
-        return Response(status_dict, status=200 if status_dict['status'] == 'healthy' else 503)
+        # Final Response using standard JsonResponse for maximum reliability
+        return JsonResponse(
+            status_dict, 
+            status=200 if status_dict['status'] == 'healthy' else 503
+        )
 
 class CartViewSet(viewsets.ModelViewSet):
     """Phase 1B: Backend cart management"""
