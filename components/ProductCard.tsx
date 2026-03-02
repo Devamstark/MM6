@@ -184,7 +184,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, index = 0, pr
             </div>
 
             {/* Color swatches */}
-            {product.colors && product.colors.length > 0 && (
+            {Array.isArray(product.colors) && product.colors.length > 0 && (
               <div className="flex items-center gap-1.5 pt-1">
                 {product.colors.slice(0, 5).map((c, i) => (
                   <div
