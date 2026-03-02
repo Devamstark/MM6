@@ -77,11 +77,12 @@ class TelegramLoginView(APIView):
         username = tg_user_data.get('username') or f"tg_{tg_id}"
         photo_url = tg_user_data.get('photo_url', '')
 
-        # Try to find TelegramUser first
-        tg_user = TelegramUser.objects.filter(telegram_id=tg_id).first()
+        # Try to find TelegramUser first (most reliable)
+        tg_profile = TelegramUser.objects.filter(telegram_id=tg_id).first()
+        user = tg_profile.user if tg_profile else None
         created = False
 
-        if not tg_user:
+        if not tg_profile:
             # Check if a User with this username already exists (for legacy support)
             user = User.objects.filter(username=username).first()
             if not user:
@@ -96,7 +97,7 @@ class TelegramLoginView(APIView):
                 created = True
             
             # Create the TelegramUser entry
-            tg_user = TelegramUser.objects.create(
+            tg_profile = TelegramUser.objects.create(
                 user=user,
                 telegram_id=tg_id,
                 username=tg_user_data.get('username'),
@@ -105,17 +106,17 @@ class TelegramLoginView(APIView):
                 photo_url=photo_url
             )
         else:
-            user = tg_user.user
+            user = tg_profile.user
             # Update Telegram profile info if changed
             updated = False
-            if tg_user.username != tg_user_data.get('username'):
-                tg_user.username = tg_user_data.get('username')
+            if tg_profile.username != tg_user_data.get('username'):
+                tg_profile.username = tg_user_data.get('username')
                 updated = True
-            if tg_user.photo_url != photo_url:
-                tg_user.photo_url = photo_url
+            if tg_profile.photo_url != photo_url:
+                tg_profile.photo_url = photo_url
                 updated = True
             if updated:
-                tg_user.save()
+                tg_profile.save()
 
         # Generate JWT tokens
         refresh = RefreshToken.for_user(user)
