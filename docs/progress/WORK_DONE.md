@@ -28,10 +28,8 @@
 | Service | URL | Purpose |
 |:---|:---|:---|
 | 📨 **EwallHost Webmail** | [https://us3.webmail.mailhostbox.com](https://us3.webmail.mailhostbox.com) | EwallHost's own webmail for `support@smartshop1.us` |
-| � **SMTP Server** | `us2.smtp.mailhostbox.com:587` | Outbound email (password resets, welcome emails) |
+| 📧 **SMTP Server** | `us2.smtp.mailhostbox.com:587` | Outbound email (password resets, welcome emails) |
 | 📥 **IMAP Server** | `us2.imap.mailhostbox.com:993` | Incoming email (used by Roundcube) |
-
-> ⚠️ Private links are accessible only from devices that know the VPS IP. No credentials are stored in this document.
 
 ---
 
@@ -122,15 +120,23 @@
 - **Structured JSON Logging**: Replaced generic console logs with `python-json-logger` for clean indexing/scraping.
 - **Sentry Error Tracking**: Initialized `sentry-sdk` integrated flawlessly with Django, Redis, and Celery for real-time tracebacks.
 - **Application Health Check**: Added explicit `/api/health/` JSON endpoint that internally executes active SQL queries and probes the Redis cache to ensure genuine operational health.
-- **Independent Status Page**: Deployed CheckCle self-hosted monitoring system onto `https://status.smartshop1.us` (run via independent Dokploy Template, not composed with the app) to monitor server uptime via Traefik.
+- **Independent Status Page**: Deployed CheckCle self-hosted monitoring system onto `https://status.smartshop1.us` to monitor server uptime via Traefik.
 - **Brute-Force Shield & Alerts**: Configured `django-axes` to ban attackers after 5 failed login attempts and instantly fire a JSON payload mapping the attacker IP and target to an isolated Slack `#security-alerts` Webhook.
 - **Order Telemetry**: Automated Celery task to dispatch successful Stripe order completions directly to a Slack `#orders` Webhook.
 
 ### 13. 🛡️ Database Optimization & Email Privacy (Feb 27, 2026)
-- **Email PII Protection**: Refactored mass-sending tasks (`send_newsletter`, `send_marketing_campaign`) to utilize the `bcc` header with `EmailMultiAlternatives`, closing a privacy vulnerability where recipient email addresses were exposed to everyone on the list.
-- **Bulk Operations**: Eliminated O(n) loops by swapping individual `.create()` loops with `.bulk_create()` during Checkout and Marketing Campaign log generation, vastly accelerating write capacity for large lists.
-- **Database Indexing**: Established critical composite B-Tree indexes on heavily queried tables (`User`, `Product`, `MarketingCampaign`) to eliminate expensive full-table scans.
-- **Automated DB Pruning**: Wrote periodic Celery task `prune_old_logs` designed to permanently delete Marketing click/send tracking older than 6 months, guarding against systemic query slowdowns caused by indefinite table bloating.
+- **Email PII Protection**: Refactored mass-sending tasks to utilize the `bcc` header, closing a privacy vulnerability where recipient email addresses were exposed.
+- **Bulk Operations**: Eliminated O(n) loops by swapping individual `.create()` loops with `.bulk_create()` during Checkout and Marketing Campaign log generation.
+- **Database Indexing**: Established critical composite B-Tree indexes on heavily queried tables (`User`, `Product`, `MarketingCampaign`).
+- **Automated DB Pruning**: Wrote periodic Celery task `prune_old_logs` designed to permanently delete Marketing tracking older than 6 months.
+
+### 14. 🤖 Telegram Integration & AI Concierge (March 2, 2026)
+- **Telegram Webhook API**: Implemented a secure async webhook endpoint for real-time Telegram event processing.
+- **Telegram Mini App (TMA)**: Integrated the React frontend with the Telegram Web App environment, enabling a seamless "one-click" store experience inside Telegram.
+- **Inline Catalog Search**: Engineered an Inline Query handler allowing users to search and share products globally across any Telegram chat.
+- **AI Concierge Service**: Built an intent-based AI assistant capable of handling order tracking status, return policy FAQs, and contact inquiries automatically.
+- **Proactive Notifications**: Automated Telegram push alerts for customers when their order status is updated to 'Shipped' or 'Delivered'.
+- **Category Refactoring**: Performed a database-to-UI cleanup, removing "Electronics" and "Fashion" demo categories to ensure store focus.
 
 ---
 
@@ -150,11 +156,15 @@ Containers restarted with updated images
         │
         ▼
 Site is live at https://smartshop1.us
+
+**Last Updated**: March 2, 2026  
+**Status**: ✅ Live in Production (v3.1.0 — Telegram Integrated)
+**URL**: https://smartshop1.us
 ```
 
 ---
 
-## �️ Architecture Overview
+## 🗺️ Architecture Overview
 
 ```
 Internet (HTTPS)

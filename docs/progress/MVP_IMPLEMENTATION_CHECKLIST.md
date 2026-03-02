@@ -166,6 +166,14 @@ This checklist tracks the implementation status of all MVP features for the Smar
 - [x] Backend Shipping Rate Stub calculation in checkout
 - [x] Automate Tax enablement setting for Stripe Intents
 
+### ✅ Features - Telegram & AI Concierge (100% Complete)
+- [x] Telegram Mini App (TMA) Integration
+- [x] Inline Query Product Search (@bot_name [query])
+- [x] Proactive Status Notifications (Shipped/Delivered)
+- [x] AI Assistant (Intent parsing for Tracking/Returns/Contact)
+- [x] Linked Telegram Profiles for Users
+- [x] Admin Notification Signal for New Orders
+
 ---
 
 ## 🎨 Design & UX
@@ -374,7 +382,7 @@ All of the following must be ✅ before launch:
 - [x] Manual testing completed (100% done)
 - [x] Documentation complete
 
-**Status**: 🟢 **LIVE IN PRODUCTION (v1.2.0)** — [https://smartshop1.us](https://smartshop1.us)
+**Status**: 🟢 **LIVE IN PRODUCTION (v3.1.0)** — [https://smartshop1.us](https://smartshop1.us)
 
 ---
 
@@ -383,7 +391,11 @@ All of the following must be ✅ before launch:
 ### Known Issues
 - Financial fields (`cogs`, `marketing_cost`, `shipping_cost`) are present in the database but currently defaulted to 0 in the UI for simplicity. Admin can edit these if features are enabled later.
 
-### Recent Updates (v3.0.0)
+### Recent Updates (v3.1.0)
+- **Telegram Ecosystem**: Full bot integration with Inline Search, Mini App support, and AI Concierge for tracking and FAQs.
+- **Category Cleanup**: Removed legacy demo categories (Electronics/Fashion) from backend and frontend.
+
+### Previous Updates (v3.0.0)
 - **Enterprise Scale**: Background CSV uploads, Celery abandoned cart recovery, automated subscriptions, API circuit breaking, variant architecture normalization, and 10-minute cart inventory holding.
 
 ### Previous Updates (v1.7.0 → v2.0.0)
@@ -404,7 +416,6 @@ All of the following must be ✅ before launch:
 
 ---
 
-**Last Updated**: February 28, 2026  
-**Status**: ✅ Live in Production (v3.0.0 — Enterprise Complete)
+**Last Updated**: March 2, 2026  
+**Status**: ✅ Live in Production (v3.1.0 — Telegram Integrated)
 **URL**: https://smartshop1.us
-

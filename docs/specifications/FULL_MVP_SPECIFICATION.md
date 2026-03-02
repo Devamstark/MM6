@@ -43,7 +43,9 @@
 - **Containerization**: Docker + Docker Compose
 - **Reverse Proxy**: Traefik (auto SSL via Let's Encrypt)
 - **Backup Storage**: MinIO (self-hosted S3)
-- **E2E Testing**: Playwright (Automated flows and reporting, excluded from Docker context for optimization)
+- **Telegram Bot API**: Python Telegram Bot (Webhook-based async processing)
+- **AI Engine**: GPT-4 based intent parsing for AI Concierge
+- **E2E Testing**: Playwright (Automated flows and reporting)
 
 ---
 
@@ -383,6 +385,23 @@
 - **Backend Models**: Extended `Index` Meta classes within `models.py`.
 - **Celery**: Configured `prune_old_logs` task mapped to a monthly periodic execution cycle.
 
+### **16. 🤖 Telegram AI Concierge & Mini App** 🤖
+
+#### Features:
+- **Telegram Mini App (TMA)**: A native-feeling store experience launched directly from the Telegram bot.
+- **AI Concierge Assistant**: Intent-based AI that handles tracking requests, return policy questions, and contact info.
+- **Inline Query Search**: Global product search via `@bot_name` in any chat, displaying cards with prices and links.
+- **Push Notifications**: Proactive order status alerts (Shipped/Delivered) sent to the user's Telegram.
+- **Command Menu**: `/start` for onboarding, `/help` for support, and `/mini_app` for shopping.
+
+#### Technical Implementation:
+- **Backend**: Async Django webhook view in `api/telegram_bot.py` with HMAC signature verification (optional, uses bot token).
+- **AI Engine**: Intent classification logic in `AIConcierge` class before falling back to product search.
+- **Frontend**: React site detects Telegram WebApp context via `@telegram-apps/sdk` or window object.
+- **Endpoints**:
+  - `POST /api/telegram-webhook/` (Primary event handler)
+  - `POST /api/ai-concierge/` (Direct AI chat endpoint)
+
 ---
 
 ## 🎨 Design System
@@ -501,6 +520,13 @@ smartshop-e-commerce/
 | POST | `/api/auth/password-reset/` | Request password reset | No |
 | POST | `/api/auth/password-reset-confirm/` | Confirm reset with OTP | No |
 | GET | `/api/auth/me/` | Get current user | Yes |
+
+### **Telegram & AI**
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/telegram-webhook/` | Main bot event handler | No (Secret token) |
+| POST | `/api/ai-concierge/` | Direct AI query endpoint | No/Yes |
+| GET | `/api/products/inline_search/` | Internal bot search | No |
 
 ### **Products**
 | Method | Endpoint | Description | Auth Required |
@@ -751,6 +777,8 @@ Frontend will run at `http://localhost:5173`
 - [ ] Dark mode toggle
 
 ### **Phase 3 Features**
+- [x] Telegram Bot & Mini App Integration — ✅ Done (v3.1.0)
+- [x] AI Support Assistant — ✅ Done (Intent-based)
 - [ ] Mobile app (React Native)
 - [ ] Seller verification system
 - [ ] Product comparison tool
@@ -866,5 +894,9 @@ For questions or issues:
 
 ---
 
-**Last Updated**: February 28, 2026
-**Version**: 3.0.0 (Enterprise Roadmap Scaling: Celery, Subscriptions, Variants, Analytics)
+**Project**: SmartShop E-Commerce Platform  
+**Version**: 3.1.0 (Telegram Ecosystem & AI Concierge)  
+**Last Updated**: March 2, 2026  
+**Status**: ✅ Live in Production (v3.1.0 — Telegram Integrated)  
+**URL**: [https://smartshop1.us](https://smartshop1.us)  
+**Completion**: 100%
