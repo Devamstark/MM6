@@ -19,8 +19,12 @@ export const TelegramInitializer: React.FC<{ children: React.ReactNode }> = ({ c
                     setIsAutoLoggingIn(true);
                     console.log("🚀 TMA: Attempting Telegram Auto-Login...");
 
-                    const baseUrl = import.meta.env.VITE_API_URL || 'https://api.smartshop1.us';
-                    const apiUrl = baseUrl.endsWith('/') ? `${baseUrl}api/auth/telegram/` : `${baseUrl}/api/auth/telegram/`;
+                    const baseUrl = import.meta.env.VITE_API_URL || 'https://api.smartshop1.us/api';
+                    // Ensure we don't double up on /api/
+                    const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+                    const apiUrl = cleanBase.includes('/api')
+                        ? `${cleanBase}/auth/telegram/`
+                        : `${cleanBase}/api/auth/telegram/`;
 
                     console.log(`🚀 TMA: Calling API: ${apiUrl}`);
 
