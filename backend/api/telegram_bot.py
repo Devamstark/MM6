@@ -20,6 +20,8 @@ class TelegramWebhookView(APIView):
 
     def post(self, request):
         try:
+            import os
+            logger.info(f"Available Env Vars: {list(os.environ.keys())}")
             data = request.data
             logger.info(f"Telegram Webhook Received Data: {json.dumps(data)}")
             
