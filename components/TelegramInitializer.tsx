@@ -4,62 +4,73 @@ import { useAuth } from '../context/AuthContext';
 import { api } from '../services/api';
 
 export const TelegramInitializer: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const { tg, initData, user: tgUser } = useTelegram();
+    const { tg, initData } = useTelegram();
     const { login, isAuthenticated, isLoading } = useAuth();
+    const [isAutoLoggingIn, setIsAutoLoggingIn] = React.useState(false);
 
     useEffect(() => {
         const tryTelegramLogin = async () => {
-            if (tg && initData && !isAuthenticated && !isLoading) {
+            // Don't run if already authenticated, loading, or already attempted in this session
+            if (tg && initData && !isAuthenticated && !isLoading && !isAutoLoggingIn) {
+                // Prevent double-execution
+                if (sessionStorage.getItem('tma_login_attempted')) return;
+
                 try {
-                    console.log("Attempting Telegram Auto-Login...");
-                    const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://api.smartshop1.us'}/api/auth/telegram/`, {
+                    setIsAutoLoggingIn(true);
+                    console.log("🚀 TMA: Attempting Telegram Auto-Login...");
+
+                    const baseUrl = import.meta.env.VITE_API_URL || 'https://api.smartshop1.us';
+                    const apiUrl = baseUrl.endsWith('/') ? `${baseUrl}api/auth/telegram/` : `${baseUrl}/api/auth/telegram/`;
+
+                    console.log(`🚀 TMA: Calling API: ${apiUrl}`);
+
+                    const response = await fetch(apiUrl, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ initData }),
                     });
 
                     if (response.ok) {
                         const data = await response.json();
+                        console.log("✅ TMA: Login Successful, saving session...");
+                        sessionStorage.setItem('tma_login_attempted', 'true');
                         login(data.user, data.access);
 
-                        // Store tokens manually since we are using fetch here
-                        localStorage.setItem('cm_token', data.access);
-                        localStorage.setItem('cm_refresh', data.refresh);
-                        localStorage.setItem('cm_user_data', JSON.stringify(data.user));
-
-                        console.log("Telegram Login Successful!");
-                        window.location.reload(); // Refresh to apply new auth state
-
-                        // Haptic feedback if available
-                        if (tg.HapticFeedback) {
-                            tg.HapticFeedback.notificationOccurred('success');
-                        }
+                        // Allow state to settle before reload if needed, 
+                        // but login() already sets user in context
                     } else {
-                        console.error("Telegram Login Failed", await response.text());
+                        console.error("❌ TMA: Login Failed", await response.text());
+                        sessionStorage.setItem('tma_login_attempted', 'error');
                     }
                 } catch (error) {
-                    console.error("Error during Telegram login:", error);
+                    console.error("❌ TMA: Error during login:", error);
+                } finally {
+                    setIsAutoLoggingIn(false);
                 }
             }
         };
 
         tryTelegramLogin();
-    }, [tg, initData, isAuthenticated, isLoading, login]);
+    }, [tg, initData, isAuthenticated, isLoading, isAutoLoggingIn, login]);
 
-    // Sync theme with Telegram
+    // Sync theme
     useEffect(() => {
         if (tg) {
-            const colorScheme = tg.colorScheme; // 'light' or 'dark'
-            document.documentElement.setAttribute('data-theme', colorScheme);
-
-            // Update primary color from Telegram if provided
+            document.documentElement.setAttribute('data-theme', tg.colorScheme || 'light');
             if (tg.themeParams?.button_color) {
                 document.documentElement.style.setProperty('--primary-color', tg.themeParams.button_color);
             }
         }
     }, [tg]);
+
+    if (isAutoLoggingIn) {
+        return (
+            <div className="min-h-screen flex flex-col items-center justify-center bg-white space-y-4">
+                <div className="w-12 h-12 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-gray-500 font-bold animate-pulse">Connecting to SmartShop Bot...</p>
+            </div>
+        );
+    }
 
     return <>{children}</>;
 };

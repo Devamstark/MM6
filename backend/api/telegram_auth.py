@@ -1,6 +1,7 @@
 import hashlib
 import hmac
 import json
+import logging
 from django.conf import settings
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -9,9 +10,12 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer
 
+logger = logging.getLogger(__name__)
+
 User = get_user_model()
 
 def verify_telegram_data(init_data: str):
+    logger.info(f"Verifying Telegram Data: {init_data[:50]}...")
     """
     Verifies the data received from the Telegram Mini App.
     See: https://core.telegram.org/bots/webapps#validating-data-received-via-the-mini-app
@@ -55,11 +59,13 @@ class TelegramLoginView(APIView):
 
     def post(self, request):
         init_data = request.data.get('initData')
+        logger.info(f"TMA Login Request received. InitData present: {bool(init_data)}")
         if not init_data:
             return Response({'error': 'initData is required'}, status=status.HTTP_400_BAD_REQUEST)
 
         is_valid, tg_user = verify_telegram_data(init_data)
         if not is_valid:
+            logger.error(f"TMA Validation Failed: {tg_user}")
             return Response({'error': f'Validation failed: {tg_user}'}, status=status.HTTP_401_UNAUTHORIZED)
 
         if not tg_user:
