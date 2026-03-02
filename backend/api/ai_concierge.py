@@ -22,32 +22,40 @@ class AIConcierge:
         'beauty': ['makeup', 'skincare', 'perfume', 'beauty', 'cosmetic'],
     }
 
+    # 👫 Gender Dictionary
+    GENDERS = ['men', 'women', 'unisex', 'man', 'woman', 'male', 'female']
+
     @staticmethod
     def parse_intent(query: str):
-        """
-        Parses a natural language query into product filters.
-        Example: "I want red sneakers under $50"
-        """
         query = query.lower()
         extracted = {
             'color': None,
             'max_price': None,
             'category': None,
-            'search_text': query
+            'gender': None,
+            'search_terms': query.split()
         }
 
-        # 1. Extract Price (Look for numbers with $ or 'under')
+        # 1. Price
         price_match = re.search(r'(?:under|below|less than|\$)\s*(\d+)', query)
         if price_match:
             extracted['max_price'] = float(price_match.group(1))
 
-        # 2. Extract Color
+        # 2. Color
         for color in AIConcierge.COLORS:
             if color in query:
                 extracted['color'] = color
                 break
 
-        # 3. Predict Category based on keywords
+        # 3. Gender
+        for g in AIConcierge.GENDERS:
+            if g in query:
+                if g in ['men', 'man', 'male']: extracted['gender'] = 'Men'
+                elif g in ['women', 'woman', 'female']: extracted['gender'] = 'Women'
+                else: extracted['gender'] = 'Unisex'
+                break
+
+        # 4. Category
         for category, keywords in AIConcierge.CATEGORY_KEYWORDS.items():
             if any(keyword in query for keyword in keywords):
                 extracted['category'] = category
@@ -57,44 +65,37 @@ class AIConcierge:
 
     @staticmethod
     def search_products(query: str, limit=5):
-        """
-        Main Search Logic. Combines Intent Parsing + Database Query.
-        """
         intent = AIConcierge.parse_intent(query)
-        
-        # Start with all active products
         products = Product.objects.all()
 
-        # Apply Price Filter
         if intent['max_price']:
             products = products.filter(price__lte=intent['max_price'])
 
-        # Apply Category Filter
+        if intent['gender']:
+            products = products.filter(Q(gender__iexact=intent['gender']) | Q(gender__iexact='unisex'))
+
         if intent['category']:
             products = products.filter(category__icontains=intent['category'])
 
-        # Apply Text Search (Name + Description)
-        search_terms = Q(name__icontains=query) | Q(description__icontains=query)
+        # Robust keyword search
+        q_obj = Q()
+        for term in intent['search_terms']:
+            if len(term) > 2: # Ignore short words
+                q_obj |= Q(name__icontains=term) | Q(description__icontains=term) | Q(category__icontains=term)
         
-        # If color found, we specifically look for it
+        if q_obj:
+            products = products.filter(q_obj)
+
         if intent['color']:
-            search_terms |= Q(colors__icontains=intent['color'])
+            products = products.filter(colors__icontains=intent['color'])
 
-        products = products.filter(search_terms).distinct()
-
-        return products[:limit], intent
+        return products.distinct()[:limit], intent
 
     @staticmethod
     def format_response(query: str):
-        """
-        Generates a friendly AI-style text response for Telegram.
-        """
         products, intent = AIConcierge.search_products(query)
         
         if not products.exists():
-            return "❌ No products found matching your search. Try something else like 'Electronics' or 'Fashion'!", []
+            return "🤷 I couldn't find exactly that. Can I show you something from our main collections?", []
 
-        response_text = f"🔍 I found {len(products)} products that you might like:\n\n"
-        
-        # Instead of just text, we return the product list so the bot can send Photo Cards
-        return response_text, products
+        return f"✨ I found these {len(products)} match(es) for you:", products

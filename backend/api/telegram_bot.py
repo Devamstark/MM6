@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
 from .models import Product
+import requests
 from .telegram_utils import send_telegram_message, send_telegram_photo
 from .ai_concierge import AIConcierge
 
@@ -27,8 +28,19 @@ class TelegramWebhookView(APIView):
             logger.info(f"Telegram Webhook Received Data: {json.dumps(data)}")
             
             message = data.get('message', {})
-            text = message.get('text', '')
-            chat_id = str(message.get('chat', {}).get('id', '')).strip()
+            callback_query = data.get('callback_query', {})
+            
+            if callback_query:
+                # Handle button clicks
+                chat_id = str(callback_query.get('message', {}).get('chat', {}).get('id', '')).strip()
+                text = callback_query.get('data', '').replace('search:', '') # 'search:men fashion' -> 'men fashion'
+                
+                # Acknowledge the callback
+                requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/answerCallbackQuery", 
+                              json={"callback_query_id": callback_query.get('id')})
+            else:
+                text = message.get('text', '')
+                chat_id = str(message.get('chat', {}).get('id', '')).strip()
             admin_id = str(getattr(settings, 'TELEGRAM_ADMIN_ID', '')).strip()
 
             is_admin = (chat_id == admin_id)
@@ -48,18 +60,23 @@ class TelegramWebhookView(APIView):
                     send_telegram_message(welcome, chat_id=chat_id)
                 else:
                     customer_welcome = "👋 *Welcome to SmartShop!*\n\n" \
-                                       "Shop the latest fashion and tech directly from Telegram.\n\n" \
-                                       "👇 *Start shopping below!*"
+                                       "I am your AI shopping assistant. Type what you are looking for (e.g., 'blue dress') or choose a category below:"
                     
-                    # Add a button to open the Mini App
-                    buttons = [[{"text": "🛍️ Open SmartShop", "web_app": {"url": "https://smartshop1.us/"}}]]
+                    # Quick Search + Mini App buttons
+                    buttons = [
+                        [{"text": "👕 Men's Fashion", "callback_data": "search:men fashion"}, 
+                         {"text": "👗 Women's Fashion", "callback_data": "search:women fashion"}],
+                        [{"text": "🔌 Electronics", "callback_data": "search:electronics"}],
+                        [{"text": "🛍️ Open SmartShop App", "web_app": {"url": "https://smartshop1.us/"}}]
+                    ]
                     
-                    send_telegram_photo(
-                        "https://smartshop1.us/logo.png", # Fallback logo
-                        customer_welcome,
-                        chat_id=chat_id,
-                        buttons=buttons
-                    )
+                    payload = {
+                        "chat_id": chat_id,
+                        "text": customer_welcome,
+                        "parse_mode": "Markdown",
+                        "reply_markup": json.dumps({"inline_keyboard": buttons})
+                    }
+                    requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/sendMessage", json=payload)
                 return Response(status=status.HTTP_200_OK)
 
             # AI CONCIERGE SEARCH (If non-command text)
@@ -67,7 +84,20 @@ class TelegramWebhookView(APIView):
                 message_text, products = AIConcierge.format_response(text)
                 
                 if not products:
-                    send_telegram_message(message_text, chat_id=chat_id)
+                    # Offer quick buttons if nothing found
+                    buttons = [
+                        [{"text": "👕 Men's Fashion", "callback_data": "search:men fashion"}, 
+                         {"text": "👗 Women's Fashion", "callback_data": "search:women fashion"}],
+                        [{"text": "🔌 Electronics", "callback_data": "search:electronics"}],
+                        [{"text": "🛍️ Open Store", "web_app": {"url": "https://smartshop1.us/"}}]
+                    ]
+                    # We need to send as a normal message for callback buttons
+                    payload = {
+                        "chat_id": chat_id,
+                        "text": message_text,
+                        "reply_markup": json.dumps({"inline_keyboard": buttons})
+                    }
+                    requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/sendMessage", json=payload)
                 else:
                     send_telegram_message(message_text, chat_id=chat_id)
                     for product in products:
