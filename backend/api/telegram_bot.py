@@ -53,16 +53,16 @@ class TelegramWebhookView(APIView):
                 bot_url = "https://t.me/cloudmart_shop_bot/smartshop" # Update with your actual bot username
                 
                 if is_admin:
-                    welcome = "🚀 *Welcome Back, Admin!*\n\n" \
+                    welcome = "🚀 <b>Welcome Back, Admin!</b>\n\n" \
                               "You have full control over SmartShop here.\n\n" \
                               "Available Admin Commands:\n" \
-                              "• `/clear_demo` - Remove all demo products\n" \
-                              "• `/seed` - Add Demo Products (Test only)\n" \
-                              "• `/stock [id] [amount]`\n" \
-                              "• `/price [id] [price]`"
+                              "• <code>/clear_demo</code> - Remove all demo products\n" \
+                              "• <code>/seed</code> - Add Demo Products (Test only)\n" \
+                              "• <code>/stock [id] [amount]</code>\n" \
+                              "• <code>/price [id] [price]</code>"
                     send_telegram_message(welcome, chat_id=chat_id)
                 else:
-                    customer_welcome = "👋 *Welcome to SmartShop!*\n\n" \
+                    customer_welcome = "👋 <b>Welcome to SmartShop!</b>\n\n" \
                                        "I am your AI shopping assistant. Type what you are looking for (e.g., 'blue dress') or choose a category below:"
                     
                     # Quick Search + Mini App buttons
@@ -76,7 +76,7 @@ class TelegramWebhookView(APIView):
                     payload = {
                         "chat_id": chat_id,
                         "text": customer_welcome,
-                        "parse_mode": "Markdown",
+                        "parse_mode": "HTML",
                         "reply_markup": json.dumps({"inline_keyboard": buttons})
                     }
                     requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/sendMessage", json=payload)
@@ -98,6 +98,7 @@ class TelegramWebhookView(APIView):
                     payload = {
                         "chat_id": chat_id,
                         "text": message_text,
+                        "parse_mode": "HTML",
                         "reply_markup": json.dumps({"inline_keyboard": buttons})
                     }
                     requests.post(f"https://api.telegram.org/bot{getattr(settings, 'TELEGRAM_BOT_TOKEN', '')}/sendMessage", json=payload)
@@ -107,13 +108,14 @@ class TelegramWebhookView(APIView):
                         # 1. Prepare valid Image
                         img = product.image.url if product.image else "https://via.placeholder.com/300"
                         if not img.startswith('http'):
-                            img = f"https://api.smartshop1.us{img}"
+                            base_url = "https://smartshop1.us"
+                            img = f"{base_url}{img}"
                         
-                        # 2. Escape name and description to prevent Markdown errors
-                        p_name = product.name.replace('*', '').replace('_', '').replace('[', '').replace(']', '')
-                        p_desc = product.description.replace('*', '').replace('_', '').replace('[', '').replace(']', '')
+                        # 2. Escape HTML special chars 
+                        p_name = product.name.replace('<', '&lt;').replace('>', '&gt;')
+                        p_desc = product.description.replace('<', '&lt;').replace('>', '&gt;')
                         
-                        caption = f"🏷️ *{p_name}*\n💰 Price: `${product.price}`\n\n{p_desc[:100]}..."
+                        caption = f"🏷️ <b>{p_name}</b>\n💰 Price: <b>${product.price}</b>\n\n{p_desc[:100]}..."
                         
                         # 3. Prepare Buttons
                         p_url = f"https://smartshop1.us/product/{product.slug}"
@@ -122,8 +124,7 @@ class TelegramWebhookView(APIView):
                         # 4. Try sending photo, fallback to text if fail
                         photo_sent = send_telegram_photo(img, caption, chat_id=chat_id, buttons=buttons)
                         if not photo_sent:
-                            # Fallback to Text-only card
-                            send_telegram_message(f"{caption}\n\n🔗 [View Product]({p_url})", chat_id=chat_id)
+                            send_telegram_message(f"{caption}\n\n🔗 <a href='{p_url}'>View Product</a>", chat_id=chat_id)
                 
                 return Response(status=status.HTTP_200_OK)
 
@@ -144,7 +145,7 @@ class TelegramWebhookView(APIView):
             elif text.startswith('/seed'):
                 try:
                     seed_demo_products()
-                    send_telegram_message("✅ *Database Seeded Successfully!*\nDemo products are now live in your shop.")
+                    send_telegram_message("✅ <b>Database Seeded Successfully!</b>\nDemo products are now live in your shop.")
                 except Exception as e:
                     send_telegram_message(f"❌ Error seeding database: {str(e)}")
 
@@ -153,7 +154,7 @@ class TelegramWebhookView(APIView):
                 try:
                     parts = text.split()
                     if len(parts) != 3:
-                        send_telegram_message("❌ Usage: `/stock [id] [amount]`")
+                        send_telegram_message("❌ Usage: <code>/stock [id] [amount]</code>")
                         return Response(status=status.HTTP_200_OK)
 
                     prod_id = parts[1]
@@ -168,7 +169,7 @@ class TelegramWebhookView(APIView):
                         product.stock_quantity = int(amount_str)
                     
                     product.save(update_fields=['stock_quantity'])
-                    send_telegram_message(f"✅ *Stock Updated*\n\n*Product:* {product.name}\n*New Stock:* `{product.stock_quantity}`")
+                    send_telegram_message(f"✅ <b>Stock Updated</b>\n\n<b>Product:</b> {product.name}\n<b>New Stock:</b> <code>{product.stock_quantity}</code>")
                 except Product.DoesNotExist:
                     send_telegram_message("❌ Product ID not found.")
                 except Exception as e:
@@ -179,7 +180,7 @@ class TelegramWebhookView(APIView):
                 try:
                     parts = text.split()
                     if len(parts) != 3:
-                        send_telegram_message("❌ Usage: `/price [id] [price]`")
+                        send_telegram_message("❌ Usage: <code>/price [id] [price]</code>")
                         return Response(status=status.HTTP_200_OK)
 
                     prod_id = parts[1]
@@ -189,7 +190,7 @@ class TelegramWebhookView(APIView):
                     product.price = float(new_price)
                     product.save(update_fields=['price'])
                     
-                    send_telegram_message(f"✅ *Price Updated*\n\n*Product:* {product.name}\n*New Price:* `${product.price}`")
+                    send_telegram_message(f"✅ <b>Price Updated</b>\n\n<b>Product:</b> {product.name}\n<b>New Price:</b> <b>${product.price}</b>")
                 except Product.DoesNotExist:
                     send_telegram_message("❌ Product ID not found.")
                 except Exception as e:

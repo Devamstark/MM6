@@ -23,7 +23,7 @@ def send_telegram_message(message: str, chat_id=None):
     payload = {
         "chat_id": target_chat_id,
         "text": message,
-        "parse_mode": "Markdown"
+        "parse_mode": "HTML"
     }
     
     try:
@@ -47,7 +47,7 @@ def send_telegram_photo(photo_url: str, caption: str, chat_id=None, buttons=None
         "chat_id": chat_id,
         "photo": photo_url,
         "caption": caption,
-        "parse_mode": "Markdown"
+        "parse_mode": "HTML"
     }
 
     if buttons:
