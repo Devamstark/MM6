@@ -8,6 +8,8 @@ from django.utils import timezone
 from .models import Order, Product, User, NewsletterSubscriber, Affiliate, BlogPost, MarketingCampaign, EmailDeliveryLog, CampaignRecipient
 from decimal import Decimal
 
+from .telegram_utils import send_telegram_message
+
 logger = logging.getLogger(__name__)
 
 @shared_task
@@ -169,16 +171,16 @@ def send_newsletter(blog_post_id):
 
 @shared_task
 def check_low_stock():
-    """Periodic task to identify products with low stock and notify sellers/admins."""
+    """Periodic task to identify products with low stock and notify sellers/admins via Email & Telegram."""
     LOW_STOCK_THRESHOLD = 5
     low_stock_products = Product.objects.filter(stock_quantity__lte=LOW_STOCK_THRESHOLD)
     
     if low_stock_products.exists():
         product_names = ", ".join([p.name for p in low_stock_products])
-        subject = "Low Stock Alert"
+        subject = "Low Stock Alert ⚠️"
         message = f"The following products are low on stock: {product_names}. Please restock soon."
         
-        # Send to admin email
+        # 1. Send to admin email
         send_mail(
             subject,
             message,
@@ -186,6 +188,19 @@ def check_low_stock():
             [settings.SERVER_EMAIL],
             fail_silently=True
         )
+
+        # 2. Notify Telegram Admin
+        try:
+            tg_msg = f"<b>Low Stock Alert!</b> ⚠️\n\n" \
+                     f"The following items have less than {LOW_STOCK_THRESHOLD} items left:\n\n"
+            for p in low_stock_products:
+                tg_msg += f"• {p.name} (Qty: <code>{p.stock_quantity}</code>)\n"
+            
+            tg_msg += f"\n🔗 <a href='https://smartshop1.us/ssx/api/product/'>Update Stock in Dashboard</a>"
+            send_telegram_message(tg_msg)
+        except Exception as e:
+            logger.error(f"Failed to ping Telegram for low stock: {str(e)}")
+
         return f"Low stock alert sent for {low_stock_products.count()} products"
     return "Stock levels are healthy"
 
@@ -521,18 +536,29 @@ def prune_old_logs():
 
 @shared_task
 def notify_slack_new_order(order_id, amount, customer):
-    """Observability: Ping slack channel when a new order is completed."""
+    """Observability: Ping Slack & Telegram when a new order is completed."""
     import requests
     from django.conf import settings
+    
+    # 1. Ping Slack
     webhook_url = getattr(settings, 'SLACK_ORDERS_WEBHOOK', None)
     if webhook_url:
-        payload = {
-            "text": f"🛍️ *New Order Received!*\n*ID:* #{order_id}\n*Customer:* {customer}\n*Value:* ${amount}"
-        }
+        payload = {"text": f"🛍️ *New Order Received!*\n*ID:* #{order_id}\n*Customer:* {customer}\n*Value:* ${amount}"}
         try:
             requests.post(webhook_url, json=payload, timeout=5)
         except Exception as e:
-            logger.error(f"Failed to ping Slack orders webhook: {str(e)}")
+            logger.error(f"Failed to ping Slack: {str(e)}")
+
+    # 2. Ping Telegram Admin
+    try:
+        tg_msg = f"🛍️ <b>New Order Received!</b>\n\n" \
+                 f"<b>ID:</b> <code>#{order_id}</code>\n" \
+                 f"<b>Customer:</b> {customer}\n" \
+                 f"<b>Value:</b> <b>${amount}</b>\n\n" \
+                 f"🔗 <a href='https://smartshop1.us/ssx/api/order/{order_id}/'>View in Dashboard</a>"
+        send_telegram_message(tg_msg)
+    except Exception as e:
+        logger.error(f"Failed to ping Telegram for new order: {str(e)}")
 
 @shared_task
 def notify_slack_security_alert(message):

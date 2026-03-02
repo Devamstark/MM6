@@ -6,7 +6,8 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
-from .models import Product
+from django.utils import timezone
+from .models import Product, Order, User
 import requests
 from .telegram_utils import send_telegram_message, send_telegram_photo
 from .ai_concierge import AIConcierge
@@ -55,7 +56,11 @@ class TelegramWebhookView(APIView):
                 if is_admin:
                     welcome = "🚀 <b>Welcome Back, Admin!</b>\n\n" \
                               "You have full control over SmartShop here.\n\n" \
-                              "Available Admin Commands:\n" \
+                              "<b>Business Insights:</b>\n" \
+                              "• <code>/stats</code> - Today's Sales Summary\n" \
+                              "• <code>/recent_orders</code> - View Last 5 Orders\n" \
+                              "• <code>/low_stock</code> - Identify Inventory Issues\n\n" \
+                              "<b>Product Management:</b>\n" \
                               "• <code>/stock [id] [amount]</code>\n" \
                               "• <code>/price [id] [price]</code>"
                     send_telegram_message(welcome, chat_id=chat_id)
@@ -139,7 +144,50 @@ class TelegramWebhookView(APIView):
             if not is_admin:
                 return Response(status=status.HTTP_200_OK)
 
-            # Command: /stock [id] [amount]
+            # --- BUSINESS INSIGHTS ---
+            
+            # Command: /stats
+            elif text.startswith('/stats'):
+                from django.db.models import Sum
+                today = timezone.now().date()
+                orders_today = Order.objects.filter(created_at__date=today)
+                total_revenue = orders_today.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+                
+                msg = f"📊 <b>Daily Sales Report</b>\n" \
+                      f"-------------------------\n" \
+                      f"📅 <b>Date:</b> {today}\n" \
+                      f"💰 <b>Total Revenue:</b> <b>${total_revenue}</b>\n" \
+                      f"📦 <b>Orders Today:</b> <code>{orders_today.count()}</code>\n" \
+                      f"-------------------------\n" \
+                      f"📈 <i>Keep up the great work!</i>"
+                send_telegram_message(msg, chat_id=chat_id)
+
+            # Command: /recent_orders
+            elif text.startswith('/recent_orders'):
+                latest_orders = Order.objects.order_by('-created_at')[:5]
+                if not latest_orders:
+                    send_telegram_message("📦 No orders found in the system yet.", chat_id=chat_id)
+                else:
+                    msg = "📋 <b>Last 5 Orders:</b>\n\n"
+                    for order in latest_orders:
+                        msg += f"• <code>#{str(order.id)[:8]}</code> - <b>${order.total_amount}</b> ({order.customer_name})\n"
+                    msg += f"\n🔗 <a href='https://smartshop1.us/ssx/api/order/'>Manage all Orders</a>"
+                    send_telegram_message(msg, chat_id=chat_id)
+
+            # Command: /low_stock
+            elif text.startswith('/low_stock'):
+                low_stock = Product.objects.filter(stock_quantity__lte=5)
+                if not low_stock:
+                    send_telegram_message("✅ All products have healthy stock levels.", chat_id=chat_id)
+                else:
+                    msg = "⚠️ <b>Inventory Issues Found:</b>\n\n"
+                    for p in low_stock:
+                        msg += f"• {p.name} (ID: <code>{str(p.id)[:8]}</code>)\n" \
+                               f"  Stock: <code>{p.stock_quantity}</code>\n"
+                    msg += f"\n🔗 <a href='https://smartshop1.us/ssx/api/product/'>Restock Now</a>"
+                    send_telegram_message(msg, chat_id=chat_id)
+
+            # --- PRODUCT MANAGEMENT ---
             elif text.startswith('/stock'):
                 try:
                     parts = text.split()
