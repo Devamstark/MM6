@@ -13,6 +13,8 @@ from .views import (
     MarketingCampaignViewSet, BlogImageView, HealthCheckView, CartViewSet, StockReservationViewSet
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
+from .telegram_auth import TelegramLoginView
+from .telegram_bot import TelegramWebhookView
 
 from rest_framework.routers import SimpleRouter
 from django.conf import settings
@@ -54,5 +56,7 @@ urlpatterns = [
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
     path('blog/upload-image/', BlogImageView.as_view(), name='blog-upload-image'),
+    path('auth/telegram/', TelegramLoginView.as_view(), name='auth_telegram'),
+    path('webhooks/telegram/', TelegramWebhookView.as_view(), name='telegram_webhook'),
     path('health/', HealthCheckView.as_view(), name='health_check'),
 ]

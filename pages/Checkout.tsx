@@ -8,6 +8,7 @@ import { Loader2, CreditCard, Lock, ShieldCheck, CheckCircle, LogIn, UserPlus, D
 import { motion, AnimatePresence } from 'framer-motion';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, CardNumberElement, CardExpiryElement, CardCvcElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { useTelegram } from '../hooks/useTelegram';
 
 // Initialize Stripe with test public key
 const stripePromise = loadStripe('pk_test_51T5FLjCXoN7dV1O9567fmjKf8uLw05HOVNDAbYjQb6b7kSCr53X0EdIjINqvQt7gDZsxSKBB5n649eDNSJrgNoZb00ezrvROlP');
@@ -428,6 +429,20 @@ export const Checkout = () => {
   const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; discount: number } | null>(null);
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
+
+  const { tg } = useTelegram();
+
+  useEffect(() => {
+    if (tg && step === 'success') {
+      tg.MainButton.setText('Close SmartShop');
+      tg.MainButton.show();
+      tg.MainButton.onClick(() => {
+        tg.close();
+      });
+    } else if (tg) {
+      tg.MainButton.hide();
+    }
+  }, [tg, step]);
 
   const [shippingData, setShippingData] = useState({
     name: user?.name || '',

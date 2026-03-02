@@ -29,64 +29,60 @@ import { BlogPostDetail } from './pages/BlogPostDetail';
 import { BloggerDashboard } from './pages/BloggerDashboard';
 import { MarketingDashboard } from './pages/MarketingDashboard';
 import ScrollToTop from './components/ScrollToTop';
+import { TelegramInitializer } from './components/TelegramInitializer';
 
 function App() {
     return (
         <AuthProvider>
-            <ToastProvider>
-                <CartProvider>
-                    <BrowserRouter>
-                        <ScrollToTop />
-                        <Routes>
-                            <Route path="/" element={<Layout><Outlet /></Layout>}>
-                                <Route index element={<Home />} />
-                                <Route path="products" element={<Shop />} />
-                                <Route path="product/:slug" element={<ProductDetail />} />
-                                <Route path="cart" element={<Cart />} />
-
-                                <Route path="login" element={<Auth />} />
-                                <Route path="register" element={<Auth />} />
-                                <Route path="forgot-password" element={<ForgotPassword />} />
-                                <Route path="reset-password" element={<ResetPassword />} />
-
-                                <Route path="contact" element={<Contact />} />
-                                <Route path="faq" element={<FAQ />} />
-                                <Route path="about" element={<AboutUs />} />
-                                <Route path="page/:slug" element={<StaticPage />} />
-                                <Route path="terms" element={<StaticPage page="terms" />} />
-                                <Route path="privacy" element={<StaticPage page="privacy" />} />
-                                <Route path="blog" element={<Blog />} />
-                                <Route path="blog/:slug" element={<BlogPostDetail />} />
-
-                                <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
-                                    <Route path="checkout" element={<Checkout />} />
-                                    <Route path="orders" element={<OrderHistory />} />
-                                    <Route path="orders/:id" element={<OrderDetail />} />
-                                    <Route path="wishlist" element={<Wishlist />} />
-                                    <Route path="points" element={<BonusPoints />} />
-                                    <Route path="affiliate" element={<Affiliate />} />
-                                    <Route path="profile" element={<UserProfile />} />
+            <TelegramInitializer>
+                <ToastProvider>
+                    <CartProvider>
+                        <BrowserRouter>
+                            <ScrollToTop />
+                            <Routes>
+                                <Route path="/" element={<Layout><Outlet /></Layout>}>
+                                    <Route index element={<Home />} />
+                                    <Route path="products" element={<Shop />} />
+                                    <Route path="product/:slug" element={<ProductDetail />} />
+                                    <Route path="cart" element={<Cart />} />
+                                    <Route path="login" element={<Auth />} />
+                                    <Route path="register" element={<Auth />} />
+                                    <Route path="forgot-password" element={<ForgotPassword />} />
+                                    <Route path="reset-password" element={<ResetPassword />} />
+                                    <Route path="contact" element={<Contact />} />
+                                    <Route path="faq" element={<FAQ />} />
+                                    <Route path="about" element={<AboutUs />} />
+                                    <Route path="page/:slug" element={<StaticPage />} />
+                                    <Route path="terms" element={<StaticPage page="terms" />} />
+                                    <Route path="privacy" element={<StaticPage page="privacy" />} />
+                                    <Route path="blog" element={<Blog />} />
+                                    <Route path="blog/:slug" element={<BlogPostDetail />} />
+                                    <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
+                                        <Route path="checkout" element={<Checkout />} />
+                                        <Route path="orders" element={<OrderHistory />} />
+                                        <Route path="orders/:id" element={<OrderDetail />} />
+                                        <Route path="wishlist" element={<Wishlist />} />
+                                        <Route path="points" element={<BonusPoints />} />
+                                        <Route path="affiliate" element={<Affiliate />} />
+                                        <Route path="profile" element={<UserProfile />} />
+                                    </Route>
+                                    <Route element={<ProtectedRoute allowedRoles={['seller', 'admin']} />}>
+                                        <Route path="seller" element={<SellerDashboard />} />
+                                    </Route>
+                                    <Route element={<ProtectedRoute allowedRoles={['blogger', 'admin']} />}>
+                                        <Route path="blogger" element={<BloggerDashboard />} />
+                                    </Route>
+                                    <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
+                                        <Route path="admin" element={<AdminDashboard />} />
+                                        <Route path="marketing" element={<MarketingDashboard />} />
+                                    </Route>
+                                    <Route path="*" element={<Navigate to="/" replace />} />
                                 </Route>
-
-                                <Route element={<ProtectedRoute allowedRoles={['seller', 'admin']} />}>
-                                    <Route path="seller" element={<SellerDashboard />} />
-                                </Route>
-
-                                <Route element={<ProtectedRoute allowedRoles={['blogger', 'admin']} />}>
-                                    <Route path="blogger" element={<BloggerDashboard />} />
-                                </Route>
-
-                                <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
-                                    <Route path="admin" element={<AdminDashboard />} />
-                                    <Route path="marketing" element={<MarketingDashboard />} />
-                                </Route>
-
-                                <Route path="*" element={<Navigate to="/" replace />} />
-                            </Route>
-                        </Routes>
-                    </BrowserRouter>
-                </CartProvider>
-            </ToastProvider>
+                            </Routes>
+                        </BrowserRouter>
+                    </CartProvider>
+                </ToastProvider>
+            </TelegramInitializer>
         </AuthProvider>
     );
 }
