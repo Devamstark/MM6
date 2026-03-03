@@ -224,12 +224,13 @@ def _fire_brute_force_alert(identifier, ip, count):
 
 def _post_slack(payload: dict):
     """
-    POST a Block Kit payload to the configured Slack Incoming Webhook.
-    Silent no-op if SLACK_WEBHOOK_URL is not set.
+    POST a Block Kit payload to the Slack Incoming Webhook.
+    Reads SLACK_SECURITY_WEBHOOK from settings — already set in Dokploy.
+    Silent no-op if not configured.
     """
-    webhook_url = getattr(settings, 'SLACK_WEBHOOK_URL', '')
+    webhook_url = getattr(settings, 'SLACK_SECURITY_WEBHOOK', '')
     if not webhook_url:
-        logger.debug("[Security] SLACK_WEBHOOK_URL not set — skipping Slack alert.")
+        logger.debug("[Security] SLACK_SECURITY_WEBHOOK not set -- skipping Slack alert.")
         return False
 
     try:
