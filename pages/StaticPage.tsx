@@ -9,10 +9,10 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section with Animation -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-purple-500/5 animate-pulse"></div>
+        <div class="bg-linear-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center relative overflow-hidden">
+          <div class="absolute inset-0 bg-linear-to-r from-indigo-500/5 to-purple-500/5 animate-pulse"></div>
           <div class="relative z-10">
-            <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl animate-bounce">
+            <div class="w-20 h-20 mx-auto mb-4 bg-linear-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center text-white shadow-xl animate-bounce">
               <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
             </div>
             <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Welcome to SmartShop</h2>
@@ -26,7 +26,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Founded -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div class="w-14 h-14 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Founded</h3>
@@ -37,7 +37,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Our Mission -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div class="w-14 h-14 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Our Mission</h3>
@@ -48,7 +48,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Our Team -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group hover:-translate-y-2">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <div class="w-14 h-14 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Our Team</h3>
@@ -59,13 +59,13 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Team Members Section -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-600">👥 Meet Our Team</h3>
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             
             <!-- Team Member 1 -->
             <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden">
-              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AC</div>
+              <div class="w-20 h-20 mx-auto mb-4 bg-linear-to-br from-indigo-400 to-indigo-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AC</div>
               <h4 class="font-bold text-gray-900 mb-1">Abdul Choudhary</h4>
               <p class="text-gray-500 text-sm mb-4">Team Lead</p>
               <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -80,7 +80,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
             <!-- Team Member 2 -->
             <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden">
-              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">VG</div>
+              <div class="w-20 h-20 mx-auto mb-4 bg-linear-to-br from-purple-400 to-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">VG</div>
               <h4 class="font-bold text-gray-900 mb-1">Vrushika Gajjar</h4>
               <p class="text-gray-500 text-sm mb-4">Developer</p>
               <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -95,7 +95,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
             <!-- Team Member 3 -->
             <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden">
-              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AM</div>
+              <div class="w-20 h-20 mx-auto mb-4 bg-linear-to-br from-amber-400 to-amber-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">AM</div>
               <h4 class="font-bold text-gray-900 mb-1">Abdul Munshi Masjud</h4>
               <p class="text-gray-500 text-sm mb-4">Developer</p>
               <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -110,7 +110,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
             <!-- Team Member 4 -->
             <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100 text-center hover:shadow-xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden">
-              <div class="w-20 h-20 mx-auto mb-4 bg-gradient-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">DT</div>
+              <div class="w-20 h-20 mx-auto mb-4 bg-linear-to-br from-green-400 to-green-600 rounded-full flex items-center justify-center text-white text-2xl font-black shadow-lg group-hover:scale-110 transition-transform duration-300">DT</div>
               <h4 class="font-bold text-gray-900 mb-1">Devam Trivedi</h4>
               <p class="text-gray-500 text-sm mb-4">Developer</p>
               <div class="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -127,7 +127,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Values Section -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">⭐ Our Values</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-indigo-100 hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
@@ -193,7 +193,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+        <div class="bg-linear-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
           <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Fast & Reliable Shipping</h2>
           <p class="text-lg text-gray-600 max-w-2xl mx-auto">We offer multiple shipping options to get your order to you quickly and safely.</p>
         </div>
@@ -204,7 +204,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Standard Shipping -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Standard</h3>
@@ -216,7 +216,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Express Shipping -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Express</h3>
@@ -228,7 +228,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Overnight Shipping -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Overnight</h3>
@@ -240,7 +240,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Shipping Coverage -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">🌍 Worldwide Shipping</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-indigo-100">
@@ -297,7 +297,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+        <div class="bg-linear-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
           <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Easy Returns & Refunds</h2>
           <p class="text-lg text-gray-600 max-w-2xl mx-auto">Not satisfied with your purchase? We make returns simple and hassle-free.</p>
         </div>
@@ -308,7 +308,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- 30-Day Returns -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">30-Day Returns</h3>
@@ -319,7 +319,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Free Returns -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Free Returns</h3>
@@ -330,7 +330,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Full Refund -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Full Refund</h3>
@@ -341,7 +341,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Return Conditions -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">📦 Return Conditions</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-indigo-100">
@@ -362,7 +362,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Self-Service Return Form (Coming Soon) -->
-        <div class="bg-gradient-to-r from-amber-50 to-orange-50 p-8 rounded-4xl border-2 border-dashed border-amber-300 text-center">
+        <div class="bg-linear-to-r from-amber-50 to-orange-50 p-8 rounded-4xl border-2 border-dashed border-amber-300 text-center">
           <div class="w-16 h-16 mx-auto mb-4 bg-amber-100 rounded-2xl flex items-center justify-center">
             <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
           </div>
@@ -410,7 +410,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+        <div class="bg-linear-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
           <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Shop in 4 Easy Steps</h2>
           <p class="text-lg text-gray-600 max-w-2xl mx-auto">Finding and ordering your favorite products has never been easier.</p>
         </div>
@@ -420,7 +420,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           
           <!-- Step 1 -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <span class="text-2xl font-black">1</span>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-3">Browse Products</h3>
@@ -429,7 +429,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
           <!-- Step 2 -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-purple-200 hover:shadow-xl transition-all duration-300 group text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-purple-500 to-purple-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <span class="text-2xl font-black">2</span>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-3">Add to Cart</h3>
@@ -438,7 +438,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
           <!-- Step 3 -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <span class="text-2xl font-black">3</span>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-3">Checkout</h3>
@@ -447,7 +447,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
 
           <!-- Step 4 -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group text-center">
-            <div class="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+            <div class="w-16 h-16 mx-auto mb-4 bg-linear-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
               <span class="text-2xl font-black">4</span>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-3">Confirm Order</h3>
@@ -457,7 +457,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Tips Section -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-6 text-center uppercase tracking-widest text-indigo-600">💡 Pro Tips</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-white p-5 rounded-2xl border border-indigo-100">
@@ -485,7 +485,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Need Help Banner -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
+        <div class="bg-linear-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
           <h3 class="text-2xl font-black mb-3">Need Help Ordering?</h3>
           <p class="text-indigo-100 mb-6">Our customer support team is available 24/7 to assist you with your order.</p>
           <a href="/contact" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-full font-bold hover:bg-indigo-50 transition-colors">
@@ -619,7 +619,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-10 animate-fade-in max-w-5xl mx-auto">
 
         <!-- Hero Section -->
-        <div class="bg-gradient-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
+        <div class="bg-linear-to-br from-indigo-50 via-white to-purple-50 p-8 md:p-10 rounded-4xl border border-indigo-100 text-center">
           <h2 class="text-3xl md:text-4xl font-black text-gray-900 mb-4">Secure & Flexible Payment Options</h2>
           <p class="text-lg text-gray-600 max-w-2xl mx-auto">Shop with confidence using our wide range of trusted payment methods. All transactions are encrypted and secure.</p>
         </div>
@@ -630,7 +630,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Credit/Debit Cards -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-indigo-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Credit/Debit Cards</h3>
@@ -646,7 +646,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- PayPal -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-blue-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-blue-600 to-blue-700 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M7.022 21h3.97c.436 0 .806-.314.878-.744l2.46-15.572a.89.89 0 00-.878-1.028H9.18a2.67 2.67 0 00-2.636 2.228L5.368 13.5.888 21h6.134z"/></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">PayPal</h3>
@@ -658,7 +658,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Apple Pay -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-gray-800 to-black rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Apple Pay</h3>
@@ -673,7 +673,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Google Pay -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-gray-300 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-white to-gray-100 rounded-2xl flex items-center justify-center shadow-lg border border-gray-200">
+              <div class="w-14 h-14 bg-linear-to-br from-white to-gray-100 rounded-2xl flex items-center justify-center shadow-lg border border-gray-200">
                 <span class="text-2xl font-bold text-gray-700">G</span>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Google Pay</h3>
@@ -688,7 +688,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Bank Transfer -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-green-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Bank Transfer</h3>
@@ -700,7 +700,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <!-- Cash on Delivery -->
           <div class="bg-white p-6 rounded-3xl shadow-lg shadow-gray-100 border border-gray-100 hover:border-amber-200 hover:shadow-xl transition-all duration-300 group">
             <div class="flex items-center gap-4 mb-4">
-              <div class="w-14 h-14 bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+              <div class="w-14 h-14 bg-linear-to-br from-amber-500 to-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
                 <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-gray-900">Cash on Delivery</h3>
@@ -712,7 +712,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Security Section -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-8 rounded-4xl border border-indigo-100">
           <h3 class="text-2xl font-black mb-8 text-center uppercase tracking-widest text-indigo-600">🔒 Your Security is Our Priority</h3>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="text-center">
@@ -759,7 +759,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
         </div>
 
         <!-- Support Banner -->
-        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
+        <div class="bg-linear-to-r from-indigo-500 to-purple-600 text-white p-8 rounded-4xl text-center">
           <h3 class="text-2xl font-black mb-3">Need Help with Payment?</h3>
           <p class="text-indigo-100 mb-6">Our support team is here to assist you 24/7 with any payment-related questions.</p>
           <a href="/contact" class="inline-flex items-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-full font-bold hover:bg-indigo-50 transition-colors">
@@ -777,7 +777,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
       <div class="space-y-8 animate-fade-in max-w-4xl mx-auto">
 
         <!-- Header Banner -->
-        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-200">
+        <div class="bg-linear-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-200">
           <div class="flex items-start gap-4">
             <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
               <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
