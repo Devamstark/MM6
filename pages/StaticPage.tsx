@@ -775,44 +775,177 @@ const staticPages: Record<string, { title: string, content: string }> = {
     title: 'Privacy Policy',
     content: `
       <div class="space-y-8 animate-fade-in max-w-4xl mx-auto">
-        <div class="bg-indigo-50 p-6 rounded-2xl border border-indigo-100 mb-8">
-          <p class="text-indigo-900 font-medium">Last Updated: February 25, 2026. This policy outlines how SmartShop collects, uses, and protects your personal data in compliance with GDPR and international privacy standards.</p>
+
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 rounded-2xl border border-indigo-200">
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+            </div>
+            <div>
+              <p class="text-xs font-bold text-indigo-500 uppercase tracking-widest mb-1">Last Updated: February 25, 2026</p>
+              <p class="text-indigo-900 font-medium text-sm leading-relaxed">SmartShop ("we," "our," "us") is committed to protecting your personal data in compliance with <strong>GDPR</strong> and international privacy standards. This policy explains what data we collect, how we use it, and your rights regarding your data.</p>
+            </div>
+          </div>
         </div>
 
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900">1. Data We Collect</h3>
-          <p class="text-gray-600">We collect information you provide directly to us (name, email, shipping address) and technical data automatically collected when you visit our site (IP address, device info via Cloudflare).</p>
-        </section>
-
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900">2. How We Use Your Data</h3>
-          <ul class="list-disc pl-5 text-gray-600 space-y-2">
-            <li>To process and ship your orders.</li>
-            <li>To maintain your account and security.</li>
-            <li>To send you transactional emails (order confirmations, shipping updates).</li>
-            <li>With your consent, to send marketing newsletters.</li>
-          </ul>
-        </section>
-
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900">3. Your Rights (GDPR)</h3>
-          <p class="text-gray-600">Under GDPR, you have the following rights:</p>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-            <div class="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-              <h4 class="font-bold text-indigo-600 mb-1">Right to Access</h4>
-              <p class="text-sm text-gray-500">Download a copy of your personal data at any time from your profile.</p>
+        <!-- Section 1 -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">1</span>
+            Data We Collect
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-1">a. Information You Provide</h4>
+              <ul class="list-disc pl-5 text-gray-600 text-sm space-y-1">
+                <li>Name, email, shipping address, billing info</li>
+                <li>Account credentials (username / password)</li>
+              </ul>
             </div>
-            <div class="p-4 bg-white border border-gray-100 rounded-xl shadow-sm">
-              <h4 class="font-bold text-indigo-600 mb-1">Right to Erasure</h4>
-              <p class="text-sm text-gray-500">Request the permanent deletion of your account and personal info.</p>
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-1">b. Information Automatically Collected</h4>
+              <ul class="list-disc pl-5 text-gray-600 text-sm space-y-1">
+                <li>IP address, device type, browser info</li>
+                <li>Login timestamps, order activity, and security logs (AuditLog)</li>
+                <li>Collected via our website, apps, or Cloudflare / other proxies</li>
+              </ul>
+            </div>
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-1">c. Optional Information</h4>
+              <ul class="list-disc pl-5 text-gray-600 text-sm space-y-1">
+                <li>Newsletter subscription preferences</li>
+                <li>Marketing interaction data (if consented)</li>
+              </ul>
             </div>
           </div>
         </section>
 
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900">4. Data Security</h3>
-          <p class="text-gray-600">We use industry-standard encryption (SSL/TLS) for data in transit and secure hashing for passwords at rest. Your data is stored on our private, self-hosted infrastructure.</p>
+        <!-- Section 2 -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">2</span>
+            How We Use Your Data
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 class="font-semibold text-gray-900 text-sm mb-1">📦 Order Processing</h4>
+              <p class="text-xs text-gray-600">To fulfill and ship orders.</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 class="font-semibold text-gray-900 text-sm mb-1">🔐 Account Security</h4>
+              <p class="text-xs text-gray-600">Monitor suspicious activity, login events, and account changes.</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 class="font-semibold text-gray-900 text-sm mb-1">✉️ Communication</h4>
+              <p class="text-xs text-gray-600">Send transactional emails: order confirmation, shipping updates, alerts.</p>
+            </div>
+            <div class="p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <h4 class="font-semibold text-gray-900 text-sm mb-1">📣 Marketing (with consent)</h4>
+              <p class="text-xs text-gray-600">Send newsletters or promotional content only when you opt in.</p>
+            </div>
+            <div class="p-4 bg-indigo-50 rounded-xl border border-indigo-100 sm:col-span-2">
+              <h4 class="font-semibold text-indigo-800 text-sm mb-1">🛡 Compliance &amp; Auditing</h4>
+              <p class="text-xs text-indigo-700">Maintain immutable AuditLogs for SOC2 compliance, including security monitoring and forensic reporting. All login events, order activity, and account changes are permanently recorded.</p>
+            </div>
+          </div>
         </section>
+
+        <!-- Section 3 -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">3</span>
+            Data Retention
+          </h3>
+          <p class="text-gray-600 text-sm">Personal data is retained only as long as necessary to fulfill the purposes above.</p>
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-4">
+            <p class="text-sm text-amber-800"><strong>AuditLog Retention:</strong> Security logs containing personal identifiers (IP address, username) are archived for <strong>6 months</strong>. After this period, personally identifiable information (PII) is anonymized while non-identifiable log entries are retained for system integrity and compliance audits.</p>
+          </div>
+        </section>
+
+        <!-- Section 4 -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">4</span>
+            Data Security
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="flex gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+              <div><h4 class="font-semibold text-gray-900 text-sm mb-0.5">Encryption</h4><p class="text-xs text-gray-600">SSL/TLS in transit · AES-256 at rest</p></div>
+            </div>
+            <div class="flex gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path></svg>
+              <div><h4 class="font-semibold text-gray-900 text-sm mb-0.5">Authentication</h4><p class="text-xs text-gray-600">Industry-standard password hashing (bcrypt)</p></div>
+            </div>
+            <div class="flex gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+              <div><h4 class="font-semibold text-gray-900 text-sm mb-0.5">Access Control</h4><p class="text-xs text-gray-600">Audit data accessible only to authorized security personnel</p></div>
+            </div>
+            <div class="flex gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100">
+              <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg>
+              <div><h4 class="font-semibold text-gray-900 text-sm mb-0.5">Monitoring &amp; Logging</h4><p class="text-xs text-gray-600">All security events logged in a SOC2-aligned, append-only AuditLog</p></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 5: GDPR Rights -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">5</span>
+            Your Rights (GDPR)
+          </h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            <div class="p-4 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <h4 class="font-bold text-indigo-600 text-sm mb-1">Right to Access</h4>
+              <p class="text-xs text-gray-500">Download a copy of your personal data anytime from your profile.</p>
+            </div>
+            <div class="p-4 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <h4 class="font-bold text-indigo-600 text-sm mb-1">Right to Erasure</h4>
+              <p class="text-xs text-gray-500">Request permanent deletion of your account and personal info.</p>
+            </div>
+            <div class="p-4 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <h4 class="font-bold text-indigo-600 text-sm mb-1">Right to Rectification</h4>
+              <p class="text-xs text-gray-500">Correct inaccurate or incomplete personal data at any time.</p>
+            </div>
+            <div class="p-4 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <h4 class="font-bold text-indigo-600 text-sm mb-1">Right to Portability</h4>
+              <p class="text-xs text-gray-500">Receive your data in a structured, machine-readable format.</p>
+            </div>
+            <div class="p-4 bg-white border border-indigo-100 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+              <h4 class="font-bold text-indigo-600 text-sm mb-1">Right to Restrict</h4>
+              <p class="text-xs text-gray-500">Request limitations on how we process your personal data.</p>
+            </div>
+            <div class="p-4 bg-indigo-50 border border-indigo-200 rounded-xl shadow-sm">
+              <h4 class="font-bold text-indigo-700 text-sm mb-1">Submit a Request</h4>
+              <p class="text-xs text-indigo-600">Email <a href="mailto:privacy@smartshop.com" class="underline font-semibold">privacy@smartshop.com</a> — we respond within 30 days as required by GDPR.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Section 6 -->
+        <section class="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm space-y-4">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center text-sm font-black">6</span>
+            Third-Party Services
+          </h3>
+          <p class="text-gray-600 text-sm">We use the following third-party providers who only access data necessary for their service and are GDPR-compliant:</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="px-3 py-1.5 bg-orange-50 border border-orange-200 text-orange-700 text-xs font-semibold rounded-full">☁️ Cloudflare — CDN &amp; Security</span>
+            <span class="px-3 py-1.5 bg-purple-50 border border-purple-200 text-purple-700 text-xs font-semibold rounded-full">💳 Stripe — Payment Processing</span>
+            <span class="px-3 py-1.5 bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold rounded-full">💰 PayPal — Payment Processing</span>
+          </div>
+        </section>
+
+        <!-- Section 7 -->
+        <section class="bg-gray-50 border border-gray-200 rounded-2xl p-6 space-y-2">
+          <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+            <span class="w-7 h-7 bg-gray-200 text-gray-700 rounded-lg flex items-center justify-center text-sm font-black">7</span>
+            Updates to This Policy
+          </h3>
+          <p class="text-gray-600 text-sm">We may update this policy from time to time. Users will be notified via email or website notifications for any major changes.</p>
+        </section>
+
       </div>
     `
   },
