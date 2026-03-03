@@ -202,7 +202,7 @@ def log_audit_event(
         log_audit_event('order_created', request=request, user=user, severity='MEDIUM',
                         metadata={'order_id': str(order.id)})
     """
-    from .models import AuditLog
+    from ..models import AuditLog
 
     ip = get_client_ip(request) if request else None
     ua_string = get_user_agent(request) if request else None
