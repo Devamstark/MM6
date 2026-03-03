@@ -11,7 +11,7 @@ from .views import (
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
     MarketingCampaignViewSet, BlogImageView, HealthCheckView, CartViewSet, StockReservationViewSet,
-    AuditLogViewSet, SecureTokenObtainPairView
+    AuditLogViewSet, SecureTokenObtainPairView, BlockedIPsView
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
 from .telegram_auth import TelegramLoginView
@@ -61,4 +61,6 @@ urlpatterns = [
     path('auth/telegram/', TelegramLoginView.as_view(), name='auth_telegram'),
     path('webhooks/telegram/', TelegramWebhookView.as_view(), name='telegram_webhook'),
     path('health/', HealthCheckView.as_view(), name='health_check'),
+    path('blocked-ips/', BlockedIPsView.as_view(), name='blocked-ips-list'),
+    path('blocked-ips/unblock/', BlockedIPsView.as_view(), name='blocked-ips-unblock'),
 ]

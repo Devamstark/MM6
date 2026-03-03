@@ -712,6 +712,69 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         })
 
 
+class BlockedIPsView(APIView):
+    """
+    GET  /api/blocked-ips/        → list all currently blocked IPs (Axes AccessAttempt)
+    POST /api/blocked-ips/unblock/ → unblock by ip_address or username
+    """
+    permission_classes = [IsSecurityAdmin]
+
+    def get(self, request):
+        try:
+            from axes.models import AccessAttempt
+            attempts = AccessAttempt.objects.all().order_by('-attempt_time')
+            data = [
+                {
+                    'id': a.id,
+                    'username': a.username,
+                    'ip_address': a.ip_address,
+                    'failures': a.failures_since_start,
+                    'last_attempt': a.attempt_time.isoformat() if a.attempt_time else None,
+                    'user_agent': a.user_agent,
+                }
+                for a in attempts
+            ]
+            return Response(data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+    def post(self, request):
+        """Unblock an IP or username."""
+        ip = request.data.get('ip_address')
+        username = request.data.get('username')
+
+        if not ip and not username:
+            return Response({'error': 'Provide ip_address or username'}, status=400)
+
+        try:
+            from axes.utils import reset
+            if ip:
+                reset(ip=ip)
+            if username:
+                reset(username=username)
+
+            # Log the manual unblock to AuditLog
+            from .security.services import log_audit_event
+            log_audit_event(
+                action='ip_unblocked',
+                request=request,
+                user=request.user,
+                severity='MEDIUM',
+                source='USER',
+                metadata={
+                    'unblocked_ip': ip or 'N/A',
+                    'unblocked_username': username or 'N/A',
+                    'unblocked_by': request.user.username,
+                },
+            )
+
+            return Response({'success': True, 'message': f'Unblocked: ip={ip or "-"} user={username or "-"}'})
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
+
+
+
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
