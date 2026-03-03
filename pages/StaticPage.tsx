@@ -778,11 +778,11 @@ const staticPages: Record<string, { title: string, content: string }> = {
         <div class="border-b-4 border-black pb-8 mb-10 flex justify-between items-end">
           <div>
             <h2 class="text-4xl font-black uppercase leading-tight tracking-tighter">Privacy<br/>Policy</h2>
-            <p class="mt-2 text-xs font-bold uppercase tracking-widest opacity-70">SmartShop &mdash; REVISON 2.1</p>
+            <p class="mt-2 text-xs font-bold uppercase tracking-widest opacity-70">SmartShop &mdash; REVISON 3.0</p>
           </div>
           <div class="text-right">
             <p class="text-[10px] font-black uppercase mb-1">Effective Date</p>
-            <p class="text-xl font-black tabular-nums">02.25.2026</p>
+            <p class="text-xl font-black tabular-nums">03.03.2026</p>
           </div>
         </div>
 
@@ -791,7 +791,7 @@ const staticPages: Record<string, { title: string, content: string }> = {
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
               <h3 class="text-lg font-black uppercase md:border-r-2 border-black">01.<br/>Scope</h3>
               <div class="md:col-span-2 space-y-4">
-                <p class="text-base font-medium">SmartShop is committed to absolute transparency regarding your personal data. This protocol outlines how we collect, process, and safeguard information in compliance with GDPR and SOC2 standards.</p>
+                <p class="text-base font-medium">SmartShop is committed to absolute transparency. This protocol outlines data processing across our Web Platform, Telegram Mini App, and AI Concierge Engine in compliance with GDPR and SOC2 standards.</p>
               </div>
             </div>
           </section>
@@ -805,8 +805,12 @@ const staticPages: Record<string, { title: string, content: string }> = {
                   <p class="text-base border-l-2 border-black pl-4">Name, Email, Physical Address, Billing Metadata, and Account Signatures.</p>
                 </div>
                 <div>
+                  <h4 class="text-sm font-black uppercase mb-2">AI & Bot Telemetry</h4>
+                  <p class="text-base border-l-2 border-black pl-4">Intent-based chat logs from AI Concierge, Telegram User IDs, and interaction histories for service optimization.</p>
+                </div>
+                <div>
                   <h4 class="text-sm font-black uppercase mb-2">Technical Telemetry</h4>
-                  <p class="text-base border-l-2 border-black pl-4">IP Address, Browser Fingerprints, Hardware Specs, and Forensic Audit Trails via Cloudflare.</p>
+                  <p class="text-base border-l-2 border-black pl-4">IP Address, Forensic Audit Trails, and automated security signals via the Brute-force Shield.</p>
                 </div>
               </div>
             </div>
@@ -815,19 +819,23 @@ const staticPages: Record<string, { title: string, content: string }> = {
           <section class="bg-black text-white p-8">
             <h3 class="text-xs font-black uppercase tracking-[0.2em] mb-4 opacity-50">03. Retention & Forensics</h3>
             <p class="text-base leading-relaxed">
-              Security logs containing user identifiers (AuditLog) are strictly retained for <span class="font-bold underline">180 days</span> to enable threat analysis and incident response. 
-              After this cycle, data is anonymized or purged.
+              Security logs (AuditLog) are strictly retained for <span class="font-bold underline">180 days</span> to enable threat analysis. User interaction data with the AI Engine is anonymized after 90 days.
             </p>
           </section>
 
           <section>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <h3 class="text-lg font-black uppercase md:border-r-2 border-black">04.<br/>Security</h3>
+              <h3 class="text-lg font-black uppercase md:border-r-2 border-black">04.<br/>GDPR Rights</h3>
               <div class="md:col-span-2">
-                <ul class="space-y-3">
-                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> 256-Bit SSL Encryption</li>
-                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> Immutable SOC2 Audit Trails</li>
-                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> Bcrypt Password Hashing</li>
+                <ul class="space-y-4">
+                  <li class="flex flex-col gap-1">
+                    <span class="text-sm font-black uppercase">Right to Portability</span>
+                    <p class="text-sm">Users can export a full machine-readable JSON copy of their Profile, Orders, and Reviews via the Security Tab.</p>
+                  </li>
+                  <li class="flex flex-col gap-1">
+                    <span class="text-sm font-black uppercase">Right to Erasure</span>
+                    <p class="text-sm">Users hold the absolute right to "be forgotten," enabling permanent self-deletion of all personal datasets.</p>
+                  </li>
                 </ul>
               </div>
             </div>
@@ -848,11 +856,11 @@ const staticPages: Record<string, { title: string, content: string }> = {
         <div class="border-b-4 border-black pb-8 mb-10 flex justify-between items-end">
           <div>
             <h2 class="text-4xl font-black uppercase leading-tight tracking-tighter">Terms of<br/>Service</h2>
-            <p class="mt-2 text-[10px] font-bold uppercase tracking-widest opacity-70">Ref: SS-2026-TOS</p>
+            <p class="mt-2 text-[10px] font-bold uppercase tracking-widest opacity-70">Ref: SS-2026-TOS-V2</p>
           </div>
           <div class="text-right">
-            <p class="text-[10px] font-black uppercase mb-1">Standard Revision</p>
-            <p class="text-xl font-black tabular-nums">V1.2</p>
+            <p class="text-[10px] font-black uppercase mb-1">Enterprise Revision</p>
+            <p class="text-xl font-black tabular-nums">V2.0</p>
           </div>
         </div>
 
@@ -863,26 +871,37 @@ const staticPages: Record<string, { title: string, content: string }> = {
                <p class="text-[10px] font-bold uppercase mt-2">Account</p>
             </div>
             <div class="md:w-3/4 space-y-4">
-              <h4 class="text-base font-black uppercase tracking-tight">Eligibility & Conduct</h4>
-              <p class="text-base leading-relaxed">Usage of the platform requires the user to be 18+ years of age. Users bear absolute liability for all actions performed under their unique credentials. SmartShop reserves the right to terminate access for security violations.</p>
+              <h4 class="text-base font-black uppercase tracking-tight">Access & Conduct</h4>
+              <p class="text-base leading-relaxed">Users must be 18+ to transact. We utilize a Brute-force Shield that may automatically restrict access based on security threats or anomalous login patterns.</p>
             </div>
           </section>
 
           <section class="flex flex-col md:flex-row gap-12">
             <div class="md:w-1/4">
                <span class="text-3xl font-black">02.</span>
-               <p class="text-[10px] font-bold uppercase mt-2">Commerce</p>
+               <p class="text-[10px] font-bold uppercase mt-2">Integrations</p>
             </div>
             <div class="md:w-3/4 space-y-4">
-              <h4 class="text-base font-black uppercase tracking-tight">Fulfillment & Pricing</h4>
-              <p class="text-base leading-relaxed">Orders are valid only upon electronic notification of shipment. We reserve the right to cancel orders due to inventory inaccuracies, pricing errors, or fraud flagging.</p>
+              <h4 class="text-base font-black uppercase tracking-tight">AI & Bots</h4>
+              <p class="text-base leading-relaxed">Transactions may be processed via our Telegram Mini App. AI Concierge responses are generated for efficiency; final purchase decisions remain the absolute responsibility of the user.</p>
+            </div>
+          </section>
+
+          <section class="flex flex-col md:flex-row gap-12">
+            <div class="md:w-1/4">
+               <span class="text-3xl font-black">03.</span>
+               <p class="text-[10px] font-bold uppercase mt-2">Marketing</p>
+            </div>
+            <div class="md:w-3/4 space-y-4">
+              <h4 class="text-base font-black uppercase tracking-tight">Communications</h4>
+              <p class="text-base leading-relaxed">By creating an account, you consent to essential service notifications. Marketing campaigns utilize targeted telemetry but allow one-click opt-out per GDPR mandates.</p>
             </div>
           </section>
 
           <section class="border-4 border-black p-8 bg-gray-50 text-center">
-             <h4 class="text-xs font-black uppercase mb-4 tracking-widest">03. Liability Disclaimer</h4>
+             <h4 class="text-xs font-black uppercase mb-4 tracking-widest">04. Liability Disclaimer</h4>
              <p class="text-sm italic uppercase font-bold leading-relaxed max-w-2xl mx-auto">
-               "SmartShop provides its environment on an 'AS-IS' basis. We disclaim all implied warranties including marketability and fitness for purpose."
+               "SmartShop provides its AI and bot integrations 'AS-IS'. We disclaim responsibility for third-party network issues originating from Telegram or Stripe."
              </p>
           </section>
         </div>
