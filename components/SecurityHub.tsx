@@ -39,6 +39,7 @@ interface BlockedIP {
     username: string;
     ip_address: string;
     failures: number;
+    is_locked: boolean;
     last_attempt: string | null;
     user_agent: string;
 }
@@ -232,12 +233,17 @@ const BlockedIPsTab = () => {
                 <div className="flex items-center gap-2">
                     <Ban className="w-4 h-4 text-red-500" />
                     <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                        {blocked.length} blocked {blocked.length === 1 ? 'entry' : 'entries'}
+                        {blocked.length} security {blocked.length === 1 ? 'incident' : 'incidents'}
                     </span>
-                    {blocked.length > 0 && (
+                    {blocked.filter(b => b.is_locked).length > 0 && (
                         <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
                             <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
-                            Active Blocks
+                            {blocked.filter(b => b.is_locked).length} Locked Out
+                        </span>
+                    )}
+                    {blocked.filter(b => !b.is_locked).length > 0 && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border border-amber-200 dark:border-amber-800">
+                            {blocked.filter(b => !b.is_locked).length} Tracking
                         </span>
                     )}
                 </div>
@@ -262,7 +268,7 @@ const BlockedIPsTab = () => {
                         <table className="min-w-full divide-y divide-gray-100 dark:divide-gray-800">
                             <thead>
                                 <tr className="bg-gray-50 dark:bg-gray-800/60">
-                                    {['IP Address', 'Username / Email', 'Failed Attempts', 'Last Attempt', 'User Agent', 'Action'].map(h => (
+                                    {['IP Address', 'Username / Email', 'Status', 'Last Attempt', 'User Agent', 'Action'].map(h => (
                                         <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider whitespace-nowrap">
                                             {h}
                                         </th>
@@ -294,12 +300,24 @@ const BlockedIPsTab = () => {
                                             </div>
                                         </td>
 
-                                        {/* Failures */}
+                                        {/* Status */}
                                         <td className="px-4 py-3 whitespace-nowrap">
-                                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800">
-                                                <Lock className="w-3 h-3" />
-                                                {entry.failures} failed
-                                            </span>
+                                            <div className="flex flex-col gap-1">
+                                                {entry.is_locked ? (
+                                                    <span className="inline-flex items-center gap-1 w-fit px-2 py-0.5 rounded text-[11px] font-bold bg-red-50 text-red-700 dark:bg-red-900/20 dark:text-red-400 border border-red-100 dark:border-red-800/50">
+                                                        <Lock className="w-3 h-3" />
+                                                        LOCKED OUT
+                                                    </span>
+                                                ) : (
+                                                    <span className="inline-flex items-center gap-1 w-fit px-2 py-0.5 rounded text-[11px] font-bold bg-amber-50 text-amber-700 dark:bg-amber-900/20 dark:text-amber-400 border border-amber-100 dark:border-amber-800/50">
+                                                        <Eye className="w-3 h-3" />
+                                                        INCIDENT TRACKING
+                                                    </span>
+                                                )}
+                                                <span className="text-[10px] text-gray-500 dark:text-gray-400 font-medium ml-1">
+                                                    {entry.failures} failed attempts
+                                                </span>
+                                            </div>
                                         </td>
 
                                         {/* Last Attempt */}

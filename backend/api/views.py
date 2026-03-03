@@ -722,6 +722,9 @@ class BlockedIPsView(APIView):
     def get(self, request):
         try:
             from axes.models import AccessAttempt
+            from django.conf import settings
+            limit = getattr(settings, 'AXES_FAILURE_LIMIT', 5)
+
             attempts = AccessAttempt.objects.all().order_by('-attempt_time')
             data = [
                 {
@@ -729,6 +732,7 @@ class BlockedIPsView(APIView):
                     'username': a.username,
                     'ip_address': a.ip_address,
                     'failures': a.failures_since_start,
+                    'is_locked': a.failures_since_start >= limit,
                     'last_attempt': a.attempt_time.isoformat() if a.attempt_time else None,
                     'user_agent': a.user_agent,
                 }
