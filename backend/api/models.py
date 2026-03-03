@@ -111,6 +111,9 @@ class AuditLog(models.Model):
         ('password_reset_request', 'Password Reset Request'),
         ('password_reset_confirm', 'Password Reset Confirm'),
         ('account_lockout', 'Account Lockout'),
+        ('failed_login', 'Failed Login'),
+        ('ip_unblocked', 'IP Unblocked'),
+        ('order_updated', 'Order Updated'),
     )
     SEVERITY_CHOICES = (
         ('LOW', 'Low'),
