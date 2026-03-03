@@ -10,7 +10,8 @@ from .views import (
     RequestPasswordResetView, VerifyResetCodeView, ResetPasswordView, ReviewViewSet, BulkProductUploadView,
     SubmitInquiryView, WishlistViewSet, ContactMessageViewSet, AddressViewSet, CouponViewSet,
     HeroBannerViewSet, HomePageSectionViewSet, BlogPostViewSet, NewsletterSubscriberViewSet,
-    MarketingCampaignViewSet, BlogImageView, HealthCheckView, CartViewSet, StockReservationViewSet
+    MarketingCampaignViewSet, BlogImageView, HealthCheckView, CartViewSet, StockReservationViewSet,
+    AuditLogViewSet, SecureTokenObtainPairView
 )
 from .payment_views import CreatePaymentIntentView, StripeWebhookView
 from .telegram_auth import TelegramLoginView
@@ -41,12 +42,13 @@ router.register(r'newsletter', NewsletterSubscriberViewSet, basename='newsletter
 router.register(r'marketing-campaigns', MarketingCampaignViewSet, basename='marketing-campaigns')
 router.register(r'carts', CartViewSet, basename='carts')
 router.register(r'reservations', StockReservationViewSet, basename='reservations')
+router.register(r'audit-logs', AuditLogViewSet, basename='audit-logs')
 
 urlpatterns = [
     path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),
     path('payments/webhook/', StripeWebhookView.as_view(), name='stripe_webhook'),
     path('', include(router.urls)),
-    path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('auth/login/', SecureTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('products/bulk_upload/', BulkProductUploadView.as_view(), name='product-bulk-upload'),
     path('auth/register/', RegisterView.as_view(), name='auth_register'),

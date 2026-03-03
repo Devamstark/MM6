@@ -4,7 +4,7 @@ from .models import (
     Product, ProductVariant, ProductImage, Order, OrderItem, Payment, PageContent, Affiliate, Review,
     Wishlist, ContactMessage, Address, Coupon, HeroBanner, HomePageSection,
     BlogPost, NewsletterSubscriber, MarketingCampaign, EmailDeliveryLog, CampaignRecipient,
-    EmailClickLog, EmailConversion, Cart, CartItem, StockReservation
+    EmailClickLog, EmailConversion, Cart, CartItem, StockReservation, AuditLog
 )
 
 User = get_user_model()
@@ -335,3 +335,18 @@ class StockReservationSerializer(serializers.ModelSerializer):
         model = StockReservation
         fields = ['id', 'product', 'variant', 'quantity', 'expires_at', 'created_at']
         read_only_fields = ('id', 'created_at')
+
+
+class AuditLogSerializer(serializers.ModelSerializer):
+    username = serializers.ReadOnlyField(source='user.username')
+    user_email = serializers.ReadOnlyField(source='user.email')
+
+    class Meta:
+        model = AuditLog
+        fields = [
+            'id', 'user', 'username', 'user_email',
+            'action', 'severity', 'source',
+            'ip_address', 'os', 'browser', 'device_type',
+            'user_agent', 'timestamp', 'metadata',
+        ]
+        read_only_fields = fields  # Fully read-only — immutable

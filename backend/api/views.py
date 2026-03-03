@@ -88,11 +88,62 @@ class WishlistViewSet(viewsets.ModelViewSet):
 
 User = get_user_model()
 
-class RegisterView(APIView):
+
+class SecureTokenObtainPairView(APIView):
+    """
+    Custom login view that:
+    1. Authenticates the user via JWT.
+    2. Detects logins from new IP addresses (known_ips anomaly check).
+    3. Logs all login events and suspicious logins to the AuditLog.
+    """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
+        from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+        from rest_framework_simplejwt.exceptions import TokenError
+        from .security.services import log_audit_event, get_client_ip, check_ip_anomaly
+
+        serializer = TokenObtainPairSerializer(data=request.data, context={'request': request})
+        try:
+            serializer.is_valid(raise_exception=True)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = serializer.user
+        current_ip = get_client_ip(request)
+
+        # Check for IP anomaly BEFORE updating known_ips
+        is_new_ip = check_ip_anomaly(user, current_ip)
+
+        if is_new_ip:
+            log_audit_event(
+                action='suspicious_login',
+                request=request,
+                user=user,
+                severity='HIGH',
+                metadata={
+                    'reason': 'Login from new IP address',
+                    'new_ip': current_ip,
+                },
+            )
+        else:
+            log_audit_event(
+                action='login',
+                request=request,
+                user=user,
+                severity='LOW',
+            )
+
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
+
+class RegisterView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+
+    def post(self, request):
         from django.db import transaction
+        from .security.services import log_audit_event
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
@@ -141,6 +192,15 @@ class RegisterView(APIView):
                         ReferralSignup.objects.create(referrer=referrer, referred_user=user)
                 except Affiliate.DoesNotExist:
                     pass  # Invalid code – silently ignore
+
+        # 🔐 AUDIT LOG: Registration Event
+        log_audit_event(
+            action='registration',
+            request=request,
+            user=user,
+            severity='LOW',
+            metadata={'email': email, 'ref_code': ref_code or None},
+        )
 
         # Send Welcome Email via Celery
         try:
@@ -494,6 +554,16 @@ class OrderViewSet(viewsets.ModelViewSet):
 
                 OrderItem.objects.bulk_create(order_items_to_create)
 
+                # 🔐 AUDIT LOG: Order Created
+                from .security.services import log_audit_event
+                log_audit_event(
+                    action='order_created',
+                    request=request,
+                    user=user,
+                    severity='MEDIUM',
+                    metadata={'order_id': str(order.id), 'total_amount': str(final_total)},
+                )
+
                 serializer = self.get_serializer(order)
                 response_data = serializer.data
                 response_data['earnings_applied'] = str(earnings_applied)
@@ -540,10 +610,90 @@ class OrderViewSet(viewsets.ModelViewSet):
         serializer = self.get_serializer(orders, many=True)
         return Response(serializer.data)
 
+# ── Audit Log ViewSet (Admin/Security Read-Only) ─────────────────────────────
+
+class IsSecurityAdmin(permissions.BasePermission):
+    """Grants access only to admins and users with is_security_staff=True."""
+    def has_permission(self, request, view):
+        return (
+            request.user.is_authenticated and
+            (request.user.role == 'admin' or getattr(request.user, 'is_security_staff', False))
+        )
+
+
+class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
+    """Read-only, append-only audit log access for Security Admins."""
+    from .models import AuditLog
+    from .serializers import AuditLogSerializer
+    queryset = None  # set dynamically
+    serializer_class = None  # set dynamically
+    permission_classes = [IsSecurityAdmin]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['action', 'severity', 'source', 'device_type']
+    search_fields = ['ip_address', 'user__username', 'user__email', 'os', 'browser']
+    ordering_fields = ['timestamp', 'severity']
+    ordering = ['-timestamp']
+
+    def get_queryset(self):
+        from .models import AuditLog
+        qs = AuditLog.objects.select_related('user').all()
+        # Allow filtering by action, severity, ip via query params
+        action = self.request.query_params.get('action')
+        severity = self.request.query_params.get('severity')
+        ip = self.request.query_params.get('ip')
+        user_id = self.request.query_params.get('user_id')
+        if action:
+            qs = qs.filter(action=action)
+        if severity:
+            qs = qs.filter(severity=severity)
+        if ip:
+            qs = qs.filter(ip_address=ip)
+        if user_id:
+            qs = qs.filter(user__id=user_id)
+        return qs
+
+    def get_serializer_class(self):
+        from .serializers import AuditLogSerializer
+        return AuditLogSerializer
+
+    @action(detail=False, methods=['get'], url_path='summary')
+    def summary(self, request):
+        """High-level stats for the Security Hub dashboard."""
+        from .models import AuditLog
+        from django.db.models import Count
+        from django.utils import timezone
+        from datetime import timedelta
+
+        now = timezone.now()
+        today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
+        last_hour = now - timedelta(hours=1)
+
+        reg_today = AuditLog.objects.filter(action='registration', timestamp__gte=today_start).count()
+        orders_last_hour = AuditLog.objects.filter(action='order_created', timestamp__gte=last_hour).count()
+        suspicious_today = AuditLog.objects.filter(action='suspicious_login', timestamp__gte=today_start).count()
+        critical_today = AuditLog.objects.filter(severity='CRITICAL', timestamp__gte=today_start).count()
+        total_logs = AuditLog.objects.count()
+
+        recent_flags = AuditLog.objects.filter(
+            severity__in=['HIGH', 'CRITICAL']
+        ).select_related('user').order_by('-timestamp')[:5]
+
+        from .serializers import AuditLogSerializer
+        return Response({
+            'registrations_today': reg_today,
+            'orders_last_hour': orders_last_hour,
+            'suspicious_logins_today': suspicious_today,
+            'critical_events_today': critical_today,
+            'total_logs': total_logs,
+            'recent_flags': AuditLogSerializer(recent_flags, many=True).data,
+        })
+
+
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
     permission_classes = [permissions.IsAuthenticated]
+
 
 class PageContentViewSet(viewsets.ModelViewSet):
     queryset = PageContent.objects.all()

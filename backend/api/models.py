@@ -30,6 +30,10 @@ class User(AbstractUser):
     bonus_points = models.IntegerField(default=0)
     profile_picture = models.TextField(blank=True, null=True) # Storing Base64 string for database persistence
     referral_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    # Security: stores the last 5 known IPs for intelligent anomaly detection
+    known_ips = models.JSONField(default=list, blank=True)
+    # Security: grants access to the Security Hub dashboard
+    is_security_staff = models.BooleanField(default=False)
 
     class Meta:
         indexes = [
@@ -94,6 +98,74 @@ class PageContent(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class AuditLog(models.Model):
+    """SOC2-compliant, append-only, immutable security audit trail."""
+    ACTION_CHOICES = (
+        ('registration', 'Registration'),
+        ('login', 'Login'),
+        ('order_created', 'Order Created'),
+        ('suspicious_login', 'Suspicious Login (New IP)'),
+        ('role_change', 'Role Change'),
+        ('password_reset_request', 'Password Reset Request'),
+        ('password_reset_confirm', 'Password Reset Confirm'),
+        ('account_lockout', 'Account Lockout'),
+    )
+    SEVERITY_CHOICES = (
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+        ('CRITICAL', 'Critical'),
+    )
+    SOURCE_CHOICES = (
+        ('USER', 'User-Triggered'),
+        ('SYSTEM', 'System-Triggered'),
+    )
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True, blank=True,
+        related_name='audit_logs'
+    )
+    action = models.CharField(max_length=50, choices=ACTION_CHOICES)
+    severity = models.CharField(max_length=10, choices=SEVERITY_CHOICES, default='LOW')
+    source = models.CharField(max_length=10, choices=SOURCE_CHOICES, default='USER')
+    ip_address = models.GenericIPAddressField(null=True, blank=True)
+    os = models.CharField(max_length=100, null=True, blank=True)
+    browser = models.CharField(max_length=100, null=True, blank=True)
+    device_type = models.CharField(max_length=50, null=True, blank=True)
+    user_agent = models.TextField(null=True, blank=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    metadata = models.JSONField(default=dict, blank=True)
+
+    class Meta:
+        ordering = ['-timestamp']
+        indexes = [
+            models.Index(fields=['user', 'timestamp']),
+            models.Index(fields=['action', 'timestamp']),
+            models.Index(fields=['severity', 'timestamp']),
+            models.Index(fields=['ip_address']),
+        ]
+
+    def save(self, *args, **kwargs):
+        """SOC2: Enforce immutability — logs can only be created, never updated."""
+        if self.pk:
+            raise Exception("AuditLog records are immutable and cannot be modified.")
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """SOC2: Block direct deletions. Only the retention Celery task bypasses this."""
+        if not kwargs.pop('_retention_bypass', False):
+            raise Exception("AuditLog records cannot be deleted. Use the retention policy task.")
+        super().delete(*args, **kwargs)
+
+    def __str__(self):
+        user_str = self.user.username if self.user else 'Anonymous'
+        return f"[{self.severity}] {self.action} — {user_str} — {self.timestamp}"
+
 
 class Affiliate(models.Model):
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='affiliate_profile')
