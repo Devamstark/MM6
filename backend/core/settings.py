@@ -272,3 +272,9 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB
 # 🤖 Telegram Bot Configuration
 TELEGRAM_BOT_TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN', '')
 TELEGRAM_ADMIN_ID = os.environ.get('TELEGRAM_ADMIN_ID', '')
+
+# 🔔 Slack Security Alerts
+# Set SLACK_WEBHOOK_URL in Dokploy → Environment Variables
+# Get it from: https://api.slack.com/apps → Incoming Webhooks → Copy Webhook URL
+SLACK_WEBHOOK_URL = os.environ.get('SLACK_WEBHOOK_URL', '')
+

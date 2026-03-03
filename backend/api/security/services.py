@@ -6,13 +6,17 @@ Views and other services should NEVER write to AuditLog directly.
 Instead, they should call log_audit_event(...) from here.
 
 Architecture:
-- get_client_ip():     Proxy-aware IP extraction (Cloudflare → Traefik → REMOTE_ADDR)
-- parse_user_agent():  Extracts OS, Browser, Device from raw User-Agent string
-- check_ip_anomaly():  Compares current IP against user's known_ips list
-- alert_security():    Throttled Slack/Telegram notifications for HIGH+ events
-- log_audit_event():   Public API — the ONLY function views should call
+- get_client_ip():        Proxy-aware IP extraction (Cloudflare → Traefik → REMOTE_ADDR)
+- parse_user_agent():     Extracts OS, Browser, Device from raw User-Agent string
+- check_ip_anomaly():     Compares current IP against user's known_ips list
+- track_failed_login():   Brute-force counter — triggers CRITICAL alert at threshold
+- send_slack_alert():     Posts rich Block Kit message to Slack Incoming Webhook
+- alert_security_team():  Throttled Slack + Telegram notifications for HIGH+ events
+- log_audit_event():      Public API — the ONLY function views should call
 """
 import logging
+import requests
+from datetime import datetime
 from django.utils import timezone
 from django.conf import settings
 
@@ -130,6 +134,177 @@ def check_ip_anomaly(user, current_ip):
 
 
 # ---------------------------------------------------------------------------
+# Brute-Force / Failed Login Tracking
+# ---------------------------------------------------------------------------
+
+# In-memory store: { "email_or_ip": [timestamp, timestamp, ...] }
+_failed_login_cache = {}
+BRUTE_FORCE_THRESHOLD = 5       # attempts before CRITICAL alert
+BRUTE_FORCE_WINDOW_MINUTES = 10  # rolling window in minutes
+
+
+def track_failed_login(identifier, request=None):
+    """
+    Track failed login attempts by identifier (email or IP).
+    Returns the current failure count within the window.
+    Fires a CRITICAL alert when threshold is hit.
+
+    Call this from the login view on authentication failure.
+    """
+    now = timezone.now()
+    window_start = now.timestamp() - BRUTE_FORCE_WINDOW_MINUTES * 60
+
+    # Prune old entries outside the window
+    attempts = [t for t in _failed_login_cache.get(identifier, []) if t > window_start]
+    attempts.append(now.timestamp())
+    _failed_login_cache[identifier] = attempts
+
+    count = len(attempts)
+    logger.warning(f"[Security] Failed login #{count} for '{identifier}'")
+
+    if count == BRUTE_FORCE_THRESHOLD:
+        ip = get_client_ip(request) if request else identifier
+        _fire_brute_force_alert(identifier, ip, count)
+
+    return count
+
+
+def _fire_brute_force_alert(identifier, ip, count):
+    """Internal — fires a CRITICAL brute-force alert ignoring throttle."""
+    logger.critical(f"[Security] BRUTE FORCE DETECTED: {count} failures for '{identifier}' from {ip}")
+
+    try:
+        emoji = '🚨'
+        slack_msg = {
+            "text": f"{emoji} *CRITICAL — Brute Force Attack Detected*",
+            "blocks": [
+                {
+                    "type": "header",
+                    "text": {"type": "plain_text", "text": "🚨 Brute Force Attack Detected", "emoji": True}
+                },
+                {
+                    "type": "section",
+                    "fields": [
+                        {"type": "mrkdwn", "text": f"*Target:*\n`{identifier}`"},
+                        {"type": "mrkdwn", "text": f"*IP Address:*\n`{ip}`"},
+                        {"type": "mrkdwn", "text": f"*Attempts:*\n{count} in {BRUTE_FORCE_WINDOW_MINUTES} min"},
+                        {"type": "mrkdwn", "text": f"*Time:*\n{datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}"},
+                    ]
+                },
+                {
+                    "type": "section",
+                    "text": {"type": "mrkdwn", "text": f"⚠️ *Recommended:* Review IP `{ip}` in your Security Hub and consider blocking."}
+                },
+                {"type": "divider"},
+                {
+                    "type": "context",
+                    "elements": [{"type": "mrkdwn", "text": "SmartShop Security · SOC2 AuditLog"}]
+                }
+            ]
+        }
+        _post_slack(slack_msg)
+
+        # Also send Telegram for brute force
+        telegram_msg = (
+            f"🚨 <b>CRITICAL — Brute Force</b>\n\n"
+            f"<b>Target:</b> {identifier}\n"
+            f"<b>IP:</b> <code>{ip}</code>\n"
+            f"<b>Attempts:</b> {count} in {BRUTE_FORCE_WINDOW_MINUTES} min\n"
+        )
+        from .telegram_utils import send_telegram_message
+        send_telegram_message(telegram_msg)
+
+    except Exception as e:
+        logger.error(f"[Security] Brute force alert failed: {e}")
+
+
+# ---------------------------------------------------------------------------
+# Slack Integration
+# ---------------------------------------------------------------------------
+
+def _post_slack(payload: dict):
+    """
+    POST a Block Kit payload to the configured Slack Incoming Webhook.
+    Silent no-op if SLACK_WEBHOOK_URL is not set.
+    """
+    webhook_url = getattr(settings, 'SLACK_WEBHOOK_URL', '')
+    if not webhook_url:
+        logger.debug("[Security] SLACK_WEBHOOK_URL not set — skipping Slack alert.")
+        return False
+
+    try:
+        resp = requests.post(webhook_url, json=payload, timeout=8)
+        if resp.status_code == 200:
+            logger.info("[Security] Slack alert sent.")
+            return True
+        else:
+            logger.warning(f"[Security] Slack returned {resp.status_code}: {resp.text}")
+            return False
+    except Exception as e:
+        logger.error(f"[Security] Slack POST failed: {e}")
+        return False
+
+
+def send_slack_security_alert(severity, action, username, ip, metadata=None):
+    """
+    Build and send a rich Slack Block Kit security alert.
+    severity: 'HIGH' or 'CRITICAL'
+    """
+    emoji = '🚨' if severity == 'CRITICAL' else '⚠️'
+    color = '#FF0000' if severity == 'CRITICAL' else '#FF8C00'
+
+    action_label = {
+        'suspicious_login': 'Suspicious Login — New IP',
+        'failed_login':     'Failed Login Attempt',
+        'account_lockout':  'Account Lockout',
+        'role_change':      'Role Changed',
+    }.get(action, action.replace('_', ' ').title())
+
+    fields = [
+        {"type": "mrkdwn", "text": f"*Severity:*\n`{severity}`"},
+        {"type": "mrkdwn", "text": f"*Event:*\n{action_label}"},
+        {"type": "mrkdwn", "text": f"*User:*\n`{username}`"},
+        {"type": "mrkdwn", "text": f"*IP Address:*\n`{ip or '—'}`"},
+    ]
+
+    if metadata:
+        for k, v in list(metadata.items())[:4]:  # max 4 extra fields
+            fields.append({"type": "mrkdwn", "text": f"*{k.replace('_',' ').title()}:*\n{v}"})
+
+    payload = {
+        "text": f"{emoji} SmartShop Security [{severity}]: {action_label}",
+        "attachments": [
+            {
+                "color": color,
+                "blocks": [
+                    {
+                        "type": "header",
+                        "text": {"type": "plain_text", "text": f"{emoji} Security Alert [{severity}]", "emoji": True}
+                    },
+                    {
+                        "type": "section",
+                        "fields": fields
+                    },
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": f"*Time:* {datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')} · <https://smartshop1.us/security|View Security Hub>"
+                        }
+                    },
+                    {"type": "divider"},
+                    {
+                        "type": "context",
+                        "elements": [{"type": "mrkdwn", "text": "SmartShop · SOC2-aligned AuditLog System"}]
+                    }
+                ]
+            }
+        ]
+    }
+    _post_slack(payload)
+
+
+# ---------------------------------------------------------------------------
 # Alert Throttling (prevent fatigue)
 # ---------------------------------------------------------------------------
 
@@ -147,22 +322,30 @@ def _should_send_alert(cache_key, throttle_minutes=5):
 
 def alert_security_team(user, action, severity, ip_address, metadata=None):
     """
-    Send throttled notification to Slack and Telegram for HIGH/CRITICAL events.
-    Uses a 5-min throttle per (user_id, action) pair to prevent alert fatigue.
+    Send throttled notification to Slack AND Telegram for HIGH/CRITICAL events.
+    Throttle: CRITICAL = instant (no delay), HIGH = max 1 alert per 5 min per user+action.
     """
     if severity not in ('HIGH', 'CRITICAL'):
         return
 
     user_id = str(user.id) if user else 'anon'
     cache_key = f"alert:{user_id}:{action}"
-    throttle = 0 if severity == 'CRITICAL' else 5  # CRITICAL = instant, HIGH = throttled
+    throttle = 0 if severity == 'CRITICAL' else 5  # CRITICAL = instant
 
     if not _should_send_alert(cache_key, throttle):
         logger.info(f"[Security] Alert throttled for {cache_key}")
         return
 
+    username = user.username if user else 'Anonymous'
+
+    # ── Slack ──────────────────────────────────────────────────────────────
     try:
-        username = user.username if user else 'Anonymous'
+        send_slack_security_alert(severity, action, username, ip_address, metadata)
+    except Exception as e:
+        logger.error(f"[Security] Slack alert failed: {e}")
+
+    # ── Telegram ───────────────────────────────────────────────────────────
+    try:
         emoji = '🚨' if severity == 'CRITICAL' else '⚠️'
         msg = (
             f"{emoji} <b>Security Alert [{severity}]</b>\n\n"
@@ -177,7 +360,7 @@ def alert_security_team(user, action, severity, ip_address, metadata=None):
         from .telegram_utils import send_telegram_message
         send_telegram_message(msg)
     except Exception as e:
-        logger.error(f"[Security] Failed to send security alert: {e}")
+        logger.error(f"[Security] Telegram alert failed: {e}")
 
 
 # ---------------------------------------------------------------------------
@@ -199,6 +382,8 @@ def log_audit_event(
     Usage examples:
         log_audit_event('registration', request=request, user=user, severity='LOW')
         log_audit_event('suspicious_login', request=request, user=user, severity='HIGH')
+        log_audit_event('failed_login', request=request, severity='MEDIUM',
+                        metadata={'email': email})
         log_audit_event('order_created', request=request, user=user, severity='MEDIUM',
                         metadata={'order_id': str(order.id)})
     """

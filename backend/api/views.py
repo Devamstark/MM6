@@ -93,24 +93,46 @@ class SecureTokenObtainPairView(APIView):
     """
     Custom login view that:
     1. Authenticates the user via JWT.
-    2. Detects logins from new IP addresses (known_ips anomaly check).
-    3. Logs all login events and suspicious logins to the AuditLog.
+    2. Logs failed logins + tracks brute-force attempts (5 failures → CRITICAL alert).
+    3. Detects logins from new IP addresses (known_ips anomaly check).
+    4. Logs all login events and suspicious logins to the AuditLog.
     """
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
         from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
         from rest_framework_simplejwt.exceptions import TokenError
-        from .security.services import log_audit_event, get_client_ip, check_ip_anomaly
+        from .security.services import (
+            log_audit_event, get_client_ip, check_ip_anomaly, track_failed_login
+        )
+
+        email_or_user = request.data.get('email') or request.data.get('username', '')
+        current_ip = get_client_ip(request)
 
         serializer = TokenObtainPairSerializer(data=request.data, context={'request': request})
         try:
             serializer.is_valid(raise_exception=True)
         except Exception as e:
+            # ── Log the failed login attempt ─────────────────────────────
+            log_audit_event(
+                action='failed_login',
+                request=request,
+                user=None,
+                severity='MEDIUM',
+                metadata={
+                    'email': email_or_user,
+                    'reason': 'Invalid credentials',
+                },
+            )
+            # ── Brute-force tracking ─────────────────────────────────────
+            # Track by email AND by IP so both vectors are caught
+            track_failed_login(email_or_user or current_ip, request=request)
+            if current_ip and current_ip != email_or_user:
+                track_failed_login(current_ip, request=request)
+
             return Response({'detail': str(e)}, status=status.HTTP_401_UNAUTHORIZED)
 
         user = serializer.user
-        current_ip = get_client_ip(request)
 
         # Check for IP anomaly BEFORE updating known_ips
         is_new_ip = check_ip_anomaly(user, current_ip)
@@ -135,6 +157,7 @@ class SecureTokenObtainPairView(APIView):
             )
 
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
+
 
 
 class RegisterView(APIView):
