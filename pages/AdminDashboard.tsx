@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, XCircle, X, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash, Shield } from 'lucide-react';
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, XCircle, X, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
@@ -15,10 +15,9 @@ import { DashboardCharts } from '../components/dashboard/DashboardCharts';
 
 import { StaffTab } from '../components/dashboard/StaffTab';
 import { CMSTab } from '../components/dashboard/CMSTab';
-import { SecurityHub } from '../components/SecurityHub';
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'staff' | 'cms' | 'security'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'staff' | 'cms'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -334,16 +333,6 @@ export const AdminDashboard = () => {
               {tab}
             </button>
           ))}
-          <button
-            onClick={() => setActiveTab('security')}
-            className={`px-5 py-2.5 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all duration-200 whitespace-nowrap ${activeTab === 'security'
-              ? 'bg-red-600 text-white shadow-md shadow-red-300/50 dark:shadow-red-900/40'
-              : 'bg-white text-red-600 hover:bg-red-50 border border-red-200 dark:bg-gray-900 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-900/20'
-              }`}
-          >
-            <Shield className="w-3.5 h-3.5" />
-            Security
-          </button>
         </div>
 
         {/* Tab Content */}
@@ -1175,13 +1164,6 @@ export const AdminDashboard = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Security Hub Tab */}
-      {activeTab === 'security' && (
-        <div className="animate-fade-in">
-          <SecurityHub />
         </div>
       )}
 

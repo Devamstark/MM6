@@ -440,6 +440,16 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                           </Link>
                         )}
 
+                        {isAdmin && (
+                          <Link
+                            to="/security"
+                            onClick={() => setIsUserMenuOpen(false)}
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-red-50 text-red-600 dark:hover:bg-red-900/20 rounded-xl transition-colors"
+                          >
+                            <Shield className="w-4 h-4" /> Security
+                          </Link>
+                        )}
+
                         <Link
                           to="/orders"
                           onClick={() => setIsUserMenuOpen(false)}
@@ -727,6 +737,15 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                       className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-blue-600 text-xs font-bold text-white rounded-lg hover:bg-blue-700 transition-colors"
                     >
                       <Mail className="w-3.5 h-3.5" /> Market
+                    </Link>
+                  )}
+                  {isAdmin && (
+                    <Link
+                      to="/security"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-red-600 text-xs font-bold text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Shield className="w-3.5 h-3.5" /> Security
                     </Link>
                   )}
                 </div>

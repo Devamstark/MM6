@@ -28,6 +28,7 @@ import { Blog } from './pages/Blog';
 import { BlogPostDetail } from './pages/BlogPostDetail';
 import { BloggerDashboard } from './pages/BloggerDashboard';
 import { MarketingDashboard } from './pages/MarketingDashboard';
+import { SecurityDashboard } from './pages/SecurityDashboard';
 import ScrollToTop from './components/ScrollToTop';
 import { TelegramInitializer } from './components/TelegramInitializer';
 
@@ -75,6 +76,7 @@ function App() {
                                     <Route element={<ProtectedRoute allowedRoles={['admin']} />}>
                                         <Route path="admin" element={<AdminDashboard />} />
                                         <Route path="marketing" element={<MarketingDashboard />} />
+                                        <Route path="security" element={<SecurityDashboard />} />
                                     </Route>
                                     <Route path="*" element={<Navigate to="/" replace />} />
                                 </Route>
