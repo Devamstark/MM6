@@ -860,11 +860,33 @@ try:
     from axes.signals import user_locked_out
     @receiver(user_locked_out)
     def handle_user_locked_out(sender, request, username, ip_address, **kwargs):
+        # 1. Slack alert (existing)
         from .tasks import notify_slack_security_alert
         message = f"Multiple failed login attempts detected.\n*Target Username:* {username}\n*Attacker IP:* {ip_address}\n*Action:* IP has been locked by Axes defense system."
         notify_slack_security_alert.delay(message)
+
+        # 2. Write to AuditLog so it appears in Security Hub
+        try:
+            from .security.services import log_audit_event
+            log_audit_event(
+                action='account_lockout',
+                request=request,
+                user=None,
+                severity='CRITICAL',
+                source='SYSTEM',
+                metadata={
+                    'username': username or 'unknown',
+                    'ip_address': ip_address or 'unknown',
+                    'reason': 'Locked by Axes after repeated failed login attempts',
+                    'unlock_after': '30 minutes (automatic) or use Django admin',
+                },
+            )
+        except Exception:
+            pass  # Never let audit logging crash the lockout flow
+
 except ImportError:
     pass
+
 
 # 🤖 Telegram: New Order Alerts
 from django.db.models.signals import post_save
