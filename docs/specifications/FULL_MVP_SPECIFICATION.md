@@ -317,6 +317,22 @@
 
 ---
 
+### **17. 🛡️ Enterprise Security Hub** 🛡️
+
+#### Features:
+- **SOC2-Compliant Audit Logging**: Centralized, immutable security logs for all critical system events (logins, registrations, role changes).
+- **Security Hub Dashboard**: Professional administrative interface for monitoring platform-wide security signals.
+- **Blocked IPs & Shields**: Real-time management of automated blocks triggered by the defensive shield.
+- **One-Click Unblock**: Administrative capability to lift IP or Username lockouts instantly.
+- **IP Anomaly Detection**: Automatic tracking of user IP history to detect and log logins from unrecognized locations.
+
+#### Technical Implementation:
+- **Backend Model**: `AuditLog` with strict append-only constraints.
+- **Service Layer**: Centralized `log_audit_event` for consistent recording across the API.
+- **Defense**: `django-axes` integration for brute-force protection and IP-based lockout state.
+
+---
+
 ### **13. Enterprise Marketing System** 📧
 
 #### Features:
@@ -520,6 +536,14 @@ smartshop-e-commerce/
 | POST | `/api/auth/password-reset/` | Request password reset | No |
 | POST | `/api/auth/password-reset-confirm/` | Confirm reset with OTP | No |
 | GET | `/api/auth/me/` | Get current user | Yes |
+
+### **Security & Compliance**
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/audit-logs/` | List security audit logs | Security Admin |
+| GET | `/api/audit-logs/summary/` | Dashboard stats (counts, trends) | Security Admin |
+| GET | `/api/blocked-ips/` | List active IP blocks (Axes) | Security Admin |
+| POST | `/api/blocked-ips/unblock/` | Restore access to IP or User | Security Admin |
 
 ### **Telegram & AI**
 | Method | Endpoint | Description | Auth Required |
@@ -779,6 +803,7 @@ Frontend will run at `http://localhost:5173`
 ### **Phase 3 Features**
 - [x] Telegram Bot & Mini App Integration — ✅ Done (v3.1.0)
 - [x] AI Support Assistant — ✅ Done (Intent-based)
+- [x] Enterprise Security Hub — ✅ Done (v3.2.0)
 - [ ] Mobile app (React Native)
 - [ ] Seller verification system
 - [ ] Product comparison tool

@@ -19,7 +19,7 @@ We only collect data that is **strictly necessary** to provide our e-commerce se
 ## **3. Data Subject Rights (How we comply)**
 
 ### **A. Right to Information & Transparency**
-*   Our **Privacy Policy** (accessible at the footer) clearly explains what data is collected and how it is used.
+*   Our **Privacy Policy** (accessible at the footer) was recently updated to a professional, legal-prose document that clearly explains data handling in full detail.
 *   We use a **Cookie Consent Banner** to inform users about tracking.
 
 ### **B. Right to Access & Portability**
@@ -33,10 +33,11 @@ We only collect data that is **strictly necessary** to provide our e-commerce se
 *   Users have the right to delete their accounts. We provide a **"Delete Account"** button. 
 *   *Note: Transactional data related to financial records may be retained as required by law (e.g., tax audits).*
 
-## **4. Data Security & Storage**
+## **4. Data Security & Monitoring**
 *   **Encryption**: All traffic is encrypted via **SSL/TLS (HTTPS)** through Cloudflare.
+*   **SOC2-Compliant Logging**: We maintain an append-only, immutable **Security Audit Log** that tracks all critical events, providing high observability for data protection.
 *   **Hashing**: User passwords are encrypted using **PBKDF2/Argon2** (standard Django security).
-*   **Data Residency**: All data is stored on your private VPS. We do not use third-party cloud databases (like Neon or MongoDB Atlas).
+*   **Data Residency**: All data is stored on your private VPS. We do not use third-party cloud databases.
 *   **Private Communications**: We use a **private SMTP mailbox** for emails, ensuring that email content and recipient addresses stay within our controlled infrastructure.
 
 ## **5. Data Minimization**
@@ -50,5 +51,5 @@ We minimize third-party data sharing. Current processors include:
 *   **Private SMTP**: For transactional emails.
 
 ---
-**Last Updated**: February 25, 2026
+**Last Updated**: March 2, 2026
 **Compliance Status**: Fully Compliant

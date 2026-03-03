@@ -1583,9 +1583,85 @@ A visual calendar component available within the marketing system.
 
 ---
 
+## 🛡️ Security & Compliance Features
+
+### Feature 73: SOC2-Compliant Audit Logging
+**User Story:** *As an administrator, I want to see a full history of all security-related activities on the platform.*
+
+**Functionality:**
+- Centralized, append-only, immutable recording of all critical events.
+- Tracks: Registrations, Login success/failure, Suspicious login (new IP), Account lockouts, IP unblocking, and Order status updates.
+- Records: Timestamp, User, Action, Severity, IP Address, OS, Browser, and Device Type.
+- Metadata storage for specific event context (e.g., why an IP was blocked or which order was updated).
+
+**Technical Details:**
+- Backend: Custom `AuditLog` model with immutability enforced at the database level.
+- Integration: Centralized `log_audit_event` service function.
+
+---
+
+### Feature 74: Real-time Security Hub
+**User Story:** *As a security admin, I want a dedicated dashboard to monitor the platform's health and security posture.*
+
+**Functionality:**
+- Live view of all audit logs with high-performance search and filtering.
+- Quick-stats cards for: Today's registrations, Hourly orders, Suspicious logins, Critical events, and Total logs.
+- Severity-based color coding for easy identification of high-risk events.
+- Responsive, premium interface with auto-refresh capabilities.
+
+**Technical Details:**
+- Frontend: `SecurityHub.tsx` using specialized summary API.
+- Permissions: Restricted to `admin` role or user with `is_security_staff` flag.
+
+---
+
+### Feature 75: Blocked IPs & Shields
+**User Story:** *As an admin, I want to see which IPs are currently blocked and be able to unblock them instantly.*
+
+**Functionality:**
+- Dedicated dashboard for active security blocks.
+- List shows: IP address, Username/Account involved, Failed attempts count, and Last attempt timestamp.
+- One-click "Unblock" button to instantly restore access.
+- Integrated search to find specific offenders or users under lockout.
+
+**Technical Details:**
+- Backend: API wrapper for `django-axes` `AccessAttempt` and `BlockedIP` models.
+- Endpoints: `GET /api/blocked-ips/`, `POST /api/blocked-ips/unblock/`.
+
+---
+
+### Feature 76: Brute-Force Shield (Axes Protection)
+**User Story:** *As a developer, I want the system to automatically defend against brute-force login attacks.*
+
+**Functionality:**
+- Automatic IP lockout after 5 consecutive failed login attempts within 10 minutes.
+- Rolling window monitoring to prevent slow-drip brute force attacks.
+- Instant Slack and Telegram alerts for every detected lockout event.
+- Thrown 403 errors for blocked IPs without hitting expensive database queries.
+
+**Technical Details:**
+- Integration: `django-axes` with custom lockout signal listeners.
+- Throttling: PBKDF2 hashing delay + Axes cooldown period.
+
+---
+
+### Feature 77: IP Anomaly Detection
+**User Story:** *As a user, I want the system to recognize when I log in from a new device or location for better security.*
+
+**Functionality:**
+- Tracks and remembers the last 5 unique IP addresses per user.
+- Compares every successful login against the user's known IP history.
+- Flags "New IP" logins as `HIGH` severity `suspicious_login` events in the audit trail.
+- Triggers priority alerts for admins to investigate potential account takeover.
+
+**Technical Details:**
+- Backend: JSONField `known_ips` on User model + IP extraction service.
+
+---
+
 ## 📊 Feature Completion Statistics
 
-### **Total Features: 60+**
+### **Total Features: 65+**
 - **Authentication**: 4/4 (100%)
 - **Product**: 7/7 (100%)
 - **Shopping**: 6/6 (100%)
@@ -1593,19 +1669,20 @@ A visual calendar component available within the marketing system.
 - **Review System**: 4/4 (100%)
 - **Seller Features**: 6/6 (100%)
 - **Admin Features**: 6/6 (100%)
+- **Security Hub**: 6/6 (100%) [NEW] ✅
 - **UI/UX Features**: 6/6 (100%)
 - **Blogger Features**: 4/4 (100%)
 - **Background Tasks & Emails**: 1/1 (100%)
 - **Enterprise Marketing**: 5/5 (100%)
 - **Wishlist & Loyalty**: 3/3 (100%)
-- **GDPR Compliance**: 2/2 (100%)
+- **GDPR Compliance**: 3/3 (100%) [UPDATED]
 - **Dynamic CMS**: 2/2 (100%)
 - **Enterprise Operations**: 8/8 (100%)
-- **Telegram & AI**: 6/6 (100%) [NEW]
+- **Telegram & AI**: 6/6 (100%)
 
 **Overall Completion: 100%** ✅
 
 ---
 
 **Last Updated**: March 2, 2026  
-**Version**: 3.1.0 (Telegram Integration & AI Concierge)
+**Version**: 3.2.0 (Enterprise Security & Compliance)

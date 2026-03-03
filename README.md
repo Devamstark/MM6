@@ -61,6 +61,7 @@ The backend API will be available at `http://localhost:8000`
 ## ✨ Features
 
 - **Multi-Role System**: Admin, Seller, and Customer roles with distinct permissions
+- **Enterprise Security Hub**: SOC2-compliant audit logging, real-time IP blocking, and security shields (New)
 - **Product Management**: Full CRUD operations for products with image uploads
 - **Shopping Cart**: Real-time cart management with Jotai state
 - **Order Processing**: Complete order workflow from cart to delivery
@@ -68,8 +69,9 @@ The backend API will be available at `http://localhost:8000`
 - **Seller Portal**: Product listing, inventory, and sales tracking
 - **Search & Filter**: Advanced product search with category filtering
 - **Responsive Design**: Mobile-first design with Tailwind CSS
-- **Authentication**: JWT-based secure authentication
+- **Authentication**: JWT-based secure authentication with brute-force protection
 - **Reviews & Ratings**: Customer product reviews and ratings
+- **AI Concierge**: Telegram-based AI assistant for tracking and support
 
 ---
 
