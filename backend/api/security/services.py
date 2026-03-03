@@ -29,16 +29,25 @@ logger = logging.getLogger('api.security')
 def get_client_ip(request):
     """
     Extract real client IP. Checks proxy headers in priority order:
-    Cloudflare (CF-Connecting-IP) → X-Forwarded-For → REMOTE_ADDR
+    Cloudflare (CF-Connecting-IP) → X-Real-IP → X-Forwarded-For → REMOTE_ADDR
     """
+    # 1. Cloudflare — The most authoritative for CF-routed traffic
     cf_ip = request.META.get('HTTP_CF_CONNECTING_IP')
     if cf_ip:
         return cf_ip.strip()
 
+    # 2. X-Real-IP — Often set by Traefik or Nginx to the first hop
+    real_ip = request.META.get('HTTP_X_REAL_IP')
+    if real_ip:
+        return real_ip.strip()
+
+    # 3. X-Forwarded-For — List of IPs (Client, Proxy1, Proxy2...)
     x_forwarded = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded:
+        # First IP in the list is the client
         return x_forwarded.split(',')[0].strip()
 
+    # 4. Fallback — Might be internal IP if behind a proxy without headers
     return request.META.get('REMOTE_ADDR', '')
 
 

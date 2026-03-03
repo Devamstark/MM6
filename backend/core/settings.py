@@ -264,6 +264,7 @@ SLACK_SECURITY_WEBHOOK = os.environ.get('SLACK_SECURITY_WEBHOOK', '')
 AXES_FAILURE_LIMIT = 5
 AXES_COOLOFF_TIME = timedelta(minutes=30)
 AXES_LOCKOUT_PARAMETERS = [["username", "ip_address"]]
+AXES_IP_GETTER = 'api.security.services.get_client_ip'
 
 # Increased data upload limits for Base64 images in CMS and Products
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10485760  # 10MB

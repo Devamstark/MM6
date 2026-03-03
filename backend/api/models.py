@@ -155,7 +155,7 @@ class AuditLog(models.Model):
 
     def save(self, *args, **kwargs):
         """SOC2: Enforce immutability — logs can only be created, never updated."""
-        if self.pk:
+        if not self._state.adding:
             raise Exception("AuditLog records are immutable and cannot be modified.")
         super().save(*args, **kwargs)
 
