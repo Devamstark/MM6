@@ -774,111 +774,125 @@ const staticPages: Record<string, { title: string, content: string }> = {
   'privacy-policy': {
     title: 'Privacy Policy',
     content: `
-      <div class="max-w-3xl mx-auto space-y-8 text-gray-700 text-sm leading-relaxed">
-
-        <div class="border-b border-gray-200 pb-6">
-          <p class="text-xs text-gray-400 uppercase tracking-widest font-medium mb-2">Effective Date: February 25, 2026</p>
-          <p>SmartShop ("we," "our," or "us") is committed to protecting your personal information. This Privacy Policy describes how we collect, use, store, and share your data when you use our website and services, and explains your rights under applicable privacy laws including the General Data Protection Regulation (GDPR).</p>
+      <div class="max-w-4xl mx-auto p-12 bg-white text-black border-4 border-black font-sans leading-relaxed tracking-tight" style="font-family: 'Inter', system-ui, sans-serif;">
+        <div class="border-b-8 border-black pb-10 mb-12 flex justify-between items-end">
+          <div>
+            <h2 class="text-6xl font-black uppercase leading-[0.85] tracking-tighter">Privacy<br/>Policy</h2>
+            <p class="mt-4 text-[10px] font-bold uppercase tracking-widest opacity-60">SmartShop &mdash; REVISON 2.1</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] font-black uppercase mb-1">Effective Date</p>
+            <p class="text-2xl font-black tabular-nums">02.25.2026</p>
+          </div>
         </div>
 
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">1. Information We Collect</h3>
-          <p><strong class="text-gray-800">a. Information you provide directly:</strong> When you create an account or place an order, we collect your name, email address, shipping address, billing information, and account credentials.</p>
-          <p><strong class="text-gray-800">b. Information collected automatically:</strong> We automatically collect technical data when you interact with our platform, including your IP address, device type, browser information, login timestamps, order activity, and security event logs. This data may be collected via our website, mobile apps, or infrastructure providers such as Cloudflare.</p>
-          <p><strong class="text-gray-800">c. Optional information:</strong> With your consent, we may collect newsletter subscription preferences and marketing interaction data.</p>
-        </section>
+        <div class="space-y-16">
+          <section>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <h3 class="text-xl font-black uppercase md:border-r-2 border-black">01.<br/>Scope</h3>
+              <div class="md:col-span-2 space-y-4">
+                <p class="text-sm font-medium">SmartShop is committed to absolute transparency regarding your personal data. This protocol outlines how we collect, process, and safeguard information in compliance with GDPR and SOC2 standards.</p>
+              </div>
+            </div>
+          </section>
 
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">2. How We Use Your Information</h3>
-          <p>We use the personal data we collect for the following purposes:</p>
-          <ul class="list-disc pl-5 space-y-1.5">
-            <li><strong class="text-gray-800">Order fulfillment:</strong> To process, ship, and manage your orders.</li>
-            <li><strong class="text-gray-800">Account security:</strong> To detect and investigate suspicious login activity, unauthorized access attempts, and account changes.</li>
-            <li><strong class="text-gray-800">Transactional communications:</strong> To send order confirmations, shipping updates, and security notifications.</li>
-            <li><strong class="text-gray-800">Marketing communications:</strong> To send promotional content, but only with your explicit consent. You may opt out at any time.</li>
-            <li><strong class="text-gray-800">Security auditing and compliance:</strong> We maintain an immutable, append-only AuditLog of security-relevant events in accordance with SOC2 security principles. These logs are used for forensic analysis, incident response, and compliance reporting.</li>
-          </ul>
-        </section>
+          <section>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <h3 class="text-xl font-black uppercase md:border-r-2 border-black">02.<br/>Data Matrix</h3>
+              <div class="md:col-span-2 space-y-6">
+                <div>
+                  <h4 class="text-xs font-black uppercase mb-2">Direct Identifiers</h4>
+                  <p class="text-sm border-l-2 border-black pl-4">Name, Email, Physical Address, Billing Metadata, and Account Signatures.</p>
+                </div>
+                <div>
+                  <h4 class="text-xs font-black uppercase mb-2">Technical Telemetry</h4>
+                  <p class="text-sm border-l-2 border-black pl-4">IP Address, Browser Fingerprints, Hardware Specs, and Forensic Audit Trails via Cloudflare.</p>
+                </div>
+              </div>
+            </div>
+          </section>
 
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">3. Data Retention</h3>
-          <p>We retain personal data only as long as necessary to fulfill the purposes described in this policy, comply with our legal obligations, resolve disputes, and enforce our agreements.</p>
-          <p>Security logs (AuditLog entries) that contain personal identifiers such as IP addresses and usernames are retained for a period of <strong class="text-gray-800">six (6) months</strong>. After this period, personally identifiable information is anonymized. Non-identifiable log data may be retained longer for system integrity and compliance auditing purposes.</p>
-        </section>
+          <section class="bg-black text-white p-8">
+            <h3 class="text-xs font-black uppercase tracking-[0.2em] mb-4 opacity-50">03. Retention & Forensics</h3>
+            <p class="text-sm leading-relaxed">
+              Security logs containing user identifiers (AuditLog) are strictly retained for <span class="text-lg font-bold">180 days</span> to enable threat analysis and incident response. 
+              After this cycle, data is anonymized or purged unless required for legal litigation.
+            </p>
+          </section>
 
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">4. Data Security</h3>
-          <p>We implement appropriate technical and organizational measures to protect your personal data against unauthorized access, loss, or disclosure:</p>
-          <ul class="list-disc pl-5 space-y-1.5">
-            <li><strong class="text-gray-800">Encryption:</strong> All data in transit is protected using SSL/TLS. Sensitive data at rest is encrypted using AES-256.</li>
-            <li><strong class="text-gray-800">Password security:</strong> Passwords are hashed using industry-standard algorithms (bcrypt). We do not store plaintext passwords.</li>
-            <li><strong class="text-gray-800">Access control:</strong> Security audit data is accessible only to authorized security personnel.</li>
-            <li><strong class="text-gray-800">Audit logging:</strong> All security-relevant events are recorded in a SOC2-aligned, tamper-resistant AuditLog system.</li>
-          </ul>
-        </section>
-
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">5. Your Rights Under GDPR</h3>
-          <p>If you are located in the European Economic Area (EEA) or a jurisdiction with equivalent data protection laws, you have the following rights regarding your personal data:</p>
-          <ul class="list-disc pl-5 space-y-1.5">
-            <li><strong class="text-gray-800">Right of access:</strong> You may request a copy of the personal data we hold about you.</li>
-            <li><strong class="text-gray-800">Right to erasure:</strong> You may request the permanent deletion of your account and associated personal information.</li>
-            <li><strong class="text-gray-800">Right to rectification:</strong> You may request that we correct any inaccurate or incomplete personal data.</li>
-            <li><strong class="text-gray-800">Right to data portability:</strong> You may request your data in a structured, machine-readable format.</li>
-            <li><strong class="text-gray-800">Right to restrict processing:</strong> You may request that we limit how we use your personal data in certain circumstances.</li>
-          </ul>
-          <p>To exercise any of these rights, please contact us at <a href="mailto:privacy@smartshop.com" class="text-gray-900 underline font-medium">privacy@smartshop.com</a>. We will respond to all verified requests within 30 days, as required by GDPR.</p>
-        </section>
-
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">6. Third-Party Service Providers</h3>
-          <p>We share data with trusted third-party providers only to the extent necessary for them to perform their services. All providers are contractually obligated to handle data in compliance with applicable privacy laws, including GDPR:</p>
-          <ul class="list-disc pl-5 space-y-1.5">
-            <li><strong class="text-gray-800">Cloudflare:</strong> Content delivery network (CDN) and security infrastructure.</li>
-            <li><strong class="text-gray-800">Stripe:</strong> Payment processing. Stripe is PCI-DSS compliant and does not store full card details on our servers.</li>
-            <li><strong class="text-gray-800">PayPal:</strong> Alternative payment processing.</li>
-          </ul>
-          <p>We do not sell your personal data to third parties.</p>
-        </section>
-
-        <section class="space-y-3">
-          <h3 class="text-base font-semibold text-gray-900 border-l-2 border-gray-300 pl-3">7. Changes to This Policy</h3>
-          <p>We may update this Privacy Policy periodically to reflect changes in our practices, technology, or legal requirements. When we make material changes, we will notify you via email or a prominent notice on our website. The date of the most recent revision is indicated at the top of this document.</p>
-          <p>Your continued use of SmartShop after any changes constitutes your acceptance of the revised policy.</p>
-        </section>
-
-        <div class="border-t border-gray-200 pt-6">
-          <p class="text-xs text-gray-500">For privacy-related questions or requests, contact us at <a href="mailto:privacy@smartshop.com" class="underline text-gray-700">privacy@smartshop.com</a>. SmartShop &mdash; &copy; 2026. All rights reserved.</p>
+          <section>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <h3 class="text-xl font-black uppercase md:border-r-2 border-black">04.<br/>Security</h3>
+              <div class="md:col-span-2">
+                <ul class="space-y-3">
+                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> 256-Bit SSL Encryption</li>
+                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> Immutable SOC2 Audit Trails</li>
+                  <li class="flex items-center gap-3 text-sm font-bold uppercase"><span class="w-2 h-2 bg-black"></span> Bcrypt Password Hashing</li>
+                </ul>
+              </div>
+            </div>
+          </section>
         </div>
 
+        <div class="mt-20 pt-10 border-t-2 border-black flex flex-col md:flex-row justify-between items-center text-[10px] font-bold uppercase tracking-widest gap-4">
+          <span>Official Legal Document &mdash; SmartShop Inc.</span>
+          <a href="mailto:privacy@smartshop.com" class="bg-black text-white px-6 py-2 hover:bg-gray-800 transition-all">Submit Request</a>
+        </div>
       </div>
     `
   },
-
   'terms-of-service': {
     title: 'Terms of Service',
     content: `
-  < div class="space-y-8 animate-fade-in max-w-4xl mx-auto" >
-        <div class="bg-gray-50 p-6 rounded-2xl border border-gray-200 mb-8">
-          <p class="text-gray-700 font-medium font-serif">By using SmartShop, you agree to these terms. Please read them carefully.</p>
+      <div class="max-w-4xl mx-auto p-12 bg-white text-black border-4 border-black font-sans leading-relaxed tracking-tight" style="font-family: 'Inter', system-ui, sans-serif;">
+        <div class="border-b-8 border-black pb-10 mb-12 flex justify-between items-end">
+          <div>
+            <h2 class="text-6xl font-black uppercase leading-[0.85] tracking-tighter">Terms of<br/>Service</h2>
+            <p class="mt-4 text-[10px] font-bold uppercase tracking-widest opacity-60">Ref: SS-2026-TOS</p>
+          </div>
+          <div class="text-right">
+            <p class="text-[10px] font-black uppercase mb-1">Standard Revision</p>
+            <p class="text-2xl font-black tabular-nums">V1.2</p>
+          </div>
         </div>
 
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">1. User Accounts</h3>
-          <p class="text-gray-600">You are responsible for maintaining the confidentiality of your account credentials. You must be at least 18 years old to make a purchase.</p>
-        </section>
+        <div class="space-y-16">
+          <section class="flex flex-col md:flex-row gap-12">
+            <div class="md:w-1/4">
+               <span class="text-4xl font-black">01.</span>
+               <p class="text-[10px] font-bold uppercase mt-2">Account</p>
+            </div>
+            <div class="md:w-3/4 space-y-4">
+              <h4 class="text-sm font-black uppercase tracking-tight">Eligibility & Conduct</h4>
+              <p class="text-sm leading-relaxed">Usage of the platform requires the user to be 18+ years of age. Users bear absolute liability for all actions performed under their unique credentials. SmartShop reserves the right to terminate access for security violations.</p>
+            </div>
+          </section>
 
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">2. Orders & Payments</h3>
-          <p class="text-gray-600">All orders are subject to acceptance and availability. Prices are subject to change without notice. Payments are processed securely via third-party providers.</p>
-        </section>
+          <section class="flex flex-col md:flex-row gap-12">
+            <div class="md:w-1/4">
+               <span class="text-4xl font-black">02.</span>
+               <p class="text-[10px] font-bold uppercase mt-2">Commerce</p>
+            </div>
+            <div class="md:w-3/4 space-y-4">
+              <h4 class="text-sm font-black uppercase tracking-tight">Fulfillment & Pricing</h4>
+              <p class="text-sm leading-relaxed">Orders are valid only upon electronic notification of shipment. We reserve the right to cancel orders due to inventory inaccuracies, pricing errors, or fraud flagging.</p>
+            </div>
+          </section>
 
-        <section class="space-y-4">
-          <h3 class="text-xl font-bold text-gray-900 uppercase tracking-tighter">3. Intellectual Property</h3>
-          <p class="text-gray-600">The content, logos, and design of SmartShop are the property of SmartShop Inc. and are protected by copyright laws.</p>
-        </section>
-      </div >
-  `
+          <section class="border-4 border-black p-8 bg-gray-50 text-center">
+             <h4 class="text-[10px] font-black uppercase mb-4 tracking-widest">03. Liability Disclaimer</h4>
+             <p class="text-[10px] italic uppercase font-bold leading-relaxed max-w-2xl mx-auto">
+               "SmartShop provides its environment on an 'AS-IS' basis. We disclaim all implied warranties including marketability and fitness for purpose."
+             </p>
+          </section>
+        </div>
+
+        <div class="mt-20 text-center text-gray-400">
+          <div class="w-16 h-2 bg-black mx-auto mb-4"></div>
+          <p class="text-[8px] font-black uppercase tracking-widest">End of Provisions &bull; 2026 SmartShop Inc.</p>
+        </div>
+      </div>
+    `
   }
 };
 
