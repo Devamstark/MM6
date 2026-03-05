@@ -327,7 +327,43 @@ export const BloggerDashboard = () => {
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1.5">Content</label>
+                                    <div className="flex items-center justify-between mb-1.5">
+                                        <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">Content</label>
+                                        <div className="flex items-center gap-2">
+                                            <input
+                                                type="file"
+                                                id="body-image-upload"
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file) return;
+                                                    try {
+                                                        setUploadingImage(true);
+                                                        const res = await api.uploadBlogImage(file);
+                                                        // Insert at cursor or just append? Textareas are tricky. Let's just give them the code to copy.
+                                                        const imgHtml = `\n<img src="${res.url}" alt="Image description" class="section-image">\n`;
+                                                        setForm(prev => ({ ...prev, content: prev.content + imgHtml }));
+                                                        setSuccessMsg('Image uploaded and tag added to content!');
+                                                        setTimeout(() => setSuccessMsg(''), 3000);
+                                                    } catch (err) {
+                                                        alert('Upload failed');
+                                                    } finally {
+                                                        setUploadingImage(false);
+                                                    }
+                                                }}
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => document.getElementById('body-image-upload')?.click()}
+                                                disabled={uploadingImage}
+                                                className="flex items-center gap-1.5 px-3 py-1 bg-indigo-50 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400 rounded-lg text-[10px] font-bold uppercase transition-all hover:bg-indigo-100"
+                                            >
+                                                {uploadingImage ? <Loader className="w-3 h-3 animate-spin" /> : <Image className="w-3 h-3" />}
+                                                Add Image to Body
+                                            </button>
+                                        </div>
+                                    </div>
                                     <textarea
                                         rows={14}
                                         value={form.content}

@@ -2,7 +2,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { api } from '../services/api';
 import { Product, DashboardStats, User as UserType, Order } from '../types';
-import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, XCircle, X, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash } from 'lucide-react';
+
+import { Plus, Edit2, Trash2, Loader2, DollarSign, ShoppingBag, Users, Package, Search, Ban, CheckCircle, XCircle, X, Filter, Move, GripVertical, Upload, Image as Images, Mail, MessageSquare, Check, Trash, PenLine, Tag, Eye, ArrowRight } from 'lucide-react';
 import { ProductForm } from '../components/ProductForm';
 import { SortableProductList } from '../components/SortableProductList';
 import { BatchProductCreator } from '../components/BatchProductCreator';
@@ -17,7 +18,7 @@ import { StaffTab } from '../components/dashboard/StaffTab';
 import { CMSTab } from '../components/dashboard/CMSTab';
 
 export const AdminDashboard = () => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'staff' | 'cms'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'sellers' | 'users' | 'orders' | 'messages' | 'analytics' | 'staff' | 'cms' | 'blog'>('overview');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [users, setUsers] = useState<UserType[]>([]);
@@ -321,7 +322,7 @@ export const AdminDashboard = () => {
 
         {/* Tabs */}
         <div className="flex flex-wrap gap-2 mb-12 w-full animate-fade-up delay-100 overflow-x-auto pb-2">
-          {['overview', 'products', 'sellers', 'users', 'orders', 'messages', 'analytics', 'staff', 'cms'].map((tab) => (
+          {['overview', 'products', 'sellers', 'users', 'orders', 'messages', 'analytics', 'staff', 'cms', 'blog'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
@@ -1001,6 +1002,72 @@ export const AdminDashboard = () => {
 
           {activeTab === 'cms' && (
             <CMSTab />
+          )}
+
+          {activeTab === 'blog' && (
+            <div className="space-y-6 animate-fade-in">
+              <div className="bg-white dark:bg-gray-900 rounded-4xl shadow-sm border border-gray-100 dark:border-gray-800 p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 transition-colors">
+                <div className="flex items-center gap-5">
+                  <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-900/20 rounded-3xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 shadow-inner">
+                    <PenLine className="w-8 h-8" />
+                  </div>
+                  <div>
+                    <h3 className="font-black text-2xl text-gray-900 dark:text-white tracking-tight">Blog Management</h3>
+                    <p className="text-sm font-medium text-gray-500 dark:text-gray-400">Create, edit, and curate your store's style guides and journal.</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => window.open('/blogger', '_blank')}
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-indigo-600 text-white rounded-2xl hover:bg-indigo-700 font-black text-xs uppercase tracking-widest shadow-xl shadow-indigo-200 dark:shadow-indigo-900/40 transition-all hover:-translate-y-1 active:scale-95"
+                >
+                  <Plus className="w-4 h-4" /> Open Blogger Studio
+                </button>
+              </div>
+
+              {/* Stats & Quick Links */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="bg-white dark:bg-gray-900 rounded-4xl border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center text-center group hover:border-indigo-500 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-violet-50 dark:bg-violet-900/20 flex items-center justify-center text-violet-600 mb-4 group-hover:scale-110 transition-transform">
+                    <Images className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-1">Image Library</h4>
+                  <p className="text-xs text-gray-500 mb-4">Manage your blog assets and cover images.</p>
+                  <button onClick={() => window.open('/blogger', '_blank')} className="mt-auto text-[10px] font-black uppercase text-indigo-600 tracking-tighter hover:underline">Manage Assets &rarr;</button>
+                </div>
+
+                <div className="bg-white dark:bg-gray-900 rounded-4xl border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center text-center group hover:border-indigo-500 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-amber-50 dark:bg-amber-900/20 flex items-center justify-center text-amber-600 mb-4 group-hover:scale-110 transition-transform">
+                    <Tag className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-1">Categories</h4>
+                  <p className="text-xs text-gray-500 mb-4">Organize posts into Style, Trends, and News.</p>
+                  <button onClick={() => window.open('/blogger', '_blank')} className="mt-auto text-[10px] font-black uppercase text-indigo-600 tracking-tighter hover:underline">Edit Categories &rarr;</button>
+                </div>
+
+                <div className="bg-white dark:bg-gray-900 rounded-4xl border border-gray-100 dark:border-gray-800 p-8 flex flex-col items-center text-center group hover:border-indigo-500 transition-colors">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600 mb-4 group-hover:scale-110 transition-transform">
+                    <Eye className="w-6 h-6" />
+                  </div>
+                  <h4 className="font-bold text-gray-900 dark:text-white mb-1">Visibility</h4>
+                  <p className="text-xs text-gray-500 mb-4">Publish, feature, or hide posts from the frontend.</p>
+                  <button onClick={() => window.open('/blogger', '_blank')} className="mt-auto text-[10px] font-black uppercase text-indigo-600 tracking-tighter hover:underline">Check Status &rarr;</button>
+                </div>
+              </div>
+
+              {/* Info Table Placeholder */}
+              <div className="bg-gray-900 rounded-4xl p-12 text-center border border-gray-800 relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+                <PenLine className="w-12 h-12 text-gray-700 mx-auto mb-4 group-hover:text-indigo-500 transition-colors" />
+                <h4 className="text-white font-black text-xl mb-2 tracking-tight">The Professional Blogger Studio</h4>
+                <p className="text-gray-400 text-sm max-w-md mx-auto mb-8 font-medium">Use our dedicated standalone editor for distraction-free writing, rich HTML support, and multi-image uploads.</p>
+                <button
+                  onClick={() => window.open('/blogger', '_blank')}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 bg-white text-black rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-indigo-50 transition-colors"
+                >
+                  Launch Studio <ArrowRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
           )}
         </div>
 

@@ -5,6 +5,8 @@ import { BlogPost } from '../types';
 import { Clock, Eye, ChevronRight, PenLine, Tag } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSEO } from '../hooks/useSEO';
+import { useAuth } from '../context/AuthContext';
+import { Settings, Plus } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Style', 'Trends', 'Care', 'News', 'Lookbook'];
 
@@ -74,11 +76,10 @@ const FeaturedCard = ({ post }: { post: BlogPost }) => (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                            post.imageFit === 'contain' ? 'object-contain' :
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${post.imageFit === 'contain' ? 'object-contain' :
                             post.imageFit === 'fill' ? 'object-fill' :
-                            'object-cover'
-                        }`}
+                                'object-cover'
+                            }`}
                         style={{ minHeight: '320px', maxHeight: '400px' }}
                         onError={e => {
                             const img = e.target as HTMLImageElement;
@@ -159,11 +160,10 @@ const PostCard = ({ post, index }: { post: BlogPost; index: number }) => (
                     <img
                         src={post.coverImage}
                         alt={post.title}
-                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${
-                            post.imageFit === 'contain' ? 'object-contain' :
+                        className={`w-full h-full transition-transform duration-500 group-hover:scale-105 ${post.imageFit === 'contain' ? 'object-contain' :
                             post.imageFit === 'fill' ? 'object-fill' :
-                            'object-cover'
-                        }`}
+                                'object-cover'
+                            }`}
                         onError={e => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
                 ) : (
@@ -210,6 +210,7 @@ export const Blog = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
     const [activeCategory, setActiveCategory] = useState('All');
+    const { user } = useAuth();
 
     useSEO({
         title: 'Fashion Blog — Style Guides, Trends & Lookbooks | SmartShop',
@@ -259,11 +260,21 @@ export const Blog = () => {
                                 Style guides, trend reports, care tips &amp; lookbooks from our editors and community.
                             </p>
                         </div>
-                        {posts.length > 0 && (
-                            <p className="text-xs text-gray-400 shrink-0 hidden sm:block">
-                                {posts.length} {posts.length === 1 ? 'post' : 'posts'}
-                            </p>
-                        )}
+                        <div className="flex flex-col items-end gap-3 shrink-0">
+                            {(user?.role === 'admin' || user?.role === 'blogger') && (
+                                <Link
+                                    to="/blogger"
+                                    className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-indigo-200 dark:shadow-none"
+                                >
+                                    <Plus className="w-3.5 h-3.5" /> Create Post
+                                </Link>
+                            )}
+                            {posts.length > 0 && (
+                                <p className="text-[10px] uppercase font-black tracking-widest text-gray-400 hidden sm:block">
+                                    {posts.length} {posts.length === 1 ? 'post' : 'posts'}
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
 
