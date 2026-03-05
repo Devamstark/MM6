@@ -352,10 +352,10 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
             </div>
 
             {/* Right: Icons */}
-            <div className="flex items-center gap-5">
+            <div className="flex items-center gap-2 sm:gap-5">
               <button
                 onClick={() => setIsThemeOpen(true)}
-                className="text-gray-900 hover:text-primary transition-colors dark:text-gray-200"
+                className="hidden md:block text-gray-900 hover:text-primary transition-colors dark:text-gray-200"
                 title="Theme Settings"
               >
                 <Settings className="w-5 h-5" />
@@ -457,6 +457,13 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                         >
                           <Package className="w-4 h-4 text-gray-400" /> Order History
                         </Link>
+
+                        <button
+                          onClick={() => { setIsThemeOpen(true); setIsUserMenuOpen(false); }}
+                          className="md:hidden w-full flex items-center gap-3 px-4 py-2.5 text-sm font-bold hover:bg-gray-50 text-gray-700 dark:text-gray-300 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                        >
+                          <Settings className="w-4 h-4 text-gray-400" /> Theme & Display
+                        </button>
                       </div>
 
                       <div className="mt-2 pt-2 border-t border-gray-100 dark:border-gray-800 px-2 text-center">
@@ -918,7 +925,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
               </button>
 
               <Link
-                to="/page/about-us"
+                to="/about"
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-gray-900 hover:bg-gray-50 transition-colors dark:text-gray-200 dark:hover:bg-gray-800"
               >
@@ -948,7 +955,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
       {/* Cart Drawer */}
       {
         cartOpen && (
-          <div className="fixed inset-0 z-[2000] overflow-hidden">
+          <div className="fixed inset-0 z-2000 overflow-hidden">
             <div
               className="absolute inset-0 bg-gray-900/20 backdrop-blur-sm transition-opacity"
               onClick={() => setCartOpen(false)}
@@ -1004,7 +1011,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                               <div>
                                 <div className="flex justify-between text-base font-medium text-gray-900 dark:text-white">
                                   <h3 className="line-clamp-2 pr-4 leading-tight">{item.name}</h3>
-                                  <p className="whitespace-nowrap font-bold text-primary">${(item.price * item.quantity).toFixed(2)}</p>
+                                  <p className="whitespace-nowrap font-bold text-primary">${((item.salePrice || item.price) * item.quantity).toFixed(2)}</p>
                                 </div>
                                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{item.brand}</p>
                               </div>
@@ -1138,7 +1145,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 <li><Link to="/contact" className="block py-1 pr-3 hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all duration-200 text-sm text-gray-500 dark:text-gray-400">Contact</Link></li>
                 <li><Link to="/blog" className="block py-1 pr-3 hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all duration-200 text-sm text-gray-500 dark:text-gray-400">Blog</Link></li>
                 {!isAdmin && <li><Link to="/affiliate" className="block py-1 pr-3 hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all duration-200 text-sm text-gray-500 dark:text-gray-400">Affiliate</Link></li>}
-                {!isAdmin && <li><Link to="/bonus-points" className="block py-1 pr-3 hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all duration-200 text-sm text-gray-500 dark:text-gray-400">Bonus Points</Link></li>}
+                {!isAdmin && <li><Link to="/points" className="block py-1 pr-3 hover:text-indigo-600 dark:hover:text-indigo-400 hover:translate-x-1 transition-all duration-200 text-sm text-gray-500 dark:text-gray-400">Bonus Points</Link></li>}
               </ul>
             </div>
 
@@ -1189,7 +1196,7 @@ export const Layout = ({ children }: { children: React.ReactNode }) => {
                 434 Main St, New Rochelle, NY 10801
               </p>
             </div>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-4 sm:gap-6">
               <Link to="/page/privacy-policy" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Privacy Policy</Link>
               <Link to="/page/terms-of-service" className="text-xs text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors">Terms of Service</Link>
               <div className="flex items-center gap-4 pl-4 border-l border-gray-200 dark:border-gray-700">

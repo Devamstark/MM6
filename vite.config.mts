@@ -16,7 +16,7 @@ export default defineConfig({
                     // Animation library (large, only needed when animations play)
                     'vendor-motion': ['framer-motion'],
                     // Radix UI primitives
-                    'vendor-radix': ['@radix-ui/react-tabs', '@radix-ui/react-tooltip'],
+                    'vendor-radix': ['@radix-ui/react-tabs'],
                     // Icons tree-shaken but still worth splitting
                     'vendor-icons': ['lucide-react'],
                 },

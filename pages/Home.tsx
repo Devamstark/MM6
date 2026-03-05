@@ -94,7 +94,7 @@ export const Home = () => {
 
   const slideVariants = {
     enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
+      x: direction > 0 ? '100%' : '-100%',
       opacity: 0
     }),
     center: {
@@ -104,7 +104,7 @@ export const Home = () => {
     },
     exit: (direction: number) => ({
       zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
+      x: direction < 0 ? '100%' : '-100%',
       opacity: 0
     })
   };
@@ -472,21 +472,21 @@ export const Home = () => {
           transition={{ duration: 0.6 }}
           className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 mt-16"
         >
-          <div className="bg-primary/5 border border-primary/20 rounded-[2.5rem] p-8 md:p-12 flex flex-col md:flex-row items-center justify-between gap-8 relative overflow-hidden group dark:bg-primary/10 dark:border-primary/30">
+          <div className="bg-primary/5 border border-primary/20 rounded-3xl md:rounded-[2.5rem] p-5 sm:p-8 md:p-12 flex flex-col items-center justify-between gap-6 md:gap-8 md:flex-row relative overflow-hidden group dark:bg-primary/10 dark:border-primary/30">
             {/* ... banner content ... */}
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
             <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-colors duration-500"></div>
 
-            <div className="flex items-center gap-8 z-10">
-              <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary/40 rotate-12 group-hover:rotate-0 transition-transform duration-500">
-                <Zap className="w-10 h-10 fill-current" />
+            <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-8 z-10 text-center sm:text-left">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 bg-primary rounded-2xl sm:rounded-3xl flex items-center justify-center text-white shadow-2xl shadow-primary/40 rotate-12 group-hover:rotate-0 transition-transform duration-500 shrink-0">
+                <Zap className="w-8 h-8 sm:w-10 sm:h-10 fill-current" />
               </div>
               <div>
-                <div className="flex items-center gap-3 mb-2">
+                <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 sm:gap-3 mb-2">
                   <span className="px-3 py-1 bg-primary text-white text-[10px] font-black uppercase rounded-full tracking-tighter">Limited Time</span>
-                  <h2 className="text-4xl font-black uppercase text-primary italic font-heading tracking-tighter">Flash Sale</h2>
+                  <h2 className="text-2xl sm:text-4xl font-black uppercase text-primary italic font-heading tracking-tighter">Flash Sale</h2>
                 </div>
-                <p className="text-gray-500 font-bold text-lg uppercase tracking-tight dark:text-gray-400">Up to <span className="text-black dark:text-white">60% OFF</span> on {flashSaleProducts.length} curated items</p>
+                <p className="text-gray-500 font-bold text-sm sm:text-lg uppercase tracking-tight dark:text-gray-400">Up to <span className="text-black dark:text-white">60% OFF</span> on {flashSaleProducts.length} curated items</p>
               </div>
             </div>
 
@@ -496,7 +496,7 @@ export const Home = () => {
 
             <Link
               to="/products?flash_sale=true"
-              className="px-12 py-5 bg-black text-white font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition-all shadow-2xl hover:shadow-black/20 hover:-translate-y-1 z-10 group-hover:scale-105 dark:bg-white dark:text-black dark:hover:bg-gray-200 dark:hover:shadow-white/20"
+              className="w-full sm:w-auto text-center px-8 sm:px-12 py-4 sm:py-5 bg-black text-white font-black uppercase tracking-widest rounded-2xl hover:bg-gray-800 transition-all shadow-2xl hover:shadow-black/20 hover:-translate-y-1 z-10 group-hover:scale-105 dark:bg-white dark:text-black dark:hover:bg-gray-200 dark:hover:shadow-white/20 text-sm sm:text-base"
             >
               Shop the Drop
             </Link>
@@ -512,7 +512,7 @@ export const Home = () => {
         </div>
 
         {contentLoading ? (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 sm:gap-x-6 gap-y-8 sm:gap-y-12">
             <SkeletonCard count={10} />
           </div>
         ) : (
@@ -520,7 +520,7 @@ export const Home = () => {
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-6 gap-y-12"
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-x-3 sm:gap-x-6 gap-y-8 sm:gap-y-12"
           >
             {featuredProducts.map((p, i) => (
               <ProductCard key={p.id} product={p} index={i} priority={i < 4} />

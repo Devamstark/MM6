@@ -134,7 +134,7 @@ export const Cart = () => {
                                                 <Link to={`/product/${item.id}`} className="text-xl font-bold text-gray-900 dark:text-white hover:text-indigo-600 transition-colors line-clamp-2 pr-8">{item.name}</Link>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-xl font-black text-gray-900 dark:text-white">${item.price.toFixed(2)}</p>
+                                                <p className="text-xl font-black text-gray-900 dark:text-white">${(item.salePrice || item.price).toFixed(2)}</p>
                                                 {item.price > 100 && <p className="text-[10px] text-green-600 font-bold uppercase tracking-tighter">Express Available</p>}
                                             </div>
                                         </div>

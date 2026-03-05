@@ -53,9 +53,10 @@ function App() {
                                     <Route path="contact" element={<Contact />} />
                                     <Route path="faq" element={<FAQ />} />
                                     <Route path="about" element={<AboutUs />} />
+                                    <Route path="page/about-us" element={<Navigate to="/about" replace />} />
                                     <Route path="page/:slug" element={<StaticPage />} />
-                                    <Route path="terms" element={<StaticPage page="terms" />} />
-                                    <Route path="privacy" element={<StaticPage page="privacy" />} />
+                                    <Route path="terms" element={<StaticPage page="terms-of-service" />} />
+                                    <Route path="privacy" element={<StaticPage page="privacy-policy" />} />
                                     <Route path="blog" element={<Blog />} />
                                     <Route path="blog/:slug" element={<BlogPostDetail />} />
                                     <Route element={<ProtectedRoute allowedRoles={['user', 'seller', 'admin']} />}>
