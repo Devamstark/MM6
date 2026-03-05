@@ -47,6 +47,7 @@ router.register(r'audit-logs', AuditLogViewSet, basename='audit-logs')
 urlpatterns = [
     path('payments/create-payment-intent/', CreatePaymentIntentView.as_view(), name='create_payment_intent'),
     path('payments/webhook/', StripeWebhookView.as_view(), name='stripe_webhook'),
+    path('blog/upload-image/', BlogImageView.as_view(), name='blog-upload-image'),
     path('', include(router.urls)),
     path('auth/login/', SecureTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
@@ -57,7 +58,6 @@ urlpatterns = [
     path('auth/password-reset/confirm/', ResetPasswordView.as_view(), name='password_reset_confirm'),
     path('inquiries/', SubmitInquiryView.as_view(), name='submit_inquiry'),
     path('dashboard/stats/', DashboardStatsView.as_view(), name='dashboard_stats'),
-    path('blog/upload-image/', BlogImageView.as_view(), name='blog-upload-image'),
     path('auth/telegram/', TelegramLoginView.as_view(), name='auth_telegram'),
     path('webhooks/telegram/', TelegramWebhookView.as_view(), name='telegram_webhook'),
     path('health/', HealthCheckView.as_view(), name='health_check'),

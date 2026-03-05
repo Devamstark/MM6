@@ -1449,8 +1449,9 @@ class BlogImageView(APIView):
         filepath = f"blog_covers/{filename}"
 
         # Save file
-        path = default_storage.save(filepath, ContentFile(image.read()))
-        url = default_storage.url(path)
+        saved_path = default_storage.save(filepath, ContentFile(image.read()))
+        # Use absolute URI to avoid issues across subdomains
+        url = request.build_absolute_uri(default_storage.url(saved_path))
 
         return Response({
             'url': url,
